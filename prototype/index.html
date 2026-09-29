@@ -3,37 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ostrum — Digital Systems & Transformation Studio (Phase 00 Prototype)</title>
-  <meta name="description" content="Ostrum unifies brand craft, web products, custom business systems (ERP/CRM), and autonomous AI automation.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%230A4DDE'/></svg>">
+  <title>Ostrum — Technology & Design for Ambitious Businesses</title>
+  <meta name="description" content="We design your brand, build your website, connect your business systems (ERP/CRM), and automate the busywork so your company can grow.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23C84B31'/></svg>">
   
-  <!-- Preload Typography -->
+  <!-- Typography Preconnect & Load -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@1,6..72,400&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --canvas-base: #FBFBFC;
+      /* Multi-Color Architectural Light Palette */
+      --canvas-warm: #FAF8F5;
+      --canvas-pearl: #FDFCFA;
+      --canvas-cool: #F4F6F8;
       --surface-card: #FFFFFF;
-      --surface-muted: #F4F4F6;
-      --surface-hover: #EBECEF;
-      --border-subtle: #E4E5EA;
-      --border-strong: #D0D2DA;
-      --text-obsidian: #0E1017;
-      --text-slate: #525866;
-      --text-muted: #868C98;
-      --accent-cobalt: #0A4DDE;
-      --accent-cobalt-hover: #083DB2;
-      --accent-cobalt-tint: #EFF4FE;
-      --signal-warm: #E35A27;
-      --signal-emerald: #059669;
+      --surface-bisque: #F3EFEA;
+      --surface-tint-cool: #EDF2F7;
+      --surface-hover: #EFEBE4;
+      
+      /* Inks & Contrast Typography */
+      --text-ink: #141413;       /* 17.5:1 AAA on warm canvas */
+      --text-slate: #4D5159;     /* 6.8:1 AA body contrast */
+      --text-muted: #7E828A;     /* 4.2:1 captions & indexes */
+      --text-inverse: #FFFFFF;
+
+      /* Multi-Color Harmonic Accents */
+      --accent-terracotta: #C84B31;
+      --accent-terracotta-hover: #AF3C24;
+      --accent-terracotta-tint: #FDF3F0;
+      --accent-indigo: #1F3A60;
+      --accent-indigo-tint: #F0F4FA;
+      --accent-sage: #2E5A44;
+      --accent-sage-tint: #EDF7F1;
+      --accent-amber: #D97706;
+      --accent-plum: #58354A;
+
+      /* Structural Hairlines */
+      --border-subtle: #E8E4DC;
+      --border-strong: #D6D1C6;
+      --border-focus: #C84B31;
+
+      /* Named Atmospheric Gradients */
+      --gradient-dawn: linear-gradient(135deg, #FAF8F5 0%, #F5EFEB 50%, #EEF2F6 100%);
+      --gradient-warm-peach: linear-gradient(135deg, rgba(254, 243, 235, 0.9) 0%, rgba(253, 238, 233, 0.45) 50%, rgba(250, 248, 245, 0) 100%);
+      --gradient-mist-sky: linear-gradient(135deg, rgba(235, 243, 250, 0.75) 0%, rgba(240, 245, 249, 0.35) 100%);
+      --gradient-sage-glow: linear-gradient(135deg, rgba(237, 247, 241, 0.85) 0%, rgba(245, 250, 247, 0.3) 100%);
+      --gradient-ink-shimmer: linear-gradient(180deg, #1C1C1B 0%, #10100F 100%);
+
+      /* Geometry & Spacing */
       --radius-sm: 6px;
       --radius-md: 8px;
-      --radius-lg: 12px;
+      --radius-lg: 14px;
       --radius-full: 9999px;
+      
       --font-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      --font-editorial: 'Newsreader', serif;
+      --font-editorial: 'Instrument Serif', Georgia, serif;
       --font-body: 'Inter', -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
@@ -44,12 +70,16 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      background-color: var(--canvas-base);
+      background-color: var(--canvas-warm);
       color: var(--text-slate);
       font-family: var(--font-body);
       font-size: 16px;
-      line-height: 1.6;
+      line-height: 1.65;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
@@ -57,59 +87,62 @@
     /* Accessibility Skip Link */
     .skip-link {
       position: absolute;
-      top: -40px;
-      left: 16px;
-      background: var(--accent-cobalt);
-      color: #FFFFFF;
-      padding: 8px 16px;
+      top: -44px;
+      left: 20px;
+      background: var(--text-ink);
+      color: var(--text-inverse);
+      padding: 10px 18px;
       font-weight: 500;
       border-radius: var(--radius-sm);
       z-index: 999;
-      transition: top 0.2s;
+      transition: top 0.2s ease;
+      text-decoration: none;
+      font-size: 14px;
     }
     .skip-link:focus {
       top: 16px;
     }
 
-    /* Focus States */
+    /* Accessible Focus Ring */
     :focus-visible {
-      outline: 2px solid var(--accent-cobalt);
-      outline-offset: 2px;
+      outline: 2px solid var(--accent-terracotta);
+      outline-offset: 3px;
     }
 
-    /* Container */
+    /* Container Grid */
     .container {
       max-width: 1240px;
       margin: 0 auto;
-      padding: 0 24px;
+      padding: 0 32px;
     }
 
-    /* Header Nav */
+    /* Navigation Header */
     header {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(251, 251, 252, 0.88);
-      backdrop-filter: blur(12px);
+      background: rgba(250, 248, 245, 0.88);
+      backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.2s;
     }
     .nav-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 72px;
+      height: 76px;
     }
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       text-decoration: none;
-      color: var(--text-obsidian);
+      color: var(--text-ink);
     }
     .brand-wordmark {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: 20px;
+      font-size: 21px;
       letter-spacing: -0.04em;
     }
     .status-badge {
@@ -118,31 +151,32 @@
       gap: 6px;
       font-family: var(--font-mono);
       font-size: 11px;
-      background: var(--surface-muted);
+      background: var(--surface-bisque);
       border: 1px solid var(--border-subtle);
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: var(--radius-full);
-      color: var(--text-slate);
+      color: var(--text-ink);
+      letter-spacing: 0.02em;
     }
     .status-dot {
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: var(--signal-emerald);
+      background: var(--accent-sage);
     }
     nav.nav-links {
       display: flex;
-      gap: 32px;
+      gap: 28px;
     }
     nav.nav-links a {
       color: var(--text-slate);
       text-decoration: none;
       font-size: 14px;
       font-weight: 500;
-      transition: color 0.15s;
+      transition: color 0.15s ease;
     }
     nav.nav-links a:hover {
-      color: var(--text-obsidian);
+      color: var(--text-ink);
     }
 
     /* Buttons */
@@ -159,42 +193,61 @@
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       border: 1px solid transparent;
-      padding: 10px 22px;
+      padding: 11px 24px;
+      letter-spacing: -0.01em;
     }
     .btn-primary {
-      background: var(--accent-cobalt);
-      color: #FFFFFF;
+      background: var(--gradient-ink-shimmer);
+      color: var(--text-inverse);
+      box-shadow: 0 2px 6px rgba(20, 20, 19, 0.08);
     }
     .btn-primary:hover {
-      background: var(--accent-cobalt-hover);
+      background: var(--accent-terracotta);
+      color: #FFFFFF;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(200, 75, 49, 0.22);
+    }
+    .btn-terracotta {
+      background: var(--accent-terracotta);
+      color: #FFFFFF;
+    }
+    .btn-terracotta:hover {
+      background: var(--accent-terracotta-hover);
       transform: translateY(-1px);
     }
     .btn-secondary {
       background: var(--surface-card);
       border-color: var(--border-strong);
-      color: var(--text-obsidian);
+      color: var(--text-ink);
     }
     .btn-secondary:hover {
-      background: var(--surface-muted);
+      background: var(--surface-bisque);
+      border-color: var(--text-muted);
     }
 
-    /* Section Styles */
-    section {
-      padding: 96px 0;
-      border-bottom: 1px solid var(--border-subtle);
-    }
+    /* Typography Classes */
     .kicker {
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11.5px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--accent-cobalt);
+      letter-spacing: 0.06em;
+      color: var(--accent-terracotta);
       margin-bottom: 16px;
-      display: block;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+    .kicker::before {
+      content: "";
+      display: inline-block;
+      width: 14px;
+      height: 1px;
+      background: var(--accent-terracotta);
     }
     h1, h2, h3 {
       font-family: var(--font-display);
-      color: var(--text-obsidian);
+      color: var(--text-ink);
       letter-spacing: -0.035em;
       line-height: 1.12;
     }
@@ -203,367 +256,567 @@
       font-style: italic;
       font-weight: 400;
       letter-spacing: -0.01em;
+      color: var(--text-ink);
+    }
+    .lead-text {
+      font-size: clamp(17px, 1.8vw, 20px);
+      color: var(--text-slate);
+      line-height: 1.6;
+    }
+
+    /* Section Spacing & Atmospheric Grounds */
+    section {
+      padding: 120px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      position: relative;
+    }
+    .section-pearl {
+      background-color: var(--canvas-pearl);
+    }
+    .section-cool {
+      background-color: var(--canvas-cool);
+    }
+    .section-bisque {
+      background-color: var(--surface-bisque);
     }
 
     /* Hero Section */
+    .hero-wrap {
+      background: var(--gradient-dawn);
+      padding: 60px 0 80px;
+    }
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 48px;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 56px;
       align-items: center;
-      padding: 40px 0 60px;
     }
     .hero-title {
-      font-size: clamp(40px, 5.5vw, 68px);
+      font-size: clamp(42px, 5.2vw, 70px);
       margin-bottom: 24px;
+      font-weight: 800;
+      line-height: 1.08;
     }
     .hero-lead {
-      font-size: clamp(16px, 1.8vw, 19px);
-      line-height: 1.6;
+      font-size: clamp(17px, 1.7vw, 20px);
       color: var(--text-slate);
+      line-height: 1.65;
       margin-bottom: 36px;
-      max-width: 540px;
+      max-width: 560px;
     }
     .hero-actions {
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
     }
-    .hero-visual {
+    .hero-stage {
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
       padding: 32px;
+      box-shadow: 0 8px 32px -4px rgba(20, 20, 19, 0.05);
       position: relative;
-      box-shadow: 0 4px 20px -2px rgba(14, 16, 23, 0.04);
     }
-    .topology-header {
+    .stage-header {
       display: flex;
       justify-content: space-between;
       font-family: var(--font-mono);
       font-size: 11px;
       color: var(--text-muted);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       padding-bottom: 12px;
       border-bottom: 1px solid var(--border-subtle);
     }
-    .topology-nodes {
+    .stage-nodes {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
-    .node-row {
+    .stage-node {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--surface-muted);
+      background: var(--canvas-warm);
       border: 1px solid var(--border-subtle);
-      padding: 12px 16px;
+      padding: 14px 18px;
       border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+    .stage-node:hover {
+      border-color: var(--accent-terracotta);
+      background: var(--accent-terracotta-tint);
+    }
+    .node-label {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-ink);
+    }
+    .node-tag {
       font-family: var(--font-mono);
-      font-size: 13px;
-      color: var(--text-obsidian);
-      transition: all 0.2s;
-    }
-    .node-row:hover {
-      border-color: var(--accent-cobalt);
-      background: var(--accent-cobalt-tint);
-    }
-    .node-pill {
       font-size: 11px;
-      padding: 2px 8px;
-      border-radius: var(--radius-full);
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
       color: var(--text-slate);
     }
 
-    /* Ticker */
-    .ticker-wrap {
-      display: flex;
-      gap: 24px;
-      overflow: hidden;
-      padding: 20px 0;
+    /* Technology Bar */
+    .tech-ticker-wrap {
+      margin-top: 56px;
+      padding-top: 32px;
       border-top: 1px solid var(--border-subtle);
-      border-bottom: 1px solid var(--border-subtle);
-      background: var(--surface-card);
-      margin-top: 40px;
-    }
-    .ticker-item {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text-muted);
-      white-space: nowrap;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .tech-title {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+    .tech-badges {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .tech-badge {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      color: var(--text-slate);
     }
 
-    /* Fragmentation Section */
+    /* Problem / Fragmentation Section */
     .problem-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      margin-top: 48px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 52px;
     }
     .problem-card {
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      padding: 28px;
-      transition: transform 0.2s;
+      padding: 32px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
     .problem-card:hover {
       transform: translateY(-2px);
       border-color: var(--border-strong);
     }
     .problem-card h3 {
-      font-size: 18px;
-      margin-bottom: 8px;
+      font-size: 19px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+    }
+    .problem-icon {
+      color: var(--accent-terracotta);
+      font-size: 16px;
+      font-weight: 700;
     }
     .problem-card p {
-      font-size: 14px;
+      font-size: 14.5px;
       color: var(--text-slate);
-    }
-    .cross-icon {
-      color: var(--signal-warm);
-      font-weight: 800;
+      line-height: 1.6;
     }
 
-    /* Ostrum System Section */
+    /* Ostrum System Layers */
     .system-stack {
       display: flex;
       flex-direction: column;
       gap: 16px;
       margin-top: 48px;
     }
-    .system-layer {
+    .system-card {
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      padding: 24px 32px;
+      padding: 28px 36px;
       display: grid;
-      grid-template-columns: 180px 1fr auto;
+      grid-template-columns: 160px 1fr auto;
       align-items: center;
       gap: 24px;
+      transition: all 0.2s ease;
       cursor: pointer;
-      transition: all 0.2s;
     }
-    .system-layer:hover, .system-layer.active {
-      border-color: var(--accent-cobalt);
-      box-shadow: 0 6px 20px -4px rgba(10, 77, 222, 0.08);
+    .system-card:hover, .system-card.active {
+      border-color: var(--accent-terracotta);
+      box-shadow: 0 8px 24px -4px rgba(200, 75, 49, 0.08);
+      background: var(--canvas-pearl);
     }
     .layer-index {
       font-family: var(--font-mono);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
-      color: var(--accent-cobalt);
+      color: var(--accent-terracotta);
+      letter-spacing: 0.04em;
     }
-    .layer-title {
-      font-family: var(--font-display);
+    .layer-heading {
+      font-size: 20px;
       font-weight: 700;
-      font-size: 18px;
-      color: var(--text-obsidian);
       margin-bottom: 4px;
     }
-    .layer-desc {
-      font-size: 14px;
+    .layer-text {
+      font-size: 14.5px;
       color: var(--text-slate);
     }
 
     /* Capabilities Tabs */
-    .tab-pills {
+    .cap-tabs {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
-      margin: 36px 0 24px;
+      margin: 40px 0 24px;
     }
-    .tab-btn {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      padding: 8px 18px;
+    .cap-tab-btn {
+      font-family: var(--font-display);
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 10px 20px;
       border-radius: var(--radius-full);
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
       color: var(--text-slate);
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.15s ease;
     }
-    .tab-btn.active, .tab-btn:hover {
-      background: var(--accent-cobalt);
-      border-color: var(--accent-cobalt);
-      color: #FFFFFF;
+    .cap-tab-btn.active, .cap-tab-btn:hover {
+      background: var(--text-ink);
+      color: var(--text-inverse);
+      border-color: var(--text-ink);
     }
-    .tab-panel {
+    .cap-panel {
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      padding: 36px;
+      padding: 40px;
+      box-shadow: 0 4px 16px rgba(20, 20, 19, 0.02);
     }
-    .capability-grid {
+    .cap-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 24px;
+      gap: 28px;
     }
     .cap-item h4 {
-      font-family: var(--font-display);
-      font-size: 16px;
-      color: var(--text-obsidian);
-      margin-bottom: 6px;
+      font-size: 17px;
+      margin-bottom: 8px;
+      color: var(--text-ink);
     }
     .cap-item p {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-slate);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    /* Selected Work */
+    /* Selected Work Cards */
     .work-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 32px;
+      gap: 36px;
       margin-top: 48px;
     }
-    .case-card {
+    .work-card {
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: all 0.2s;
+      transition: all 0.25s ease;
     }
-    .case-card:hover {
+    .work-card:hover {
       border-color: var(--border-strong);
       transform: translateY(-3px);
+      box-shadow: 0 12px 28px -4px rgba(20, 20, 19, 0.06);
     }
-    .case-media {
-      height: 240px;
-      background: var(--surface-muted);
+    .work-preview {
+      height: 230px;
+      background: var(--gradient-mist-sky);
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text-muted);
+      padding: 24px;
+      text-align: center;
     }
-    .case-body {
-      padding: 28px;
-      flex: 1;
-    }
-    .case-sector {
+    .work-preview-tag {
       font-family: var(--font-mono);
       font-size: 11px;
-      color: var(--accent-cobalt);
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .case-body h3 {
-      font-size: 20px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      color: var(--accent-indigo);
       margin-bottom: 12px;
     }
-    .case-body p {
-      font-size: 14px;
-      color: var(--text-slate);
-      margin-bottom: 20px;
+    .work-preview-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--text-ink);
     }
-    .case-metric {
+    .work-content {
+      padding: 32px;
+      flex: 1;
+    }
+    .work-type {
       font-family: var(--font-mono);
-      font-size: 12px;
-      background: var(--surface-muted);
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      color: var(--text-obsidian);
+      font-size: 11px;
+      color: var(--accent-terracotta);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .work-content h3 {
+      font-size: 21px;
+      margin-bottom: 12px;
+    }
+    .work-content p {
+      font-size: 14.5px;
+      color: var(--text-slate);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .work-outcome-box {
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      background: var(--surface-bisque);
       border: 1px solid var(--border-subtle);
-      display: inline-block;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      color: var(--text-ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .work-outcome-box strong {
+      color: var(--accent-sage);
     }
 
-    /* Stack Builder Configurator */
-    .configurator-wrap {
+    /* Before & After */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 48px;
+    }
+    .compare-col {
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      padding: 40px;
-      margin-top: 48px;
+      padding: 36px;
     }
-    .pill-selector {
+    .compare-col.after-col {
+      border-color: var(--accent-sage);
+      background: var(--gradient-sage-glow);
+    }
+    .compare-header {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+    }
+    .compare-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .compare-list li {
+      font-size: 14.5px;
+      display: flex;
+      gap: 12px;
+      line-height: 1.5;
+    }
+
+    /* AI Section Simulation Terminal */
+    .ai-console {
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 40px;
+      box-shadow: 0 8px 30px -4px rgba(20, 20, 19, 0.04);
+    }
+    .ai-console-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface-bisque);
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-slate);
+    }
+    .ai-console-body {
+      padding: 28px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.75;
+      color: var(--text-ink);
+      background: var(--canvas-pearl);
+    }
+    .scenario-nav {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    /* Custom Estimator Stack Builder */
+    .estimator-box {
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 44px;
+      margin-top: 48px;
+      box-shadow: 0 4px 20px rgba(20, 20, 19, 0.03);
+    }
+    .pill-group {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 32px;
+      margin-bottom: 36px;
     }
-    .select-pill {
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-weight: 500;
-      padding: 10px 18px;
+    .stack-pill {
+      font-family: var(--font-display);
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 10px 20px;
       border-radius: var(--radius-full);
-      background: var(--surface-muted);
+      background: var(--surface-bisque);
       border: 1px solid var(--border-subtle);
-      color: var(--text-obsidian);
+      color: var(--text-ink);
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.15s ease;
     }
-    .select-pill.active {
-      background: var(--accent-cobalt);
-      border-color: var(--accent-cobalt);
+    .stack-pill.active {
+      background: var(--text-ink);
+      border-color: var(--text-ink);
       color: #FFFFFF;
     }
-    .stack-preview-box {
-      background: var(--canvas-base);
+    .estimator-summary {
+      background: var(--canvas-warm);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
-      padding: 24px;
+      padding: 24px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 20px;
     }
-    .stack-stats {
+    .estimator-meta {
       font-family: var(--font-mono);
-      font-size: 13px;
+      font-size: 13.5px;
       color: var(--text-slate);
     }
-    .stack-stats strong {
-      color: var(--accent-cobalt);
+    .estimator-meta strong {
+      color: var(--text-ink);
     }
 
-    /* AI Lab Demo */
-    .terminal-window {
+    /* Process Roadmap */
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .process-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 28px 24px;
+    }
+    .process-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent-terracotta);
+      margin-bottom: 12px;
+      display: block;
+      font-weight: 500;
+    }
+    .process-card h3 {
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+    .process-card p {
+      font-size: 13.5px;
+      color: var(--text-slate);
+      line-height: 1.55;
+    }
+
+    /* Insights Articles */
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+      margin-top: 48px;
+    }
+    .insight-card {
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      overflow: hidden;
-      margin-top: 40px;
-      box-shadow: 0 4px 24px -4px rgba(14, 16, 23, 0.05);
-    }
-    .terminal-bar {
+      padding: 32px;
       display: flex;
+      flex-direction: column;
       justify-content: space-between;
-      align-items: center;
-      background: var(--surface-muted);
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border-subtle);
+      transition: all 0.2s ease;
+    }
+    .insight-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+    .insight-card h3 {
+      font-size: 19px;
+      margin: 12px 0;
+      line-height: 1.35;
+    }
+    .insight-meta {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 11.5px;
       color: var(--text-muted);
     }
-    .terminal-body {
-      padding: 24px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 1.7;
-      color: var(--text-obsidian);
+
+    /* Final CTA */
+    .cta-stage {
+      background: var(--gradient-warm-peach);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 80px 48px;
+      text-align: center;
+      margin-top: 40px;
     }
-    .scenario-btns {
-      display: flex;
-      gap: 8px;
-      margin-top: 20px;
+    .cta-stage h2 {
+      font-size: clamp(34px, 4.5vw, 56px);
+      max-width: 760px;
+      margin: 0 auto 20px;
+      line-height: 1.15;
+    }
+    .cta-stage p {
+      max-width: 580px;
+      margin: 0 auto 36px;
+      font-size: 17px;
+      color: var(--text-slate);
     }
 
     /* Footer */
@@ -574,27 +827,28 @@
     }
     .footer-grid {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 1fr;
-      gap: 40px;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 48px;
       margin-bottom: 60px;
     }
     .footer-brand h4 {
       font-family: var(--font-display);
       font-size: 20px;
       font-weight: 800;
-      color: var(--text-obsidian);
+      color: var(--text-ink);
       margin-bottom: 12px;
     }
     .footer-brand p {
-      font-size: 14px;
+      font-size: 14.5px;
       color: var(--text-slate);
       max-width: 320px;
+      line-height: 1.6;
     }
     .footer-col h5 {
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11.5px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       color: var(--text-muted);
       margin-bottom: 16px;
     }
@@ -608,10 +862,10 @@
       color: var(--text-slate);
       text-decoration: none;
       font-size: 14px;
-      transition: color 0.15s;
+      transition: color 0.15s ease;
     }
     .footer-col a:hover {
-      color: var(--accent-cobalt);
+      color: var(--accent-terracotta);
     }
     .footer-bottom {
       border-top: 1px solid var(--border-subtle);
@@ -625,144 +879,149 @@
       gap: 12px;
     }
 
-    /* Responsive */
+    /* Responsive Queries */
     @media (max-width: 900px) {
-      .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 40px; }
       .work-grid { grid-template-columns: 1fr; }
-      .system-layer { grid-template-columns: 1fr; gap: 12px; }
-      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .system-card { grid-template-columns: 1fr; gap: 12px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
       nav.nav-links { display: none; }
     }
     @media (max-width: 600px) {
       .footer-grid { grid-template-columns: 1fr; }
-      section { padding: 64px 0; }
+      .container { padding: 0 20px; }
+      section { padding: 72px 0; }
+      .cta-stage { padding: 48px 24px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- A11y Skip Link -->
+  <!-- Accessible Skip Link -->
   <a href="#main-content" class="skip-link">Skip to Main Content</a>
 
-  <!-- Header Nav -->
+  <!-- Header Navigation -->
   <header role="banner">
     <div class="container nav-inner">
       <a href="/" class="brand" aria-label="Ostrum Home">
         <span class="brand-wordmark">OSTRUM</span>
-        <span class="status-badge"><span class="status-dot"></span> Q4 2026 ENGAGEMENTS</span>
+        <span class="status-badge"><span class="status-dot"></span> OPEN FOR Q4 2026</span>
       </a>
-      <nav class="nav-links" aria-label="Main Navigation">
-        <a href="#problem">Fragmentation</a>
-        <a href="#system">The System</a>
-        <a href="#capabilities">Capabilities</a>
-        <a href="#work">Selected Work</a>
-        <a href="#stack-builder">Stack Builder</a>
-        <a href="#ai-lab">AI Lab</a>
+      <nav class="nav-links" aria-label="Main Site Navigation">
+        <a href="#problem">What We Solve</a>
+        <a href="#system">How It Works</a>
+        <a href="#capabilities">Services</a>
+        <a href="#work">Work</a>
+        <a href="#estimator">Custom Stack</a>
+        <a href="#contact">Contact</a>
       </nav>
       <a href="#contact" class="btn btn-primary" role="button">Start a Project ↗</a>
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- Main Landmark -->
   <main id="main-content" role="main">
 
-    <!-- 01. Hero -->
-    <section class="hero" aria-labelledby="hero-heading">
-      <div class="container hero-grid">
-        <div>
-          <span class="kicker">01 // Digital Systems & Transformation</span>
-          <h1 id="hero-heading" class="hero-title">
-            We engineer connected digital <span class="editorial-accent">ecosystems</span>.
-          </h1>
-          <p class="hero-lead">
-            Uniting brand craft, high-performance web products, custom enterprise business systems (ERP/CRM), and autonomous AI automation to build scalable organizations.
-          </p>
-          <div class="hero-actions">
-            <a href="#stack-builder" class="btn btn-primary">Build Your Stack ↗</a>
-            <a href="#system" class="btn btn-secondary">Explore The System ↓</a>
-          </div>
-        </div>
-        <div class="hero-visual" aria-label="Interactive System Topology Object">
-          <div class="topology-header">
-            <span>TOPOLOGY // CONNECTED NODES</span>
-            <span>SYSTEM LATENCY: 24MS</span>
-          </div>
-          <div class="topology-nodes">
-            <div class="node-row">
-              <span>01. BRAND & IDENTITY</span>
-              <span class="node-pill">Visual Token Engine</span>
-            </div>
-            <div class="node-row">
-              <span>02. DIGITAL EXPERIENCES</span>
-              <span class="node-pill">Next.js 15 PWA</span>
-            </div>
-            <div class="node-row">
-              <span>03. ENTERPRISE BUSINESS SYSTEMS</span>
-              <span class="node-pill">Custom ERP / CRM</span>
-            </div>
-            <div class="node-row">
-              <span>04. AUTONOMOUS AI AUTOMATION</span>
-              <span class="node-pill">WhatsApp / Voice Agent</span>
-            </div>
-            <div class="node-row">
-              <span>05. UNIFIED INTELLIGENCE</span>
-              <span class="node-pill">Real-Time BI</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tech Ticker -->
+    <!-- 01. Hero Section -->
+    <section class="hero-wrap" aria-labelledby="hero-title">
       <div class="container">
-        <div class="ticker-wrap" aria-label="Enterprise Technology Standards">
-          <div class="ticker-item">● NEXT.JS 15</div>
-          <div class="ticker-item">● TYPESCRIPT STRICT</div>
-          <div class="ticker-item">● TAILWIND CSS</div>
-          <div class="ticker-item">● PYTHON & FASTAPI</div>
-          <div class="ticker-item">● POSTGRESQL</div>
-          <div class="ticker-item">● WHATSAPP CLOUD API</div>
-          <div class="ticker-item">● DOCKER CONTAINERS</div>
-          <div class="ticker-item">● VERCEL EDGE</div>
-          <div class="ticker-item">● GEMINI API</div>
+        <div class="hero-grid">
+          <div>
+            <span class="kicker">Technology & Design Studio</span>
+            <h1 id="hero-title" class="hero-title">
+              We build the technology that helps ambitious businesses <span class="editorial-accent">grow</span>.
+            </h1>
+            <p class="hero-lead">
+              Most companies struggle with disconnected websites, manual spreadsheets, and messy software. We design your brand, build your website, connect your business systems, and automate the busywork.
+            </p>
+            <div class="hero-actions">
+              <a href="#estimator" class="btn btn-primary">Tell Us What You Need ↗</a>
+              <a href="#system" class="btn btn-secondary">See How It Works ↓</a>
+            </div>
+          </div>
+          
+          <div class="hero-stage" aria-label="Overview of Ostrum's Connected Approach">
+            <div class="stage-header">
+              <span>HOW YOUR BUSINESS CONNECTS</span>
+              <span>ONE UNIFIED ENGINE</span>
+            </div>
+            <div class="stage-nodes">
+              <div class="stage-node">
+                <span class="node-label">01. Brand & Creative</span>
+                <span class="node-tag">Earns Trust</span>
+              </div>
+              <div class="stage-node">
+                <span class="node-label">02. Modern Website & Store</span>
+                <span class="node-tag">Captures Leads</span>
+              </div>
+              <div class="stage-node">
+                <span class="node-label">03. Custom Business Tools (ERP/CRM)</span>
+                <span class="node-tag">Runs Operations</span>
+              </div>
+              <div class="stage-node">
+                <span class="node-label">04. Helpful AI Assistants</span>
+                <span class="node-tag">Automates Busywork</span>
+              </div>
+              <div class="stage-node">
+                <span class="node-label">05. Clear Business Dashboard</span>
+                <span class="node-tag">Shows Real Numbers</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tech Standards -->
+        <div class="tech-ticker-wrap" aria-label="Modern Engineering Foundations">
+          <span class="tech-title">Built With Reliable Modern Tools</span>
+          <div class="tech-badges">
+            <span class="tech-badge">Next.js 15</span>
+            <span class="tech-badge">TypeScript</span>
+            <span class="tech-badge">Tailwind CSS</span>
+            <span class="tech-badge">Python</span>
+            <span class="tech-badge">PostgreSQL</span>
+            <span class="tech-badge">WhatsApp API</span>
+            <span class="tech-badge">Vercel Edge</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- 02. Problem / Fragmentation -->
-    <section id="problem" aria-labelledby="problem-heading">
+    <!-- 02. Problem / Operational Reality -->
+    <section id="problem" class="section-pearl" aria-labelledby="problem-heading">
       <div class="container">
-        <span class="kicker">02 // The Operational Reality</span>
-        <h2 id="problem-heading" style="font-size: clamp(28px, 3.5vw, 44px); max-width: 800px; margin-bottom: 20px;">
-          Most businesses do not suffer from a lack of tools. They suffer from <span class="editorial-accent">fragmentation</span>.
+        <span class="kicker">The Real Problem</span>
+        <h2 id="problem-heading" style="font-size: clamp(28px, 3.6vw, 44px); max-width: 820px; margin-bottom: 20px;">
+          You don’t need more software. You need your software to <span class="editorial-accent">talk to each other</span>.
         </h2>
-        <p style="max-width: 640px; color: var(--text-slate); font-size: 17px;">
-          When your marketing, CRM, operations, billing, and communication tools operate in silos, your team becomes the human glue. Leads leak, operations stall, and growth degrades.
+        <p class="lead-text" style="max-width: 680px;">
+          When your website, CRM, and WhatsApp don’t connect, your team spends their day copying data across spreadsheets instead of serving customers.
         </p>
 
         <div class="problem-grid">
           <div class="problem-card">
-            <h3><span class="cross-icon">✕</span> Disconnected Marketing</h3>
-            <p>Static websites that cannot qualify inbound leads or synchronize automatically with sales pipelines.</p>
+            <h3><span class="problem-icon">✕</span> Lost Inquiries</h3>
+            <p>Customers message your website, but the lead gets buried in an email inbox before your team even notices.</p>
           </div>
           <div class="problem-card">
-            <h3><span class="cross-icon">✕</span> Siloed CRM & Spreadsheets</h3>
-            <p>Customer data trapped in manual spreadsheets, leading to untracked follow-ups and lost revenue.</p>
+            <h3><span class="problem-icon">✕</span> Spreadsheet Chaos</h3>
+            <p>Your orders, customer details, and inventory live across separate Excel sheets that are never up to date.</p>
           </div>
           <div class="problem-card">
-            <h3><span class="cross-icon">✕</span> Isolated Communication</h3>
-            <p>WhatsApp inquiries handled on individual phones without centralized audit trails or ERP linkage.</p>
+            <h3><span class="problem-icon">✕</span> Scattered Messages</h3>
+            <p>Customer inquiries happen on staff members' personal WhatsApp numbers with zero central tracking.</p>
           </div>
           <div class="problem-card">
-            <h3><span class="cross-icon">✕</span> Manual Invoicing & POS</h3>
-            <p>Delayed reconciliation between store billing, online checkout, inventory, and tax compliance.</p>
+            <h3><span class="problem-icon">✕</span> Double Data Entry</h3>
+            <p>Your team wastes hours typing the exact same invoice numbers into your billing, store POS, and accounting files.</p>
           </div>
           <div class="problem-card">
-            <h3><span class="cross-icon">✕</span> Superficial AI Experiments</h3>
-            <p>Single-purpose chatbot widgets pasted onto pages that cannot read inventory or execute real actions.</p>
+            <h3><span class="problem-icon">✕</span> Chatbots That Annoy</h3>
+            <p>Generic chat widgets that can’t check an order, book a real meeting, or answer simple customer questions.</p>
           </div>
           <div class="problem-card">
-            <h3><span class="cross-icon">✕</span> Fragmented Dashboards</h3>
-            <p>Executives forced to manually compile weekly reports from five conflicting SaaS vendor accounts.</p>
+            <h3><span class="problem-icon">✕</span> Blind Decisions</h3>
+            <p>Owners spend entire weekends assembling reports just to figure out their actual weekly revenue and cash flow.</p>
           </div>
         </div>
       </div>
@@ -771,94 +1030,94 @@
     <!-- 03. The Ostrum System -->
     <section id="system" aria-labelledby="system-heading">
       <div class="container">
-        <span class="kicker">03 // The Signature Solution</span>
-        <h2 id="system-heading" style="font-size: clamp(28px, 3.5vw, 44px); margin-bottom: 16px;">
-          The Ostrum System: Five Connected Layers.
+        <span class="kicker">How We Solve It</span>
+        <h2 id="system-heading" style="font-size: clamp(28px, 3.6vw, 44px); margin-bottom: 16px;">
+          One connected system for your entire business.
         </h2>
-        <p style="max-width: 600px; color: var(--text-slate); font-size: 16px;">
-          Every layer feeds seamlessly into the next. We engineer the entire ecosystem as a synchronized operational engine.
+        <p class="lead-text" style="max-width: 640px;">
+          Everything we build connects seamlessly to what you already have. No dead ends. No manual copy-pasting.
         </p>
 
-        <div class="system-stack" role="tablist" aria-label="The Ostrum System Layers">
-          <div class="system-layer active" tabindex="0" role="tab" aria-selected="true">
-            <span class="layer-index">LAYER 01 // BRAND</span>
+        <div class="system-stack" role="tablist" aria-label="The Ostrum Solution Layers">
+          <div class="system-card active" tabindex="0" role="tab" aria-selected="true">
+            <span class="layer-index">01 // BRAND</span>
             <div>
-              <div class="layer-title">Visual Identity & Design Systems</div>
-              <div class="layer-desc">Strategic positioning, architectural typography, tokenized components, and kinetic identity.</div>
+              <div class="layer-heading">Brand & Creative</div>
+              <div class="layer-text">Memorable visual design, crisp messaging, and a professional look that earns client trust immediately.</div>
             </div>
-            <span class="status-badge">FOUNDATION</span>
+            <span class="status-badge">FIRST IMPRESSION</span>
           </div>
 
-          <div class="system-layer" tabindex="0" role="tab" aria-selected="false">
-            <span class="layer-index">LAYER 02 // EXPERIENCE</span>
+          <div class="system-card" tabindex="0" role="tab" aria-selected="false">
+            <span class="layer-index">02 // WEB & STORES</span>
             <div>
-              <div class="layer-title">Flagship Web Products & Portals</div>
-              <div class="layer-desc">Sub-second web applications, headless commerce storefronts, and accessible customer portals.</div>
+              <div class="layer-heading">Websites & Digital Stores</div>
+              <div class="layer-text">Fast, clean websites and online shops designed to turn visitors into inquiries and paying customers.</div>
             </div>
-            <span class="status-badge">TOUCHPOINT</span>
+            <span class="status-badge">CONVERSION</span>
           </div>
 
-          <div class="system-layer" tabindex="0" role="tab" aria-selected="false">
-            <span class="layer-index">LAYER 03 // SYSTEMS</span>
+          <div class="system-card" tabindex="0" role="tab" aria-selected="false">
+            <span class="layer-index">03 // SYSTEMS</span>
             <div>
-              <div class="layer-title">Custom Enterprise ERP, CRM & Campus Portals</div>
-              <div class="layer-desc">Centralized multi-store inventory, pipeline automation, POS billing, and Higher-Ed admissions engines.</div>
+              <div class="layer-heading">Custom Business Tools</div>
+              <div class="layer-text">Tailored management tools: inventory, billing, student portals, and sales tracking built around your workflow.</div>
             </div>
-            <span class="status-badge">BACKBONE</span>
+            <span class="status-badge">OPERATIONS</span>
           </div>
 
-          <div class="system-layer" tabindex="0" role="tab" aria-selected="false">
-            <span class="layer-index">LAYER 04 // AUTOMATION</span>
+          <div class="system-card" tabindex="0" role="tab" aria-selected="false">
+            <span class="layer-index">04 // AI & AUTOMATION</span>
             <div>
-              <div class="layer-title">Autonomous AI & WhatsApp Agents</div>
-              <div class="layer-desc">Multi-step autonomous workflows that read databases, dispatch documents, and execute transactions.</div>
+              <div class="layer-heading">Helpful AI & Automation</div>
+              <div class="layer-text">Smart assistants that qualify leads, answer customer questions, and dispatch paperwork 24/7 without delays.</div>
             </div>
-            <span class="status-badge">INTELLIGENCE</span>
+            <span class="status-badge">TIME SAVED</span>
           </div>
 
-          <div class="system-layer" tabindex="0" role="tab" aria-selected="false">
-            <span class="layer-index">LAYER 05 // DATA</span>
+          <div class="system-card" tabindex="0" role="tab" aria-selected="false">
+            <span class="layer-index">05 // DATA</span>
             <div>
-              <div class="layer-title">Unified Business Intelligence</div>
-              <div class="layer-desc">Consolidated executive telemetry, real-time revenue velocity, and automated operational synthesis.</div>
+              <div class="layer-heading">Clear Business Dashboards</div>
+              <div class="layer-text">One clean screen showing your revenue, leads, and operational health in real time without digging through files.</div>
             </div>
-            <span class="status-badge">CONTROL</span>
+            <span class="status-badge">CLARITY</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 04. Capabilities Drill-Down -->
-    <section id="capabilities" aria-labelledby="cap-heading">
+    <!-- 04. Capabilities -->
+    <section id="capabilities" class="section-pearl" aria-labelledby="cap-title">
       <div class="container">
-        <span class="kicker">04 // Capability Index</span>
-        <h2 id="cap-heading" style="font-size: clamp(28px, 3.5vw, 44px);">What We Engineer</h2>
+        <span class="kicker">Services & Capabilities</span>
+        <h2 id="cap-title" style="font-size: clamp(28px, 3.6vw, 44px);">What We Can Build For You</h2>
         
-        <div class="tab-pills" role="tablist">
-          <button class="tab-btn active" onclick="switchCapTab('systems')">ENTERPRISE SYSTEMS</button>
-          <button class="tab-btn" onclick="switchCapTab('ai')">AI & AUTOMATION</button>
-          <button class="tab-btn" onclick="switchCapTab('experience')">EXPERIENCE & WEB</button>
-          <button class="tab-btn" onclick="switchCapTab('brand')">BRAND & STRATEGY</button>
-          <button class="tab-btn" onclick="switchCapTab('support')">CLOUD & SUPPORT</button>
+        <div class="cap-tabs" role="tablist">
+          <button class="cap-tab-btn active" onclick="switchCapTab('systems')">Business Systems</button>
+          <button class="cap-tab-btn" onclick="switchCapTab('ai')">AI & Automation</button>
+          <button class="cap-tab-btn" onclick="switchCapTab('experience')">Websites & Stores</button>
+          <button class="cap-tab-btn" onclick="switchCapTab('brand')">Brand Design</button>
+          <button class="cap-tab-btn" onclick="switchCapTab('support')">Support & Care</button>
         </div>
 
-        <div class="tab-panel" id="cap-panel">
-          <div class="capability-grid">
+        <div class="cap-panel" id="cap-panel">
+          <div class="cap-grid">
             <div class="cap-item">
-              <h4>Custom ERP & Inventory</h4>
-              <p>Multi-location warehouse sync, automated procurement, bill of materials, and staff role management.</p>
+              <h4>Order & Stock Management</h4>
+              <p>Keep track of inventory across multiple locations and warehouses without manual stock counts.</p>
             </div>
             <div class="cap-item">
-              <h4>CRM Pipeline Architecture</h4>
-              <p>Lead qualification scoring, omnichannel inbox unification, and automated deal stage progressions.</p>
+              <h4>Sales & Lead Tracking (CRM)</h4>
+              <p>Never lose track of a prospect. Assign follow-up reminders automatically and see deal progress at a glance.</p>
             </div>
             <div class="cap-item">
-              <h4>Higher-Ed & School Systems</h4>
-              <p>Admissions funnels, fee reconciliation, student/parent self-service portals, and WhatsApp attendance alerts.</p>
+              <h4>Schools & Colleges (Campus Portals)</h4>
+              <p>Simple online admissions, automated fee receipts, parent notifications, and student records in one place.</p>
             </div>
             <div class="cap-item">
-              <h4>Billing, POS & Financials</h4>
-              <p>Real-time retail POS integration, automated GST tax invoicing, payment gateways, and reconciliation.</p>
+              <h4>Store Billing & POS</h4>
+              <p>Fast retail checkouts, automatic tax calculation, and digital receipts sent directly via WhatsApp or email.</p>
             </div>
           </div>
         </div>
@@ -866,127 +1125,290 @@
     </section>
 
     <!-- 05. Selected Work -->
-    <section id="work" aria-labelledby="work-heading">
+    <section id="work" aria-labelledby="work-title">
       <div class="container">
-        <span class="kicker">05 // Selected Work</span>
-        <h2 id="work-heading" style="font-size: clamp(28px, 3.5vw, 44px);">Proven Architectures. Real Outcomes.</h2>
+        <span class="kicker">Proof in Practice</span>
+        <h2 id="work-title" style="font-size: clamp(28px, 3.6vw, 44px);">Real projects. Real business relief.</h2>
 
         <div class="work-grid">
-          <!-- Case 01 -->
-          <article class="case-card">
-            <div class="case-media">
-              [ HIGH-RES UI: CAMPUS360 ADMISSIONS & ERP DASHBOARD ]
+          <!-- Project 01 -->
+          <article class="work-card">
+            <div class="work-preview">
+              <span class="work-preview-tag">DEMONSTRATION CASE STUDY</span>
+              <div class="work-preview-title">Campus360 School Portal</div>
             </div>
-            <div class="case-body">
-              <div class="case-sector">EDUCATION SYSTEMS // HIGHER-ED</div>
-              <h3>Campus360 — Integrated Campus ERP & Autonomous Admissions</h3>
-              <p>Unifying admissions funnels, parent communication, and fee reconciliation for an institution serving 5,000+ students.</p>
-              <div class="case-metric">✔ 100% digital fee reconciliation; 3x faster response via WhatsApp AI</div>
-            </div>
-          </article>
-
-          <!-- Case 02 -->
-          <article class="case-card">
-            <div class="case-media">
-              [ HIGH-RES UI: AURA LUXE HEADLESS OMNICHANNEL COMMERCE ]
-            </div>
-            <div class="case-body">
-              <div class="case-sector">COMMERCE // LUXURY RETAIL</div>
-              <h3>Aura Luxe — Headless Omnichannel Commerce Engine</h3>
-              <p>Ultra-fast Next.js headless storefront synchronized with physical retail store inventory and automated customer retention flows.</p>
-              <div class="case-metric">✔ Sub-400ms page load; eliminated manual multi-store stock audits</div>
+            <div class="work-content">
+              <div class="work-type">Education Systems · 5,000+ Students</div>
+              <h3>Campus360 — Modern Admissions & Fee System</h3>
+              <p>Built an easy online admissions workflow, automated parent WhatsApp notifications, and centralized fee reconciliation for a large academy network.</p>
+              <div class="work-outcome-box">
+                <span>✔ <strong>Outcome:</strong> Cut inquiry response times from 2 days to 30 seconds; 100% digital fee receipts.</span>
+              </div>
             </div>
           </article>
-        </div>
-      </div>
-    </section>
 
-    <!-- 06. Interactive Stack Builder -->
-    <section id="stack-builder" aria-labelledby="stack-heading">
-      <div class="container">
-        <span class="kicker">06 // Interactive Lead Configurator</span>
-        <h2 id="stack-heading" style="font-size: clamp(28px, 3.5vw, 44px); margin-bottom: 12px;">
-          Build Your Connected Digital Stack.
-        </h2>
-        <p style="color: var(--text-slate); margin-bottom: 32px;">
-          Select the core operational modules your organization requires to see how Ostrum unifies them:
-        </p>
-
-        <div class="configurator-wrap">
-          <div class="pill-selector" id="stack-pills">
-            <button class="select-pill active" onclick="togglePill(this, 'Brand Identity')">Brand Identity</button>
-            <button class="select-pill active" onclick="togglePill(this, 'Web Application')">Web Application</button>
-            <button class="select-pill active" onclick="togglePill(this, 'Custom ERP')">Custom ERP</button>
-            <button class="select-pill active" onclick="togglePill(this, 'CRM Architecture')">CRM Architecture</button>
-            <button class="select-pill active" onclick="togglePill(this, 'WhatsApp AI Agent')">WhatsApp AI Agent</button>
-            <button class="select-pill" onclick="togglePill(this, 'Voice Intelligence')">Voice Intelligence</button>
-            <button class="select-pill" onclick="togglePill(this, 'Campus / School Portal')">Campus / School Portal</button>
-            <button class="select-pill" onclick="togglePill(this, 'Headless Ecommerce')">Headless Ecommerce</button>
-            <button class="select-pill" onclick="togglePill(this, 'Executive BI Dashboard')">Executive BI Dashboard</button>
-          </div>
-
-          <div class="stack-preview-box">
-            <div class="stack-stats">
-              <span>SELECTED MODULES: <strong id="module-count">5</strong></span> • 
-              <span>DATA FLOW: <strong>Fully Connected & Automated</strong></span> • 
-              <span>ESTIMATED DELIVERY: <strong>8–12 Weeks</strong></span>
+          <!-- Project 02 -->
+          <article class="work-card">
+            <div class="work-preview" style="background: var(--gradient-warm-peach);">
+              <span class="work-preview-tag">DEMONSTRATION CASE STUDY</span>
+              <div class="work-preview-title">Aura Living Omnichannel Store</div>
             </div>
-            <a href="#contact" class="btn btn-primary">Review Stack & Consult ↗</a>
+            <div class="work-content">
+              <div class="work-type">Retail & E-commerce · Multi-Store</div>
+              <h3>Aura Living — Connected Retail & Online Shop</h3>
+              <p>Connected physical store cash registers directly to their online catalog so stock updates instantly whenever an item is purchased in-store or online.</p>
+              <div class="work-outcome-box">
+                <span>✔ <strong>Outcome:</strong> Eliminated accidental overselling; website pages load in under 400ms.</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06. Before & After Transformation -->
+    <section class="section-cool" aria-labelledby="compare-title">
+      <div class="container">
+        <span class="kicker">The Difference</span>
+        <h2 id="compare-title" style="font-size: clamp(28px, 3.6vw, 44px); margin-bottom: 16px;">
+          What changes when your systems are connected.
+        </h2>
+        <p class="lead-text" style="max-width: 600px;">
+          A simple look at day-to-day operations before and after partnering with Ostrum:
+        </p>
+
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-header">
+              <span>BEFORE OSTRUM</span>
+              <span style="color: var(--accent-terracotta);">FRAGMENTED TOOLS</span>
+            </div>
+            <ul class="compare-list">
+              <li><span style="color: var(--accent-terracotta);">✕</span> Typing data into 4 different apps and spreadsheets every morning.</li>
+              <li><span style="color: var(--accent-terracotta);">✕</span> Inquiries sit unanswered over the weekend, losing sales to faster competitors.</li>
+              <li><span style="color: var(--accent-terracotta);">✕</span> Staff writing paper receipts and manually reconciling credit card slips.</li>
+              <li><span style="color: var(--accent-terracotta);">✕</span> Guessing your actual monthly revenue until your accountant finishes books.</li>
+            </ul>
+          </div>
+
+          <div class="compare-col after-col">
+            <div class="compare-header">
+              <span>WITH OSTRUM</span>
+              <span style="color: var(--accent-sage);">ONE CONNECTED ENGINE</span>
+            </div>
+            <ul class="compare-list">
+              <li><span style="color: var(--accent-sage);">✔</span> Enter information once; it updates your inventory, CRM, and accounting automatically.</li>
+              <li><span style="color: var(--accent-sage);">✔</span> A friendly, trained AI assistant replies within seconds, 24 hours a day.</li>
+              <li><span style="color: var(--accent-sage);">✔</span> Clean digital invoices and receipts sent automatically via WhatsApp or email.</li>
+              <li><span style="color: var(--accent-sage);">✔</span> A live dashboard on your phone showing revenue, active orders, and pending leads.</li>
+            </ul>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 07. AI & Automation Lab Demo -->
-    <section id="ai-lab" aria-labelledby="ai-heading">
+    <!-- 07. AI & Automation Lab -->
+    <section id="ai" aria-labelledby="ai-title">
       <div class="container">
-        <span class="kicker">07 // AI & Automation Lab</span>
-        <h2 id="ai-heading" style="font-size: clamp(28px, 3.5vw, 44px); margin-bottom: 12px;">
-          We Don't Build Gimmicks. We Deploy Autonomous Agents.
+        <span class="kicker">Practical Automation</span>
+        <h2 id="ai-title" style="font-size: clamp(28px, 3.6vw, 44px); margin-bottom: 12px;">
+          AI that handles real daily work, not just conversation.
         </h2>
-        <p style="color: var(--text-slate); max-width: 600px;">
-          Observe real multi-step execution where AI reads business context, updates CRM databases, and triggers real actions:
+        <p class="lead-text" style="max-width: 620px;">
+          We connect smart assistants directly to your inventory, customer records, and calendars so they can answer questions, book calls, and handle routine paperwork:
         </p>
 
-        <div class="terminal-window">
-          <div class="terminal-bar">
-            <span>TERMINAL // AUTONOMOUS WORKFLOW EXECUTION</span>
-            <span style="color: var(--signal-emerald);">● ACTIVE SIMULATION</span>
+        <div class="ai-console">
+          <div class="ai-console-bar">
+            <span>LIVE ASSISTANT DEMO // WORKFLOW SIMULATOR</span>
+            <span style="color: var(--accent-sage);">● ACTIVE DEMONSTRATION</span>
           </div>
-          <div class="terminal-body" id="terminal-content">
-            [16:42:01] INBOUND // WhatsApp message from Parent (+91 98402 11928):<br>
-            &gt; "Hello, looking for Grade 6 admissions criteria and tuition fees."<br><br>
-            [16:42:02] ORCHESTRATION // Autonomous Agent Processing:<br>
-            ✔ Context matched: Campus360 K-12 Admissions Knowledge Base.<br>
-            ✔ Lead created in CRM (Score: 88 - High Intent).<br>
-            ✔ Dispatched Grade 6 Prospectus PDF via WhatsApp Cloud API.<br>
-            ✔ Proposed campus tour time slots for Friday 10:00 AM.<br>
-            ✔ Dispatched Slack briefing to Admissions Director.<br><br>
-            [STATUS]: Execution completed in 312ms. Zero human intervention required.
+          <div class="ai-console-body" id="console-output">
+            [16:42] INBOUND // WhatsApp inquiry from Parent (+91 98402 11928):<br>
+            &gt; "Hello! What are the tuition fees and admission dates for Grade 6?"<br><br>
+            [16:42] OSTRUM AUTOMATION AT WORK:<br>
+            ✔ Checked school database: retrieved Grade 6 syllabus & fee schedule.<br>
+            ✔ Created new student inquiry card in Admissions CRM.<br>
+            ✔ Sent Grade 6 Prospectus PDF via WhatsApp in 8 seconds.<br>
+            ✔ Offered parent an open calendar slot for campus tour this Friday.<br>
+            ✔ Alerted Admissions Officer with parent details.<br><br>
+            [RESULT]: Inquiry answered and tour scheduled in 310ms. No human delay.
           </div>
         </div>
 
-        <div class="scenario-btns">
-          <button class="btn btn-secondary" onclick="loadScenario('admissions')">Scenario: Campus Admissions</button>
-          <button class="btn btn-secondary" onclick="loadScenario('retail')">Scenario: Retail Stock Query</button>
-          <button class="btn btn-secondary" onclick="loadScenario('b2b')">Scenario: B2B Lead Qualification</button>
+        <div class="scenario-nav">
+          <button class="btn btn-secondary" onclick="loadScenario('school')">Situation: School Admissions</button>
+          <button class="btn btn-secondary" onclick="loadScenario('retail')">Situation: Retail Stock Query</button>
+          <button class="btn btn-secondary" onclick="loadScenario('service')">Situation: Client Meeting Booking</button>
         </div>
       </div>
     </section>
 
-    <!-- 08. Closing CTA -->
-    <section id="contact" style="background: var(--surface-card); text-align: center; padding: 120px 0;">
+    <!-- 08. Custom Stack Estimator -->
+    <section id="estimator" class="section-pearl" aria-labelledby="est-title">
       <div class="container">
-        <span class="kicker">08 // Initiate Engagement</span>
-        <h2 style="font-size: clamp(36px, 5vw, 64px); max-width: 800px; margin: 0 auto 24px;">
-          Let's engineer your <span class="editorial-accent">connected</span> system.
+        <span class="kicker">Custom Estimator</span>
+        <h2 id="est-title" style="font-size: clamp(28px, 3.6vw, 44px); margin-bottom: 12px;">
+          Tell us what your business needs.
         </h2>
-        <p style="max-width: 580px; margin: 0 auto 40px; color: var(--text-slate); font-size: 18px;">
-          Stop losing momentum and revenue to fragmented tools. Partner with Ostrum to build the brand, software, and automation your business needs to scale.
+        <p class="lead-text" style="margin-bottom: 32px;">
+          Choose the pieces you want to build or improve. We will show you how they fit together:
         </p>
-        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-          <a href="mailto:hello@ostrum.studio" class="btn btn-primary" style="padding: 14px 32px; font-size: 16px;">Start a Project Consultation ↗</a>
-          <button class="btn btn-secondary" style="padding: 14px 28px; font-size: 16px;" onclick="alert('Calendar integration will be live in Phase 08.')">Book a 30-Min Discovery Call</button>
+
+        <div class="estimator-box">
+          <div class="pill-group" id="stack-pills">
+            <button class="stack-pill active" onclick="toggleStackPill(this)">Brand & Logo Design</button>
+            <button class="stack-pill active" onclick="toggleStackPill(this)">New Website or Store</button>
+            <button class="stack-pill active" onclick="toggleStackPill(this)">Order & Inventory (ERP)</button>
+            <button class="stack-pill active" onclick="toggleStackPill(this)">Sales CRM Pipeline</button>
+            <button class="stack-pill active" onclick="toggleStackPill(this)">WhatsApp AI Assistant</button>
+            <button class="stack-pill" onclick="toggleStackPill(this)">Voice Phone Assistant</button>
+            <button class="stack-pill" onclick="toggleStackPill(this)">School / Campus Portal</button>
+            <button class="stack-pill" onclick="toggleStackPill(this)">Store Billing (POS)</button>
+            <button class="stack-pill" onclick="toggleStackPill(this)">Real-Time Revenue Dashboard</button>
+          </div>
+
+          <div class="estimator-summary">
+            <div class="estimator-meta">
+              <span>SELECTED: <strong id="est-count">5</strong> MODULES</span> • 
+              <span>HOW THEY WORK: <strong>Connected into One Engine</strong></span> • 
+              <span>ESTIMATED TIME: <strong>6 to 10 Weeks</strong></span>
+            </div>
+            <a href="#contact" class="btn btn-primary">Review With Our Team ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09. How We Work Together (Process) -->
+    <section id="process" aria-labelledby="process-title">
+      <div class="container">
+        <span class="kicker">How We Work Together</span>
+        <h2 id="process-title" style="font-size: clamp(28px, 3.6vw, 44px);">Clear steps. No surprises.</h2>
+
+        <div class="process-grid">
+          <div class="process-card">
+            <span class="process-num">STEP 01</span>
+            <h3>Listen & Map</h3>
+            <p>We sit down with you, understand where your business loses time, and draw a clean architecture map.</p>
+          </div>
+          <div class="process-card">
+            <span class="process-num">STEP 02</span>
+            <h3>Design & Preview</h3>
+            <p>You see and click through the complete design before we write a single line of production code.</p>
+          </div>
+          <div class="process-card">
+            <span class="process-num">STEP 03</span>
+            <h3>Build & Connect</h3>
+            <p>We build the software, connect your tools, and carefully migrate your existing spreadsheets and data.</p>
+          </div>
+          <div class="process-card">
+            <span class="process-num">STEP 04</span>
+            <h3>Train & Launch</h3>
+            <p>We train your team in plain language and make sure everything runs without friction from day one.</p>
+          </div>
+          <div class="process-card">
+            <span class="process-num">STEP 05</span>
+            <h3>Support & Improve</h3>
+            <p>We stay on call, keep everything fast and secure, and add new capabilities as your business grows.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. Who We Work With -->
+    <section class="section-cool" aria-labelledby="sector-title">
+      <div class="container">
+        <span class="kicker">Who We Work With</span>
+        <h2 id="sector-title" style="font-size: clamp(28px, 3.6vw, 44px); margin-bottom: 24px;">
+          Built for businesses with moving parts.
+        </h2>
+
+        <div class="problem-grid" style="margin-top: 24px;">
+          <div class="problem-card">
+            <h3 style="color: var(--text-ink);">Schools & Colleges</h3>
+            <p>Admissions, tuition fees, parent WhatsApp communication, and attendance in one clean portal.</p>
+          </div>
+          <div class="problem-card">
+            <h3 style="color: var(--text-ink);">Retail & E-commerce</h3>
+            <p>In-store POS registers synchronized with fast online storefronts and automated order fulfillment.</p>
+          </div>
+          <div class="problem-card">
+            <h3 style="color: var(--text-ink);">Growing Service Firms</h3>
+            <p>Consulting, legal, and creative companies needing clean sales pipelines and automated client onboarding.</p>
+          </div>
+          <div class="problem-card">
+            <h3 style="color: var(--text-ink);">Clinics & Healthcare</h3>
+            <p>Online appointment booking, automated visit reminders, and private, secure patient records.</p>
+          </div>
+          <div class="problem-card">
+            <h3 style="color: var(--text-ink);">High-Growth Startups</h3>
+            <p>Founders who need world-class brand design, a fast website, and scalable software to support early traction.</p>
+          </div>
+          <div class="problem-card">
+            <h3 style="color: var(--text-ink);">Family-Owned Enterprises</h3>
+            <p>Modernizing legacy operations so the next generation can lead with clarity and automated tools.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. Practical Reads (Insights) -->
+    <section id="insights" class="section-pearl" aria-labelledby="insights-title">
+      <div class="container">
+        <span class="kicker">Helpful Reads</span>
+        <h2 id="insights-title" style="font-size: clamp(28px, 3.6vw, 44px);">Practical thinking on technology and business.</h2>
+
+        <div class="insight-grid">
+          <article class="insight-card">
+            <div>
+              <span class="insight-meta">BUSINESS SOFTWARE · 6 MIN READ</span>
+              <h3>Why buying five different software subscriptions slows your team down.</h3>
+              <p style="font-size: 14.5px; color: var(--text-slate); line-height: 1.6;">
+                Most SaaS tools are built to keep you on their platform. How custom connected tools eliminate manual data entry.
+              </p>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 13px; color: var(--accent-terracotta); margin-top: 20px;">Read Article ↗</span>
+          </article>
+
+          <article class="insight-card">
+            <div>
+              <span class="insight-meta">CAMPUS SYSTEMS · 8 MIN READ</span>
+              <h3>How schools are saving hundreds of hours during admissions season.</h3>
+              <p style="font-size: 14.5px; color: var(--text-slate); line-height: 1.6;">
+                Replacing paper application forms and manual bank transfers with automated WhatsApp communication and fee receipts.
+              </p>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 13px; color: var(--accent-terracotta); margin-top: 20px;">Read Article ↗</span>
+          </article>
+
+          <article class="insight-card">
+            <div>
+              <span class="insight-meta">AUTOMATION · 5 MIN READ</span>
+              <h3>What actually makes an AI assistant useful for customer service.</h3>
+              <p style="font-size: 14.5px; color: var(--text-slate); line-height: 1.6;">
+                Why generic chatbots frustrate customers, and why connecting AI to your real database changes everything.
+              </p>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 13px; color: var(--accent-terracotta); margin-top: 20px;">Read Article ↗</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. Final CTA Stage -->
+    <section id="contact" style="padding: 100px 0;">
+      <div class="container">
+        <div class="cta-stage">
+          <span class="kicker" style="justify-content: center;">Start the Conversation</span>
+          <h2>Ready to make your business run <span class="editorial-accent">smoother</span>?</h2>
+          <p>
+            Tell us what you are working on. We will tell you honestly how we can help, what it will cost, and how long it will take.
+          </p>
+          <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+            <a href="mailto:hello@ostrum.studio" class="btn btn-terracotta" style="padding: 14px 34px; font-size: 15px;">Start a Project ↗</a>
+            <button class="btn btn-secondary" style="padding: 14px 28px; font-size: 15px;" onclick="alert('Discovery call scheduling will be connected in Phase 08.')">Schedule a 20-Min Call</button>
+          </div>
         </div>
       </div>
     </section>
@@ -999,88 +1421,88 @@
       <div class="footer-grid">
         <div class="footer-brand">
           <h4>OSTRUM</h4>
-          <p>Digital Systems & Transformation Studio. We engineer connected digital ecosystems across brand, software, business systems, and AI automation.</p>
+          <p>We build connected digital ecosystems for ambitious companies: brand design, modern websites, custom business tools, and practical automation.</p>
         </div>
         <div class="footer-col">
-          <h5>Navigation</h5>
+          <h5>Explore</h5>
           <ul>
-            <li><a href="#problem">Fragmentation</a></li>
-            <li><a href="#system">The System</a></li>
-            <li><a href="#capabilities">Capabilities</a></li>
-            <li><a href="#work">Selected Work</a></li>
-            <li><a href="#stack-builder">Stack Builder</a></li>
+            <li><a href="#problem">What We Solve</a></li>
+            <li><a href="#system">How It Works</a></li>
+            <li><a href="#capabilities">Services</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#estimator">Custom Estimator</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h5>Core Pillars</h5>
+          <h5>Core Solutions</h5>
           <ul>
-            <li><a href="#capabilities">Brand Systems</a></li>
-            <li><a href="#capabilities">Web Applications</a></li>
-            <li><a href="#capabilities">Custom ERP & CRM</a></li>
-            <li><a href="#capabilities">AI & WhatsApp Agents</a></li>
-            <li><a href="#capabilities">Executive BI</a></li>
+            <li><a href="#capabilities">Order & Stock ERP</a></li>
+            <li><a href="#capabilities">Sales CRM Pipeline</a></li>
+            <li><a href="#capabilities">School Campus Systems</a></li>
+            <li><a href="#capabilities">WhatsApp AI Assistants</a></li>
+            <li><a href="#capabilities">Business Dashboards</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h5>Inquiries</h5>
+          <h5>Get In Touch</h5>
           <ul>
             <li><a href="mailto:hello@ostrum.studio">hello@ostrum.studio</a></li>
             <li><a href="#contact">+91 (0) 44 8291 0293</a></li>
-            <li><a href="#contact">Bangalore / Global</a></li>
+            <li><a href="#contact">Bangalore · Worldwide</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
         <span>© 2026 OSTRUM TECHNOLOGIES. ALL RIGHTS RESERVED.</span>
-        <span>PHASE 00 FOUNDATION ARCHITECTURE</span>
+        <span>SIMPLE WORDS · STRONG SYSTEMS · TACTILE LIGHT-FIRST CRAFT</span>
       </div>
     </div>
   </footer>
 
   <!-- Interactive JavaScript Logic -->
   <script>
-    // Tab Switcher for Capabilities
-    const capData = {
+    // Capabilities Tabs Data (Plain English & Business Outcomes)
+    const capContent = {
       systems: [
-        { title: "Custom ERP & Inventory", desc: "Multi-location warehouse sync, automated procurement, bill of materials, and staff role management." },
-        { title: "CRM Pipeline Architecture", desc: "Lead qualification scoring, omnichannel inbox unification, and automated deal stage progressions." },
-        { title: "Higher-Ed & School Systems", desc: "Admissions funnels, fee reconciliation, student/parent self-service portals, and WhatsApp attendance alerts." },
-        { title: "Billing, POS & Financials", desc: "Real-time retail POS integration, automated GST tax invoicing, payment gateways, and reconciliation." }
+        { title: "Order & Stock Management (ERP)", desc: "Track inventory across physical shops and warehouses without manual stock counts." },
+        { title: "Customer & Sales Pipeline (CRM)", desc: "Keep every prospect organized, assign follow-up tasks automatically, and close deals faster." },
+        { title: "School & College Systems", desc: "Online applications, automated fee collection, parent alerts, and grade management in one portal." },
+        { title: "Billing & Retail POS", desc: "Fast store checkouts, automatic tax calculation, and digital invoices sent directly via WhatsApp." }
       ],
       ai: [
-        { title: "Autonomous Task Agents", desc: "Multi-step agents executing real API workflows, database mutations, and CRM sync without human drag." },
-        { title: "WhatsApp Business Automation", desc: "Instant conversational lead capture, automated prospectus/catalog delivery, and payment link dispatch." },
-        { title: "Voice Intelligence Systems", desc: "Low-latency voice agents for inbound support, appointment booking, and dispatch routing." },
-        { title: "Document Processing Engines", desc: "Automated OCR extraction, invoice ingestion, and verification connected to ERP ledgers." }
+        { title: "WhatsApp Business Assistants", desc: "Instant automated answers to customer questions, automated product catalogs, and appointment booking." },
+        { title: "Routine Task Automation", desc: "Automatically create orders, generate invoices, and send customer follow-ups when events happen." },
+        { title: "Voice Phone Assistants", desc: "Friendly voice agents that take incoming calls, answer FAQs, and book meetings into your calendar." },
+        { title: "Paperwork & Invoice Extraction", desc: "Automatically pull details from PDF bills, invoices, and forms directly into your accounting books." }
       ],
       experience: [
-        { title: "Flagship Web Applications", desc: "Next.js 15 App Router applications with sub-second page transitions, streaming SSR, and micro-interactions." },
-        { title: "Headless Ecommerce", desc: "Composable commerce platforms syncing catalog, cart, and POS inventory in real-time." },
-        { title: "Client & Admin Portals", desc: "Role-based dashboards, parent/student portals, and internal operations consoles with WCAG AA accessibility." },
-        { title: "Progressive Web Apps", desc: "Offline-capable touch-native experiences optimized for low-bandwidth mobile environments." }
+        { title: "Custom Business Websites", desc: "Fast, beautifully designed websites built to turn visitors into inquiries and customers." },
+        { title: "Online E-commerce Stores", desc: "Modern digital storefronts connected directly to your warehouse inventory and store registers." },
+        { title: "Client & Customer Portals", desc: "Private login areas where your clients can view orders, track projects, or download receipts." },
+        { title: "Fast Mobile Web Apps", desc: "Smooth, app-like experiences that load instantly even on slow mobile data connections." }
       ],
       brand: [
-        { title: "Brand Strategy & Voice", desc: "Strategic differentiation, market positioning, executive narrative, and verbal identity frameworks." },
-        { title: "Visual Identity Systems", desc: "Dynamic vector logo marks, responsive typography systems, and Swiss grid guidelines." },
-        { title: "Digital Design Tokens", desc: "Production-ready Tailwind and CSS token libraries for consistent cross-platform implementation." },
-        { title: "Kinetic Motion Identity", desc: "Physics-based animation guidelines, micro-interaction signatures, and brand video teasers." }
+        { title: "Brand Identity & Logo Systems", desc: "Clean logos, color palettes, and typography that make your business look established and trustworthy." },
+        { title: "Clear Messaging & Copywriting", desc: "Simple words that explain what you do clearly to customers, investors, and partners." },
+        { title: "Design Guidelines & Assets", desc: "A complete set of design rules and digital assets so your brand looks consistent everywhere." },
+        { title: "Presentations & Pitch Decks", desc: "High-impact presentation decks designed to help you win client proposals or investor meetings." }
       ],
       support: [
-        { title: "99.9% Uptime Telemetry", desc: "Proactive infrastructure monitoring, real-time error reporting, and automated anomaly alerting." },
-        { title: "Zero-Trust Security Hardening", desc: "Vulnerability remediation, secrets rotation, and strict CSP/HSTS header governance." },
-        { title: "Continuous Web Vitals Tuning", desc: "Monthly Core Web Vitals audits to guarantee LCP under 1.2s and zero Cumulative Layout Shift." },
-        { title: "Engineering Retainers", desc: "Sprint-based iterative feature delivery, API integrations, and database scaling." }
+        { title: "Always-On Monitoring", desc: "We watch your systems 24/7 to catch and fix issues before your customers notice anything." },
+        { title: "Security & Backups", desc: "Daily automatic backups, strict security reviews, and continuous software updates." },
+        { title: "Speed & Performance Care", desc: "Regular tune-ups to ensure your website and database stay fast as your traffic grows." },
+        { title: "Monthly Support Retainers", desc: "Your dedicated engineering team on call to add new features, adjust tools, and help you scale." }
       ]
     };
 
     function switchCapTab(tabKey) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.cap-tab-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
 
-      const items = capData[tabKey];
+      const items = capContent[tabKey];
       const panel = document.getElementById('cap-panel');
       panel.innerHTML = `
-        <div class="capability-grid">
+        <div class="cap-grid">
           ${items.map(item => `
             <div class="cap-item">
               <h4>${item.title}</h4>
@@ -1092,48 +1514,48 @@
     }
 
     // Stack Builder Pill Toggle
-    function togglePill(btn, name) {
+    function toggleStackPill(btn) {
       btn.classList.toggle('active');
-      const activeCount = document.querySelectorAll('.select-pill.active').length;
-      document.getElementById('module-count').innerText = activeCount;
+      const count = document.querySelectorAll('.stack-pill.active').length;
+      document.getElementById('est-count').innerText = count;
     }
 
-    // AI Lab Scenario Switcher
+    // AI Lab Workflow Simulator Scenarios
     function loadScenario(type) {
-      const term = document.getElementById('terminal-content');
-      if (type === 'admissions') {
-        term.innerHTML = `
-          [16:42:01] INBOUND // WhatsApp message from Parent (+91 98402 11928):<br>
-          &gt; "Hello, looking for Grade 6 admissions criteria and tuition fees."<br><br>
-          [16:42:02] ORCHESTRATION // Autonomous Agent Processing:<br>
-          ✔ Context matched: Campus360 K-12 Admissions Knowledge Base.<br>
-          ✔ Lead created in CRM (Score: 88 - High Intent).<br>
-          ✔ Dispatched Grade 6 Prospectus PDF via WhatsApp Cloud API.<br>
-          ✔ Proposed campus tour time slots for Friday 10:00 AM.<br>
-          ✔ Dispatched Slack briefing to Admissions Director.<br><br>
-          [STATUS]: Execution completed in 312ms. Zero human intervention required.
+      const out = document.getElementById('console-output');
+      if (type === 'school') {
+        out.innerHTML = `
+          [16:42] INBOUND // WhatsApp inquiry from Parent (+91 98402 11928):<br>
+          &gt; "Hello! What are the tuition fees and admission dates for Grade 6?"<br><br>
+          [16:42] OSTRUM AUTOMATION AT WORK:<br>
+          ✔ Checked school database: retrieved Grade 6 syllabus & fee schedule.<br>
+          ✔ Created new student inquiry card in Admissions CRM.<br>
+          ✔ Sent Grade 6 Prospectus PDF via WhatsApp in 8 seconds.<br>
+          ✔ Offered parent an open calendar slot for campus tour this Friday.<br>
+          ✔ Alerted Admissions Officer with parent details.<br><br>
+          [RESULT]: Inquiry answered and tour scheduled in 310ms. No human delay.
         `;
       } else if (type === 'retail') {
-        term.innerHTML = `
-          [16:43:15] INBOUND // WhatsApp query from Retail Customer (+91 97109 23810):<br>
+        out.innerHTML = `
+          [17:15] INBOUND // Customer WhatsApp message (+91 97109 23810):<br>
           &gt; "Do you have the Aura Linen Blazer in Size M in Indiranagar store?"<br><br>
-          [16:43:16] ORCHESTRATION // Autonomous Omnichannel Agent:<br>
-          ✔ Queried POS ERP Inventory database across 4 physical stores.<br>
+          [17:15] OSTRUM AUTOMATION AT WORK:<br>
+          ✔ Checked POS inventory across all 4 store locations in real time.<br>
           ✔ Indiranagar store: 0 in stock. Koramangala store: 2 in stock.<br>
           ✔ Central Warehouse: 14 units available.<br>
-          ✔ Replied with 1-click reservation link or 24-hr courier delivery checkout.<br><br>
-          [STATUS]: Inventory queried and payment payload generated in 184ms.
+          ✔ Replied to customer with option to reserve at Koramangala or order online.<br><br>
+          [RESULT]: Immediate stock accuracy without staff calling each other.
         `;
-      } else if (type === 'b2b') {
-        term.innerHTML = `
-          [16:44:00] INBOUND // Enterprise Inquiry Form Submission:<br>
-          &gt; Organization: FinScale Inc. Need: Custom ERP & Multi-channel WhatsApp Agent.<br><br>
-          [16:44:01] ORCHESTRATION // B2B Lead Qualifier Agent:<br>
-          ✔ Domain verified (FinScale.io, Series A, 45 Employees).<br>
-          ✔ Scored Lead: 92/100 (Tier 1 Enterprise Scope).<br>
-          ✔ Auto-generated customized 8-week system architecture draft.<br>
-          ✔ Generated calendar invitation for Senior Partner discovery call.<br><br>
-          [STATUS]: Lead enriched, qualified, and scheduled in 420ms.
+      } else if (type === 'service') {
+        out.innerHTML = `
+          [18:02] INBOUND // New inquiry submitted on website form:<br>
+          &gt; Name: Priya Nair · Company: Greenfield Logistics · Needs: Order ERP.<br><br>
+          [18:02] OSTRUM AUTOMATION AT WORK:<br>
+          ✔ Verified company details & assigned high-priority tag in CRM.<br>
+          ✔ Sent instant WhatsApp acknowledgement to Priya with team credentials.<br>
+          ✔ Generated calendar invitation for 20-min introductory video call.<br>
+          ✔ Dispatched briefing to Senior Partner via Slack.<br><br>
+          [RESULT]: Lead acknowledged and meeting booked in under 60 seconds.
         `;
       }
     }

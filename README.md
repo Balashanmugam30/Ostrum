@@ -33,16 +33,19 @@ All foundational research, positioning, information architecture, wireframes, de
 | **[Technical Foundation](docs/TECHNICAL_FOUNDATION.md)** | Next.js 15 App Router architecture, TypeScript strictness, edge API boundaries, AI integration model, and Web Vitals budgets. |
 | **[Quality Constraints Contract](docs/QUALITY_CONSTRAINTS.md)** | Unbreakable quality bar covering UX, Visuals, Motion, Accessibility (WCAG 2.2 AA), Performance, and Engineering standards. |
 | **[Phase 00 Decisions Summary](docs/PHASE_00_DECISIONS.md)** | Executive summary of all Phase 00 decisions, feature scope verdicts (V1 vs Later), and repository verification. |
+| **[Content Guidelines](docs/OSTRUM_CONTENT_GUIDELINES.md)** | Phase 01 global copy guidelines: simple human language, strong ideas, business outcomes, jargon bans. |
+| **[Visual Direction](docs/OSTRUM_VISUAL_DIRECTION.md)** | Phase 01 global visual architecture: multi-color alabaster palette, atmospheric gradients, typography hierarchy. |
+| **[Phase 01 Refinement Report](docs/PHASE_01_GLOBAL_REFINEMENT_REPORT.md)** | Complete Phase 01 report documenting visual research, copy translations, and browser testing. |
 
 ---
 
 ## 3. Implementation Roadmap (Phases 01–10)
 
-The subsequent phases will implement this blueprint sequentially:
+The subsequent phases build sequentially on this foundation:
 
-1. **PHASE 01:** Visual Identity & Design System Tokens
-2. **PHASE 02:** Core Shell, Navigation, Header & Footer
-3. **PHASE 03:** Hero & Opening Narrative Experience
+1. **PHASE 01 (COMPLETED):** Global Content + Visual Identity Refinement (Multi-color palette, human copy, typography)
+2. **PHASE 02:** Core Shell, Navigation, Header & Footer Section Redesign
+3. **PHASE 03:** Hero & Opening Narrative Experience Section Redesign
 4. **PHASE 04:** Core Story Sections (Fragmentation, Ostrum System, Capabilities)
 5. **PHASE 05:** Work & Case Study Architecture (Index & Deep Case Template)
 6. **PHASE 06:** AI & Automation Lab (Simulations, Concierge Drawer, Stack Builder)
