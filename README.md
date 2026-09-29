@@ -33,9 +33,10 @@ All foundational research, positioning, information architecture, wireframes, de
 | **[Technical Foundation](docs/TECHNICAL_FOUNDATION.md)** | Next.js 15 App Router architecture, TypeScript strictness, edge API boundaries, AI integration model, and Web Vitals budgets. |
 | **[Quality Constraints Contract](docs/QUALITY_CONSTRAINTS.md)** | Unbreakable quality bar covering UX, Visuals, Motion, Accessibility (WCAG 2.2 AA), Performance, and Engineering standards. |
 | **[Phase 00 Decisions Summary](docs/PHASE_00_DECISIONS.md)** | Executive summary of all Phase 00 decisions, feature scope verdicts (V1 vs Later), and repository verification. |
-| **[Content Guidelines](docs/OSTRUM_CONTENT_GUIDELINES.md)** | Phase 01 global copy guidelines: simple human language, strong ideas, business outcomes, jargon bans. |
-| **[Visual Direction](docs/OSTRUM_VISUAL_DIRECTION.md)** | Phase 01 global visual architecture: multi-color alabaster palette, atmospheric gradients, typography hierarchy. |
-| **[Phase 01 Refinement Report](docs/PHASE_01_GLOBAL_REFINEMENT_REPORT.md)** | Complete Phase 01 report documenting visual research, copy translations, and browser testing. |
+| **[Content Guidelines](docs/OSTRUM_CONTENT_GUIDELINES.md)** | Phase 01 & 01B copy guidelines: simple human language, strong ideas, business outcomes, jargon bans. |
+| **[Visual Direction](docs/OSTRUM_VISUAL_DIRECTION.md)** | Direction E architecture: warm alabaster canvas, terracotta ochre & nocturne indigo accents, synchronized lattice motif. |
+| **[Phase 01 Refinement Report](docs/PHASE_01_GLOBAL_REFINEMENT_REPORT.md)** | Initial Phase 01 report documenting visual research, copy translations, and browser testing. |
+| **[Phase 01B Creative Reset Report](docs/PHASE_01B_CREATIVE_RESET_REPORT.md)** | Phase 01B report: Direction E selection, 17-chapter narrative, missing content resolution, and browser validation. |
 
 ---
 
@@ -43,8 +44,9 @@ All foundational research, positioning, information architecture, wireframes, de
 
 The subsequent phases build sequentially on this foundation:
 
-1. **PHASE 01 (COMPLETED):** Global Content + Visual Identity Refinement (Multi-color palette, human copy, typography)
-2. **PHASE 02:** Core Shell, Navigation, Header & Footer Section Redesign
+1. **PHASE 01 (COMPLETED):** Global Content + Visual Identity Refinement (Initial Multi-color palette & human copy pass)
+2. **PHASE 01B (COMPLETED):** Global Creative Reset + Missing Content + Direction E (17-Chapter Narrative Architecture, Alabaster/Terracotta/Indigo Tokens, Synchronized Lattice Motif)
+3. **PHASE 02:** Core Shell, Navigation, Header & Footer Section Redesign
 3. **PHASE 03:** Hero & Opening Narrative Experience Section Redesign
 4. **PHASE 04:** Core Story Sections (Fragmentation, Ostrum System, Capabilities)
 5. **PHASE 05:** Work & Case Study Architecture (Index & Deep Case Template)

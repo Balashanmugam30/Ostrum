@@ -1,6 +1,6 @@
 # Ostrum — Global Content & Copywriting Guidelines
 
-> **Status:** RATIFIED (Phase 01 Global Refinement)  
+> **Status:** RATIFIED & EXPANDED (Phase 01B Global Creative Reset)  
 > **Mandate:** Simple Words • Strong Ideas • Human Language • Business Outcomes  
 > **Target Reader:** Business Owners, Operations Leaders, Founders, School Trustees, Commercial Directors  
 
@@ -39,7 +39,7 @@ When a business owner visits the Ostrum website, they should think:
 * ❌ *Unified spend-to-revenue attribution modeling*
 * ❌ *Revolutionary / Disruptive / Cutting-edge / Next-generation*
 * ❌ *Synergy / Paradigm shift / Holistic digital transformation*
-* ❌ *Zero human intervention required* (sounds scary and inaccurate)
+* ❌ *Zero human intervention required* (sounds scary, inaccurate, and alienating)
 * ❌ Repeating *"Digital ecosystem"* three times per paragraph
 
 ### Plain Human Words to Prefer Instead
@@ -53,9 +53,9 @@ When a business owner visits the Ostrum website, they should think:
 
 ## 4. "Before & After" Copy Translation Guide
 
-Use these real examples from the Phase 01 rewrite as a standard for all future writing:
+Use these real examples from the Ostrum rewrite as an authoritative benchmark for all future writing:
 
-| Context | ❌ Old Technical Copy (Phase 00) | ✅ New Human Copy (Phase 01) |
+| Context | ❌ Old Technical Copy (Phase 00) | ✅ New Human Copy (Phase 01 & 01B) |
 | :--- | :--- | :--- |
 | **Hero Headline** | *"We engineer connected digital ecosystems."* | **"We build the technology that helps ambitious businesses grow."** |
 | **Hero Subtitle** | *"Uniting brand craft, high-performance web products, custom enterprise business systems (ERP/CRM), and autonomous AI automation to build scalable organizations."* | **"Most companies struggle with disconnected websites, manual spreadsheets, and messy software. We design your brand, build your website, connect your business systems, and automate the busywork."** |
@@ -65,28 +65,60 @@ Use these real examples from the Phase 01 rewrite as a standard for all future w
 | **AI Section** | *"We don't build gimmicks. We deploy autonomous agents with vector context."* | **"AI that handles real daily work, not just conversation."** |
 | **AI Detail** | *"Autonomous Task Agents executing real API workflows, database mutations, and CRM sync."* | **"We connect smart assistants directly to your inventory, customer records, and calendars so they can answer questions, book calls, and handle routine paperwork 24/7."** |
 | **Work Showcase** | *"Campus360: Integrated Campus ERP & Autonomous Admissions Engine."* | **"Campus360: A simple admissions and fee system for a school with 5,000 students."** |
-| **Process** | *"01. Discover & Audit -> 02. Brand & UX -> 03. Systemic Build -> 04. Agentic Auto"* | **"01. Listen & Map -> 02. Design & Preview -> 03. Build & Connect -> 04. Train & Launch -> 05. Support & Improve"** |
+| **Process** | *"01. Discover & Audit -> 02. Brand & UX -> 03. Systemic Build -> 04. Agentic Auto"* | **"01. Listen & Map -> 02. Design & Preview -> 03. Build & Connect -> 04. Train & Launch"** |
 | **CTA Headline** | *"Let's engineer your connected system."* | **"Ready to make your business run smoother?"** |
 | **CTA Subhead** | *"Stop losing revenue and momentum to fragmented tools. Partner with Ostrum."* | **"Tell us what you are working on. We'll tell you honestly how we can help, what it will cost, and how long it will take."** |
 
 ---
 
-## 5. How to Discuss AI Without Hype or Fear
+## 5. Specific Guidelines for the 17-Chapter Flow
+
+### Chapter 11: About Ostrum / Studio Genesis & Engineering Leadership
+* **The Core Story:** Ostrum was founded on a simple realization: small and mid-market businesses are drowning in disconnected SaaS subscriptions and manual spreadsheet work. Large enterprises hire \$500k consultancy teams; small businesses are left with fragmented freelancers or clunky no-code hacks. Ostrum fills the gap by providing dedicated studio engineering craft at transparent pricing.
+* **Tone:** Humble, resolute, craft-obsessed, accountable. No corporate boardroom buzzwords.
+* **Key Phrases:**
+  - *"We started Ostrum because we saw great businesses held back by bad software."*
+  - *"We write clean code, respect your team's existing habits, and stand behind everything we build."*
+  - *"Every project is led by senior engineers and designers—never handed off to an anonymous junior offshore pool."*
+
+### Chapter 12: Client Proof, Partner Stories & Industry Endorsements
+* **The Truthfulness Standard:** Under no circumstances should fake testimonials, made-up 5-star ratings, stock photo client avatars, or fabricated client names ever be used.
+* **Structure:** Provide an authentic, transparent proof framework:
+  1. Real client quotes where available and signed off.
+  2. Clearly labeled **Demonstration Case Studies** (e.g. *Campus360* and *Aura Living*) with clear notes explaining they are comprehensive architectural demonstration models showing what Ostrum builds.
+  3. A transparent callout: *"We are currently onboarding our initial client cohort. If you partner with us now, you work directly with our founding principals."*
+* **Tone:** Refreshingly honest, high-integrity, and trustworthy.
+
+### Chapter 15: Critical Inquiries & Frequently Asked Questions (FAQ)
+* **Goal:** Proactively answer the tough questions that business owners and CTOs ask behind closed doors before signing a contract.
+* **Required Questions & Voice:**
+  1. *“Will this replace our existing software or force us to start from scratch?”*  
+     Answer: We build around what is already working. If your team loves QuickBooks or Google Sheets, we connect to it. We only replace what is broken or causing severe manual bottlenecks.
+  2. *“How long does a typical project take from start to launch?”*  
+     Answer: A typical focused web application or custom ERP integration takes between 6 and 10 weeks. We ship working software in 2-week milestones so you see continuous progress.
+  3. *“Who actually owns the code and intellectual property?”*  
+     Answer: You do. 100%. All custom code, design files, database schemas, and documentation are transferred to your repository upon completion. Zero lock-in.
+  4. *“How do you handle maintenance and support after launch?”*  
+     Answer: We offer monthly care retainers that include 24/7 uptime monitoring, security patching, and reserved developer hours each month for improvements.
+  5. *“What makes your AI assistants different from standard chatbots?”*  
+     Answer: Standard chatbots only read static text and answer FAQs. Our assistants connect directly to your live database, inventory, and WhatsApp APIs, meaning they can actually check stock, update customer records, and generate receipts.
+
+### Chapter 16: Structured Project Inquiry & Technical Brief Flow
+* **Goal:** Make initiating a project feel structured, transparent, and respectful of the client's time.
+* **4-Step Selection Flow:**
+  - **Step 1: Your Primary Objective** (e.g. *Build a new website*, *Connect our business software / ERP*, *Automate manual WhatsApp busywork*, *Full brand & system overhaul*).
+  - **Step 2: Current Operations Scale** (e.g. *Early Stage / 1–10 people*, *Growing Firm / 10–50 people*, *Established Enterprise / 50+ people*).
+  - **Step 3: Target Launch Timeline** (e.g. *Within 30 Days*, *6 to 10 Weeks*, *Next Quarter / Planning Ahead*).
+  - **Step 4: Contact & Project Summary** (Clean inputs for Name, Work Email, Company Name, and brief details).
+* **CTA Button Copy:** *"Submit Project Brief for Review ↗"* (Clear, confident, professional).
+
+---
+
+## 6. How to Discuss AI Without Hype or Fear
 
 1. **Focus on the Task, Not the Model:** Talk about what the assistant *does* (e.g. *"sends the prospectus PDF to the parent within 10 seconds"*, *"checks which store has a medium linen shirt in stock"*), not the LLM parameter size or token windows.
 2. **Never Promise "Zero Human Intervention":** Real businesses want automation that *empowers* their staff, not an unmonitored rogue bot. Say: *"Handles routine repetitive inquiries so your team can focus on complex customer conversations."*
 3. **Be Concrete:** Show real inputs (a customer's WhatsApp message) and real outputs (an updated CRM row and a calendar invite).
-
----
-
-## 6. How to Present Case Studies & Proof Truthfully
-
-* **Strict Ban on Fabricated Proof:** Never invent client names, fake 5-star ratings, synthetic review quotes, or exaggerated metrics (*"Increased sales by 850% in 3 days!"*).
-* **Clear Labeling:** If an example is a concept, prototype, or internal demonstration, label it honestly:
-  - `Demonstration Project`
-  - `Client Concept`
-  - `Architecture Case Study`
-* **Focus on Problem and Solution:** Describe the operational friction before Ostrum, what was designed and built, and what changed in the client's day-to-day operations.
 
 ---
 
