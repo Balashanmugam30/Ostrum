@@ -79,7 +79,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
       </nav>
 
       <div className="border-t border-border-subtle pt-6 flex flex-col gap-4">
-        <StatusBadge label="CURRENT STATUS: AVAILABLE FOR Q2/Q3" variant="sage" />
+        <StatusBadge label="CURRENT STATUS: ACCEPTING NEW PROJECTS" variant="sage" />
         <RollingButton
           href="#brief"
           variant="terracotta"

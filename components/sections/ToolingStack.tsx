@@ -28,7 +28,7 @@ export function ToolingStack() {
         { name: 'WhatsApp Cloud API', tag: 'Official Meta' },
         { name: 'Stripe & Razorpay', tag: 'PCI Payments' },
         { name: 'Anthropic & OpenAI', tag: 'Practical AI' },
-        { name: 'REST & Webhooks', tag: 'Sub-second Sync' },
+        { name: 'REST & Webhooks', tag: 'Real-Time Sync' },
       ],
     },
     {
@@ -46,16 +46,16 @@ export function ToolingStack() {
     <section
       id="stack"
       aria-labelledby="stack-title"
-      className="py-24 sm:py-32 bg-canvas-cool border-b border-border-subtle"
+      className="py-32 sm:py-44 bg-canvas-cool border-b border-border-subtle"
     >
       <div className="max-w-[1240px] mx-auto px-6 md:px-8">
         <SectionKicker>Chapter 09 // Tooling & Infrastructure</SectionKicker>
 
         <h2
           id="stack-title"
-          className="font-display font-bold text-3xl sm:text-4xl lg:text-[44px] leading-tight tracking-tight text-ink-primary mb-3"
+          className="font-display font-bold text-3xl sm:text-4xl lg:text-[46px] leading-[1.08] tracking-tight text-ink-primary mb-4"
         >
-          Built on proven, modern industry standards.
+          Built on proven, <span className="font-serif italic font-normal text-ink-primary/90">modern industry standards</span>.
         </h2>
 
         <p className="text-base sm:text-lg text-ink-slate max-w-2xl mb-12 leading-relaxed">
@@ -66,7 +66,7 @@ export function ToolingStack() {
           {categories.map((cat, idx) => (
             <div
               key={idx}
-              className="relative bg-surface-card border border-border-subtle rounded-xl p-6 shadow-subtle flex flex-col justify-between"
+              className="relative bg-surface-card border border-border-subtle rounded-xl p-6 sm:p-7 shadow-subtle flex flex-col justify-between"
             >
               <CornerCrosses />
 

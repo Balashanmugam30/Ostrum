@@ -15,7 +15,7 @@ export function FaqAccordion() {
     <section
       id="faq"
       aria-labelledby="faq-title"
-      className="py-24 sm:py-32 bg-canvas-cool border-b border-border-subtle"
+      className="py-32 sm:py-44 bg-canvas-cool border-b border-border-subtle"
     >
       <div className="max-w-[860px] mx-auto px-6 md:px-8">
         <div className="text-center mb-12">
@@ -23,13 +23,13 @@ export function FaqAccordion() {
 
           <h2
             id="faq-title"
-            className="font-display font-bold text-3xl sm:text-4xl lg:text-[44px] leading-tight tracking-tight text-ink-primary mb-3"
+            className="font-display font-bold text-3xl sm:text-4xl lg:text-[46px] leading-[1.08] tracking-tight text-ink-primary mb-4"
           >
-            Frequently asked questions.
+            Frequently asked <span className="font-serif italic font-normal text-ink-primary/90">questions</span>.
           </h2>
 
           <p className="text-base sm:text-lg text-ink-slate max-w-xl mx-auto leading-relaxed">
-            Honest, straightforward answers to the practical questions business leaders ask before working with us:
+            Honest, straightforward answers to the practical questions business leaders ask before partnering with us:
           </p>
         </div>
 

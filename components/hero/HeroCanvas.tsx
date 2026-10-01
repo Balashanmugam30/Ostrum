@@ -5,6 +5,7 @@ import { SectionKicker } from '@/components/ui/SectionKicker';
 import { RollingButton } from '@/components/ui/RollingButton';
 import { ArchitectureDiagram } from '@/components/hero/ArchitectureDiagram';
 import { ThreeDArtifact } from '@/components/hero/ThreeDArtifact';
+import { AtmosphericCanvas } from '@/components/hero/AtmosphericCanvas';
 
 export function HeroCanvas() {
   const [activeTab, setActiveTab] = useState<'schematic' | 'threed'>('schematic');
@@ -13,9 +14,11 @@ export function HeroCanvas() {
     <section
       id="hero"
       aria-labelledby="hero-heading"
-      className="relative pt-20 pb-20 md:pt-28 md:pb-24 bg-gradient-to-br from-canvas-warm via-[#F5EDE6] to-canvas-cool overflow-hidden border-b border-border-subtle"
+      className="relative min-h-[85vh] flex items-center pt-24 pb-20 md:pt-32 md:pb-28 bg-canvas-warm overflow-hidden border-b border-border-subtle"
     >
-      <div className="max-w-[1240px] mx-auto px-6 md:px-8">
+      <AtmosphericCanvas />
+
+      <div className="relative z-10 max-w-[1240px] mx-auto px-6 md:px-8 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column: Hero Narrative Statement */}
           <div className="lg:col-span-7 flex flex-col items-start">
@@ -23,10 +26,10 @@ export function HeroCanvas() {
 
             <h1
               id="hero-heading"
-              className="font-display font-extrabold text-4xl sm:text-5xl lg:text-[62px] leading-[1.06] tracking-tight text-ink-primary"
+              className="font-display font-extrabold text-4xl sm:text-5xl lg:text-[64px] leading-[1.05] tracking-tight text-ink-primary"
             >
               We build the technology that helps ambitious businesses{' '}
-              <span className="font-editorial italic font-normal text-accent-terracotta tracking-normal">
+              <span className="font-serif italic font-normal text-accent-terracotta tracking-normal">
                 grow
               </span>
               .
@@ -63,24 +66,24 @@ export function HeroCanvas() {
               <button
                 type="button"
                 onClick={() => setActiveTab('schematic')}
-                className={`font-mono text-xs px-3 py-1 rounded-full border transition-all ${
+                className={`font-mono text-xs px-3.5 py-1.5 rounded-full border transition-all cursor-pointer ${
                   activeTab === 'schematic'
-                    ? 'bg-ink-primary text-white border-ink-primary'
+                    ? 'bg-ink-primary text-white border-ink-primary shadow-xs'
                     : 'bg-surface-card text-ink-slate border-border-subtle hover:border-border-strong'
                 }`}
               >
-                Schematic View
+                Schematic Architecture
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('threed')}
-                className={`font-mono text-xs px-3 py-1 rounded-full border transition-all ${
+                className={`font-mono text-xs px-3.5 py-1.5 rounded-full border transition-all cursor-pointer ${
                   activeTab === 'threed'
-                    ? 'bg-ink-primary text-white border-ink-primary'
+                    ? 'bg-ink-primary text-white border-ink-primary shadow-xs'
                     : 'bg-surface-card text-ink-slate border-border-subtle hover:border-border-strong'
                 }`}
               >
-                3D Interactive Core
+                3D Connected Core
               </button>
             </div>
 

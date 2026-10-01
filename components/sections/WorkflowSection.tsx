@@ -30,16 +30,16 @@ export function WorkflowSection() {
     <section
       id="workflow"
       aria-labelledby="workflow-title"
-      className="py-24 sm:py-32 bg-canvas-pearl border-b border-border-subtle"
+      className="py-32 sm:py-44 bg-canvas-pearl border-b border-border-subtle"
     >
       <div className="max-w-[1240px] mx-auto px-6 md:px-8">
         <SectionKicker>Chapter 10 // Execution Workflow</SectionKicker>
 
         <h2
           id="workflow-title"
-          className="font-display font-bold text-3xl sm:text-4xl lg:text-[44px] leading-tight tracking-tight text-ink-primary mb-3"
+          className="font-display font-bold text-3xl sm:text-4xl lg:text-[46px] leading-[1.08] tracking-tight text-ink-primary mb-4"
         >
-          Clear stages. Zero guesswork.
+          Clear stages. <span className="font-serif italic font-normal text-ink-primary/90">Zero guesswork</span>.
         </h2>
 
         <p className="text-base sm:text-lg text-ink-slate max-w-2xl mb-12 leading-relaxed">
@@ -50,7 +50,7 @@ export function WorkflowSection() {
           {steps.map((s, idx) => (
             <div
               key={idx}
-              className="relative bg-surface-card border border-border-subtle rounded-2xl p-7 shadow-subtle flex flex-col justify-between hover:border-border-strong hover:-translate-y-0.5 transition-all duration-200"
+              className="relative bg-surface-card border border-border-subtle rounded-2xl p-7 sm:p-8 shadow-subtle flex flex-col justify-between hover:border-border-strong hover:-translate-y-0.5 transition-all duration-200"
             >
               <CornerCrosses />
 
@@ -58,7 +58,8 @@ export function WorkflowSection() {
                 <span className="font-mono text-xs font-semibold text-accent-terracotta tracking-wider block mb-3">
                   {s.num}
                 </span>
-                <h3 className="font-display font-bold text-lg text-ink-primary mb-2.5">
+
+                <h3 className="font-display font-bold text-lg sm:text-xl text-ink-primary mb-2.5">
                   {s.title}
                 </h3>
                 <p className="text-sm text-ink-slate leading-relaxed">

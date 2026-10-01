@@ -8,20 +8,20 @@ export function SelectedWorks() {
     <section
       id="works"
       aria-labelledby="works-title"
-      className="py-24 sm:py-32 bg-canvas-cool border-b border-border-subtle"
+      className="py-32 sm:py-44 bg-canvas-cool border-b border-border-subtle"
     >
       <div className="max-w-[1240px] mx-auto px-6 md:px-8">
         <SectionKicker>Chapter 06 // Selected Works</SectionKicker>
 
         <h2
           id="works-title"
-          className="font-display font-bold text-3xl sm:text-4xl lg:text-[44px] leading-tight tracking-tight text-ink-primary mb-3"
+          className="font-display font-bold text-3xl sm:text-4xl lg:text-[46px] leading-[1.08] tracking-tight text-ink-primary mb-4"
         >
-          Proof of technical craft.
+          Proof of <span className="font-serif italic font-normal text-ink-primary/90">technical craft</span>.
         </h2>
 
         <p className="text-base sm:text-lg text-ink-slate max-w-2xl mb-12 leading-relaxed">
-          Explore real architectural solutions we build. Each demonstration model illustrates how complex operational bottlenecks are resolved through custom code:
+          Explore real architectural solutions we design and build. Each demonstration model illustrates how complex operational bottlenecks are resolved through custom engineering:
         </p>
 
         {/* 3-Card Grid */}
@@ -34,11 +34,11 @@ export function SelectedWorks() {
               <CornerCrosses />
 
               <div>
-                <span className="inline-block font-mono text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-surface-bisque text-ink-slate border border-border-subtle mb-5">
+                <span className="inline-block font-mono text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-md bg-surface-bisque text-ink-slate border border-border-subtle mb-5">
                   {project.badge}
                 </span>
 
-                <h3 className="font-display font-bold text-xl text-ink-primary mb-3 leading-snug">
+                <h3 className="font-display font-bold text-xl sm:text-2xl text-ink-primary mb-3 leading-snug">
                   {project.title}
                 </h3>
 
@@ -58,10 +58,10 @@ export function SelectedWorks() {
                     {project.stack.slice(0, 2).join(' · ')}
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-ink-slate pt-1 border-t border-dashed border-border-subtle">
+                <div className="flex justify-between items-center text-ink-slate pt-2 border-t border-dashed border-border-subtle">
                   <span className="font-mono text-[11px] uppercase text-accent-terracotta font-semibold">OUTCOME:</span>
-                  <span className="font-bold text-accent-terracotta text-right">
-                    {project.metrics[0].value} {project.metrics[0].label}
+                  <span className="font-semibold text-accent-terracotta text-right">
+                    {project.metrics[0].value}
                   </span>
                 </div>
               </div>

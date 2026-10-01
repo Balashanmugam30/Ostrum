@@ -52,6 +52,7 @@ const config: Config = {
       fontFamily: {
         display: ['var(--font-display)', '-apple-system', 'sans-serif'],
         editorial: ['var(--font-editorial)', 'Georgia', 'serif'],
+        serif: ['var(--font-editorial)', 'Georgia', 'serif'],
         body: ['var(--font-body)', '-apple-system', 'sans-serif'],
         mono: ['var(--font-mono)', 'monospace'],
       },

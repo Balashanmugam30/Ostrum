@@ -8,16 +8,16 @@ export function FieldNotes() {
     <section
       id="insights"
       aria-labelledby="insights-title"
-      className="py-24 sm:py-32 bg-canvas-pearl border-b border-border-subtle"
+      className="py-32 sm:py-44 bg-canvas-pearl border-b border-border-subtle"
     >
       <div className="max-w-[1240px] mx-auto px-6 md:px-8">
         <SectionKicker>Chapter 14 // Studio Field Notes</SectionKicker>
 
         <h2
           id="insights-title"
-          className="font-display font-bold text-3xl sm:text-4xl lg:text-[44px] leading-tight tracking-tight text-ink-primary mb-3"
+          className="font-display font-bold text-3xl sm:text-4xl lg:text-[46px] leading-[1.08] tracking-tight text-ink-primary mb-4"
         >
-          Practical thinking on technology and business.
+          Practical thinking on <span className="font-serif italic font-normal text-ink-primary/90">technology and business</span>.
         </h2>
 
         <p className="text-base sm:text-lg text-ink-slate max-w-2xl mb-12 leading-relaxed">

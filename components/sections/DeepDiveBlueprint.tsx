@@ -35,20 +35,20 @@ export function DeepDiveBlueprint() {
     <section
       id="blueprint"
       aria-labelledby="blueprint-title"
-      className="py-24 sm:py-32 bg-canvas-pearl border-b border-border-subtle"
+      className="py-32 sm:py-44 bg-canvas-pearl border-b border-border-subtle"
     >
       <div className="max-w-[1240px] mx-auto px-6 md:px-8">
         <SectionKicker>Chapter 08 // Technical Architecture</SectionKicker>
 
         <h2
           id="blueprint-title"
-          className="font-display font-bold text-3xl sm:text-4xl lg:text-[44px] leading-tight tracking-tight text-ink-primary mb-3"
+          className="font-display font-bold text-3xl sm:text-4xl lg:text-[46px] leading-[1.08] tracking-tight text-ink-primary mb-4"
         >
-          Architectural Blueprint: Campus360
+          Architectural Blueprint: <span className="font-serif italic font-normal text-ink-primary/90">Campus360</span>
         </h2>
 
         <p className="text-base sm:text-lg text-ink-slate max-w-2xl mb-12 leading-relaxed">
-          A detailed look into how we engineered a complete operational backbone for education: separating concern layers to maintain high security, sub-second responses, and effortless staff usability.
+          A rigorous examination into how we engineered a complete operational backbone for education: separating concern layers to maintain high security, sub-second responses, and effortless staff usability.
         </p>
 
         <div className="relative bg-surface-card border border-border-subtle rounded-2xl p-8 sm:p-12 shadow-card">
@@ -83,7 +83,7 @@ export function DeepDiveBlueprint() {
               href="#brief"
               variant="primary"
               className="py-2.5 px-6 text-sm"
-              subLabel="Free Diagnostic Assessment"
+              subLabel="Comprehensive Technical Consultation"
             >
               Request Architecture Review
             </RollingButton>

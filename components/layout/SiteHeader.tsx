@@ -77,13 +77,13 @@ export function SiteHeader() {
           {/* Header Action Items */}
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="hidden md:block">
-              <StatusBadge label="AVAILABLE FOR Q2/Q3" variant="sage" />
+              <StatusBadge label="ACCEPTING NEW PROJECTS" variant="sage" />
             </div>
 
             <RollingButton
               href="#brief"
               variant="primary"
-              className="py-2 px-4.5 text-[13.5px]"
+              className="py-2 px-5 text-[13px] whitespace-nowrap min-w-[120px]"
               ariaLabel="Initiate Project Brief"
             >
               Start Brief

@@ -9,20 +9,20 @@ export function EngagementModels() {
     <section
       id="pricing"
       aria-labelledby="pricing-title"
-      className="py-24 sm:py-32 bg-surface-card border-b border-border-subtle"
+      className="py-32 sm:py-44 bg-surface-card border-b border-border-subtle"
     >
       <div className="max-w-[1240px] mx-auto px-6 md:px-8">
         <SectionKicker>Chapter 13 // Engagement Models</SectionKicker>
 
         <h2
           id="pricing-title"
-          className="font-display font-bold text-3xl sm:text-4xl lg:text-[44px] leading-tight tracking-tight text-ink-primary mb-3"
+          className="font-display font-bold text-3xl sm:text-4xl lg:text-[46px] leading-[1.08] tracking-tight text-ink-primary mb-4"
         >
-          Clear investment. No hidden extras.
+          Transparent <span className="font-serif italic font-normal text-ink-primary/90">investment</span>. Zero hidden lock-in.
         </h2>
 
         <p className="text-base sm:text-lg text-ink-slate max-w-2xl mb-12 leading-relaxed">
-          Choose the engagement model that best matches your company&apos;s stage and immediate operational priorities:
+          Choose the architectural engagement model that matches your operational maturity and technology roadmap:
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
@@ -53,11 +53,11 @@ export function EngagementModels() {
                 </p>
 
                 <div className="mb-8 pb-6 border-b border-border-subtle">
-                  <span className="font-display font-extrabold text-4xl text-ink-primary">
+                  <div className="font-display font-bold text-2xl text-ink-primary">
                     {tier.price}
-                  </span>
-                  <span className="font-mono text-xs text-ink-muted ml-2">
-                    / {tier.period}
+                  </div>
+                  <span className="font-mono text-xs text-ink-muted block mt-1">
+                    {tier.period}
                   </span>
                 </div>
 
@@ -77,7 +77,7 @@ export function EngagementModels() {
                 href={tier.ctaHref}
                 variant={tier.featured ? 'terracotta' : 'secondary'}
                 className="w-full justify-center py-3 text-sm font-bold"
-                subLabel="Zero Sales Spam Guaranteed"
+                subLabel="Direct Technical Consultation"
               >
                 {tier.ctaText}
               </RollingButton>

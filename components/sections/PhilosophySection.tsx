@@ -26,7 +26,7 @@ export function PhilosophySection() {
     <section
       id="philosophy"
       aria-labelledby="philosophy-title"
-      className="py-24 sm:py-32 bg-surface-bisque border-b border-border-subtle"
+      className="py-32 sm:py-44 bg-surface-bisque border-b border-border-subtle"
     >
       <div className="max-w-[1240px] mx-auto px-6 md:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
@@ -34,16 +34,16 @@ export function PhilosophySection() {
           <div className="lg:col-span-5 flex flex-col items-start">
             <SectionKicker>Chapter 04 // Operational Philosophy</SectionKicker>
 
-            <span className="font-editorial text-7xl text-accent-terracotta leading-none -mb-3 select-none" aria-hidden="true">
+            <span className="font-serif text-7xl text-accent-terracotta leading-none -mb-3 select-none" aria-hidden="true">
               “
             </span>
 
             <h2
               id="philosophy-title"
-              className="font-display font-bold text-3xl sm:text-4xl lg:text-[42px] leading-tight tracking-tight text-ink-primary"
+              className="font-display font-bold text-3xl sm:text-4xl lg:text-[44px] leading-[1.08] tracking-tight text-ink-primary"
             >
               You don&apos;t need more software. You need your software to{' '}
-              <span className="font-editorial italic font-normal text-accent-terracotta">
+              <span className="font-serif italic font-normal text-accent-terracotta">
                 talk to each other
               </span>
               .

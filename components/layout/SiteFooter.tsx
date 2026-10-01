@@ -72,8 +72,8 @@ export function SiteFooter() {
 
         {/* Footer Bottom Bar */}
         <div className="border-t border-[#232B38] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-[#6B7280]">
-          <span>© 2026 OSTRUM TECHNOLOGIES & DESIGN STUDIO. ALL RIGHTS RESERVED.</span>
-          <span>CLARTÉ-CRAFT TRANSLATION · LIGHT-FIRST · 17-CHAPTER ARCHITECTURE</span>
+          <span>© 2026 OSTRUM TECHNOLOGY & DESIGN STUDIO. ALL RIGHTS RESERVED.</span>
+          <span>FULL SOURCE CODE IP TRANSFER · ZERO VENDOR LOCK-IN · NEXT.JS 15</span>
         </div>
       </div>
     </footer>

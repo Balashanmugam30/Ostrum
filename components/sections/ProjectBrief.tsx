@@ -36,7 +36,7 @@ export function ProjectBrief() {
     <section
       id="brief"
       aria-labelledby="brief-title"
-      className="py-24 sm:py-32 bg-surface-bisque border-b border-border-subtle"
+      className="py-32 sm:py-44 bg-surface-bisque border-b border-border-subtle"
     >
       <div className="max-w-[980px] mx-auto px-6 md:px-8">
         <div className="text-center mb-12">
@@ -44,13 +44,13 @@ export function ProjectBrief() {
 
           <h2
             id="brief-title"
-            className="font-display font-bold text-3xl sm:text-4xl lg:text-[44px] leading-tight tracking-tight text-ink-primary mb-3"
+            className="font-display font-bold text-3xl sm:text-4xl lg:text-[46px] leading-[1.08] tracking-tight text-ink-primary mb-4"
           >
-            Initiate your project brief.
+            Initiate your <span className="font-serif italic font-normal text-ink-primary/90">project brief</span>.
           </h2>
 
           <p className="text-base sm:text-lg text-ink-slate max-w-xl mx-auto leading-relaxed">
-            Select your requirements below. We will review your operational scope and respond within 24 business hours with an honest assessment and timeline:
+            Select your architectural priorities below. We will review your operational scope and respond with an honest assessment and proposed technical path:
           </p>
         </div>
 
@@ -171,14 +171,14 @@ export function ProjectBrief() {
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
               <span className="font-mono text-xs text-ink-slate flex items-center gap-1.5">
-                <span>🔒</span> Privacy guaranteed. Zero sales spam or unsolicited pitches.
+                <span>🔒</span> Confidential technical assessment. Zero sales spam or unsolicited contact.
               </span>
 
               <RollingButton
                 type="submit"
                 variant="terracotta"
                 className="py-3 px-8 text-sm font-bold"
-                subLabel="24-Hour Founder Response"
+                subLabel="Direct Technical Review"
               >
                 Submit Project Brief for Review
               </RollingButton>
