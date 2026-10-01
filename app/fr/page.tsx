@@ -1,11 +1,20 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import { IntroHero } from '@/components/sections/IntroHero';
 import { BookInfos } from '@/components/sections/BookInfos';
 import { GallerySection } from '@/components/sections/GallerySection';
 import { FooterCta } from '@/components/sections/FooterCta';
 import { Footer } from '@/components/footer/Footer';
 
-export default function HomePage() {
+export default function FrenchPage() {
+  const { setLocale } = useLanguage();
+
+  useEffect(() => {
+    setLocale('fr');
+  }, [setLocale]);
+
   return (
     <div className="relative w-full flex flex-col items-center">
       {/* SECTION 01 / 02: Monumental Hero Narrative & Parallax Logo */}

@@ -1,102 +1,62 @@
-import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Instrument_Serif, Inter, JetBrains_Mono } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { SiteHeader } from '@/components/layout/SiteHeader';
-import { SiteFooter } from '@/components/layout/SiteFooter';
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['600', '700', '800'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: ['400'],
-  style: ['normal', 'italic'],
-  variable: '--font-editorial',
-  display: 'swap',
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-body',
-  display: 'swap',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-mono',
-  display: 'swap',
-});
+import { LanguageProvider } from '@/context/LanguageContext';
+import { Header } from '@/components/navigation/Header';
+import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
+import { OrderModal } from '@/components/modal/OrderModal';
 
 export const metadata: Metadata = {
-  title: 'Ostrum — Art-Directed Technology & Design Studio',
+  title: 'CLARTÉ — When Illness Becomes Light',
   description:
-    'We design your brand, build your website, connect your business systems (ERP/CRM), and automate the busywork so your company can grow.',
+    'A personal narrative and experiential art book. Each chapter extends into a digital generative experience.',
   keywords: [
-    'Digital Transformation Studio',
-    'Custom ERP Software',
-    'CRM Systems',
-    'Brand Identity Design',
-    'WhatsApp Business Automation',
-    'Education Campus Portals',
-    'Next.js Web Applications',
+    'Clarté',
+    'Art Book',
+    'Experiential Book',
+    'Generative Art',
+    'Digital Experiences',
+    'Three.js',
+    'WebGL',
   ],
-  authors: [{ name: 'Ostrum Studio' }],
-  metadataBase: new URL('https://ostrum.studio'),
+  metadataBase: new URL('https://clarte.page'),
   openGraph: {
-    title: 'Ostrum — Art-Directed Technology & Design Studio',
+    title: 'CLARTÉ — When Illness Becomes Light',
     description:
-      'We design your brand, build your website, connect your business systems (ERP/CRM), and automate the busywork so your company can grow.',
-    url: 'https://ostrum.studio',
-    siteName: 'Ostrum Studio',
+      'A personal narrative and experiential art book. Each chapter extends into a digital generative experience.',
+    url: 'https://clarte.page',
+    siteName: 'CLARTÉ',
     locale: 'en_US',
     type: 'website',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Ostrum — Art-Directed Technology & Design Studio',
-    description:
-      'We design your brand, build your website, connect your business systems (ERP/CRM), and automate the busywork so your company can grow.',
-  },
-  icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23D24B2C'/></svg>",
-  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#000000',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html
-      lang="en"
-      className={`${plusJakartaSans.variable} ${instrumentSerif.variable} ${inter.variable} ${jetbrainsMono.variable} scroll-smooth`}
-    >
-      <body className="min-h-screen flex flex-col bg-canvas-warm text-ink-slate font-body selection:bg-accent-terracotta/20 selection:text-ink-primary">
-        {/* Accessibility Skip Link */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-5 py-2.5 bg-ink-primary text-white font-medium text-sm rounded-md shadow-lg outline-none ring-2 ring-accent-terracotta"
-        >
-          Skip to main content
-        </a>
+    <html lang="en" className="dark bg-black">
+      <body className="bg-black text-white antialiased selection:bg-white selection:text-black">
+        <LanguageProvider>
+          {/* Fixed Luminous Caustics WebGL Background */}
+          <BackgroundCaustics />
 
-        {/* Global Site Header */}
-        <SiteHeader />
+          {/* Minimalist Floating Global Header */}
+          <Header />
 
-        {/* Main Content Viewport */}
-        <div id="main-content" className="flex-1">
-          {children}
-        </div>
+          {/* Page Main Content */}
+          <main className="relative z-10">{children}</main>
 
-        {/* Global Site Footer */}
-        <SiteFooter />
+          {/* Global Order Checkout Modal */}
+          <OrderModal />
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { SectionKicker } from '@/components/ui/SectionKicker';
-import { RollingButton } from '@/components/ui/RollingButton';
+import { PrimaryBtn } from '@/components/ui/PrimaryBtn';
 
 export default function ErrorBoundary({
   error,
@@ -16,29 +15,23 @@ export default function ErrorBoundary({
   }, [error]);
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center py-20 px-6">
-      <div className="max-w-md w-full text-center">
-        <SectionKicker centered>System Telemetry // Runtime Error</SectionKicker>
-
-        <h1 className="font-display font-bold text-3xl text-ink-primary mt-4 mb-4">
-          A temporary synchronization issue occurred.
+    <div className="min-h-[80vh] flex items-center justify-center py-20 px-6 text-center">
+      <div className="max-w-md w-full flex flex-col items-center">
+        <h1 className="h1 font-serif text-4xl text-white mb-4">
+          Something went wrong.
         </h1>
 
-        <p className="text-sm text-ink-slate leading-relaxed mb-8">
-          Our telemetry engine has logged this event. You can attempt to re-render the view or return to the main overview.
+        <p className="text-sm text-white/70 leading-relaxed mb-8">
+          An unexpected interruption occurred. You can retry or return to the main narrative.
         </p>
 
-        <div className="flex justify-center gap-4">
-          <button
-            type="button"
-            onClick={() => reset()}
-            className="px-6 py-2.5 rounded-full bg-accent-terracotta text-white font-semibold text-sm hover:bg-accent-terracotta-hover transition-colors"
-          >
-            Retry Synchronization
-          </button>
-          <RollingButton href="/" variant="secondary">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <PrimaryBtn onClick={() => reset()}>
+            Retry
+          </PrimaryBtn>
+          <PrimaryBtn href="/" theme="white">
             Return Home
-          </RollingButton>
+          </PrimaryBtn>
         </div>
       </div>
     </div>
