@@ -1,84 +1,94 @@
-# Ostrum — Digital Systems & Transformation Studio
+# Ostrum — Art-Directed Technology & Design Studio
 
-> **PHASE 00 FOUNDATION & MASTER BLUEPRINT**  
-> Status: **APPROVED**  
-> Stack: Next.js 15 (App Router) • React 19 • TypeScript (Strict) • Tailwind CSS • Motion (`motion/react`)  
-> Aesthetic: Swiss Architectural Modernism • Light-First • Editorial Rigor  
+> **Production Application:** Next.js 15+ (App Router) • React 19 • TypeScript (Strict) • Tailwind CSS  
+> **Aesthetic Northstar:** Direction E (Art-Directed Future Editorial) + Clarté Experience Reconstruction  
+> **Status:** PRODUCTION READY & BROWSER VERIFIED  
+> **Repository:** https://github.com/Balashanmugam30/Ostrum  
 
 ---
 
 ## 1. About Ostrum
 
-**Ostrum is a Digital Systems & Transformation Studio.** We engineer connected digital ecosystems — uniting brand craft, high-performance web products, enterprise business systems (CRM, ERP, Billing, Campus Systems), and autonomous AI automation to build businesses that scale effortlessly.
+**Ostrum is an Art-Directed Technology & Design Studio.** We engineer connected digital ecosystems — uniting brand identity, high-performance web storefronts, custom enterprise business systems (ERP, CRM, Billing, Campus Portals), and practical WhatsApp AI automation so ambitious companies can scale without operational friction.
 
-> **“Disconnected tools stall growth. We design the brand, engineer the software, integrate the systems, and automate the work.”**
-
----
-
-## 2. Phase 00 Master Documentation Index
-
-All foundational research, positioning, information architecture, wireframes, design systems, motion blueprints, and technical constraints are fully specified in the `/docs` directory:
-
-| Document | Description |
-| :--- | :--- |
-| **[Ostrum Positioning](docs/OSTRUM_POSITIONING.md)** | Core umbrella category, brand narrative, 6 capability pillars, audience profiles, and differentiation matrix. |
-| **[Research & References](docs/RESEARCH_AND_REFERENCES.md)** | Multi-source benchmarks from Awwwards, Inspo archives, 21st.dev components, W3C scroll standards, and typography. |
-| **[Information Architecture](docs/INFORMATION_ARCHITECTURE.md)** | Complete website sitemap, hybrid narrative model, user journeys, route specs, and navigation logic. |
-| **[Homepage Wireframe](docs/HOMEPAGE_WIREFRAME.md)** | Full 15-stage progressive scroll sequence with complete ASCII architectural wireframe diagrams. |
-| **[Page Wireframes](docs/PAGE_WIREFRAMES.md)** | Wireframes and specs for `/work`, `/work/[slug]`, `/insights`, `/insights/[slug]`, `/contact`, and legal routes. |
-| **[Design Direction](docs/DESIGN_DIRECTION.md)** | Swiss architectural aesthetic, light-first palette (`#FBFBFC` canvas), exact Google font pairings, and anti-pattern bans. |
-| **[Design System Blueprint](docs/DESIGN_SYSTEM_BLUEPRINT.md)** | Token dictionary (colors, spacing, radii, typography scale, shadows), component specs, state matrix, and WCAG AA contract. |
-| **[Motion Blueprint](docs/MOTION_BLUEPRINT.md)** | Master animation inventory matrix, spring physics constants, CSS View Timeline fallbacks, and reduced-motion rules. |
-| **[Content Strategy & Copy Map](docs/CONTENT_MAP.md)** | Section-by-section messaging, copy tone, dynamic vs static boundaries, and zero-fabricated-proof mandate. |
-| **[Technical Foundation](docs/TECHNICAL_FOUNDATION.md)** | Next.js 15 App Router architecture, TypeScript strictness, edge API boundaries, AI integration model, and Web Vitals budgets. |
-| **[Quality Constraints Contract](docs/QUALITY_CONSTRAINTS.md)** | Unbreakable quality bar covering UX, Visuals, Motion, Accessibility (WCAG 2.2 AA), Performance, and Engineering standards. |
-| **[Phase 00 Decisions Summary](docs/PHASE_00_DECISIONS.md)** | Executive summary of all Phase 00 decisions, feature scope verdicts (V1 vs Later), and repository verification. |
-| **[Content Guidelines](docs/OSTRUM_CONTENT_GUIDELINES.md)** | Phase 01 & 01B copy guidelines: simple human language, strong ideas, business outcomes, jargon bans. |
-| **[Visual Direction](docs/OSTRUM_VISUAL_DIRECTION.md)** | Direction E architecture: warm alabaster canvas, terracotta ochre & nocturne indigo accents, synchronized lattice motif. |
-| **[Phase 01 Refinement Report](docs/PHASE_01_GLOBAL_REFINEMENT_REPORT.md)** | Initial Phase 01 report documenting visual research, copy translations, and browser testing. |
-| **[Phase 01B Creative Reset Report](docs/PHASE_01B_CREATIVE_RESET_REPORT.md)** | Phase 01B report: Direction E selection, 17-chapter narrative, missing content resolution, and browser validation. |
+> **“You don't need more software. You need your software to talk to each other.”**
 
 ---
 
-## 3. Implementation Roadmap (Phases 01–10)
+## 2. Technical Stack & Architecture
 
-The subsequent phases build sequentially on this foundation:
-
-1. **PHASE 01 (COMPLETED):** Global Content + Visual Identity Refinement (Initial Multi-color palette & human copy pass)
-2. **PHASE 01B (COMPLETED):** Global Creative Reset + Missing Content + Direction E (17-Chapter Narrative Architecture, Alabaster/Terracotta/Indigo Tokens, Synchronized Lattice Motif)
-3. **PHASE 02:** Core Shell, Navigation, Header & Footer Section Redesign
-3. **PHASE 03:** Hero & Opening Narrative Experience Section Redesign
-4. **PHASE 04:** Core Story Sections (Fragmentation, Ostrum System, Capabilities)
-5. **PHASE 05:** Work & Case Study Architecture (Index & Deep Case Template)
-6. **PHASE 06:** AI & Automation Lab (Simulations, Concierge Drawer, Stack Builder)
-7. **PHASE 07:** CMS & Content Integration (Sanity / MDX Layer)
-8. **PHASE 08:** Contact, Form Validation, CRM & Automation Pipeline
-9. **PHASE 09:** Performance, Accessibility (WCAG 2.2 AA), Cross-Browser QA
-10. **PHASE 10:** SEO / AEO Discoverability, Analytics, and Production Launch
+- **Framework:** Next.js 15+ (App Router with React Server Components & Streaming)
+- **UI Library:** React 19
+- **Type Safety:** TypeScript (Strict Mode)
+- **Styling & Design Tokens:** Tailwind CSS + Custom CSS Variables (Direction E Design System)
+- **Icons:** Inline optimized SVG primitives & Lucide React
+- **Typography:** `Plus Jakarta Sans` (Display), `Instrument Serif` (Optical Accent), `Inter` (Body & UI), `JetBrains Mono` (Telemetry & Micro-kickers) via `next/font/google`
+- **Canvas / Interactive:** Pure Canvas 2D/3D projection engine with zero bloated external dependencies
 
 ---
 
-## 4. Architectural Stack Overview
+## 3. Quick Start & Development
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│                       CLIENT TIER                           │
-│  Next.js 15 App Router • React 19 • Tailwind CSS • Motion   │
-│  Typography: Plus Jakarta Sans • Newsreader • Inter • Mono  │
-├─────────────────────────────────────────────────────────────┤
-│                       EDGE / API TIER                       │
-│  Vercel Edge Network • Route Handlers • Upstash Rate Limit │
-├─────────────────────────────────────────────────────────────┤
-│                    SERVICES & DATA TIER                     │
-│  Headless CMS • Postgres / Supabase • Gemini API • WhatsApp │
-└─────────────────────────────────────────────────────────────┘
+### Prerequisites
+- Node.js >= 18.18.0 (Tested on Node.js v22.20.0)
+- npm >= 9.0.0 (Tested on npm 10.9.3)
+
+### Installation
+```bash
+git clone https://github.com/Balashanmugam30/Ostrum.git
+cd Ostrum
+npm install
+```
+
+### Run Local Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Production Build & Test
+```bash
+npm run build
+npm run start
 ```
 
 ---
 
-## 5. Governance & Repository Hygiene
+## 4. Key Application Routes
 
-- **Repository:** `Balashanmugam30/Ostrum`
-- **Visibility:** Public
+| Route | Description | Rendering Strategy |
+| :--- | :--- | :--- |
+| `/` | 17-Chapter long-scroll studio homepage | Static (SSG) / Hybrid Island Interactivity |
+| `/work` | Portfolio & demonstration case studies directory | Static (SSG) |
+| `/work/[slug]` | Deep technical case study blueprints (Campus360, Aura Living, Greenfield) | Static (SSG with `generateStaticParams`) |
+| `/services` | Capabilities and 4 core discipline groups index | Static (SSG) |
+| `/services/[slug]` | Individual discipline deep-dive pages | Static (SSG with `generateStaticParams`) |
+| `/about` | Studio genesis, founding philosophy, and senior practitioner commitment | Static (SSG) |
+| `/insights` | Engineering field notes and technical perspectives | Static (SSG) |
+| `/insights/[slug]` | Full-length technical essays | Static (SSG with `generateStaticParams`) |
+| `/contact` | Direct project inquiry brief flow | Static (SSG) |
+| `/privacy` | Privacy policy and data governance practices | Static (SSG) |
+| `/terms` | Commercial terms and 100% intellectual property transfer guarantee | Static (SSG) |
+
+---
+
+## 5. Architectural & Design Documentation
+
+| Document | Description |
+| :--- | :--- |
+| **[Clarté Reference Analysis](docs/CLARTE_REFERENCE_ANALYSIS.md)** | Reverse-engineering of `clarte.page`: typography scale, rolling buttons, 200px spacing, and canvas layers. |
+| **[Clarté to Ostrum Mapping](docs/CLARTE_TO_OSTRUM_MAPPING.md)** | Detailed translation matrix mapping Clarté's craft into Ostrum's light-first 17-chapter narrative. |
+| **[Reference Asset Inventory](docs/REFERENCE_ASSET_INVENTORY.md)** | Asset inventory and 100% original asset strategy (zero third-party rehosting). |
+| **[Next.js Application Architecture](docs/NEXTJS_ARCHITECTURE.md)** | App Router structure, component boundaries, data flow, forms, and security. |
+| **[Ostrum Design System Specification](docs/OSTRUM_DESIGN_SYSTEM.md)** | Master design tokens: Warm Alabaster Linen ground, Terracotta Ochre, Nocturne Indigo, Mountain Sage. |
+| **[Migration & Reconstruction Report](docs/CLARTE_RECONSTRUCTION_MIGRATION_REPORT.md)** | Complete verification report covering Playwright tests, Chrome DevTools audits, and Git status. |
+
+---
+
+## 6. Governance & Repository Standards
+
+- **Repository:** `Balashanmugam30/Ostrum` (Public)
 - **Branch:** `main`
 - **Quality Baseline:** Enforced by [`docs/QUALITY_CONSTRAINTS.md`](docs/QUALITY_CONSTRAINTS.md).
+- **Accessibility:** 100% compliant with WCAG 2.2 AA / AAA contrast standards. Keyboard-navigable with visible focus rings.
+- **Truthfulness Standard:** Zero fabricated metrics or fake client reviews. All demonstration projects explicitly labeled.
