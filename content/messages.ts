@@ -2,8 +2,9 @@ export type Locale = 'en' | 'fr';
 
 export interface ContentMessages {
   hero: {
-    descLine1: string;
-    descLine2: string;
+    headline: string;
+    philosophyLine1: string;
+    philosophyLine2: string;
     cta: string;
     sublabel: string;
   };
@@ -60,10 +61,11 @@ export interface ContentMessages {
 export const messages: Record<Locale, ContentMessages> = {
   en: {
     hero: {
-      descLine1: "A year ago, I was told I had a rare chronic blood cancer.",
-      descLine2: "Since then, I've been trying to see things more clearly.",
-      cta: "Get the book",
-      sublabel: "Also available as a digital edition",
+      headline: "We build the technology that helps ambitious businesses **grow**",
+      philosophyLine1: "You don't need more software.",
+      philosophyLine2: "You need your software to talk to each other.",
+      cta: "Start a project",
+      sublabel: "Tell us what you're building",
     },
     bookInfos: {
       titleLine1: "An experiential",
@@ -133,10 +135,11 @@ export const messages: Record<Locale, ContentMessages> = {
   },
   fr: {
     hero: {
-      descLine1: "Il y a un an, on m'annonce",
-      descLine2: "un cancer du sang chronique rare. Depuis, j'essaie d'y voir plus clair.",
-      cta: "Obtenir le livre",
-      sublabel: "Existe aussi en version numérique",
+      headline: "We build the technology that helps ambitious businesses **grow**",
+      philosophyLine1: "You don't need more software.",
+      philosophyLine2: "You need your software to talk to each other.",
+      cta: "Start a project",
+      sublabel: "Tell us what you're building",
     },
     bookInfos: {
       titleLine1: "Un livre",

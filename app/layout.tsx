@@ -6,25 +6,25 @@ import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
 import { OrderModal } from '@/components/modal/OrderModal';
 
 export const metadata: Metadata = {
-  title: 'CLARTÉ — When Illness Becomes Light',
+  title: 'OSTRUM — Digital Transformation Studio',
   description:
-    'A personal narrative and experiential art book. Each chapter extends into a digital generative experience.',
+    'We build the technology that helps ambitious businesses grow. Custom software development, integrations, and digital infrastructure.',
   keywords: [
-    'Clarté',
-    'Art Book',
-    'Experiential Book',
-    'Generative Art',
-    'Digital Experiences',
+    'Ostrum',
+    'Digital Transformation',
+    'Technology Studio',
+    'Software Architecture',
+    'Integrations',
     'Three.js',
     'WebGL',
   ],
-  metadataBase: new URL('https://clarte.page'),
+  metadataBase: new URL('https://ostrum.com'),
   openGraph: {
-    title: 'CLARTÉ — When Illness Becomes Light',
+    title: 'OSTRUM — Digital Transformation Studio',
     description:
-      'A personal narrative and experiential art book. Each chapter extends into a digital generative experience.',
-    url: 'https://clarte.page',
-    siteName: 'CLARTÉ',
+      'We build the technology that helps ambitious businesses grow.',
+    url: 'https://ostrum.com',
+    siteName: 'OSTRUM',
     locale: 'en_US',
     type: 'website',
   },

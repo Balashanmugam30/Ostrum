@@ -104,9 +104,30 @@ body {
   padding: 0.95rem 1.25rem;
   position: relative;
   text-decoration: none;
-  transition: color var(--duration) var(--ease), background var(--duration) var(--ease);
+  transition: color var(--duration) var(--ease),
+              background var(--duration) var(--ease),
+              transform var(--duration) var(--ease),
+              box-shadow var(--duration) var(--ease);
   white-space: nowrap;
   width: fit-content;
+}
+
+@media (hover: hover) {
+  .primary-btn:hover {
+    color: var(--black);
+    transform: translateY(-2px) scale(1.015);
+    box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.35);
+  }
+}
+
+.primary-btn:active {
+  transform: translateY(0px) scale(0.985);
+  transition-duration: 0.15s;
+}
+
+.primary-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 4px;
 }
 
 .primary-btn .bg {
@@ -115,10 +136,6 @@ body {
   inset: 0;
   position: absolute;
   transition: clip-path var(--duration) var(--ease);
-}
-
-.primary-btn:hover {
-  color: var(--black);
 }
 
 .primary-btn:hover .bg {
@@ -216,3 +233,158 @@ body {
 .animate-fadeIn {
   animation: fadeIn 0.3s cubic-bezier(0.38, 0.005, 0.215, 1) forwards;
 }
+
+/* Line by Line Split Text Animation */
+.line-by-line {
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.38, 0.005, 0.215, 1);
+}
+
+.line-by-line.is-visible {
+  opacity: 1;
+}
+
+.split-parent {
+  clip-path: inset(0 -30px 0 -30px);
+  display: block;
+  overflow: visible;
+}
+
+.split {
+  margin-top: -0.2em;
+  padding-top: 0.2em;
+  position: relative;
+  display: inline-block;
+  transform: translateY(125%);
+  transition: transform 0.95s cubic-bezier(0.38, 0.005, 0.215, 1);
+  will-change: transform;
+}
+
+.line-by-line.is-visible .split {
+  transform: translateY(0%);
+}
+
+/* Sticky Reveal Footer Structure */
+.footer {
+  clip-path: polygon(0px 0px, 0px 100%, 100% 100%, 100% 0px);
+  height: 100dvh;
+  position: relative;
+  width: 100%;
+  z-index: 10;
+}
+
+.footer-clip {
+  clip-path: polygon(0px 100vh, 0px 100%, 100% 100%, 100% 100vh);
+  height: calc(100% + 100vh);
+  position: relative;
+  top: -100vh;
+}
+
+.footer-inner {
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 1.5rem;
+  position: sticky;
+  top: 0px;
+  width: 100%;
+}
+
+.footer-bg {
+  height: 100%;
+  inset: 0px;
+  object-fit: cover;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  z-index: -1;
+}
+
+.footer-logo {
+  position: relative;
+  width: 100%;
+}
+
+.footer-logo .magnet-wrap {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+}
+
+.footer-logo > span {
+  display: block;
+  font-size: 20vw;
+  margin-bottom: -10.5vw;
+}
+
+.footer-logo svg {
+  height: auto;
+  width: 100%;
+}
+
+.footer-nav {
+  display: flex;
+  font-size: 1rem;
+  font-weight: 500;
+  gap: 1.5rem;
+  justify-content: space-between;
+  opacity: 0.75;
+}
+
+.footer-nav a {
+  text-decoration: none;
+  transition: opacity 0.3s cubic-bezier(0.38, 0.005, 0.215, 1);
+}
+
+.footer-nav a:hover {
+  opacity: 0.5;
+}
+
+.footer-copy {
+  line-height: 1;
+  text-align: center;
+}
+
+.highlight {
+  font-family: 'Romie', Georgia, serif;
+  font-style: italic;
+  display: inline-block;
+  vertical-align: baseline;
+  padding-right: 0.22em;
+  padding-left: 0.04em;
+  margin-right: -0.06em;
+}
+
+/* Scroll Cue Animation */
+@keyframes scrollCueBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+.scroll-cue-arrow {
+  animation: scrollCueBounce 2.2s ease-in-out infinite;
+}
+
+/* Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .line-by-line,
+  .line-by-line .split,
+  .primary-btn,
+  .primary-btn *,
+  .scroll-cue-arrow {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+

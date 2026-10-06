@@ -10,68 +10,252 @@ export function BackgroundCaustics() {
     const container = containerRef.current;
     if (!container) return;
 
-    const isMobile = window.innerWidth <= 440;
+    const isMobile = window.innerWidth < 768;
     if (isMobile) return;
 
     let animationFrameId: number;
-    const scene = new THREE.Scene();
+    const size = { width: container.clientWidth || window.innerWidth, height: container.clientHeight || window.innerHeight };
 
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+    const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' });
+    renderer.setSize(size.width, size.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.domElement.style.display = 'block';
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
     renderer.domElement.style.position = 'absolute';
     renderer.domElement.style.inset = '0';
+    renderer.domElement.style.pointerEvents = 'none';
     container.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 10);
+    camera.position.z = 1;
+
 
     const vertexShader = `
       varying vec2 vUv;
       void main() {
         vUv = uv;
-        gl_Position = vec4(position, 1.0);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }
     `;
 
     const fragmentShader = `
-      uniform sampler2D uTexture;
-      uniform float uTime;
-      uniform vec2 uResolution;
-      uniform float uLoaded;
+      precision highp float;
       varying vec2 vUv;
 
-      void main() {
-        if (uLoaded < 0.5) {
-          gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-          return;
-        }
+      uniform float uTime;
+      uniform vec2 uResolution;
+      uniform vec2 uMouse;
 
-        // Cover UV calculation for 1920x1080 background texture
-        vec2 sRes = uResolution;
-        vec2 tRes = vec2(1920.0, 1080.0);
-        float sAspect = sRes.x / sRes.y;
-        float tAspect = tRes.x / tRes.y;
+      // Texture
+      uniform sampler2D uTexture;
+      uniform vec2 uTextureResolution;
+
+      // Water
+      uniform float uWaterScale;
+      uniform float uWaterSpeed;
+      uniform float uDistortionStrength;
+
+      // Mouse interaction
+      uniform float uMouseRadius;
+      uniform float uMouseStrength;
+
+      // Grain
+      uniform float uGrainIntensity;
+      uniform float uGrainSpeed;
+
+      // Scroll
+      uniform float uScrollY;
+
+      // Halo
+      uniform float uHaloIntensity;
+      uniform float uHaloSize;
+      uniform vec3 uHaloColor;
+
+      // ============================================
+      // SIMPLEX 3D NOISE
+      // ============================================
+
+      vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+      vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+      float snoise(vec3 v) {
+        const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
+        const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+
+        vec3 i = floor(v + dot(v, C.yyy));
+        vec3 x0 = v - i + dot(i, C.xxx);
+
+        vec3 g = step(x0.yzx, x0.xyz);
+        vec3 l = 1.0 - g;
+        vec3 i1 = min(g.xyz, l.zxy);
+        vec3 i2 = max(g.xyz, l.zxy);
+
+        vec3 x1 = x0 - i1 + C.xxx;
+        vec3 x2 = x0 - i2 + C.yyy;
+        vec3 x3 = x0 - D.yyy;
+
+        i = mod289(i);
+        vec4 p = permute(permute(permute(
+          i.z + vec4(0.0, i1.z, i2.z, 1.0))
+          + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+          + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+
+        float n_ = 0.142857142857;
+        vec3 ns = n_ * D.wyz - D.xzx;
+
+        vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+
+        vec4 x_ = floor(j * ns.z);
+        vec4 y_ = floor(j - 7.0 * x_);
+
+        vec4 x = x_ * ns.x + ns.yyyy;
+        vec4 y = y_ * ns.x + ns.yyyy;
+        vec4 h = 1.0 - abs(x) - abs(y);
+
+        vec4 b0 = vec4(x.xy, y.xy);
+        vec4 b1 = vec4(x.zw, y.zw);
+
+        vec4 s0 = floor(b0) * 2.0 + 1.0;
+        vec4 s1 = floor(b1) * 2.0 + 1.0;
+        vec4 sh = -step(h, vec4(0.0));
+
+        vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+        vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+
+        vec3 p0 = vec3(a0.xy, h.x);
+        vec3 p1 = vec3(a0.zw, h.y);
+        vec3 p2 = vec3(a1.xy, h.z);
+        vec3 p3 = vec3(a1.zw, h.w);
+
+        vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+        p0 *= norm.x;
+        p1 *= norm.y;
+        p2 *= norm.z;
+        p3 *= norm.w;
+
+        vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
+        m = m * m;
+        return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+      }
+
+      // ============================================
+      // OBJECT-FIT COVER UV (aligned to top)
+      // ============================================
+
+      vec2 coverUV(vec2 uv, vec2 screenSize, vec2 textureSize) {
+        float screenAspect = screenSize.x / screenSize.y;
+        float textureAspect = textureSize.x / textureSize.y;
+
         vec2 scale = vec2(1.0);
-        if (sAspect > tAspect) {
-          scale = vec2(1.0, tAspect / sAspect);
+
+        if (screenAspect > textureAspect) {
+          scale.y = textureAspect / screenAspect;
         } else {
-          scale = vec2(sAspect / tAspect, 1.0);
+          scale.x = screenAspect / textureAspect;
         }
-        vec2 uv = (vUv - 0.5) * scale + 0.5;
 
-        // Subtle organic caustic pulse
-        float dist = distance(uv, vec2(0.5, 0.5));
-        float wave = sin(dist * 6.0 - uTime * 0.6) * 0.0025;
-        vec2 distortedUv = uv + vec2(wave, -wave * 0.5);
+        vec2 offset = vec2(0.5, 1.0 - scale.y * 0.5);
+        return (uv - vec2(0.5, 0.5)) * scale + offset;
+      }
 
-        vec4 tex = texture2D(uTexture, distortedUv);
+      // ============================================
+      // WATER DISTORTION
+      // ============================================
 
-        // Fine film grain
-        float noise = (fract(sin(dot(uv * (uTime * 0.2 + 1.0), vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * 0.025;
-        gl_FragColor = vec4(tex.rgb + vec3(noise), tex.a);
+      vec2 waterDistortion(vec2 p, float time) {
+        vec3 coord = vec3(p * uWaterScale, time * uWaterSpeed);
+
+        float n1 = snoise(coord);
+        float n2 = snoise(coord + vec3(0.1, 0.0, 0.0));
+        float n3 = snoise(coord + vec3(0.0, 0.1, 0.0));
+
+        vec2 grad = vec2(n2 - n1, n3 - n1);
+        return grad * uDistortionStrength;
+      }
+
+      // ============================================
+      // FILM GRAIN
+      // ============================================
+
+      float filmGrain(vec2 uv, float time) {
+        vec2 grainUv = uv * uResolution;
+        float seed = floor(time * uGrainSpeed) * 0.37;
+
+        float grain1 = fract(sin(dot(grainUv + seed, vec2(12.9898, 78.233))) * 43758.5453);
+        float grain2 = fract(sin(dot(grainUv * 0.7 + 0.5 + seed, vec2(39.346, 11.135))) * 43758.5453);
+
+        return mix(grain1, grain2, 0.5);
+      }
+
+      // ============================================
+      // MOUSE DISTORTION
+      // ============================================
+
+      vec2 mouseDistortion(vec2 uv, vec2 mouse) {
+        vec2 dir = uv - mouse;
+        float dist = length(dir);
+
+        float strength = smoothstep(uMouseRadius, 0.0, dist);
+        strength = pow(strength, 1.5);
+
+        vec2 displacement = normalize(dir + 0.0001) * strength * uMouseStrength;
+        return displacement;
+      }
+
+      // ============================================
+      // MOUSE LIGHT HALO
+      // ============================================
+
+      vec3 mouseHalo(vec2 uv, vec2 mouse) {
+        float aspect = uResolution.x / uResolution.y;
+
+        vec2 uvCorrected = vec2(uv.x * aspect, uv.y);
+        vec2 mouseCorrected = vec2(mouse.x * aspect, mouse.y);
+
+        float dist = length(uvCorrected - mouseCorrected);
+        float glow = smoothstep(uHaloSize, 0.0, dist);
+        float intensity = pow(glow, 1.5);
+
+        return uHaloColor * intensity * uHaloIntensity;
+      }
+
+      // ============================================
+      // MAIN
+      // ============================================
+
+      void main() {
+        vec2 uv = vUv;
+        float time = uTime;
+
+        vec2 texUV = coverUV(uv, uResolution, uTextureResolution);
+        texUV.y -= uScrollY;
+
+        vec2 distortion = waterDistortion(uv, time);
+        vec2 mouseDist = mouseDistortion(uv, uMouse);
+
+        texUV += distortion + mouseDist;
+
+        vec3 color = vec3(0.0);
+        if (texUV.x >= 0.0 && texUV.x <= 1.0 && texUV.y >= 0.0 && texUV.y <= 1.0) {
+          color = texture2D(uTexture, texUV).rgb;
+        }
+
+        vec3 halo = mouseHalo(uv, uMouse);
+        color += halo;
+
+        float grain1 = filmGrain(uv, time);
+        float grain2 = filmGrain(uv * 1.5 + 0.5, time * 0.8);
+        float grain3 = filmGrain(uv * 3.0, time * 1.5);
+        float grain = grain1 * 0.5 + grain2 * 0.3 + grain3 * 0.2;
+
+        color = color + (grain - 0.5) * uGrainIntensity;
+        color = clamp(color, 0.0, 1.0);
+
+        gl_FragColor = vec4(color, 1.0);
       }
     `;
 
@@ -79,57 +263,107 @@ export function BackgroundCaustics() {
       vertexShader,
       fragmentShader,
       uniforms: {
-        uTexture: { value: null },
         uTime: { value: 0 },
-        uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-        uLoaded: { value: 0.0 },
+        uResolution: { value: new THREE.Vector2(size.width, size.height) },
+        uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+        uTexture: { value: null },
+        uTextureResolution: { value: new THREE.Vector2(1920, 1080) },
+        uWaterScale: { value: 2 },
+        uWaterSpeed: { value: 0.15 },
+        uDistortionStrength: { value: isMobile ? 0.018 : 0.025 },
+        uMouseRadius: { value: 0.3 },
+        uMouseStrength: { value: isMobile ? 0 : 0.035 },
+        uGrainIntensity: { value: isMobile ? 0.25 : 0.4 },
+        uGrainSpeed: { value: isMobile ? 8 : 12 },
+        uScrollY: { value: 0 },
+        uHaloIntensity: { value: isMobile ? 0 : 0.75 },
+        uHaloSize: { value: 0.5 },
+        uHaloColor: { value: new THREE.Color(0.91, 0.063, 0) },
       },
-      transparent: true,
-      depthTest: false,
-      depthWrite: false,
     });
+
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+    scene.add(mesh);
 
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load('/images/bg.webp', (tex) => {
-      tex.colorSpace = THREE.SRGBColorSpace;
       tex.minFilter = THREE.LinearFilter;
       tex.magFilter = THREE.LinearFilter;
       material.uniforms.uTexture.value = tex;
-      material.uniforms.uLoaded.value = 1.0;
-      material.needsUpdate = true;
+      if (tex.image) {
+        material.uniforms.uTextureResolution.value.set(tex.image.width, tex.image.height);
+      }
     });
 
-    const geometry = new THREE.PlaneGeometry(2, 2);
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
+    const mousePos = { x: 0.5, y: 0.5 };
+    const targetPos = { x: 0.5, y: 0.5 };
+    let scrollY = 0;
+    let targetScrollY = 0;
+    let isVisible = true;
 
-    const clock = new THREE.Clock();
+    const onMouseMove = (e: MouseEvent) => {
+      targetPos.x = e.clientX / size.width;
+      targetPos.y = 1 - e.clientY / size.height;
+    };
+
+    const onScroll = () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      targetScrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+    };
+
+    const onVisibilityChange = () => {
+      isVisible = document.visibilityState === 'visible';
+    };
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    onScroll();
+
+    const startTime = performance.now();
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      material.uniforms.uTime.value = clock.getElapsedTime();
+      if (!isVisible) return;
+
+      const elapsed = (performance.now() - startTime) * 0.001;
+      mousePos.x += (targetPos.x - mousePos.x) * 0.08;
+      mousePos.y += (targetPos.y - mousePos.y) * 0.08;
+      scrollY += (targetScrollY - scrollY) * 0.1;
+
+      const uniforms = material.uniforms;
+      uniforms.uTime.value = elapsed;
+      uniforms.uMouse.value.set(mousePos.x, mousePos.y);
+      uniforms.uScrollY.value = scrollY * 0.8;
+
       renderer.render(scene, camera);
     };
 
     animate();
 
-    const handleResize = () => {
-      if (!renderer || !material) return;
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+    const onResize = () => {
+      size.width = container.clientWidth || window.innerWidth;
+      size.height = container.clientHeight || window.innerHeight;
+      renderer.setSize(size.width, size.height);
+      material.uniforms.uResolution.value.set(size.width, size.height);
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', onResize);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+
       if (renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);
       }
-      renderer.dispose();
-      geometry.dispose();
+      material.uniforms.uTexture.value?.dispose();
       material.dispose();
+      mesh.geometry.dispose();
+      renderer.dispose();
     };
   }, []);
 

@@ -82,8 +82,8 @@ export function OrderModal() {
                   onClick={() => setModalMode('physical')}
                   className={`flex-1 py-2 text-xs md:text-sm font-medium rounded transition-all duration-200 ${
                     isPhysical
-                      ? 'bg-black text-white shadow-sm'
-                      : 'text-black/70 hover:text-black'
+                      ? 'bg-white text-black shadow-sm font-medium'
+                      : 'text-black/60 hover:text-black'
                   }`}
                 >
                   {t.modal.physicalTab}
@@ -93,8 +93,8 @@ export function OrderModal() {
                   onClick={() => setModalMode('digital')}
                   className={`flex-1 py-2 text-xs md:text-sm font-medium rounded transition-all duration-200 ${
                     !isPhysical
-                      ? 'bg-black text-white shadow-sm'
-                      : 'text-black/70 hover:text-black'
+                      ? 'bg-white text-black shadow-sm font-medium'
+                      : 'text-black/60 hover:text-black'
                   }`}
                 >
                   {t.modal.digitalTab}
@@ -119,7 +119,7 @@ export function OrderModal() {
               <ul className="modal-details space-y-2.5 text-xs md:text-sm text-black/80 font-normal leading-relaxed">
                 {details.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <span className="text-black/40 mt-0.5">•</span>
+                    <span className="text-black/40 mt-0.5">—</span>
                     <span>{item}</span>
                   </li>
                 ))}

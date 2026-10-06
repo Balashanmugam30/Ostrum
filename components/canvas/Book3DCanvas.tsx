@@ -8,6 +8,16 @@ interface Book3DCanvasProps {
   isInteractive?: boolean;
 }
 
+function createSubUvPlane(w: number, h: number, uMin: number, uMax: number, segments = 16) {
+  const geom = new THREE.PlaneGeometry(w, h, segments, 1);
+  const uvs = geom.attributes.uv;
+  for (let i = 0; i < uvs.count; i++) {
+    const c = uvs.getX(i);
+    uvs.setX(i, uMin + c * (uMax - uMin));
+  }
+  return geom;
+}
+
 export function Book3DCanvas({ className = '', isInteractive = true }: Book3DCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -15,260 +25,325 @@ export function Book3DCanvas({ className = '', isInteractive = true }: Book3DCan
     const container = containerRef.current;
     if (!container) return;
 
+    const isMobile = window.innerWidth < 768;
     let animationFrameId: number;
-    const width = container.clientWidth || 392;
-    const height = container.clientHeight || 523;
 
-    // Scene & Camera
+    const size = {
+      width: container.clientWidth || 420,
+      height: container.clientHeight || 560,
+    };
+
+    // Reference dimensions
+    const bookWidth = 1.48;
+    const bookHeight = 2.1;
+    const bookDepth = 0.035;
+    const halfDepth = bookDepth / 2;
+
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    camera.position.set(0, 0, 3.2);
+    const aspect = size.width / size.height;
+    const camera = new THREE.PerspectiveCamera(30, aspect, 0.1, 100);
+    camera.position.set(0, 0, 4.5);
+    camera.lookAt(0, 0, 0);
 
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(width, height);
+    const renderer = new THREE.WebGLRenderer({
+      antialias: !isMobile,
+      alpha: true,
+      powerPreference: 'high-performance',
+    });
+    renderer.setSize(size.width, size.height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+    renderer.setClearColor(0x000000, 0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.4;
     renderer.domElement.style.display = 'block';
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
     container.appendChild(renderer.domElement);
 
-    // Lighting
+    // Reference Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfff5ea, 1.8);
-    keyLight.position.set(2, 3, 3);
+    const keyLight = new THREE.DirectionalLight(0xfff1ee, 1.8);
+    keyLight.position.set(3, 4, 5);
     scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(0xcc3322, 1.2);
-    rimLight.position.set(-3, -2, -1);
-    scene.add(rimLight);
+    const fillLight = new THREE.DirectionalLight(0xc8d3ff, 0.6);
+    fillLight.position.set(-3, 1, 3);
+    scene.add(fillLight);
 
-    const mouseLight = new THREE.PointLight(0xffffff, 1.2, 5);
-    mouseLight.position.set(0, 0, 1.5);
+    const mouseLight = new THREE.PointLight(0xffeadb, 2, 3, 1.5);
+    mouseLight.position.set(0, 0, 0.8);
     scene.add(mouseLight);
 
-    // Book Group
     const bookGroup = new THREE.Group();
     scene.add(bookGroup);
 
-    // Hardcover Book Dimensions (1:1.4 aspect ratio)
-    const bookWidth = 1.12;
-    const bookHeight = 1.56;
-    const bookDepth = 0.12;
-    const halfDepth = bookDepth / 2;
-
+    // Textures & Materials
     const textureLoader = new THREE.TextureLoader();
     const bookTexture = textureLoader.load('/images/book.webp', (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
-      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.minFilter = THREE.LinearFilter;
       tex.magFilter = THREE.LinearFilter;
     });
 
-    const normalTexture = textureLoader.load('/images/book_normal.webp', (tex) => {
-      tex.minFilter = THREE.LinearMipmapLinearFilter;
+    const bookNormal = textureLoader.load('/images/book_normal.webp', (tex) => {
+      tex.minFilter = THREE.LinearFilter;
       tex.magFilter = THREE.LinearFilter;
     });
 
-    // Cover material with normal bump mapping
     const coverMaterial = new THREE.MeshStandardMaterial({
       map: bookTexture,
-      normalMap: normalTexture,
-      normalScale: new THREE.Vector2(0.9, 0.9),
+      normalMap: bookNormal,
+      normalScale: new THREE.Vector2(1, 1),
       roughness: 0.85,
-      metalness: 0.05,
+      metalness: 0,
+      envMapIntensity: 0,
     });
 
-    // Dark page edges material
-    const pageMaterial = new THREE.MeshStandardMaterial({
-      color: 0x181514,
-      roughness: 0.85,
-      metalness: 0.0,
+    const spineEdgeMaterial = new THREE.MeshStandardMaterial({
+      color: 0x151010,
+      roughness: 0.7,
+      metalness: 0,
     });
 
-    // 1. Front Cover (UV x mapped from 0.5 to 1.0)
-    const frontGeometry = new THREE.PlaneGeometry(bookWidth, bookHeight, 16, 16);
-    const frontUvs = frontGeometry.attributes.uv;
-    for (let i = 0; i < frontUvs.count; i++) {
-      const u = frontUvs.getX(i);
-      frontUvs.setX(i, 0.5 + u * 0.5);
-    }
-    const frontMesh = new THREE.Mesh(frontGeometry, coverMaterial);
+    const pageEdgeMaterial = new THREE.MeshStandardMaterial({
+      color: 0xddd9cf,
+      roughness: 0.9,
+      metalness: 0,
+    });
+
+    const segs = isMobile ? 8 : 16;
+
+    // 1. Front Cover (UV 0.5 to 1.0)
+    const frontGeom = createSubUvPlane(bookWidth, bookHeight, 0.5, 1.0, segs);
+    const frontMesh = new THREE.Mesh(frontGeom, coverMaterial);
     frontMesh.position.z = halfDepth;
+    const frontBasePositions = new Float32Array(frontGeom.attributes.position.array);
     bookGroup.add(frontMesh);
 
-    // 2. Back Cover (UV x mapped from 0.0 to 0.5)
-    const backGeometry = new THREE.PlaneGeometry(bookWidth, bookHeight, 16, 16);
-    const backUvs = backGeometry.attributes.uv;
-    for (let i = 0; i < backUvs.count; i++) {
-      const u = backUvs.getX(i);
-      backUvs.setX(i, u * 0.5);
-    }
-    const backMesh = new THREE.Mesh(backGeometry, coverMaterial);
-    backMesh.position.z = -halfDepth;
+    // 2. Back Cover (UV 0.0 to 0.5)
+    const backGeom = createSubUvPlane(bookWidth, bookHeight, 0.0, 0.5, segs);
+    const backMesh = new THREE.Mesh(backGeom, coverMaterial);
     backMesh.rotation.y = Math.PI;
+    backMesh.position.z = -halfDepth;
+    const backBasePositions = new Float32Array(backGeom.attributes.position.array);
     bookGroup.add(backMesh);
 
-    // 3. Spine (-X edge)
-    const spineGeometry = new THREE.PlaneGeometry(bookDepth, bookHeight);
-    const spineMaterial = new THREE.MeshStandardMaterial({
-      color: 0x141010,
-      roughness: 0.75,
-      metalness: 0.0,
-    });
-    const spineMesh = new THREE.Mesh(spineGeometry, spineMaterial);
-    spineMesh.position.x = -bookWidth / 2;
+    // 3. Spine
+    const spineGeom = new THREE.PlaneGeometry(bookDepth, bookHeight);
+    const spineMesh = new THREE.Mesh(spineGeom, spineEdgeMaterial);
     spineMesh.rotation.y = -Math.PI / 2;
+    spineMesh.position.x = -bookWidth / 2;
     bookGroup.add(spineMesh);
 
-    // 4. Paper block (+X right pages edge)
-    const rightPageGeometry = new THREE.PlaneGeometry(bookDepth, bookHeight);
-    const rightPageMesh = new THREE.Mesh(rightPageGeometry, pageMaterial);
-    rightPageMesh.position.x = bookWidth / 2;
-    rightPageMesh.rotation.y = Math.PI / 2;
-    bookGroup.add(rightPageMesh);
+    // 4. Pages Edge (right)
+    const pageGeom = new THREE.PlaneGeometry(bookDepth, bookHeight);
+    const pageMesh = new THREE.Mesh(pageGeom, pageEdgeMaterial);
+    pageMesh.rotation.y = Math.PI / 2;
+    pageMesh.position.x = bookWidth / 2;
+    bookGroup.add(pageMesh);
 
-    // 5. Top paper block (+Y edge)
-    const topPageGeometry = new THREE.PlaneGeometry(bookWidth, bookDepth);
-    const topPageMesh = new THREE.Mesh(topPageGeometry, pageMaterial);
-    topPageMesh.position.y = bookHeight / 2;
-    topPageMesh.rotation.x = -Math.PI / 2;
-    bookGroup.add(topPageMesh);
+    // 5. Top Edge
+    const topGeom = new THREE.PlaneGeometry(bookWidth, bookDepth);
+    const topMesh = new THREE.Mesh(topGeom, spineEdgeMaterial);
+    topMesh.rotation.x = -Math.PI / 2;
+    topMesh.position.y = bookHeight / 2;
+    bookGroup.add(topMesh);
 
-    // 6. Bottom paper block (-Y edge)
-    const bottomPageGeometry = new THREE.PlaneGeometry(bookWidth, bookDepth);
-    const bottomPageMesh = new THREE.Mesh(bottomPageGeometry, pageMaterial);
-    bottomPageMesh.position.y = -bookHeight / 2;
-    bottomPageMesh.rotation.x = Math.PI / 2;
-    bookGroup.add(bottomPageMesh);
+    // 6. Bottom Edge
+    const bottomGeom = new THREE.PlaneGeometry(bookWidth, bookDepth);
+    const bottomMesh = new THREE.Mesh(bottomGeom, spineEdgeMaterial);
+    bottomMesh.rotation.x = Math.PI / 2;
+    bottomMesh.position.y = -bookHeight / 2;
+    bookGroup.add(bottomMesh);
 
-    // Initial orientation: angled slightly to showcase 3D physical depth
-    bookGroup.rotation.y = -0.32;
-    bookGroup.rotation.x = 0.10;
+    function bendCover(mesh: THREE.Mesh, basePositions: Float32Array, amount: number) {
+      if (!mesh || !basePositions) return;
+      const pos = mesh.geometry.attributes.position;
+      const halfW = bookWidth / 2;
+      for (let n = 0; n < pos.count; n++) {
+        const r = basePositions[n * 3];
+        const c = basePositions[n * 3 + 2];
+        const l = (r + halfW) / bookWidth;
+        pos.setZ(n, c + Math.sin(l * Math.PI) * amount);
+      }
+      pos.needsUpdate = true;
+    }
 
-    // Interaction State
+    // Scroll & Mouse Tracking
+    let containerOffsetTop = 0;
+    let containerOffsetLeft = 0;
+    const cacheOffset = () => {
+      let e = 0;
+      let t = 0;
+      let s: HTMLElement | null = container;
+      while (s) {
+        e += s.offsetTop;
+        t += s.offsetLeft;
+        s = s.offsetParent as HTMLElement | null;
+      }
+      containerOffsetTop = e;
+      containerOffsetLeft = t;
+    };
+    cacheOffset();
+
+    const mousePos = { x: 0, y: 0 };
+    const targetMousePos = { x: 0, y: 0 };
+    let scrollProgress = 0;
+    let targetScrollProgress = 0;
+    let isVisible = true;
+
+    // Drag interaction support
     let isDragging = false;
-    let prevMousePos = { x: 0, y: 0 };
-    let targetRotation = { x: 0.10, y: -0.32 };
-    let currentRotation = { x: 0.10, y: -0.32 };
-    let rotationVelocity = { x: 0, y: 0 };
+    let dragStart = { x: 0, y: 0 };
+    let dragOffset = { x: 0, y: 0 };
 
-    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (isMobile) return;
+      if (isDragging) {
+        dragOffset.x += (e.clientX - dragStart.x) * 0.005;
+        dragOffset.y += (e.clientY - dragStart.y) * 0.005;
+        dragStart = { x: e.clientX, y: e.clientY };
+        return;
+      }
+      const s = containerOffsetTop - window.scrollY;
+      const i = containerOffsetLeft;
+      targetMousePos.x = ((e.clientX - i) / size.width - 0.5) * 2;
+      targetMousePos.y = ((e.clientY - s) / size.height - 0.5) * 2;
+    };
+
+    const onMouseDown = (e: MouseEvent) => {
       if (!isInteractive) return;
       isDragging = true;
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-      prevMousePos = { x: clientX, y: clientY };
-      rotationVelocity = { x: 0, y: 0 };
+      dragStart = { x: e.clientX, y: e.clientY };
     };
 
-    const onPointerMove = (e: MouseEvent | TouchEvent) => {
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-
-      const rect = container.getBoundingClientRect();
-      const nx = ((clientX - rect.left) / rect.width) * 2 - 1;
-      const ny = -(((clientY - rect.top) / rect.height) * 2 - 1);
-      mouseLight.position.set(nx * 1.5, ny * 1.5, 1.8);
-
-      if (!isDragging || !isInteractive) return;
-
-      const deltaX = clientX - prevMousePos.x;
-      const deltaY = clientY - prevMousePos.y;
-
-      rotationVelocity = {
-        x: deltaY * 0.008,
-        y: deltaX * 0.008,
-      };
-
-      targetRotation.y += rotationVelocity.y;
-      targetRotation.x += rotationVelocity.x;
-      targetRotation.x = Math.max(-0.6, Math.min(0.6, targetRotation.x));
-
-      prevMousePos = { x: clientX, y: clientY };
-    };
-
-    const onPointerUp = () => {
+    const onMouseUp = () => {
       isDragging = false;
     };
 
-    const domElement = renderer.domElement;
-    domElement.addEventListener('mousedown', onPointerDown);
-    window.addEventListener('mousemove', onPointerMove);
-    window.addEventListener('mouseup', onPointerUp);
+    const onScroll = () => {
+      const vh = window.innerHeight;
+      const topRel = containerOffsetTop - window.scrollY;
+      const s = vh * 0.85;
+      const i = vh * 0.1;
+      const o = vh * -0.6;
+      if (topRel > i) {
+        const n = 1 - (topRel - i) / (s - i);
+        targetScrollProgress = Math.max(0, Math.min(1, n));
+      } else {
+        const n = 1 + (i - topRel) / (i - o);
+        targetScrollProgress = Math.max(1, Math.min(2, n));
+      }
+    };
 
-    domElement.addEventListener('touchstart', onPointerDown, { passive: true });
-    window.addEventListener('touchmove', onPointerMove, { passive: true });
-    window.addEventListener('touchend', onPointerUp);
+    const onVisibilityChange = () => {
+      isVisible = document.visibilityState === 'visible';
+    };
 
-    // Animation Loop
-    const clock = new THREE.Clock();
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('mouseup', onMouseUp);
+    container.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    onScroll();
+
+    const startTime = performance.now();
+    let lastTime = startTime;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      if (!isVisible) return;
 
-      if (!isDragging) {
-        targetRotation.y += rotationVelocity.y;
-        targetRotation.x += rotationVelocity.x;
-        rotationVelocity.x *= 0.92;
-        rotationVelocity.y *= 0.92;
+      const now = performance.now();
+      const dt = Math.min((now - lastTime) * 0.001, 0.05);
+      lastTime = now;
+      const elapsed = (now - startTime) * 0.001;
+      const smooth = 1 - Math.exp(-3 * dt);
 
-        const gentleBob = Math.sin(elapsedTime * 1.2) * 0.035;
-        bookGroup.position.y = gentleBob;
-      }
+      mousePos.x += (targetMousePos.x - mousePos.x) * smooth;
+      mousePos.y += (targetMousePos.y - mousePos.y) * smooth;
+      dragOffset.x *= 0.95;
+      dragOffset.y *= 0.95;
 
-      currentRotation.x += (targetRotation.x - currentRotation.x) * 0.1;
-      currentRotation.y += (targetRotation.y - currentRotation.y) * 0.1;
+      scrollProgress += (targetScrollProgress - scrollProgress) * 0.1;
 
-      bookGroup.rotation.x = currentRotation.x;
-      bookGroup.rotation.y = currentRotation.y;
+      const sp = scrollProgress;
+      const o = Math.max(0, Math.min(1, sp));
+      const n = Math.max(0, Math.min(1, sp - 1));
+
+      let rotY = THREE.MathUtils.lerp(Math.PI - 0.3, -0.15, o);
+      let rotX = THREE.MathUtils.lerp(0.3, 0.02, o);
+      rotY += n * -(Math.PI - 0.3 + 0.15);
+      rotX += n * (0.3 - 0.02);
+
+      const l = Math.sin(o * Math.PI) * 0.08;
+      const d = Math.sin(n * Math.PI) * -0.07;
+      const bend = l + d;
+
+      bendCover(frontMesh, frontBasePositions, bend);
+      bendCover(backMesh, backBasePositions, -bend);
+
+      const influence = o * (1 - n) * 0.12;
+      bookGroup.rotation.y = rotY + mousePos.x * influence + dragOffset.x;
+      bookGroup.rotation.x = rotX - mousePos.y * influence * 0.5 + dragOffset.y;
+
+      const bob = Math.sin(elapsed * 0.8) * 0.015 * (o * (1 - n));
+      bookGroup.position.y = bob;
+
+      const scale = THREE.MathUtils.lerp(0.85, 1, o) - n * 0.1;
+      bookGroup.scale.setScalar(scale);
+      bookGroup.position.z = THREE.MathUtils.lerp(-0.3, 0, o) - n * 0.3;
+
+      const lightX = THREE.MathUtils.lerp(5, 2, sp);
+      const lightY = THREE.MathUtils.lerp(2, 4, sp);
+      keyLight.position.set(lightX, lightY, 5);
+      keyLight.intensity = THREE.MathUtils.lerp(1.2, 1.8, sp);
+
+      mouseLight.position.set(mousePos.x * 1.2, -mousePos.y * 0.8, 0.6);
 
       renderer.render(scene, camera);
     };
 
     animate();
 
-    const handleResize = () => {
-      if (!container || !renderer || !camera) return;
-      const newW = container.clientWidth;
-      const newH = container.clientHeight;
-      camera.aspect = newW / newH;
+    const onResize = () => {
+      size.width = container.clientWidth || 420;
+      size.height = container.clientHeight || 560;
+      camera.aspect = size.width / size.height;
       camera.updateProjectionMatrix();
-      renderer.setSize(newW, newH);
+      renderer.setSize(size.width, size.height);
+      cacheOffset();
+      onScroll();
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', onResize);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      domElement.removeEventListener('mousedown', onPointerDown);
-      window.removeEventListener('mousemove', onPointerMove);
-      window.removeEventListener('mouseup', onPointerUp);
-      domElement.removeEventListener('touchstart', onPointerDown);
-      window.removeEventListener('touchmove', onPointerMove);
-      window.removeEventListener('touchend', onPointerUp);
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('mouseup', onMouseUp);
+      container.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
 
-      if (domElement.parentNode) {
-        domElement.parentNode.removeChild(domElement);
+      if (renderer.domElement.parentNode) {
+        renderer.domElement.parentNode.removeChild(renderer.domElement);
       }
-
-      renderer.dispose();
-      frontGeometry.dispose();
-      backGeometry.dispose();
-      spineGeometry.dispose();
-      rightPageGeometry.dispose();
-      topPageGeometry.dispose();
-      bottomPageGeometry.dispose();
-      coverMaterial.dispose();
-      spineMaterial.dispose();
-      pageMaterial.dispose();
       bookTexture.dispose();
-      normalTexture.dispose();
+      bookNormal.dispose();
+      frontGeom.dispose();
+      backGeom.dispose();
+      spineGeom.dispose();
+      pageGeom.dispose();
+      topGeom.dispose();
+      bottomGeom.dispose();
+      coverMaterial.dispose();
+      spineEdgeMaterial.dispose();
+      pageEdgeMaterial.dispose();
+      renderer.dispose();
     };
   }, [isInteractive]);
 

@@ -1,11 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
-import { ClarteLogo } from '@/components/ui/ClarteLogo';
+import { OstrumLogo } from '@/components/ui/OstrumLogo';
 
 export function Header() {
-  const { locale, setLocale } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [inFooter, setInFooter] = useState(false);
 
@@ -43,39 +41,14 @@ export function Header() {
         aria-label="Back to top"
       >
         <div className="w-[100px] h-auto">
-          <ClarteLogo />
+          <OstrumLogo />
         </div>
       </button>
 
-      {/* Language Switcher */}
-      <nav className="pointer-events-auto">
-        <ul className="flex items-center">
-          <li>
-            <button
-              type="button"
-              className="lang-switcher text-sm tracking-wide text-white py-2 px-3 focus:outline-none"
-              onClick={() => setLocale(locale === 'en' ? 'fr' : 'en')}
-              aria-label={`Switch language to ${locale === 'en' ? 'French' : 'English'}`}
-            >
-              <span
-                className={`transition-opacity duration-200 ${
-                  locale === 'en' ? 'opacity-100 font-medium' : 'opacity-50 hover:opacity-75'
-                }`}
-              >
-                EN
-              </span>
-              <span className="opacity-40 mx-1.5">—</span>
-              <span
-                className={`transition-opacity duration-200 ${
-                  locale === 'fr' ? 'opacity-100 font-medium' : 'opacity-50 hover:opacity-75'
-                }`}
-              >
-                FR
-              </span>
-            </button>
-          </li>
-        </ul>
-      </nav>
+      {/* Top-Right Micro Label (Quiet discipline mark) */}
+      <div className="pointer-events-auto text-[10px] md:text-[11px] tracking-[0.2em] text-white/50 uppercase font-sans font-normal py-2 px-3 select-none">
+        DIGITAL SYSTEMS · DESIGN · AI
+      </div>
     </header>
   );
 }
