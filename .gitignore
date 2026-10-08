@@ -27,4 +27,5 @@ Thumbs.db
 # Research Artifacts
 reference-capture/
 rebuild-capture/
+.test-results/
 

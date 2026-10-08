@@ -11,35 +11,25 @@ export interface ContentMessages {
   engine: {
     index: string;
     badge: string;
-    headlinePart1: string;
-    headlineHighlight1: string;
-    headlinePart2: string;
-    headlineHighlight2: string;
+    headlineLine1: string;
+    headlineLine2: string;
     description: string;
-    coreBadge: string;
-    coreLabel: string;
-    coreSub: string;
-    studio: {
+    forBusiness: {
       number: string;
-      title: string;
-      tagline: string;
-      description: string;
-      capabilities: Array<{ label: string; detail: string }>;
-      cta: string;
-      footnote: string;
-    };
-    foundry: {
-      number: string;
-      title: string;
-      tagline: string;
-      description: string;
-      capabilities: Array<{ label: string; detail: string }>;
-      cta: string;
-      footnote: string;
-    };
-    sharedSynergy: {
-      label: string;
+      tag: string;
       statement: string;
+      detail: string;
+    };
+    forNext: {
+      number: string;
+      tag: string;
+      statement: string;
+      detail: string;
+    };
+    backing: {
+      statement: string;
+      subtext: string;
+      triad: string;
     };
   };
   gallery: {
@@ -96,47 +86,27 @@ export const messages: Record<Locale, ContentMessages> = {
       sublabel: "",
     },
     engine: {
-      index: "02 / THE OSTRUM ENGINE",
-      badge: "ONE COMPANY · TWO ENGINES",
-      headlinePart1: "We build for businesses.",
-      headlineHighlight1: "We build",
-      headlinePart2: "We build what doesn't exist yet.",
-      headlineHighlight2: "what doesn't exist yet",
-      description: "Ostrum operates as two synchronized engines powered by a single core of engineering, design, and product discipline. We partner with established companies to build high-leverage systems, while independently creating original software and ventures for problems we observe in the world.",
-      coreBadge: "THE OSTRUM CORE",
-      coreLabel: "OSTRUM",
-      coreSub: "ONE CORE · TWO OUTCOMES",
-      studio: {
+      index: "02 / THE OSTRUM CORE",
+      badge: "ENGINE · VENTURE · FOUNDRY",
+      headlineLine1: "We build for today.",
+      headlineLine2: "We build what's next.",
+      description: "Ostrum works in two directions: we solve critical engineering and operational problems for ambitious businesses, and we create original products when the right answer doesn't exist yet.",
+      forBusiness: {
         number: "01",
-        title: "STUDIO",
-        tagline: "Client Systems & Digital Modernization",
-        description: "We partner with ambitious companies to build flagship web experiences, custom software, and automated operational architecture that compound leverage.",
-        capabilities: [
-          { label: "Brand & Experience", detail: "Signature digital identity and immersive web" },
-          { label: "Custom Software", detail: "Resilient applications engineered for scale" },
-          { label: "AI & Automation", detail: "Intelligent workflows eliminating operational drag" },
-          { label: "Technical Infrastructure", detail: "Modern, maintainable software foundations" },
-        ],
-        cta: "Partner with Studio",
-        footnote: "SYSTEMS FOR AMBITIOUS COMPANIES",
+        tag: "FOR BUSINESS",
+        statement: "Systems that make ambitious companies move better.",
+        detail: "Flagship web architecture, custom software, and automated infrastructure engineered for compound advantage.",
       },
-      foundry: {
+      forNext: {
         number: "02",
-        title: "FOUNDRY",
-        tagline: "Original Products & Venture Incubation",
-        description: "We identify acute friction, validate solutions directly with users, and engineer independent products from scratch — backing high-conviction ideas with dedicated execution and operating depth.",
-        capabilities: [
-          { label: "Problem Discovery", detail: "Identifying market gaps and friction worth solving" },
-          { label: "Rapid Validation", detail: "User testing and concept stress-testing before code" },
-          { label: "Product Engineering", detail: "Crafting end-to-end proprietary software" },
-          { label: "Venture Incubation", detail: "Operational, technical, and strategic co-building" },
-        ],
-        cta: "Explore Active Products",
-        footnote: "ORIGINAL PRODUCTS & VENTURES",
+        tag: "FOR WHAT'S NEXT",
+        statement: "Products and ventures built around problems worth solving.",
+        detail: "Identifying acute friction, validating solutions from first principles, and engineering original software and ventures.",
       },
-      sharedSynergy: {
-        label: "THE ENGINE DYNAMICS",
-        statement: "Every insight gained from building enterprise software sharpens our proprietary products. Every breakthrough discovered in our ventures elevates our client architecture.",
+      backing: {
+        statement: "Some ideas become products. Some products become ventures.",
+        subtext: "Selected high-conviction initiatives may receive dedicated Ostrum product, engineering, and venture backing.",
+        triad: "BUILD · DISCOVER · BACK",
       },
     },
     gallery: {
@@ -203,47 +173,27 @@ export const messages: Record<Locale, ContentMessages> = {
       sublabel: "",
     },
     engine: {
-      index: "02 / LE MOTEUR OSTRUM",
-      badge: "UNE ENTREPRISE · DEUX MOTEURS",
-      headlinePart1: "Nous construisons pour les entreprises.",
-      headlineHighlight1: "Nous construisons",
-      headlinePart2: "Nous concevons ce qui n'existe pas encore.",
-      headlineHighlight2: "ce qui n'existe pas encore",
-      description: "Ostrum déploie deux moteurs synchronisés animés par un même noyau d'ingénierie, de design et de rigueur produit. Nous accompagnons les entreprises pour bâtir des systèmes à fort levier, tout en créant de façon autonome des logiciels et initiatives pour les défis du monde réel.",
-      coreBadge: "LE CŒUR OSTRUM",
-      coreLabel: "OSTRUM",
-      coreSub: "UN CŒUR · DEUX DYNAMISQUES",
-      studio: {
+      index: "02 / LE CŒUR OSTRUM",
+      badge: "MOTEUR · VENTURE · FOUNDRY",
+      headlineLine1: "Nous construisons pour aujourd'hui.",
+      headlineLine2: "Nous créons ce qui vient ensuite.",
+      description: "Ostrum opère dans deux directions : nous résolvons les défis technologiques et opérationnels des entreprises ambitieuses, et nous concevons des produits originaux quand la solution n'existe pas encore.",
+      forBusiness: {
         number: "01",
-        title: "STUDIO",
-        tagline: "Systèmes Clients & Modernisation Numérique",
-        description: "Nous concevons pour des entreprises ambitieuses des expériences web d'exception, des logiciels sur-mesure et des architectures d'automatisation à fort impact.",
-        capabilities: [
-          { label: "Marque & Expérience", detail: "Identités digitales et interfaces immersives" },
-          { label: "Logiciels Sur-Mesure", detail: "Applications robustes pensées pour l'échelle" },
-          { label: "IA & Automatisation", detail: "Flux intelligents réduisant la friction opérationnelle" },
-          { label: "Infrastructure Technique", detail: "Socles logiciels modernes et durables" },
-        ],
-        cta: "Collaborer avec le Studio",
-        footnote: "SYSTÈMES POUR ENTREPRISES AMBITIEUSES",
+        tag: "POUR LES ENTREPRISES",
+        statement: "Des systèmes qui font avancer les entreprises ambitieuses.",
+        detail: "Architectures web d'exception, logiciels sur-mesure et infrastructures automatisées conçues pour l'échelle.",
       },
-      foundry: {
+      forNext: {
         number: "02",
-        title: "FOUNDRY",
-        tagline: "Produits Originaux & Création de Projets",
-        description: "Nous identifions les frictions réelles, validons les solutions directement avec les utilisateurs et concevons des produits indépendants — avec une exécution rigoureuse et une profondeur opérationnelle.",
-        capabilities: [
-          { label: "Détection de Problèmes", detail: "Identifier les besoins et inefficacités critiques" },
-          { label: "Validation Rapide", detail: "Tests d'usage et confrontation terrain avant le code" },
-          { label: "Ingénierie Produit", detail: "Développement de logiciels propriétaires complets" },
-          { label: "Incubation de Projets", detail: "Co-construction technique, produit et stratégique" },
-        ],
-        cta: "Découvrir nos Produits",
-        footnote: "PRODUITS ORIGINAUX & VENTURES",
+        tag: "POUR L'AVENIR",
+        statement: "Des produits et projets bâtis autour de vrais problèmes.",
+        detail: "Détecter les frictions réelles, valider sur le terrain et concevoir des logiciels et ventures indépendants.",
       },
-      sharedSynergy: {
-        label: "DYNAMIQUE DU MOTEUR",
-        statement: "Chaque défi résolu en entreprise enrichit nos produits originaux. Chaque percée réalisée dans nos ventures élève l'architecture de nos systèmes clients.",
+      backing: {
+        statement: "Certaines idées deviennent des produits. Certains produits deviennent des ventures.",
+        subtext: "Les initiatives à forte conviction sélectionnées peuvent recevoir un soutien technique, produit et opérationnel d'Ostrum.",
+        triad: "CONSTRUIRE · DÉCOUVRIR · SOUTENIR",
       },
     },
     gallery: {
