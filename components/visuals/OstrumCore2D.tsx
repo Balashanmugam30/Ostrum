@@ -6,23 +6,33 @@ import Image from 'next/image';
 interface OstrumCore2DProps {
   className?: string;
   activeFocus?: 'business' | 'next' | null;
+  onScrollProgress?: (progress: number) => void;
 }
 
-export function OstrumCore2D({ className = '', activeFocus = null }: OstrumCore2DProps) {
+export function OstrumCore2D({
+  className = '',
+  activeFocus = null,
+  onScrollProgress,
+}: OstrumCore2DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [rotationDeg, setRotationDeg] = useState(0);
 
   // Smooth interpolated rotation & scroll values
-  const currentRot = useRef({ x: 0, y: 0, scale: 0.9, z: 0 });
-  const targetRot = useRef({ x: 0, y: 0, scale: 0.9, z: 0 });
+  const currentRotY = useRef(0);
+  const targetRotY = useRef(0);
+  const currentRotX = useRef(0);
+  const targetRotX = useRef(0);
+  const currentScale = useRef(0.92);
+  const targetScale = useRef(0.92);
 
-  // DOM layer refs for direct transform updates (60fps without React re-render churn)
+  // Direct DOM refs for 60fps transform performance
   const rigRef = useRef<HTMLDivElement>(null);
-  const layerBloomRef = useRef<HTMLDivElement>(null);
-  const layerBackRingsRef = useRef<HTMLDivElement>(null);
-  const layerCoreRef = useRef<HTMLDivElement>(null);
-  const layerFrontRingsRef = useRef<HTMLDivElement>(null);
-  const layerFlareRef = useRef<HTMLDivElement>(null);
+  const frontLayerRef = useRef<HTMLDivElement>(null);
+  const backLayerRef = useRef<HTMLDivElement>(null);
+  const sideLayerRef = useRef<HTMLDivElement>(null);
+  const rearRingRef = useRef<HTMLDivElement>(null);
+  const frontRingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -31,35 +41,39 @@ export function OstrumCore2D({ className = '', activeFocus = null }: OstrumCore2
     const handleMediaChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
     media.addEventListener('change', handleMediaChange);
 
-    // Scroll-linked approach & depth resolution
+    // Scroll-driven 360-degree rotation mapping
     const handleScroll = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight || 800;
 
-      // Start approaching when top enters bottom of viewport
-      const enter = viewportHeight * 0.9;
-      const center = viewportHeight * 0.3;
-      const progress = Math.min(1, Math.max(0, (enter - rect.top) / (enter - center)));
+      // Section scroll bounds: starts when section approaches, completes through section travel
+      const start = viewportHeight * 0.95;
+      const end = -rect.height * 0.6;
+      const rawProgress = (start - rect.top) / (start - end);
+      const clampedProgress = Math.min(1, Math.max(0, rawProgress));
 
-      // Interpolate depth: 0.88 scale -> 1.05 scale, -40px Z -> 0px Z, tilt forward slightly
-      targetRot.current.scale = 0.88 + progress * 0.17;
-      targetRot.current.z = (progress - 1) * 50;
+      onScrollProgress?.(clampedProgress);
+
+      // Target full 360-degree rotation
+      targetRotY.current = clampedProgress * 360;
+
+      // Scale smoothly: 0.9 -> 1.05 at center -> 0.95 at exit
+      const distFromCenter = Math.abs(clampedProgress - 0.5) * 2; // 0 at center, 1 at ends
+      targetScale.current = 1.05 - distFromCenter * 0.12;
     };
 
-    // Pointer tilt interaction
+    // Desktop subtle pointer interaction (+/- 2 degrees max)
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const handleMouseMove = (e: MouseEvent) => {
       if (isTouch || !containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top > window.innerHeight) return;
 
-      const normX = ((e.clientX - rect.left) / rect.width - 0.5) * 2; // -1 to 1
+      const normX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
       const normY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
 
-      // Max tilt: 10 degrees horizontal, 8 degrees vertical
-      targetRot.current.y = normX * 10;
-      targetRot.current.x = -normY * 8;
+      targetRotX.current = -normY * 2.5; // very subtle 2.5 deg tilt
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -83,42 +97,64 @@ export function OstrumCore2D({ className = '', activeFocus = null }: OstrumCore2
       if (isVisible) {
         const elapsed = (time - startTime) * 0.001;
 
-        // Bias towards active focus if user hovers business or next
-        let biasY = 0;
-        if (activeFocus === 'business') biasY = -6;
-        if (activeFocus === 'next') biasY = 6;
+        // Subtle zero-g breath
+        const breathY = Math.sin(elapsed * 1.1) * 4;
+        const idleRot = Math.cos(elapsed * 0.7) * 1.0;
 
-        // Subtle continuous zero-g breathing oscillation
-        const breathY = Math.sin(elapsed * 1.2) * 5;
-        const breathRot = Math.cos(elapsed * 0.8) * 1.5;
+        // Physical spring damping (lerp)
+        currentRotY.current += (targetRotY.current - currentRotY.current) * 0.08;
+        currentRotX.current += (targetRotX.current - currentRotX.current) * 0.08;
+        currentScale.current += (targetScale.current - currentScale.current) * 0.08;
 
-        // Smooth physical spring damping (lerp)
-        currentRot.current.x += (targetRot.current.x - currentRot.current.x) * 0.07;
-        currentRot.current.y += (targetRot.current.y + biasY - currentRot.current.y) * 0.07;
-        currentRot.current.scale += (targetRot.current.scale - currentRot.current.scale) * 0.08;
-        currentRot.current.z += (targetRot.current.z - currentRot.current.z) * 0.08;
+        const totalRotY = currentRotY.current + idleRot;
+        const totalRotX = currentRotX.current;
+        const scale = currentScale.current;
 
-        const { x, y, scale, z } = currentRot.current;
+        // Normalize angle to [0, 360)
+        let normAngle = ((totalRotY % 360) + 360) % 360;
 
+        // Calculate state opacities for seamless 360 transition:
+        // Front is dominant around 0° (315° to 45°)
+        // Side is dominant around 90° (45° to 135°) and 270° (225° to 315°)
+        // Back is dominant around 180° (135° to 225°)
+        let frontOpacity = 0;
+        let backOpacity = 0;
+        let sideOpacity = 0;
+
+        if (normAngle <= 45 || normAngle >= 315) {
+          frontOpacity = 1;
+        } else if (normAngle > 45 && normAngle < 135) {
+          // Transition through 90°
+          sideOpacity = 1;
+          frontOpacity = Math.max(0, 1 - (normAngle - 45) / 45);
+          backOpacity = Math.max(0, (normAngle - 90) / 45);
+        } else if (normAngle >= 135 && normAngle <= 225) {
+          backOpacity = 1;
+        } else {
+          // Transition through 270°
+          sideOpacity = 1;
+          backOpacity = Math.max(0, 1 - (normAngle - 225) / 45);
+          frontOpacity = Math.max(0, (normAngle - 270) / 45);
+        }
+
+        // Apply transforms
         if (rigRef.current) {
-          rigRef.current.style.transform = `scale(${scale}) rotateX(${x}deg) rotateY(${y + breathRot}deg) translateY(${breathY}px)`;
+          rigRef.current.style.transform = `scale(${scale}) rotateX(${totalRotX}deg) rotateY(${totalRotY}deg) translateY(${breathY}px)`;
         }
 
-        // Parallax depth offsets per layer
-        if (layerBloomRef.current) {
-          layerBloomRef.current.style.transform = `translate3d(${-y * 1.8}px, ${-x * 1.5}px, -70px)`;
+        if (frontLayerRef.current) {
+          frontLayerRef.current.style.opacity = `${frontOpacity}`;
         }
-        if (layerBackRingsRef.current) {
-          layerBackRingsRef.current.style.transform = `translate3d(${-y * 1.2}px, ${-x * 1.0}px, -35px)`;
+        if (backLayerRef.current) {
+          backLayerRef.current.style.opacity = `${backOpacity}`;
         }
-        if (layerCoreRef.current) {
-          layerCoreRef.current.style.transform = `translate3d(${y * 0.5}px, ${x * 0.5}px, 0px)`;
+        if (sideLayerRef.current) {
+          sideLayerRef.current.style.opacity = `${sideOpacity}`;
         }
-        if (layerFrontRingsRef.current) {
-          layerFrontRingsRef.current.style.transform = `translate3d(${y * 1.6}px, ${x * 1.4}px, 40px)`;
-        }
-        if (layerFlareRef.current) {
-          layerFlareRef.current.style.transform = `translate3d(${y * 2.4}px, ${x * 2.0}px, 65px)`;
+
+        // Update state periodically for test inspection (avoid spamming React render)
+        if (Math.abs(normAngle - rotationDeg) > 2) {
+          setRotationDeg(Math.round(normAngle));
         }
       }
 
@@ -136,165 +172,171 @@ export function OstrumCore2D({ className = '', activeFocus = null }: OstrumCore2
       observer.disconnect();
       if (animId) cancelAnimationFrame(animId);
     };
-  }, [prefersReducedMotion, activeFocus]);
+  }, [prefersReducedMotion, rotationDeg, onScrollProgress]);
 
   return (
     <div
       ref={containerRef}
-      className={`relative w-full max-w-[560px] md:max-w-[620px] aspect-square mx-auto flex items-center justify-center select-none pointer-events-none ${className}`}
+      data-testid="ostrum-core-container"
+      data-rotation-deg={rotationDeg}
+      data-prefers-reduced-motion={prefersReducedMotion}
+      className={`relative w-full max-w-[500px] md:max-w-[560px] aspect-square mx-auto flex items-center justify-center select-none pointer-events-none bg-transparent ${className}`}
       style={{ perspective: '1200px' }}
       aria-hidden="true"
     >
-      {/* 3D Transform Rig */}
+      {/* 3D Transform Rig — Zero black overlay, completely transparent */}
       <div
         ref={rigRef}
-        className="relative w-full h-full flex items-center justify-center transition-transform duration-75 will-change-transform"
+        data-testid="ostrum-core-rig"
+        className="relative w-full h-full flex items-center justify-center will-change-transform bg-transparent"
         style={{ transformStyle: 'preserve-3d' }}
       >
         {/* ==============================================================
-            LAYER 01: ATMOSPHERIC RADIANT BLOOM (Depth Z: -70px)
-            Soft crimson back-illumination echoing the hero caustics
+            LAYER 01: REAR GYROSCOPE CALIBRATION RING (Depth Z: -30px)
+            Thin champagne gold and ivory architectural hairline orbit
             ============================================================== */}
         <div
-          ref={layerBloomRef}
-          className="absolute inset-0 rounded-full blur-[70px] opacity-40 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(circle at 50% 50%, rgba(255,85,60,0.85) 0%, rgba(180,25,15,0.45) 45%, transparent 75%)',
-            transform: 'translateZ(-70px)',
-          }}
-        />
-
-        {/* ==============================================================
-            LAYER 02: REAR ARMILLARY GYROSCOPE RINGS (Depth Z: -35px)
-            Thin calibrated architectural rings orbiting counter-clockwise
-            ============================================================== */}
-        <div
-          ref={layerBackRingsRef}
-          className="absolute inset-[6%] flex items-center justify-center pointer-events-none"
-          style={{ transform: 'translateZ(-35px)' }}
+          ref={rearRingRef}
+          className="absolute inset-[6%] flex items-center justify-center pointer-events-none bg-transparent"
+          style={{ transform: 'translateZ(-30px)' }}
         >
           <svg
             viewBox="0 0 500 500"
             fill="none"
-            className={`w-full h-full opacity-35 ${
-              prefersReducedMotion ? '' : 'animate-[spin_70s_linear_infinite_reverse]'
+            className={`w-full h-full opacity-40 ${
+              prefersReducedMotion ? '' : 'animate-[spin_65s_linear_infinite_reverse]'
             }`}
           >
-            {/* Outer structural tick circle */}
             <circle
               cx="250"
               cy="250"
               r="230"
-              stroke="#ff7a66"
-              strokeWidth="0.75"
-              strokeDasharray="2 12"
+              stroke="#e6d5b8"
+              strokeWidth="0.8"
+              strokeDasharray="3 14"
             />
-            {/* Degree quadrant markers */}
             <circle
               cx="250"
               cy="250"
-              r="215"
+              r="218"
               stroke="#ffffff"
-              strokeWidth="0.5"
-              strokeDasharray="4 20"
+              strokeWidth="0.4"
+              strokeDasharray="6 24"
               opacity="0.6"
             />
-            {/* Micro coordinate crosshairs */}
-            <line x1="20" y1="250" x2="40" y2="250" stroke="#ff5c4a" strokeWidth="1" />
-            <line x1="460" y1="250" x2="480" y2="250" stroke="#ff5c4a" strokeWidth="1" />
-            <line x1="250" y1="20" x2="250" y2="40" stroke="#ff5c4a" strokeWidth="1" />
-            <line x1="250" y1="460" x2="250" y2="480" stroke="#ff5c4a" strokeWidth="1" />
           </svg>
         </div>
 
         {/* ==============================================================
-            LAYER 03: THE 2.5D OSTRUM CORE SCULPTURE (Depth Z: 0px)
-            High-res levitating artifact with transparent feathered alpha
+            LAYER 02: THE SCULPTURAL OSTRUM CORE (Depth Z: 0px)
+            Multi-state volumetric rotation (Front, Side, Back)
             ============================================================== */}
         <div
-          ref={layerCoreRef}
-          className="relative w-[82%] h-[82%] rounded-full overflow-visible pointer-events-auto cursor-grab active:cursor-grabbing"
-          style={{ transform: 'translateZ(0px)' }}
+          className="relative w-[86%] h-[86%] flex items-center justify-center bg-transparent"
+          style={{ transformStyle: 'preserve-3d' }}
         >
-          {/* Ambient rim glow */}
+          {/* Subtle back ambient reflection glint */}
           <div
-            className="absolute inset-2 rounded-full blur-[24px] opacity-35"
+            className="absolute inset-4 rounded-full blur-[20px] opacity-25 pointer-events-none"
             style={{
               background:
-                'radial-gradient(circle at 50% 50%, rgba(255,100,70,0.6) 20%, rgba(255,60,40,0.15) 60%, transparent 80%)',
+                'radial-gradient(circle at 50% 50%, rgba(255,185,130,0.4) 0%, rgba(255,90,70,0.1) 50%, transparent 70%)',
             }}
           />
 
-          {/* Master 2.5D Sculpture Asset */}
-          <Image
-            src="/images/ostrum-core-floating.webp"
-            alt="The Ostrum Core — An engineered physical artifact floating in space"
-            width={720}
-            height={720}
-            priority
-            className="w-full h-full object-contain filter drop-shadow-[0_24px_50px_rgba(0,0,0,0.9)] select-none pointer-events-none"
-          />
+          {/* FRONT STATE (0° to 90°, 270° to 360°) */}
+          <div
+            ref={frontLayerRef}
+            data-testid="core-face-front"
+            className="absolute inset-0 flex items-center justify-center transition-opacity duration-150 will-change-opacity bg-transparent"
+            style={{
+              transform: 'translateZ(1.5px)',
+              backfaceVisibility: 'visible',
+            }}
+          >
+            <Image
+              src="/images/ostrum-core-front.webp"
+              alt="Ostrum Core Front"
+              width={640}
+              height={640}
+              priority
+              className="w-full h-full object-contain filter drop-shadow-[0_16px_36px_rgba(0,0,0,0.4)] select-none pointer-events-none"
+            />
+          </div>
+
+          {/* SIDE / TRANSITION PROFILE STATE (Around 90° and 270°) */}
+          <div
+            ref={sideLayerRef}
+            data-testid="core-face-side"
+            className="absolute inset-0 flex items-center justify-center transition-opacity duration-150 will-change-opacity bg-transparent"
+            style={{
+              transform: 'translateZ(0px)',
+              backfaceVisibility: 'visible',
+            }}
+          >
+            <Image
+              src="/images/ostrum-core-side.webp"
+              alt="Ostrum Core Lateral Profile"
+              width={640}
+              height={640}
+              priority
+              className="w-full h-full object-contain filter drop-shadow-[0_16px_36px_rgba(0,0,0,0.4)] select-none pointer-events-none"
+            />
+          </div>
+
+          {/* BACK STATE (90° to 270°) */}
+          <div
+            ref={backLayerRef}
+            data-testid="core-face-back"
+            className="absolute inset-0 flex items-center justify-center transition-opacity duration-150 will-change-opacity bg-transparent"
+            style={{
+              transform: 'translateZ(-1.5px) rotateY(180deg)',
+              backfaceVisibility: 'visible',
+            }}
+          >
+            <Image
+              src="/images/ostrum-core-back.webp"
+              alt="Ostrum Core Reverse View"
+              width={640}
+              height={640}
+              priority
+              className="w-full h-full object-contain filter drop-shadow-[0_16px_36px_rgba(0,0,0,0.4)] select-none pointer-events-none"
+            />
+          </div>
         </div>
 
         {/* ==============================================================
-            LAYER 04: FOREGROUND ENERGY RINGS & FILAMENTS (Depth Z: +40px)
-            Gold/crimson laser orbits rotating forward over the sculpture
+            LAYER 03: FOREGROUND ARCHITECTURAL RINGS (Depth Z: +30px)
+            Gold and ivory laser orbit in forward 3D space
             ============================================================== */}
         <div
-          ref={layerFrontRingsRef}
-          className="absolute inset-[10%] flex items-center justify-center pointer-events-none"
-          style={{ transform: 'translateZ(40px)' }}
+          ref={frontRingRef}
+          className="absolute inset-[8%] flex items-center justify-center pointer-events-none bg-transparent"
+          style={{ transform: 'translateZ(30px)' }}
         >
           <svg
             viewBox="0 0 500 500"
             fill="none"
-            className={`w-full h-full opacity-65 ${
-              prefersReducedMotion ? '' : 'animate-[spin_50s_linear_infinite]'
+            className={`w-full h-full opacity-55 ${
+              prefersReducedMotion ? '' : 'animate-[spin_48s_linear_infinite]'
             }`}
           >
             {/* Luminous orbital elliptical ring */}
             <ellipse
               cx="250"
               cy="250"
-              rx="195"
-              ry="110"
-              transform="rotate(-28 250 250)"
-              stroke="#ffbe99"
-              strokeWidth="1.25"
-              strokeDasharray="180 30 60 40"
+              rx="200"
+              ry="115"
+              transform="rotate(-24 250 250)"
+              stroke="#f5e6cc"
+              strokeWidth="1.0"
+              strokeDasharray="160 35 55 45"
             />
-            {/* Harmonic counter-ring */}
-            <ellipse
-              cx="250"
-              cy="250"
-              rx="185"
-              ry="95"
-              transform="rotate(38 250 250)"
-              stroke="#ff5c4a"
-              strokeWidth="0.85"
-              strokeDasharray="40 15 90 20"
-              opacity="0.75"
-            />
-            {/* Floating micro-satellites */}
-            <circle cx="95" cy="180" r="2.5" fill="#ffffff" />
-            <circle cx="405" cy="320" r="2" fill="#ffbe99" />
+            {/* Delicate gold focal dot */}
+            <circle cx="100" cy="185" r="2.5" fill="#f5e6cc" />
+            <circle cx="400" cy="315" r="2" fill="#ffbe99" />
           </svg>
         </div>
-
-        {/* ==============================================================
-            LAYER 05: FOREGROUND SPECULAR OPTICAL FLARE (Depth Z: +65px)
-            Refraction hotspot at the central ember nucleus
-            ============================================================== */}
-        <div
-          ref={layerFlareRef}
-          className="absolute w-24 h-24 rounded-full pointer-events-none opacity-50 blur-[6px]"
-          style={{
-            background:
-              'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.95) 0%, rgba(255,190,120,0.6) 35%, transparent 70%)',
-            transform: 'translateZ(65px)',
-          }}
-        />
       </div>
     </div>
   );
