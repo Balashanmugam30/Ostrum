@@ -61,11 +61,11 @@ export interface ContentMessages {
 export const messages: Record<Locale, ContentMessages> = {
   en: {
     hero: {
-      headline: "We build the technology that helps ambitious businesses **grow**",
-      philosophyLine1: "You don't need more software.",
-      philosophyLine2: "You need your software to talk to each other.",
-      cta: "Start a project",
-      sublabel: "Tell us what you're building",
+      headline: "We build the technology that helps businesses **grow**\nAnd create original products for problems worth solving",
+      philosophyLine1: "High-leverage digital systems for ambitious companies.",
+      philosophyLine2: "Independent software and ventures for what the world still needs.",
+      cta: "",
+      sublabel: "",
     },
     bookInfos: {
       titleLine1: "An experiential",
@@ -135,11 +135,11 @@ export const messages: Record<Locale, ContentMessages> = {
   },
   fr: {
     hero: {
-      headline: "We build the technology that helps ambitious businesses **grow**",
-      philosophyLine1: "You don't need more software.",
-      philosophyLine2: "You need your software to talk to each other.",
-      cta: "Start a project",
-      sublabel: "Tell us what you're building",
+      headline: "Nous créons la technologie qui fait **grandir** les entreprises\nEt les produits originaux dont le monde a besoin",
+      philosophyLine1: "Des systèmes digitaux à fort levier pour les entreprises ambitieuses.",
+      philosophyLine2: "Des logiciels et initiatives pour les défis qui comptent.",
+      cta: "",
+      sublabel: "",
     },
     bookInfos: {
       titleLine1: "Un livre",

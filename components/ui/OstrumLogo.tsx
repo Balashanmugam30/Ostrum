@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface OstrumLogoProps {
   className?: string;
@@ -8,7 +8,7 @@ interface OstrumLogoProps {
 }
 
 export function OstrumLogo({ className = '', hasParallax = false }: OstrumLogoProps) {
-  const [scrollY, setScrollY] = useState(0);
+  const groupRefs = useRef<(SVGGElement | null)[]>([]);
 
   useEffect(() => {
     if (!hasParallax) return;
@@ -16,26 +16,43 @@ export function OstrumLogo({ className = '', hasParallax = false }: OstrumLogoPr
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (mediaQuery.matches) return;
 
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
+    let animId: number;
+    let targetScrollY = window.scrollY;
+    let currentScrollY = window.scrollY;
+
+    const onScroll = () => {
+      targetScrollY = window.scrollY;
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasParallax]);
+    window.addEventListener('scroll', onScroll, { passive: true });
 
-  // Differential parallax factors matching reference:
-  // Outer letters move slower, inner letters accelerate
-  const letterTransforms = hasParallax
-    ? [
-        `translate3d(0px, ${scrollY * 0.08}px, 0px)`,
-        `translate3d(0px, ${scrollY * 0.18}px, 0px)`,
-        `translate3d(0px, ${scrollY * 0.35}px, 0px)`,
-        `translate3d(0px, ${scrollY * 0.35}px, 0px)`,
-        `translate3d(0px, ${scrollY * 0.18}px, 0px)`,
-        `translate3d(0px, ${scrollY * 0.08}px, 0px)`,
-      ]
-    : [undefined, undefined, undefined, undefined, undefined, undefined];
+    // Differential UPWARD factors matching reference:
+    // Negative factors ensure that as scrollY increases (user scrolls down),
+    // the transform translates UPWARD (negative Y in SVG/CSS space).
+    // Center letters elevate with greater lift, creating a dignified parabolic ascension.
+    const factors = [-0.22, -0.30, -0.38, -0.38, -0.30, -0.22];
+
+    const tick = () => {
+      animId = requestAnimationFrame(tick);
+      // Smooth damped interpolation
+      currentScrollY += (targetScrollY - currentScrollY) * 0.12;
+
+      for (let i = 0; i < factors.length; i++) {
+        const el = groupRefs.current[i];
+        if (el) {
+          const y = currentScrollY * factors[i];
+          el.style.transform = `translate3d(0px, ${y.toFixed(2)}px, 0px)`;
+        }
+      }
+    };
+
+    tick();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [hasParallax]);
 
   const letters = [
     { char: 'O', x: 0 },
@@ -59,10 +76,11 @@ export function OstrumLogo({ className = '', hasParallax = false }: OstrumLogoPr
       {letters.map((item, i) => (
         <g
           key={item.char}
+          ref={(el) => {
+            groupRefs.current[i] = el;
+          }}
           className="letter is-inview"
           style={{
-            transform: letterTransforms[i],
-            transition: 'transform 0.1s linear',
             willChange: hasParallax ? 'transform' : 'auto',
           }}
         >

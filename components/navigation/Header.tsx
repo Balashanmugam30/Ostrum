@@ -47,7 +47,7 @@ export function Header() {
 
       {/* Top-Right Micro Label (Quiet discipline mark) */}
       <div className="pointer-events-auto text-[10px] md:text-[11px] tracking-[0.2em] text-white/50 uppercase font-sans font-normal py-2 px-3 select-none">
-        DIGITAL SYSTEMS · DESIGN · AI
+        DESIGN · TECHNOLOGY · VENTURES
       </div>
     </header>
   );
