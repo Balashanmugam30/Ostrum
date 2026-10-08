@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { IntroHero } from '@/components/sections/IntroHero';
-import { BookInfos } from '@/components/sections/BookInfos';
+import { FoundrySection } from '@/components/sections/FoundrySection';
 import { GallerySection } from '@/components/sections/GallerySection';
 import { FooterCta } from '@/components/sections/FooterCta';
 import { Footer } from '@/components/footer/Footer';
@@ -17,11 +17,11 @@ export default function FrenchPage() {
 
   return (
     <div className="relative w-full flex flex-col items-center">
-      {/* SECTION 01 / 02: Monumental Hero Narrative & Parallax Logo */}
+      {/* SECTION 01: Monumental Hero Narrative & Parallax Logo */}
       <IntroHero />
 
-      {/* SECTION 03: The Artifact Showcase (Interactive 3D Book & Editorial Copy) */}
-      <BookInfos />
+      {/* SECTION 02: Ostrum Foundry (2.5D Venture Dossier & Studio Model) */}
+      <FoundrySection />
 
       {/* SECTION 04: The Experiential Space (3D Interactive Fan Carousel) */}
       <GallerySection />

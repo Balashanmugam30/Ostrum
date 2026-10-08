@@ -14,6 +14,21 @@ export interface ContentMessages {
     desc: string[];
     cta: string;
   };
+  foundry: {
+    index: string;
+    badge: string;
+    headlineLine1: string;
+    headlineLine2: string;
+    description: string;
+    steps: Array<{
+      num: string;
+      title: string;
+      detail: string;
+    }>;
+    cta: string;
+    sublabel: string;
+    flipHint: string;
+  };
   gallery: {
     title: string;
     subtitleLine1: string;
@@ -77,6 +92,23 @@ export const messages: Record<Locale, ContentMessages> = {
         "digital experience.",
       ],
       cta: "Order the book",
+    },
+    foundry: {
+      index: "02 / OSTRUM FOUNDRY",
+      badge: "TECHNOLOGY · DESIGN · VENTURES",
+      headlineLine1: "We don't only build for businesses.",
+      headlineLine2: "We build what **doesn't exist yet**.",
+      description: "We partner with ambitious companies to solve complex operational challenges. And when a critical solution doesn't yet exist in the market, we build it ourselves — taking original ideas from first observation to production software and independent ventures.",
+      steps: [
+        { num: "01", title: "FIND", detail: "Real problems worth solving." },
+        { num: "02", title: "VALIDATE", detail: "Talk to people. Test the need before building." },
+        { num: "03", title: "BUILD", detail: "Design the product. Engineer the technology." },
+        { num: "04", title: "LAUNCH", detail: "Put it in the real world with immediate feedback loops." },
+        { num: "05", title: "BACK", detail: "Support promising ideas with product, people, and operating depth. Selected initiatives may receive dedicated studio backing." },
+      ],
+      cta: "Explore the studio",
+      sublabel: "ORIGINAL VENTURES & COLLABORATIVE LABS",
+      flipHint: "Inspect dossier back",
     },
     gallery: {
       title: "The Experiences",
@@ -151,6 +183,23 @@ export const messages: Record<Locale, ContentMessages> = {
         "expérience numérique.",
       ],
       cta: "Commander le livre",
+    },
+    foundry: {
+      index: "02 / OSTRUM FOUNDRY",
+      badge: "TECHNOLOGIE · DESIGN · VENTURES",
+      headlineLine1: "Nous ne construisons pas seulement pour les entreprises.",
+      headlineLine2: "Nous concevons ce qui **n'existe pas encore**.",
+      description: "Nous accompagnons les entreprises ambitieuses dans leurs défis technologiques. Et lorsqu'une solution essentielle n'existe pas sur le marché, nous la construisons nous-mêmes — de l'idée originelle jusqu'au produit déployé et aux ventures indépendantes.",
+      steps: [
+        { num: "01", title: "TROUVER", detail: "Des problèmes réels qui méritent d'être résolus." },
+        { num: "02", title: "VALIDER", detail: "Échanger avec les usagers. Valider le besoin avant de construire." },
+        { num: "03", title: "CONSTRUIRE", detail: "Concevoir le produit. Développer une technologie robuste." },
+        { num: "04", title: "LANCER", detail: "Mettre le produit dans le monde réel avec des boucles de retour." },
+        { num: "05", title: "SOUTENIR", detail: "Apporter compétences produit, équipe et exécution. Les initiatives sélectionnées peuvent recevoir un soutien direct d'Ostrum." },
+      ],
+      cta: "Découvrir le studio",
+      sublabel: "VENTURES ORIGINALES & LABS COLLABORATIFS",
+      flipHint: "Cliquer pour voir le verso",
     },
     gallery: {
       title: "Les expériences",
