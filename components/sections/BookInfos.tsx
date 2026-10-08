@@ -1,3 +1,3 @@
 'use client';
 
-export { FoundrySection, FoundrySection as BookInfos } from './FoundrySection';
+export { OstrumEngineSection, OstrumEngineSection as BookInfos, OstrumEngineSection as FoundrySection } from './OstrumEngineSection';

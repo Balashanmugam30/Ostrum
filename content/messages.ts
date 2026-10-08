@@ -8,26 +8,39 @@ export interface ContentMessages {
     cta: string;
     sublabel: string;
   };
-  bookInfos: {
-    titleLine1: string;
-    titleLine2: string;
-    desc: string[];
-    cta: string;
-  };
-  foundry: {
+  engine: {
     index: string;
     badge: string;
-    headlineLine1: string;
-    headlineLine2: string;
+    headlinePart1: string;
+    headlineHighlight1: string;
+    headlinePart2: string;
+    headlineHighlight2: string;
     description: string;
-    steps: Array<{
-      num: string;
+    coreBadge: string;
+    coreLabel: string;
+    coreSub: string;
+    studio: {
+      number: string;
       title: string;
-      detail: string;
-    }>;
-    cta: string;
-    sublabel: string;
-    flipHint: string;
+      tagline: string;
+      description: string;
+      capabilities: Array<{ label: string; detail: string }>;
+      cta: string;
+      footnote: string;
+    };
+    foundry: {
+      number: string;
+      title: string;
+      tagline: string;
+      description: string;
+      capabilities: Array<{ label: string; detail: string }>;
+      cta: string;
+      footnote: string;
+    };
+    sharedSynergy: {
+      label: string;
+      statement: string;
+    };
   };
   gallery: {
     title: string;
@@ -82,33 +95,49 @@ export const messages: Record<Locale, ContentMessages> = {
       cta: "",
       sublabel: "",
     },
-    bookInfos: {
-      titleLine1: "An experiential",
-      titleLine2: "book",
-      desc: [
-        "This project takes the form of a book.",
-        "A book to read, but also to experience.",
-        "Each chapter extends into a",
-        "digital experience.",
-      ],
-      cta: "Order the book",
-    },
-    foundry: {
-      index: "02 / OSTRUM FOUNDRY",
-      badge: "TECHNOLOGY · DESIGN · VENTURES",
-      headlineLine1: "We don't only build for businesses.",
-      headlineLine2: "We build what **doesn't exist yet**.",
-      description: "We partner with ambitious companies to solve complex operational challenges. And when a critical solution doesn't yet exist in the market, we build it ourselves — taking original ideas from first observation to production software and independent ventures.",
-      steps: [
-        { num: "01", title: "FIND", detail: "Real problems worth solving." },
-        { num: "02", title: "VALIDATE", detail: "Talk to people. Test the need before building." },
-        { num: "03", title: "BUILD", detail: "Design the product. Engineer the technology." },
-        { num: "04", title: "LAUNCH", detail: "Put it in the real world with immediate feedback loops." },
-        { num: "05", title: "BACK", detail: "Support promising ideas with product, people, and operating depth. Selected initiatives may receive dedicated studio backing." },
-      ],
-      cta: "Explore the studio",
-      sublabel: "ORIGINAL VENTURES & COLLABORATIVE LABS",
-      flipHint: "Inspect dossier back",
+    engine: {
+      index: "02 / THE OSTRUM ENGINE",
+      badge: "ONE COMPANY · TWO ENGINES",
+      headlinePart1: "We build for businesses.",
+      headlineHighlight1: "We build",
+      headlinePart2: "We build what doesn't exist yet.",
+      headlineHighlight2: "what doesn't exist yet",
+      description: "Ostrum operates as two synchronized engines powered by a single core of engineering, design, and product discipline. We partner with established companies to build high-leverage systems, while independently creating original software and ventures for problems we observe in the world.",
+      coreBadge: "THE OSTRUM CORE",
+      coreLabel: "OSTRUM",
+      coreSub: "ONE CORE · TWO OUTCOMES",
+      studio: {
+        number: "01",
+        title: "STUDIO",
+        tagline: "Client Systems & Digital Modernization",
+        description: "We partner with ambitious companies to build flagship web experiences, custom software, and automated operational architecture that compound leverage.",
+        capabilities: [
+          { label: "Brand & Experience", detail: "Signature digital identity and immersive web" },
+          { label: "Custom Software", detail: "Resilient applications engineered for scale" },
+          { label: "AI & Automation", detail: "Intelligent workflows eliminating operational drag" },
+          { label: "Technical Infrastructure", detail: "Modern, maintainable software foundations" },
+        ],
+        cta: "Partner with Studio",
+        footnote: "SYSTEMS FOR AMBITIOUS COMPANIES",
+      },
+      foundry: {
+        number: "02",
+        title: "FOUNDRY",
+        tagline: "Original Products & Venture Incubation",
+        description: "We identify acute friction, validate solutions directly with users, and engineer independent products from scratch — backing high-conviction ideas with dedicated execution and operating depth.",
+        capabilities: [
+          { label: "Problem Discovery", detail: "Identifying market gaps and friction worth solving" },
+          { label: "Rapid Validation", detail: "User testing and concept stress-testing before code" },
+          { label: "Product Engineering", detail: "Crafting end-to-end proprietary software" },
+          { label: "Venture Incubation", detail: "Operational, technical, and strategic co-building" },
+        ],
+        cta: "Explore Active Products",
+        footnote: "ORIGINAL PRODUCTS & VENTURES",
+      },
+      sharedSynergy: {
+        label: "THE ENGINE DYNAMICS",
+        statement: "Every insight gained from building enterprise software sharpens our proprietary products. Every breakthrough discovered in our ventures elevates our client architecture.",
+      },
     },
     gallery: {
       title: "The Experiences",
@@ -173,33 +202,49 @@ export const messages: Record<Locale, ContentMessages> = {
       cta: "",
       sublabel: "",
     },
-    bookInfos: {
-      titleLine1: "Un livre",
-      titleLine2: "expérientiel",
-      desc: [
-        "Ce projet prend la forme d'un livre.",
-        "Un livre à lire, mais aussi à traverser.",
-        "Chaque chapitre se prolonge par une",
-        "expérience numérique.",
-      ],
-      cta: "Commander le livre",
-    },
-    foundry: {
-      index: "02 / OSTRUM FOUNDRY",
-      badge: "TECHNOLOGIE · DESIGN · VENTURES",
-      headlineLine1: "Nous ne construisons pas seulement pour les entreprises.",
-      headlineLine2: "Nous concevons ce qui **n'existe pas encore**.",
-      description: "Nous accompagnons les entreprises ambitieuses dans leurs défis technologiques. Et lorsqu'une solution essentielle n'existe pas sur le marché, nous la construisons nous-mêmes — de l'idée originelle jusqu'au produit déployé et aux ventures indépendantes.",
-      steps: [
-        { num: "01", title: "TROUVER", detail: "Des problèmes réels qui méritent d'être résolus." },
-        { num: "02", title: "VALIDER", detail: "Échanger avec les usagers. Valider le besoin avant de construire." },
-        { num: "03", title: "CONSTRUIRE", detail: "Concevoir le produit. Développer une technologie robuste." },
-        { num: "04", title: "LANCER", detail: "Mettre le produit dans le monde réel avec des boucles de retour." },
-        { num: "05", title: "SOUTENIR", detail: "Apporter compétences produit, équipe et exécution. Les initiatives sélectionnées peuvent recevoir un soutien direct d'Ostrum." },
-      ],
-      cta: "Découvrir le studio",
-      sublabel: "VENTURES ORIGINALES & LABS COLLABORATIFS",
-      flipHint: "Cliquer pour voir le verso",
+    engine: {
+      index: "02 / LE MOTEUR OSTRUM",
+      badge: "UNE ENTREPRISE · DEUX MOTEURS",
+      headlinePart1: "Nous construisons pour les entreprises.",
+      headlineHighlight1: "Nous construisons",
+      headlinePart2: "Nous concevons ce qui n'existe pas encore.",
+      headlineHighlight2: "ce qui n'existe pas encore",
+      description: "Ostrum déploie deux moteurs synchronisés animés par un même noyau d'ingénierie, de design et de rigueur produit. Nous accompagnons les entreprises pour bâtir des systèmes à fort levier, tout en créant de façon autonome des logiciels et initiatives pour les défis du monde réel.",
+      coreBadge: "LE CŒUR OSTRUM",
+      coreLabel: "OSTRUM",
+      coreSub: "UN CŒUR · DEUX DYNAMISQUES",
+      studio: {
+        number: "01",
+        title: "STUDIO",
+        tagline: "Systèmes Clients & Modernisation Numérique",
+        description: "Nous concevons pour des entreprises ambitieuses des expériences web d'exception, des logiciels sur-mesure et des architectures d'automatisation à fort impact.",
+        capabilities: [
+          { label: "Marque & Expérience", detail: "Identités digitales et interfaces immersives" },
+          { label: "Logiciels Sur-Mesure", detail: "Applications robustes pensées pour l'échelle" },
+          { label: "IA & Automatisation", detail: "Flux intelligents réduisant la friction opérationnelle" },
+          { label: "Infrastructure Technique", detail: "Socles logiciels modernes et durables" },
+        ],
+        cta: "Collaborer avec le Studio",
+        footnote: "SYSTÈMES POUR ENTREPRISES AMBITIEUSES",
+      },
+      foundry: {
+        number: "02",
+        title: "FOUNDRY",
+        tagline: "Produits Originaux & Création de Projets",
+        description: "Nous identifions les frictions réelles, validons les solutions directement avec les utilisateurs et concevons des produits indépendants — avec une exécution rigoureuse et une profondeur opérationnelle.",
+        capabilities: [
+          { label: "Détection de Problèmes", detail: "Identifier les besoins et inefficacités critiques" },
+          { label: "Validation Rapide", detail: "Tests d'usage et confrontation terrain avant le code" },
+          { label: "Ingénierie Produit", detail: "Développement de logiciels propriétaires complets" },
+          { label: "Incubation de Projets", detail: "Co-construction technique, produit et stratégique" },
+        ],
+        cta: "Découvrir nos Produits",
+        footnote: "PRODUITS ORIGINAUX & VENTURES",
+      },
+      sharedSynergy: {
+        label: "DYNAMIQUE DU MOTEUR",
+        statement: "Chaque défi résolu en entreprise enrichit nos produits originaux. Chaque percée réalisée dans nos ventures élève l'architecture de nos systèmes clients.",
+      },
     },
     gallery: {
       title: "Les expériences",
