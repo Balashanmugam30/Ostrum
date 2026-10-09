@@ -382,11 +382,14 @@ body {
   .line-by-line .split,
   .primary-btn,
   .primary-btn *,
-  .scroll-cue-arrow {
+  .scroll-cue-arrow,
+  .ostrum-engine-section,
+  .ostrum-engine-section * {
     transition: none !important;
     animation: none !important;
     transform: none !important;
     opacity: 1 !important;
+    filter: none !important;
   }
 }
 

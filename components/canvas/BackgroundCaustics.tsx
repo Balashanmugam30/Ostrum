@@ -18,7 +18,7 @@ export function BackgroundCaustics() {
 
     const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' });
     renderer.setSize(size.width, size.height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
     renderer.domElement.style.display = 'block';
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
@@ -183,7 +183,7 @@ export function BackgroundCaustics() {
 
       float filmGrain(vec2 uv, float time) {
         vec2 grainUv = uv * uResolution;
-        float seed = floor(time * uGrainSpeed) * 0.37;
+        float seed = mod(floor(time * uGrainSpeed), 400.0) * 0.37;
 
         float grain1 = fract(sin(dot(grainUv + seed, vec2(12.9898, 78.233))) * 43758.5453);
         float grain2 = fract(sin(dot(grainUv * 0.7 + 0.5 + seed, vec2(39.346, 11.135))) * 43758.5453);
@@ -218,9 +218,11 @@ export function BackgroundCaustics() {
 
         float dist = length(uvCorrected - mouseCorrected);
         float glow = smoothstep(uHaloSize, 0.0, dist);
-        float intensity = pow(glow, 1.5);
+        float intensity = pow(glow, 1.6);
 
-        return uHaloColor * intensity * uHaloIntensity;
+        // Radiant crimson-amber luminescence
+        vec3 haloGrad = mix(uHaloColor, vec3(1.0, 0.45, 0.28), glow * 0.45);
+        return haloGrad * intensity * uHaloIntensity;
       }
 
       // ============================================
@@ -232,17 +234,16 @@ export function BackgroundCaustics() {
         float time = uTime;
 
         vec2 texUV = coverUV(uv, uResolution, uTextureResolution);
-        texUV.y -= uScrollY;
+        // Restrained subtle parallax: max 0.06 shift, safe from clipping
+        texUV.y -= uScrollY * 0.06;
 
         vec2 distortion = waterDistortion(uv, time);
         vec2 mouseDist = mouseDistortion(uv, uMouse);
 
         texUV += distortion + mouseDist;
+        texUV = clamp(texUV, 0.001, 0.999);
 
-        vec3 color = vec3(0.0);
-        if (texUV.x >= 0.0 && texUV.x <= 1.0 && texUV.y >= 0.0 && texUV.y <= 1.0) {
-          color = texture2D(uTexture, texUV).rgb;
-        }
+        vec3 color = texture2D(uTexture, texUV).rgb;
 
         vec3 halo = mouseHalo(uv, uMouse);
         color += halo;
@@ -271,14 +272,14 @@ export function BackgroundCaustics() {
         uWaterScale: { value: 2 },
         uWaterSpeed: { value: 0.15 },
         uDistortionStrength: { value: isMobile ? 0.018 : 0.025 },
-        uMouseRadius: { value: 0.3 },
+        uMouseRadius: { value: 0.35 },
         uMouseStrength: { value: isMobile ? 0 : 0.035 },
         uGrainIntensity: { value: isMobile ? 0.25 : 0.4 },
         uGrainSpeed: { value: isMobile ? 8 : 12 },
         uScrollY: { value: 0 },
-        uHaloIntensity: { value: isMobile ? 0 : 0.75 },
-        uHaloSize: { value: 0.5 },
-        uHaloColor: { value: new THREE.Color(0.91, 0.063, 0) },
+        uHaloIntensity: { value: isMobile ? 0 : 0.85 },
+        uHaloSize: { value: 0.55 },
+        uHaloColor: { value: new THREE.Color(1.0, 0.18, 0.08) },
       },
     });
 
@@ -300,10 +301,11 @@ export function BackgroundCaustics() {
     let scrollY = 0;
     let targetScrollY = 0;
     let isVisible = true;
+    let isContextLost = false;
 
     const onMouseMove = (e: MouseEvent) => {
-      targetPos.x = e.clientX / size.width;
-      targetPos.y = 1 - e.clientY / size.height;
+      targetPos.x = e.clientX / window.innerWidth;
+      targetPos.y = 1 - e.clientY / window.innerHeight;
     };
 
     const onScroll = () => {
@@ -315,6 +317,18 @@ export function BackgroundCaustics() {
       isVisible = document.visibilityState === 'visible';
     };
 
+    const onContextLost = (e: Event) => {
+      e.preventDefault();
+      isContextLost = true;
+    };
+
+    const onContextRestored = () => {
+      isContextLost = false;
+    };
+
+    renderer.domElement.addEventListener('webglcontextlost', onContextLost, false);
+    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored, false);
+
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('scroll', onScroll, { passive: true });
     document.addEventListener('visibilitychange', onVisibilityChange);
@@ -324,9 +338,9 @@ export function BackgroundCaustics() {
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      if (!isVisible) return;
+      if (!isVisible || isContextLost) return;
 
-      const elapsed = (performance.now() - startTime) * 0.001;
+      const elapsed = ((performance.now() - startTime) * 0.001) % 3600.0;
       mousePos.x += (targetPos.x - mousePos.x) * 0.08;
       mousePos.y += (targetPos.y - mousePos.y) * 0.08;
       scrollY += (targetScrollY - scrollY) * 0.1;
@@ -334,7 +348,7 @@ export function BackgroundCaustics() {
       const uniforms = material.uniforms;
       uniforms.uTime.value = elapsed;
       uniforms.uMouse.value.set(mousePos.x, mousePos.y);
-      uniforms.uScrollY.value = scrollY * 0.8;
+      uniforms.uScrollY.value = scrollY;
 
       renderer.render(scene, camera);
     };
@@ -356,6 +370,8 @@ export function BackgroundCaustics() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
+      renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
 
       if (renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);

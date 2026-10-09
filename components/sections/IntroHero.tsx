@@ -26,7 +26,11 @@ export function IntroHero() {
 
       {/* Monumental Upward Parallax Wordmark */}
       <div className="w-[85vw] max-w-[1250px] -mt-[4vw] z-10 transition-transform duration-300">
-        <OstrumLogo hasParallax className="w-full h-auto text-white drop-shadow-2xl" />
+        <OstrumLogo
+          hasParallax
+          isScrolled={scrolled}
+          className="w-full h-auto text-white drop-shadow-2xl"
+        />
       </div>
 
       {/* Main Statement & Dual Positioning */}
