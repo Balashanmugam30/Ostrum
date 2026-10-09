@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { OstrumCore2D } from '@/components/visuals/OstrumCore2D';
+import { OstrumCore3D } from '@/components/visuals/OstrumCore3D';
 
 export function OstrumEngineSection() {
   const { t } = useLanguage();
@@ -142,12 +142,19 @@ export function OstrumEngineSection() {
           </div>
 
           {/* ============================================================
-              CENTER: THE 2.5D OSTRUM CORE CENTERPIECE
-              Sculptural translucent design artifact with 360° scroll rotation
-              Zero black overlay, pure floating physical presence
+              CENTER: THE SIGNATURE 3D OSTRUM CORE CENTERPIECE
+              Sculptural Möbius Art Ribbon (Crimson Porcelain) with 360° scroll rotation
+              Zero black overlay, 100% transparent canvas, pure floating physical presence
               ============================================================ */}
           <div className="w-full lg:w-[44%] flex items-center justify-center relative bg-transparent">
-            <OstrumCore2D activeFocus={activeFocus} />
+            <div className="relative w-full aspect-square max-w-[340px] sm:max-w-[420px] md:max-w-[480px] lg:max-w-[520px] min-h-[340px] sm:min-h-[420px] md:min-h-[480px] lg:min-h-[520px] flex items-center justify-center pointer-events-auto bg-transparent">
+              <OstrumCore3D
+                variation="crimson-porcelain"
+                scrollDriven={true}
+                activeFocus={activeFocus}
+                className="w-full h-full"
+              />
+            </div>
           </div>
 
           {/* ============================================================
