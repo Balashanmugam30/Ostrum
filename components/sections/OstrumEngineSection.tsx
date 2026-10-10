@@ -63,8 +63,6 @@ export function OstrumEngineSection() {
       return;
     }
 
-    const isMobile = window.innerWidth < 768;
-    const travelDistance = isMobile ? -50 : -120;
 
     const ctx = gsap.context(() => {
       // Create master scrubbed timeline
@@ -114,13 +112,6 @@ export function OstrumEngineSection() {
         0.12
       );
 
-      // Sequence Stage 2: Sculpture Parallax Travel (Begins higher -> enters center)
-      tl.fromTo(
-        sculptureWrapperRef.current,
-        { y: travelDistance },
-        { y: 0, duration: 0.48, ease: 'power1.out' },
-        0.10
-      );
 
       // Sequence Stage 3: Left & Right Identity Blocks Reveal in Coordinated Stagger
       tl.fromTo(

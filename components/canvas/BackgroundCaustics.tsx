@@ -143,22 +143,22 @@ export function BackgroundCaustics() {
       }
 
       // ============================================
-      // OBJECT-FIT COVER UV (aligned to top)
+      // OBJECT-FIT COVER UV (with safe overscan for parallax)
       // ============================================
 
-      vec2 coverUV(vec2 uv, vec2 screenSize, vec2 textureSize) {
+      vec2 coverUV(vec2 uv, vec2 screenSize, vec2 textureSize, float overscan) {
         float screenAspect = screenSize.x / screenSize.y;
         float textureAspect = textureSize.x / textureSize.y;
 
-        vec2 scale = vec2(1.0);
+        vec2 scale = vec2(1.0 / overscan);
 
         if (screenAspect > textureAspect) {
-          scale.y = textureAspect / screenAspect;
+          scale.y = (textureAspect / screenAspect) / overscan;
         } else {
-          scale.x = screenAspect / textureAspect;
+          scale.x = (screenAspect / textureAspect) / overscan;
         }
 
-        vec2 offset = vec2(0.5, 1.0 - scale.y * 0.5);
+        vec2 offset = vec2(0.5, 0.5);
         return (uv - vec2(0.5, 0.5)) * scale + offset;
       }
 
@@ -233,9 +233,11 @@ export function BackgroundCaustics() {
         vec2 uv = vUv;
         float time = uTime;
 
-        vec2 texUV = coverUV(uv, uResolution, uTextureResolution);
-        // Restrained subtle parallax: max 0.06 shift, safe from clipping
-        texUV.y -= uScrollY * 0.06;
+        // Overscan factor 1.20 provides safe margin for parallax without border clipping
+        vec2 texUV = coverUV(uv, uResolution, uTextureResolution, 1.20);
+        // Liquid responsive scroll parallax: 0.14 texture travel across page scroll
+        float yParallax = - (uScrollY - 0.5) * 0.14;
+        texUV.y += yParallax;
 
         vec2 distortion = waterDistortion(uv, time);
         vec2 mouseDist = mouseDistortion(uv, uMouse);

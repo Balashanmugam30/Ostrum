@@ -330,7 +330,9 @@ export function OstrumContinuousJourney() {
       let targetScreenY: number;
       let targetScale: number;
 
-      if (scrollY <= anchors.dockScrollY) {
+      const isDocked = scrollY >= anchors.dockScrollY;
+
+      if (!isDocked) {
         // JOURNEY PHASE (Hero 'O' -> Section 02 Centerpiece)
         // Horizontal: glides smoothly from Hero 'O' center to viewport center
         targetScreenX = anchors.heroDocX + (anchors.slotDocX - anchors.heroDocX) * ease;
@@ -343,8 +345,8 @@ export function OstrumContinuousJourney() {
         // Scale: smoothly scales from hero silhouette scale up to centerpiece scale
         targetScale = anchors.heroScale + (anchors.slotScale - anchors.heroScale) * ease;
       } else {
-        // DOCKED PHASE (Firmly attached to Section 02 slot in document space)
-        // Travels UP with Section 02 as user scrolls into later sections
+        // DOCKED PHASE (Firmly locked to Section 02 slot in document space)
+        // Stays perfectly centered between "01 · FOR BUSINESS" and "02 · FOR WHAT'S NEXT"
         targetScreenX = anchors.slotDocX;
         targetScreenY = anchors.slotDocY - scrollY;
         targetScale = anchors.slotScale;
@@ -361,28 +363,37 @@ export function OstrumContinuousJourney() {
         currentRotationY = t * Math.PI * 2;
         isInitialized = true;
       } else {
-        currentX += (targetWorld.x - currentX) * 0.18;
-        currentY += (targetWorld.y - currentY) * 0.18;
+        // Snappy tracking when docked to eliminate trailing lag; smooth glide during journey
+        const posLerp = isDocked ? 0.35 : 0.18;
+        currentX += (targetWorld.x - currentX) * posLerp;
+        currentY += (targetWorld.y - currentY) * posLerp;
         currentScale += (targetScale - currentScale) * 0.16;
       }
 
-      // Zero-G subtle organic breathing float
-      const floatOffset = Math.sin(time * 0.0016) * 0.04 * currentScale;
+      // Zero-G subtle organic breathing float: active ONLY during journey, strictly ZERO when docked
+      const floatOffset = isDocked ? 0 : Math.sin(time * 0.0016) * 0.04 * currentScale * (1 - ease);
 
       modelRoot.position.set(currentX, currentY + floatOffset, 0);
       modelRoot.scale.set(currentScale, currentScale, currentScale);
 
       // Continuous 360-degree rotation across journey + focus bias
-      const targetRotY = t * Math.PI * 2 + focusBias;
+      const targetRotY = (isDocked ? Math.PI * 2 : t * Math.PI * 2) + focusBias;
       currentRotationY += (targetRotY - currentRotationY) * 0.14;
       modelRoot.rotation.y = currentRotationY;
 
-      // Subtle spatial pointer tilt
+      // Subtle spatial pointer tilt: vertical pitch and camera elevation zeroed when docked
       if (!isMobile && !prefersReducedMotion) {
-        modelRoot.rotation.x = pointer.y * 0.16;
-        modelRoot.rotation.z = -pointer.x * 0.12;
-        camera.position.x = pointer.x * 0.18;
-        camera.position.y = pointer.y * 0.14;
+        if (isDocked) {
+          modelRoot.rotation.x = 0;
+          modelRoot.rotation.z = 0;
+          camera.position.x = pointer.x * 0.08;
+          camera.position.y = 0;
+        } else {
+          modelRoot.rotation.x = pointer.y * 0.16 * (1 - ease);
+          modelRoot.rotation.z = -pointer.x * 0.12 * (1 - ease);
+          camera.position.x = pointer.x * 0.18;
+          camera.position.y = pointer.y * 0.14 * (1 - ease);
+        }
       }
       camera.lookAt(0, 0, 0);
 
