@@ -143,22 +143,25 @@ export function BackgroundCaustics() {
       }
 
       // ============================================
-      // OBJECT-FIT COVER UV (with safe overscan for parallax)
+      // OBJECT-FIT COVER UV (aligned to top in hero)
       // ============================================
 
-      vec2 coverUV(vec2 uv, vec2 screenSize, vec2 textureSize, float overscan) {
+      vec2 coverUV(vec2 uv, vec2 screenSize, vec2 textureSize) {
         float screenAspect = screenSize.x / screenSize.y;
         float textureAspect = textureSize.x / textureSize.y;
 
-        vec2 scale = vec2(1.0 / overscan);
+        vec2 scale = vec2(1.0);
 
         if (screenAspect > textureAspect) {
-          scale.y = (textureAspect / screenAspect) / overscan;
+          // Screen is wider - scale texture width to match, crop height
+          scale.y = textureAspect / screenAspect;
         } else {
-          scale.x = (screenAspect / textureAspect) / overscan;
+          // Screen is taller - scale texture height to match, crop width
+          scale.x = screenAspect / textureAspect;
         }
 
-        vec2 offset = vec2(0.5, 0.5);
+        // Center horizontally, align to top vertically
+        vec2 offset = vec2(0.5, 1.0 - scale.y * 0.5);
         return (uv - vec2(0.5, 0.5)) * scale + offset;
       }
 
@@ -218,11 +221,9 @@ export function BackgroundCaustics() {
 
         float dist = length(uvCorrected - mouseCorrected);
         float glow = smoothstep(uHaloSize, 0.0, dist);
-        float intensity = pow(glow, 1.6);
+        float intensity = pow(glow, 1.5);
 
-        // Radiant crimson-amber luminescence
-        vec3 haloGrad = mix(uHaloColor, vec3(1.0, 0.45, 0.28), glow * 0.45);
-        return haloGrad * intensity * uHaloIntensity;
+        return uHaloColor * intensity * uHaloIntensity;
       }
 
       // ============================================
@@ -233,36 +234,25 @@ export function BackgroundCaustics() {
         vec2 uv = vUv;
         float time = uTime;
 
-        // Overscan factor 1.25 provides safe margin for parallax without border clipping
-        vec2 texUV = coverUV(uv, uResolution, uTextureResolution, 1.25);
-        // Liquid responsive scroll parallax: 0.16 texture travel across page scroll
-        float yParallax = - (uScrollY - 0.5) * 0.16;
-        texUV.y += yParallax;
+        // Calculate cover UV for texture (aligned to top)
+        vec2 texUV = coverUV(uv, uResolution, uTextureResolution);
+
+        // Apply continuous scroll progression through the tall 2532px artwork
+        texUV.y -= uScrollY;
 
         vec2 distortion = waterDistortion(uv, time);
         vec2 mouseDist = mouseDistortion(uv, uMouse);
 
         texUV += distortion + mouseDist;
-        texUV = clamp(texUV, 0.001, 0.999);
 
-        vec3 color = texture2D(uTexture, texUV).rgb;
+        // Continuous texture sampling with seamless boundary falloff into obsidian black
+        vec3 color = vec3(0.0);
+        if (texUV.x >= 0.0 && texUV.x <= 1.0 && texUV.y >= 0.0 && texUV.y <= 1.0) {
+          float bottomFade = smoothstep(0.0, 0.03, texUV.y);
+          color = texture2D(uTexture, texUV).rgb * bottomFade;
+        }
 
-        // ============================================
-        // CLARTÉ ATMOSPHERIC BURGUNDY VIGNETTE & CONTRAST
-        // ============================================
-        // Aspect-corrected radial coordinate from optical center (50% x, 46% y)
-        float aspect = uResolution.x / uResolution.y;
-        vec2 vCoord = vec2((uv.x - 0.5) * aspect, uv.y - 0.46);
-        float vDist = length(vCoord);
-
-        // Smooth gradual organic vignette falloff:
-        // Inside vDist < 0.38: saturated luminous scarlet focal core
-        // Between 0.38 and 1.25: deepens into obsidian burgundy (#0d0103 to #050001)
-        float vignette = smoothstep(1.25, 0.38, vDist);
-        vec3 deepBurgundy = vec3(0.042, 0.006, 0.010);
-        color = mix(deepBurgundy, color * vec3(1.08, 0.98, 0.95), vignette);
-
-        // Radiant cursor halo over focal core
+        // Radiant cursor halo
         vec3 halo = mouseHalo(uv, uMouse);
         color += halo;
 
@@ -286,18 +276,18 @@ export function BackgroundCaustics() {
         uResolution: { value: new THREE.Vector2(size.width, size.height) },
         uMouse: { value: new THREE.Vector2(0.5, 0.5) },
         uTexture: { value: null },
-        uTextureResolution: { value: new THREE.Vector2(1920, 1080) },
+        uTextureResolution: { value: new THREE.Vector2(1920, 2532) },
         uWaterScale: { value: 2 },
         uWaterSpeed: { value: 0.15 },
         uDistortionStrength: { value: isMobile ? 0.018 : 0.025 },
-        uMouseRadius: { value: 0.35 },
+        uMouseRadius: { value: 0.3 },
         uMouseStrength: { value: isMobile ? 0 : 0.035 },
         uGrainIntensity: { value: isMobile ? 0.25 : 0.4 },
         uGrainSpeed: { value: isMobile ? 8 : 12 },
         uScrollY: { value: 0 },
-        uHaloIntensity: { value: isMobile ? 0 : 0.85 },
-        uHaloSize: { value: 0.55 },
-        uHaloColor: { value: new THREE.Color(1.0, 0.18, 0.08) },
+        uHaloIntensity: { value: isMobile ? 0 : 0.75 },
+        uHaloSize: { value: 0.5 },
+        uHaloColor: { value: new THREE.Color(0.91, 0.063, 0.0) },
       },
     });
 
@@ -361,12 +351,13 @@ export function BackgroundCaustics() {
       const elapsed = ((performance.now() - startTime) * 0.001) % 3600.0;
       mousePos.x += (targetPos.x - mousePos.x) * 0.08;
       mousePos.y += (targetPos.y - mousePos.y) * 0.08;
-      scrollY += (targetScrollY - scrollY) * 0.16;
+      scrollY += (targetScrollY - scrollY) * 0.10;
 
       const uniforms = material.uniforms;
       uniforms.uTime.value = elapsed;
       uniforms.uMouse.value.set(mousePos.x, mousePos.y);
-      uniforms.uScrollY.value = scrollY;
+      // Continuous scroll progression mapping through 2532px vertical artwork
+      uniforms.uScrollY.value = scrollY * 0.84;
 
       renderer.render(scene, camera);
     };
@@ -378,6 +369,8 @@ export function BackgroundCaustics() {
       size.height = container.clientHeight || window.innerHeight;
       renderer.setSize(size.width, size.height);
       material.uniforms.uResolution.value.set(size.width, size.height);
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      targetScrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
     };
 
     window.addEventListener('resize', onResize);
@@ -408,18 +401,9 @@ export function BackgroundCaustics() {
       style={{
         backgroundImage: 'url(/images/bg.webp)',
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center center',
+        backgroundPosition: 'center top',
         backgroundSize: 'cover',
       }}
-    >
-      {/* Non-interactive Atmospheric Burgundy Vignette Layer */}
-      <div
-        className="absolute inset-0 pointer-events-none z-[1]"
-        style={{
-          background:
-            'radial-gradient(ellipse 95% 85% at 50% 46%, transparent 35%, rgba(20, 2, 5, 0.45) 72%, rgba(6, 1, 2, 0.88) 100%)',
-        }}
-      />
-    </div>
+    />
   );
 }
