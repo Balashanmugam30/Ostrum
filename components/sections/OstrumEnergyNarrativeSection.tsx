@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
+  (window as any).ScrollTrigger = ScrollTrigger;
 }
 
 function renderSupportingWithHighlights(
@@ -63,11 +64,11 @@ export function OstrumEnergyNarrativeSection() {
     if (prefersReducedMotion) {
       window.dispatchEvent(new CustomEvent('ostrum:bg-darken', { detail: 1 }));
       window.dispatchEvent(
-        new CustomEvent('ostrum:energy-progress', { detail: { progress: 0.5, beat: 1 } })
+        new CustomEvent('ostrum:energy-progress', { detail: { progress: 0.5, beat: 2 } })
       );
       const beatEls = gsap.utils.toArray<HTMLElement>('.narrative-beat-card');
       beatEls.forEach((el, idx) => {
-        gsap.set(el, { opacity: idx === 1 ? 1 : 0, y: 0 });
+        gsap.set(el, { opacity: idx === 2 ? 1 : 0, y: 0 });
         const fills = el.querySelectorAll<HTMLElement>('.text-fill-mask');
         fills.forEach((fill) => {
           gsap.set(fill, { clipPath: 'inset(0 0% 0 0)' });
@@ -78,7 +79,7 @@ export function OstrumEnergyNarrativeSection() {
 
     const ctx = gsap.context(() => {
       const isMobile = window.innerWidth < 768;
-      const scrollDistance = isMobile ? 2600 : 3800;
+      const scrollDistance = isMobile ? 3200 : 4600;
 
       // Master Pinned Trigger for the Energy Narrative
       ScrollTrigger.create({
@@ -94,19 +95,22 @@ export function OstrumEnergyNarrativeSection() {
           const p = self.progress; // 0.0 to 1.0
 
           // Calculate active beat index:
-          // -1: Stage 0 (0.00 - 0.16) Object alone against pitch-black void
-          //  0: Beat 01 (0.16 - 0.36) Complexity, made clear.
-          //  1: Beat 02 (0.36 - 0.57) Intelligence that works.
-          //  2: Beat 03 (0.57 - 0.78) Built for what comes next.
-          //  3: Beat 04 (0.78 - 1.00) Build what does not exist yet.
+          // -1: Stage 0 (0.00 - 0.12) Object alone against pitch-black void
+          //  0: Beat 01 (0.12 - 0.28) Your tools don't work together.
+          //  1: Beat 02 (0.29 - 0.44) It shouldn't be this hard.
+          //  2: Beat 03 (0.45 - 0.62) We make your business work better.
+          //  3: Beat 04 (0.63 - 0.80) Got a problem no product solves?
+          //  4: Beat 05 (0.81 - 1.00) Ready to build what comes next?
           let currentBeat = -1;
-          if (p >= 0.78) {
+          if (p >= 0.81) {
+            currentBeat = 4;
+          } else if (p >= 0.63) {
             currentBeat = 3;
-          } else if (p >= 0.57) {
+          } else if (p >= 0.45) {
             currentBeat = 2;
-          } else if (p >= 0.36) {
+          } else if (p >= 0.29) {
             currentBeat = 1;
-          } else if (p >= 0.16) {
+          } else if (p >= 0.12) {
             currentBeat = 0;
           }
           setActiveBeat(currentBeat);
@@ -125,12 +129,12 @@ export function OstrumEnergyNarrativeSection() {
         },
       });
 
-      // Scrubbed Master Timeline for the 4 Narrative Beats with Outline-to-Fill Reveals
+      // Scrubbed Master Timeline for the 5 Narrative Beats with Scroll-Scrubbed Text-Fill Reveals
       const beatCards = gsap.utils.toArray<HTMLElement>('.narrative-beat-card');
 
       // Initialize all cards: opacity 0, offset down, with 100% clipped fills
       beatCards.forEach((card) => {
-        gsap.set(card, { opacity: 0, y: 30 });
+        gsap.set(card, { opacity: 0, y: 24 });
         const fills = card.querySelectorAll<HTMLElement>('.text-fill-mask');
         fills.forEach((fill) => {
           gsap.set(fill, { clipPath: 'inset(0 100% 0 0)' });
@@ -146,95 +150,102 @@ export function OstrumEnergyNarrativeSection() {
         },
       });
 
-      // Stage 0: 0.00 -> 0.16 is pure object-only stage (zero text, sculpture alone in center)
+      // Stage 0: 0.00 -> 0.12 is pure object-only stage (zero text, sculpture alone in center)
 
-      if (beatCards.length >= 4) {
+      if (beatCards.length >= 5) {
         // ==============================================================
-        // BEAT 01: "Complexity, made clear." (0.16 -> 0.35)
+        // BEAT 01: "Your tools don't work together." (0.12 -> 0.28)
         // ==============================================================
         const card0 = beatCards[0];
         const headFill0 = card0.querySelector<HTMLElement>('.heading-fill');
         const subFill0 = card0.querySelector<HTMLElement>('.supporting-fill');
 
-        // Card enters: Outlines visible
-        tl.to(card0, { opacity: 1, y: 0, duration: 0.03, ease: 'power2.out' }, 0.16);
-        // Headline fill progression (scrubbed outline-to-fill)
+        // Card enters: base muted grey lettering appears
+        tl.to(card0, { opacity: 1, y: 0, duration: 0.03, ease: 'power2.out' }, 0.12);
+        // Headline fill progression (scrubbed grey-to-white fill)
         if (headFill0) {
-          tl.to(headFill0, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.19);
+          tl.to(headFill0, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.15);
         }
         // Supporting sentence fill progression
         if (subFill0) {
-          tl.to(subFill0, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.23);
+          tl.to(subFill0, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.18);
         }
-        // Reading Hold: fully filled, crystal clear
-        tl.to(card0, { opacity: 1, duration: 0.04 }, 0.28);
-        // Exit transition
-        tl.to(card0, { opacity: 0, y: -20, duration: 0.03, ease: 'power2.in' }, 0.32);
+        // Reading Hold: fully filled, clear ivory/white
+        tl.to(card0, { opacity: 1, duration: 0.03 }, 0.23);
+        // Exit dissolve
+        tl.to(card0, { opacity: 0, y: -20, duration: 0.02, ease: 'power2.in' }, 0.26);
 
         // ==============================================================
-        // BEAT 02: "Intelligence that works." (0.37 -> 0.56)
+        // BEAT 02: "It shouldn't be this hard." (0.29 -> 0.44)
+        // Punchline beat with no supporting sentence
         // ==============================================================
         const card1 = beatCards[1];
         const headFill1 = card1.querySelector<HTMLElement>('.heading-fill');
-        const subFill1 = card1.querySelector<HTMLElement>('.supporting-fill');
 
-        // Card enters: Outlines visible
-        tl.to(card1, { opacity: 1, y: 0, duration: 0.03, ease: 'power2.out' }, 0.37);
-        // Headline fill progression
+        tl.to(card1, { opacity: 1, y: 0, duration: 0.03, ease: 'power2.out' }, 0.29);
         if (headFill1) {
-          tl.to(headFill1, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.40);
-        }
-        // Supporting sentence fill progression
-        if (subFill1) {
-          tl.to(subFill1, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.44);
+          tl.to(headFill1, { clipPath: 'inset(0 0% 0 0)', duration: 0.06, ease: 'none' }, 0.32);
         }
         // Reading Hold
-        tl.to(card1, { opacity: 1, duration: 0.04 }, 0.49);
-        // Exit transition
-        tl.to(card1, { opacity: 0, y: -20, duration: 0.03, ease: 'power2.in' }, 0.53);
+        tl.to(card1, { opacity: 1, duration: 0.04 }, 0.38);
+        // Exit dissolve
+        tl.to(card1, { opacity: 0, y: -20, duration: 0.02, ease: 'power2.in' }, 0.42);
 
         // ==============================================================
-        // BEAT 03: "Built for what comes next." (0.58 -> 0.77)
+        // BEAT 03: "We make your business work better." (0.45 -> 0.62)
         // ==============================================================
         const card2 = beatCards[2];
         const headFill2 = card2.querySelector<HTMLElement>('.heading-fill');
         const subFill2 = card2.querySelector<HTMLElement>('.supporting-fill');
 
-        // Card enters: Outlines visible
-        tl.to(card2, { opacity: 1, y: 0, duration: 0.03, ease: 'power2.out' }, 0.58);
-        // Headline fill progression
+        tl.to(card2, { opacity: 1, y: 0, duration: 0.03, ease: 'power2.out' }, 0.45);
         if (headFill2) {
-          tl.to(headFill2, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.61);
+          tl.to(headFill2, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.48);
         }
-        // Supporting sentence fill progression
         if (subFill2) {
-          tl.to(subFill2, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.65);
+          tl.to(subFill2, { clipPath: 'inset(0 0% 0 0)', duration: 0.06, ease: 'none' }, 0.51);
         }
         // Reading Hold
-        tl.to(card2, { opacity: 1, duration: 0.04 }, 0.70);
-        // Exit transition
-        tl.to(card2, { opacity: 0, y: -20, duration: 0.03, ease: 'power2.in' }, 0.74);
+        tl.to(card2, { opacity: 1, duration: 0.03 }, 0.57);
+        // Exit dissolve
+        tl.to(card2, { opacity: 0, y: -20, duration: 0.02, ease: 'power2.in' }, 0.60);
 
         // ==============================================================
-        // BEAT 04: "Build what does not exist yet." (0.79 -> 1.00)
-        // Only final supporting paragraph has selective crimson/coral highlights
+        // BEAT 04: "Got a problem no product solves?" (0.63 -> 0.80)
         // ==============================================================
         const card3 = beatCards[3];
         const headFill3 = card3.querySelector<HTMLElement>('.heading-fill');
         const subFill3 = card3.querySelector<HTMLElement>('.supporting-fill');
 
-        // Card enters: Outlines visible
-        tl.to(card3, { opacity: 1, y: 0, duration: 0.04, ease: 'power2.out' }, 0.79);
-        // Headline fill progression
+        tl.to(card3, { opacity: 1, y: 0, duration: 0.03, ease: 'power2.out' }, 0.63);
         if (headFill3) {
-          tl.to(headFill3, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.83);
+          tl.to(headFill3, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.66);
         }
-        // Supporting paragraph fill progression (reveals coral accents)
         if (subFill3) {
-          tl.to(subFill3, { clipPath: 'inset(0 0% 0 0)', duration: 0.06, ease: 'none' }, 0.87);
+          tl.to(subFill3, { clipPath: 'inset(0 0% 0 0)', duration: 0.06, ease: 'none' }, 0.69);
         }
-        // Settle Hold through 1.00 for stable poise
-        tl.to(card3, { opacity: 1, duration: 0.07 }, 0.93);
+        // Reading Hold
+        tl.to(card3, { opacity: 1, duration: 0.03 }, 0.75);
+        // Exit dissolve
+        tl.to(card3, { opacity: 0, y: -20, duration: 0.02, ease: 'power2.in' }, 0.78);
+
+        // ==============================================================
+        // BEAT 05: "Ready to build what comes next?" (0.81 -> 1.00)
+        // Climax beat with selective coral highlights on supporting text
+        // ==============================================================
+        const card4 = beatCards[4];
+        const headFill4 = card4.querySelector<HTMLElement>('.heading-fill');
+        const subFill4 = card4.querySelector<HTMLElement>('.supporting-fill');
+
+        tl.to(card4, { opacity: 1, y: 0, duration: 0.03, ease: 'power2.out' }, 0.81);
+        if (headFill4) {
+          tl.to(headFill4, { clipPath: 'inset(0 0% 0 0)', duration: 0.05, ease: 'none' }, 0.84);
+        }
+        if (subFill4) {
+          tl.to(subFill4, { clipPath: 'inset(0 0% 0 0)', duration: 0.06, ease: 'none' }, 0.88);
+        }
+        // Settle Hold through 1.00 for majestic resting poise
+        tl.to(card4, { opacity: 1, duration: 0.06 }, 0.94);
       }
     }, section);
 
@@ -274,22 +285,20 @@ export function OstrumEnergyNarrativeSection() {
           {narrative.beats.map((beat) => (
             <div
               key={beat.id}
-              className="narrative-beat-card absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-auto px-4"
+              className="narrative-beat-card absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-auto px-6 md:px-12"
               style={{ opacity: 0 }}
             >
-              {/* 1. Primary Statement: High-Impact Editorial Heading with Outline-to-Fill Reveal */}
-              <div className="relative inline-block max-w-[960px] mx-auto">
-                {/* Base Layer: Accessible Semantic Heading (Crisp Outlines Visible First) */}
+              {/* 1. Primary Statement: Reference Neue Montreal Medium (Inactive Muted Grey -> Scrubbed White Fill) */}
+              <div className="relative inline-block max-w-[1080px] mx-auto">
+                {/* Base Layer: Inactive Solid Muted Grey Text (Reference: rgba(255, 255, 255, 0.30)) */}
                 <h2
-                  className="outline-heading font-sans font-medium text-center text-[clamp(36px,5.8vw,78px)] tracking-[-0.03em] leading-[1.06] select-none text-transparent drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]"
-                  style={{
-                    WebkitTextStroke: '1.2px rgba(255, 255, 255, 0.45)',
-                  }}
+                  className="font-sans font-medium text-center text-[clamp(34px,3.9vw,75px)] tracking-[-0.01em] leading-[1.2] select-none text-white/30 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]"
+                  style={{ textWrap: 'balance' }}
                 >
                   {beat.primary}
                 </h2>
 
-                {/* Fill Overlay: Scroll-Scrubbed Horizontal Inset Reveal */}
+                {/* Fill Overlay: Scroll-Scrubbed Solid Pure White Reveal */}
                 <div
                   className="text-fill-mask heading-fill absolute inset-0 pointer-events-none select-none overflow-hidden"
                   aria-hidden="true"
@@ -299,30 +308,26 @@ export function OstrumEnergyNarrativeSection() {
                   }}
                 >
                   <div
-                    className="font-sans font-medium text-center text-[clamp(36px,5.8vw,78px)] tracking-[-0.03em] leading-[1.06] text-white drop-shadow-[0_4px_32px_rgba(255,255,255,0.22)]"
-                    style={{
-                      WebkitTextStroke: '1.2px #ffffff',
-                    }}
+                    className="font-sans font-medium text-center text-[clamp(34px,3.9vw,75px)] tracking-[-0.01em] leading-[1.2] text-white drop-shadow-[0_4px_32px_rgba(255,255,255,0.25)]"
+                    style={{ textWrap: 'balance' }}
                   >
                     {beat.primary}
                   </div>
                 </div>
               </div>
 
-              {/* 2. Supporting Statement: Editorial Secondary Paragraph with Outline-to-Fill Reveal */}
+              {/* 2. Supporting Statement: Editorial Secondary Paragraph with Scroll-Scrubbed Reveal */}
               {beat.supporting ? (
-                <div className="relative inline-block max-w-[660px] mx-auto mt-6 sm:mt-7">
-                  {/* Base Layer: Accessible Semantic Paragraph (Crisp Outlines Visible First) */}
+                <div className="relative inline-block max-w-[760px] mx-auto mt-6 md:mt-8">
+                  {/* Base Layer: Inactive Muted Grey */}
                   <p
-                    className="outline-supporting text-center text-sm sm:text-base md:text-[18px] lg:text-[20px] tracking-[-0.015em] leading-[1.52] font-normal select-none text-transparent drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]"
-                    style={{
-                      WebkitTextStroke: '0.8px rgba(255, 255, 255, 0.40)',
-                    }}
+                    className="font-sans font-normal text-center text-[clamp(17px,1.4vw,23px)] tracking-[-0.01em] leading-[1.4] select-none text-white/30 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]"
+                    style={{ textWrap: 'balance' }}
                   >
                     {beat.supporting}
                   </p>
 
-                  {/* Fill Overlay: Scroll-Scrubbed Horizontal Inset Reveal */}
+                  {/* Fill Overlay: Scroll-Scrubbed Pure White / Coral Highlights */}
                   <div
                     className="text-fill-mask supporting-fill absolute inset-0 pointer-events-none select-none overflow-hidden"
                     aria-hidden="true"
@@ -331,7 +336,10 @@ export function OstrumEnergyNarrativeSection() {
                       WebkitClipPath: 'inset(0 100% 0 0)',
                     }}
                   >
-                    <p className="text-center text-sm sm:text-base md:text-[18px] lg:text-[20px] tracking-[-0.015em] leading-[1.52] font-normal text-white/90 drop-shadow-[0_2px_16px_rgba(0,0,0,0.8)]">
+                    <p
+                      className="font-sans font-normal text-center text-[clamp(17px,1.4vw,23px)] tracking-[-0.01em] leading-[1.4] text-white/90 drop-shadow-[0_2px_16px_rgba(0,0,0,0.8)]"
+                      style={{ textWrap: 'balance' }}
+                    >
                       {renderSupportingWithHighlights(
                         beat.supporting,
                         beat.highlight,

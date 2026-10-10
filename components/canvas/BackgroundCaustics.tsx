@@ -349,24 +349,44 @@ export function BackgroundCaustics() {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       targetScrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
 
-      const energyEl = document.getElementById('energy-narrative');
-      if (energyEl) {
-        const rect = energyEl.getBoundingClientRect();
-        const winH = window.innerHeight || 800;
-        const transitionDistance = Math.min(winH * 0.8, 600);
+      const scrollYPos = window.scrollY;
+      const st02 = (window as any).ScrollTrigger?.getById('section02-hold');
+      const stEnergy = (window as any).ScrollTrigger?.getById('energy-narrative-pin');
 
-        if (rect.top >= transitionDistance) {
-          // Fully above Section 03 (Hero & Section 02 hold): 100% normal crimson caustics
+      if (st02 && stEnergy) {
+        const dockEnd = st02.end;
+        const energyStart = stEnergy.start;
+        const handoffSpan = Math.max(1, energyStart - dockEnd);
+
+        if (scrollYPos <= dockEnd) {
+          // Section 01 (Hero) and Section 02 (Engine & Reading Hold): 100% pure crimson caustics
           targetDarken = 0.0;
-        } else if (rect.top > 0) {
-          // Continuous reversible transition entering/leaving Section 03
-          targetDarken = Math.max(0, Math.min(1, (transitionDistance - rect.top) / transitionDistance));
+        } else if (scrollYPos < energyStart) {
+          // Exact handoff journey between Section 02 release and Section 03 entrance:
+          // Smooth, continuous, mono-directional transition from 0.0 to 1.0
+          targetDarken = Math.max(0, Math.min(1, (scrollYPos - dockEnd) / handoffSpan));
         } else {
-          // Inside Section 03 pinned narrative & subsequent release spacer: pitch black
+          // Inside Section 03 pinned narrative & subsequent spacer: deep black with subtle ruby core
           targetDarken = 1.0;
         }
       } else {
-        targetDarken = 0.0;
+        // Fallback using DOM geometry if ScrollTrigger is not yet registered
+        const energyEl = document.getElementById('energy-narrative');
+        if (energyEl) {
+          const rect = energyEl.getBoundingClientRect();
+          const winH = window.innerHeight || 800;
+          const transitionDistance = Math.min(winH * 0.8, 600);
+
+          if (rect.top >= transitionDistance) {
+            targetDarken = 0.0;
+          } else if (rect.top > 0) {
+            targetDarken = Math.max(0, Math.min(1, (transitionDistance - rect.top) / transitionDistance));
+          } else {
+            targetDarken = 1.0;
+          }
+        } else {
+          targetDarken = 0.0;
+        }
       }
     };
 

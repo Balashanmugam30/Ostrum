@@ -13,6 +13,7 @@ import { LivingThread } from '@/components/ui/LivingThread';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
+  (window as any).ScrollTrigger = ScrollTrigger;
 }
 
 export function OstrumEngineSection() {
@@ -118,20 +119,6 @@ export function OstrumEngineSection() {
             id: 'section02-hold',
             scrub: 0.6,
             anticipatePin: 1,
-            onUpdate: (self) => {
-              const p = self.progress;
-              // Smooth background darkening transition near exit (0.72 -> 1.00)
-              if (p >= 0.72) {
-                const darkProgress = Math.min(1, (p - 0.72) / 0.28);
-                window.dispatchEvent(
-                  new CustomEvent('ostrum:bg-darken', { detail: darkProgress })
-                );
-              } else {
-                window.dispatchEvent(
-                  new CustomEvent('ostrum:bg-darken', { detail: 0.0 })
-                );
-              }
-            },
           },
         });
 

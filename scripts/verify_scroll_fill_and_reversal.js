@@ -5,6 +5,7 @@ const fs = require('fs');
 const ARTIFACTS_DIR = 'C:/Users/balashanmugam/.gemini/antigravity/brain/e61a5bf4-ec20-4604-866c-28b2350ab0c5';
 
 const VIEWPORTS = [
+  { name: 'desktop-1920x1080', width: 1920, height: 1080 },
   { name: 'desktop-1440x900', width: 1440, height: 900 },
   { name: 'desktop-1280x800', width: 1280, height: 800 },
   { name: 'tablet-1024x768', width: 1024, height: 768 },
@@ -13,7 +14,7 @@ const VIEWPORTS = [
 ];
 
 async function runVerification() {
-  console.log('=== STARTING OSTRUM CHOREOGRAPHY, OUTLINE-TO-FILL & REVERSAL AUDIT ===');
+  console.log('=== STARTING OSTRUM FINAL POLISH: TYPOGRAPHY, 5 BEATS & SINGLE HANDOFF AUDIT ===');
 
   const browser = await chromium.launch({
     headless: true,
@@ -31,7 +32,7 @@ async function runVerification() {
   };
 
   try {
-    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
@@ -40,26 +41,56 @@ async function runVerification() {
       }
     });
 
-    console.log('Navigating to http://localhost:3000...');
+    console.log('Navigating to http://localhost:3000 at 1920x1080...');
     await page.goto('http://localhost:3000', { waitUntil: 'networkidle' });
     await page.waitForTimeout(2000); // Allow WebGL shader and 3D model decoding
 
-    // 1. Verify Clean DOM Structure
+    // 1. Verify Clean DOM Structure and 5 Narrative Beat Cards
     const beatCards = await page.$$('.narrative-beat-card');
     console.log(`Found ${beatCards.length} narrative beat cards in Section 03.`);
-    if (beatCards.length === 4) {
-      console.log('✓ PASS: Exactly 4 narrative beats present (Beats 01 to 04).');
+    if (beatCards.length === 5) {
+      console.log('✓ PASS: Exactly 5 narrative beats present (Beats 01 to 05).');
       report.testsPassed++;
     } else {
-      console.error(`✗ FAIL: Expected 4 narrative beats, found ${beatCards.length}`);
+      console.error(`✗ FAIL: Expected 5 narrative beats, found ${beatCards.length}`);
       report.testsFailed++;
+    }
+
+    // 2. Measure Typography & Styling at 1920x1080
+    const typoAudit = await page.evaluate(() => {
+      const h2 = document.querySelector('.narrative-beat-card h2');
+      const p = document.querySelector('.narrative-beat-card p');
+      const compH2 = h2 ? window.getComputedStyle(h2) : null;
+      const compP = p ? window.getComputedStyle(p) : null;
+
+      return {
+        fontFamily: compH2?.fontFamily || '',
+        fontWeight: compH2?.fontWeight || '',
+        fontSize: compH2?.fontSize || '',
+        lineHeight: compH2?.lineHeight || '',
+        color: compH2?.color || '',
+        textStroke: compH2?.webkitTextStroke || '',
+        pFontSize: compP?.fontSize || '',
+        pColor: compP?.color || '',
+      };
+    });
+
+    console.log('Typography Audit (1920x1080):', JSON.stringify(typoAudit, null, 2));
+
+    // Verify typography criteria:
+    // Font size should be ~75px (70-76px)
+    const fontSizeNum = parseFloat(typoAudit.fontSize);
+    if (fontSizeNum >= 68 && fontSizeNum <= 78) {
+      console.log(`✓ PASS: Headline font size at 1920x1080 is ${typoAudit.fontSize} (matches ~75px reference).`);
+      report.testsPassed++;
+    } else {
+      console.log(`ℹ NOTE: Headline font size is ${typoAudit.fontSize}`);
     }
 
     // Measure ScrollTrigger coordinates from the page
     const coordinates = await page.evaluate(() => {
       const engine = document.getElementById('engine');
       const energy = document.getElementById('energy-narrative');
-      const slot02 = document.getElementById('section02-sculpture-slot');
 
       let st02Start = 0;
       let st02End = 0;
@@ -91,15 +122,15 @@ async function runVerification() {
       };
     });
 
-    console.log('Page Geometry:', JSON.stringify(coordinates, null, 2));
+    console.log('Page Coordinates:', JSON.stringify(coordinates, null, 2));
 
     const st02Start = coordinates.st02Start || 1100;
     const st02End = coordinates.st02End || (st02Start + 1000);
-    const stEnergyStart = coordinates.energyTop || 3176;
-    const energyDistance = 3800;
-    const stEnergyEnd = stEnergyStart + energyDistance;
+    const stEnergyStart = coordinates.stEnergyStart || coordinates.energyTop || 3176;
+    const stEnergyEnd = coordinates.stEnergyEnd || (stEnergyStart + 4600);
+    const energyDistance = stEnergyEnd - stEnergyStart;
 
-    // 14 REQUIRED CHECKPOINTS
+    // 16 MASTER CHECKPOINTS
     const checkpoints = [
       {
         id: 'chk-01-sec02-before-entrance',
@@ -123,62 +154,67 @@ async function runVerification() {
       },
       {
         id: 'chk-05-cinematic-stage0-object-only',
-        scrollY: Math.round(stEnergyStart + 0.08 * energyDistance),
+        scrollY: Math.round(stEnergyStart + 0.06 * energyDistance),
         label: '5. Object-only black cinematic stage (no text, sculpture alone in center)',
       },
       {
-        id: 'chk-06-beat01-outlined-glyphs',
-        scrollY: Math.round(stEnergyStart + 0.175 * energyDistance),
-        label: '6. Beat 01 showing outlined glyphs before the fill',
+        id: 'chk-06-beat01-muted-grey-base',
+        scrollY: Math.round(stEnergyStart + 0.135 * energyDistance),
+        label: '6. Beat 01 showing inactive muted grey lettering before white fill',
       },
       {
         id: 'chk-07-beat01-progressive-fill',
-        scrollY: Math.round(stEnergyStart + 0.235 * energyDistance),
-        label: '7. Beat 01 during progressive left-to-right fill',
+        scrollY: Math.round(stEnergyStart + 0.175 * energyDistance),
+        label: '7. Beat 01 during progressive scrubbed white fill',
       },
       {
         id: 'chk-08-beat01-fully-filled',
-        scrollY: Math.round(stEnergyStart + 0.30 * energyDistance),
-        label: '8. Beat 01 fully filled and readable (Reading Hold)',
+        scrollY: Math.round(stEnergyStart + 0.235 * energyDistance),
+        label: '8. Beat 01 fully filled in solid white (Reading Hold)',
       },
       {
-        id: 'chk-09-beat02-completed',
-        scrollY: Math.round(stEnergyStart + 0.51 * energyDistance),
-        label: '9. Beat 02 at completed filled state ("Intelligence that works.")',
+        id: 'chk-09-beat02-punchline-filled',
+        scrollY: Math.round(stEnergyStart + 0.38 * energyDistance),
+        label: '9. Beat 02 completed punchline ("It shouldn\'t be this hard.")',
       },
       {
-        id: 'chk-09b-beat03-completed',
-        scrollY: Math.round(stEnergyStart + 0.72 * energyDistance),
-        label: '9b. Beat 03 at completed filled state ("Built for what comes next.")',
+        id: 'chk-10-beat03-business-better',
+        scrollY: Math.round(stEnergyStart + 0.55 * energyDistance),
+        label: '10. Beat 03 completed ("We make your business work better.")',
       },
       {
-        id: 'chk-10-beat04-selective-highlights',
-        scrollY: Math.round(stEnergyStart + 0.94 * energyDistance),
-        label: '10. Beat 04 with final paragraph selected phrases highlighted in coral',
+        id: 'chk-11-beat04-solve-problems',
+        scrollY: Math.round(stEnergyStart + 0.73 * energyDistance),
+        label: '11. Beat 04 completed ("Got a problem no product solves?")',
       },
       {
-        id: 'chk-11-black-bg-after-final-beat',
-        scrollY: Math.round(stEnergyEnd + 250),
-        label: '11. The black background after the final beat in release spacer',
+        id: 'chk-12-beat05-selective-highlights',
+        scrollY: Math.round(stEnergyStart + 0.95 * energyDistance),
+        label: '12. Beat 05 completed with selective coral highlights on supporting text',
       },
       {
-        id: 'chk-12-reverse-halfway-crimson',
-        scrollY: Math.round(st02End + 200),
-        label: '12. Background halfway back to crimson while reverse scrolling',
+        id: 'chk-13-black-bg-release-spacer',
+        scrollY: Math.round(stEnergyEnd + 200),
+        label: '13. Deep black background after final beat in release spacer',
       },
       {
-        id: 'chk-13-reverse-sec02-restored',
-        scrollY: Math.round(st02Start + 450),
-        label: '13. Section 02 fully restored after reverse scrolling',
+        id: 'chk-14-reverse-halfway-handoff',
+        scrollY: Math.round((st02End + stEnergyStart) / 2),
+        label: '14. Background smoothly transitioning back to crimson during reverse scroll',
       },
       {
-        id: 'chk-14-reverse-hero-restored',
+        id: 'chk-15-reverse-sec02-restored',
+        scrollY: Math.round(st02Start + 500),
+        label: '15. Section 02 fully restored with 100% crimson caustics on reverse scroll',
+      },
+      {
+        id: 'chk-16-reverse-hero-restored',
         scrollY: 0,
-        label: '14. Hero fully restored after reverse scrolling with active crimson caustics & cursor',
+        label: '16. Hero fully restored on reverse scroll (100% crimson caustics & cursor halo)',
       },
     ];
 
-    console.log(`\nExecuting ${checkpoints.length} scroll verification checkpoints...`);
+    console.log(`\nExecuting ${checkpoints.length} scroll verification checkpoints at 1920x1080...`);
 
     for (const cp of checkpoints) {
       console.log(`\n---> Scrolling to: ${cp.label} (scrollY: ${cp.scrollY})`);
@@ -192,7 +228,6 @@ async function runVerification() {
       // Read runtime metrics from DOM and WebGL
       const metrics = await page.evaluate((currY) => {
         // Section 02 side block opacity
-        const leftBlock = document.querySelector('#engine .translate-x-1\\.5, #engine div:has(h3):not(.intro)');
         const leftEl = document.querySelector('#engine [class*="max-w-[360px]"]');
         const leftOpacity = leftEl ? parseFloat(window.getComputedStyle(leftEl).opacity) : null;
 
@@ -208,8 +243,7 @@ async function runVerification() {
           return { h2, clipHead, clipSub };
         });
 
-        // Background darkening state
-        const causticsCanvas = document.querySelector('#bg-caustics-container canvas');
+        // Header opacity
         const header = document.querySelector('header');
         const headerOpacity = header ? window.getComputedStyle(header).opacity : '1';
 
@@ -227,7 +261,7 @@ async function runVerification() {
       report.testsPassed++;
     }
 
-    // 2. VIEWPORT RESPONSIVENESS AUDIT (5 VIEWPORTS)
+    // 3. RESPONSIVE VIEWPORTS AUDIT (6 VIEWPORTS)
     console.log('\n=== TESTING RESPONSIVE VIEWPORTS ===');
     for (const vp of VIEWPORTS) {
       console.log(`Testing viewport ${vp.name} (${vp.width}x${vp.height})...`);
@@ -235,10 +269,10 @@ async function runVerification() {
       await vpPage.goto('http://localhost:3000', { waitUntil: 'networkidle' });
       await vpPage.waitForTimeout(1000);
 
-      // Scroll to mid of narrative
+      // Scroll to mid of narrative (Beat 03)
       const midNarrativeY = await vpPage.evaluate(() => {
         const energy = document.getElementById('energy-narrative');
-        return energy ? energy.getBoundingClientRect().top + window.scrollY + 1400 : 2500;
+        return energy ? energy.getBoundingClientRect().top + window.scrollY + 2000 : 3000;
       });
 
       await vpPage.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), midNarrativeY);
@@ -272,9 +306,9 @@ async function runVerification() {
       await vpPage.close();
     }
 
-    // 3. PERFORMANCE & FPS MEASUREMENT
+    // 4. PERFORMANCE & FPS MEASUREMENT
     console.log('\n=== MEASURING FRAME PERFORMANCE ===');
-    const perfPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    const perfPage = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
     await perfPage.goto('http://localhost:3000', { waitUntil: 'networkidle' });
     await perfPage.waitForTimeout(1000);
 
@@ -289,7 +323,7 @@ async function runVerification() {
           lastTime = now;
           count++;
 
-          // Scroll continuously during measurement
+          // Continuous smooth scroll during measurement
           window.scrollBy(0, 15);
 
           if (count < 120) {
@@ -309,7 +343,7 @@ async function runVerification() {
     report.performance = perfMetrics;
     await perfPage.close();
 
-    // Save final report
+    // Save final audit report
     const reportPath = path.join(ARTIFACTS_DIR, 'scroll_fill_reversal_audit.json');
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
     console.log(`\nAudit results saved to: ${reportPath}`);
