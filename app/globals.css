@@ -37,7 +37,6 @@ html {
   box-sizing: border-box;
   background-color: var(--black);
   color: var(--white);
-  scroll-behavior: smooth;
 }
 
 *, *::before, *::after {

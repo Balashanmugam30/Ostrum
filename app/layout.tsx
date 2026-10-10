@@ -4,6 +4,7 @@ import { LanguageProvider } from '@/context/LanguageContext';
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
 import { OrderModal } from '@/components/modal/OrderModal';
+import { SmoothScroll } from '@/components/providers/SmoothScroll';
 
 export const metadata: Metadata = {
   title: 'OSTRUM — Digital Transformation Studio',
@@ -45,17 +46,19 @@ export default function RootLayout({
     <html lang="en" className="dark bg-black">
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black">
         <LanguageProvider>
-          {/* Fixed Luminous Caustics WebGL Background */}
-          <BackgroundCaustics />
+          <SmoothScroll>
+            {/* Fixed Luminous Caustics WebGL Background */}
+            <BackgroundCaustics />
 
-          {/* Minimalist Floating Global Header */}
-          <Header />
+            {/* Minimalist Floating Global Header */}
+            <Header />
 
-          {/* Page Main Content */}
-          <main className="relative z-10">{children}</main>
+            {/* Page Main Content */}
+            <main className="relative z-10">{children}</main>
 
-          {/* Global Order Checkout Modal */}
-          <OrderModal />
+            {/* Global Order Checkout Modal */}
+            <OrderModal />
+          </SmoothScroll>
         </LanguageProvider>
       </body>
     </html>

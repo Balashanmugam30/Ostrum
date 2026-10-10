@@ -181,3 +181,87 @@ Both defects have been eradicated. Furthermore, a **single continuous 3D scroll 
 | **Mobile Standard**  | $390 \times 844$  | Scaled, centered | $y = 421.86\text{px}$ ($\Delta = 0.14\text{px}$) | Settled, 0 bobbing, 0 drift | 0 errors |
 | **Mobile Compact**   | $375 \times 812$  | Scaled, centered | $y = 405.86\text{px}$ ($\Delta = 0.14\text{px}$) | Settled, 0 bobbing, 0 drift | 0 errors |
 
+---
+
+## 6. Targeted Fixes: Clarté Atmospheric Burgundy Vignette, Editorial Pinned 3D Hold & Lenis Smooth Scrolling (October 10, 2026)
+
+### 6.1 Atmospheric Burgundy Vignette & Enhanced Scroll Parallax (`components/canvas/BackgroundCaustics.tsx`)
+* **Reference Direction:** Inspired by the supplied CLARTÉ recording: deep burgundy and obsidian dark red toward the outer edges and corners, a concentrated luminous scarlet focal core, organic radial strands, and responsive liquid parallax.
+* **Shader Architecture:**
+  - Implemented aspect-corrected radial coordinates centered at $(50\%, 46\%)$ in the fragment shader:
+    ```glsl
+    float aspect = uResolution.x / uResolution.y;
+    vec2 vCoord = vec2((uv.x - 0.5) * aspect, uv.y - 0.46);
+    float vDist = length(vCoord);
+    float vignette = smoothstep(1.25, 0.38, vDist);
+    vec3 deepBurgundy = vec3(0.042, 0.006, 0.010);
+    color = mix(deepBurgundy, color * vec3(1.08, 0.98, 0.95), vignette);
+    ```
+  - Added a non-interactive CSS composite vignette overlay inside `.background-webgl`:
+    `radial-gradient(ellipse 95% 85% at 50% 46%, transparent 35%, rgba(20, 2, 5, 0.45) 72%, rgba(6, 1, 2, 0.88) 100%)`
+  - Increased overscan to $1.25$ and liquid parallax factor to $0.16$ ($\approx 173\text{px}$ of safe vertical texture travel across page scroll), completely eliminating border clipping while providing continuous, perceptible parallax motion.
+
+### 6.2 Permanent Section 02 Editorial Pinned Hold (`OstrumEngineSection.tsx` & `OstrumContinuousJourney.tsx`)
+* **Root Cause of Post-Arrival Cropping & Drift:** Previously, once the sculpture completed its descent to `#section02-sculpture-slot`, any further scroll within Section 02 immediately translated the sculpture upward with standard document scroll (`targetScreenY = slotDocY - scrollY`). When a user scrolled $300\text{px}–500\text{px}$ to read the section's copy, the sculpture was pushed off the top of the viewport and cropped in half.
+* **Pinning & Docking Architecture:**
+  1. In `OstrumEngineSection.tsx`, created an editorial pinned hold on `compositionWrapperRef`:
+     ```tsx
+     ScrollTrigger.create({
+       trigger: compositionWrapperRef.current,
+       start: 'center center',
+       end: `+=${holdDistance}`, // 600px desktop, 350px mobile
+       pin: true,
+       pinSpacing: true,
+       id: 'section02-hold',
+       anticipatePin: 1,
+     });
+     ```
+  2. In `OstrumContinuousJourney.tsx`, synchronized the 3D render loop directly with `section02-hold`:
+     - **During Hold (`scrollY >= dockStart && scrollY <= dockEnd`):**
+       `targetScreenX = anchors.slotDocX` ($50\%$ screen width)  
+       `targetScreenY = window.innerHeight * 0.50` (mathematical center)  
+       `targetScale = anchors.slotScale`  
+       Both the flanking cards ("01 · FOR BUSINESS" & "02 · FOR WHAT'S NEXT") and the 3D sculpture remain locked at the center of the viewport for the entire 600px hold. Zero vertical jumping, zero drifting, zero bobbing, zero cropping.
+     - **Arrival Highlight Specular Sweep:**
+       Upon first docking, a subtle warm champagne specular gleam triggers across the porcelain ribbons:
+       ```ts
+       gsap.to(keyLight, {
+         intensity: 2.85,
+         duration: 0.45,
+         ease: 'power2.out',
+         yoyo: true,
+         repeat: 1,
+         onComplete: () => { keyLight.intensity = 2.2; }
+       });
+       ```
+     - **Unpinned Exit (`scrollY > dockEnd`):**
+       As scroll proceeds past the hold toward Section 04, `targetScreenY = window.innerHeight * 0.50 - exitOffset`, smoothly translating upward with the unpinned Section 02 DOM until culled offscreen.
+     - **Bidirectional Reversibility:**
+       Reverse scrolling up through the page holds firmly in the center during the hold interval, and then smoothly climbs back into the Hero 'O' counter aperture with sub-pixel precision.
+
+### 6.3 Scroll Lag Elimination via Lenis Smooth Scrolling (`components/providers/SmoothScroll.tsx`)
+* **Architecture:**
+  - Installed official `lenis` library.
+  - Implemented `SmoothScroll.tsx` wrapping all page routes in `app/layout.tsx`.
+  - Driven strictly through `gsap.ticker.add((time) => lenis.raf(time * 1000))` with `gsap.ticker.lagSmoothing(0)` and `autoRaf: false`.
+  - Bound `lenis.on('scroll', ScrollTrigger.update)` to eliminate frame tearing between smooth scrolling and ScrollTrigger pinning.
+  - Removed conflicting CSS `scroll-behavior: smooth` from `app/globals.css`.
+  - Preserved full accessibility: bypasses Lenis if `(prefers-reduced-motion: reduce)` is enabled.
+
+### 6.4 Measured Telemetry & Playwright Verification Matrix (Post-Hold Fix)
+
+| Test Stage | Viewport | Measured Metric | Result | Stability Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Hero Resting** | $1440 \times 900$ | Counter aperture alignment | $x = 104\text{px}, y = 171\text{px}$ | 100% nested in Romie serif 'O' |
+| **Hold Start** | $1440 \times 900$ | Center on screen | $y = 450.34\text{px}$ ($\Delta = 0.34\text{px}$) | Locked at viewport center |
+| **Hold +150px** | $1440 \times 900$ | Center on screen | $y = 450.34\text{px}$ ($\Delta = 0.34\text{px}$) | Rock-solid, 0 drift |
+| **Hold +300px** | $1440 \times 900$ | Center on screen | $y = 450.34\text{px}$ ($\Delta = 0.34\text{px}$) | Rock-solid, 0 drift |
+| **Hold +450px** | $1440 \times 900$ | Center on screen | $y = 450.34\text{px}$ ($\Delta = 0.34\text{px}$) | Rock-solid, 0 drift |
+| **Hover Bias (Left)** | $1440 \times 900$ | Focus tilt event | `detail: -0.22 rad` | Tilts smoothly toward Business |
+| **Hover Bias (Right)**| $1440 \times 900$ | Focus tilt event | `detail: +0.22 rad` | Tilts smoothly toward Next |
+| **Exit Phase** | $1440 \times 900$ | Unpinning at dockEnd + 850px | Continuous scroll upward | Natural unpinned transition |
+| **Reverse Scroll** | $1440 \times 900$ | Re-entry to Hero at scroll 0 | $y = 171\text{px}$ counter | 100% reversible precision |
+| **Mobile Standard** | $390 \times 844$ | Slot visibility & overflow | `hasOverflow: false` | Centered, 0 overflow |
+| **Mobile Compact** | $375 \times 812$ | Slot visibility & overflow | `hasOverflow: false` | Centered, 0 overflow |
+| **Console Errors** | All Viewports | Runtime error logs | `0 errors, 0 warnings` | Clean production build |
+

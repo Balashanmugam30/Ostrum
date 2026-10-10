@@ -242,14 +242,17 @@ export function OstrumContinuousJourney() {
       const slotWorldUnits = (slotPixelTarget / window.innerHeight) * vHeight;
       const sScale = Math.max(0.25, Math.min(0.55, slotWorldUnits / 3.35));
 
-      // Dock scroll position: when slot center reaches viewport center
-      const dScrollY = Math.max(1, sDocY - window.innerHeight * 0.50);
+      // Dock scroll position: synchronized with Section 02 editorial hold ScrollTrigger
+      const st = ScrollTrigger.getById('section02-hold');
+      const holdDist = isMob ? 350 : 600;
+      const dScrollY = st ? st.start : Math.max(1, sDocY - window.innerHeight * 0.50);
 
       let exitY = sDocY + 600;
       if (engineSection) {
         const engRect = engineSection.getBoundingClientRect();
         exitY = engRect.bottom + window.scrollY;
       }
+      exitY = Math.max(exitY, dScrollY + holdDist + window.innerHeight * 0.8);
 
       anchors = {
         heroDocX: hDocX,
@@ -292,6 +295,7 @@ export function OstrumContinuousJourney() {
     let currentScale = anchors.heroScale;
     let currentRotationY = 0;
     let isInitialized = false;
+    let hasPlayedArrival = false;
 
     const animate = (time: number) => {
       if (isDisposed) return;
@@ -319,9 +323,14 @@ export function OstrumContinuousJourney() {
       pointer.y += (pointer.targetY - pointer.y) * 0.06;
       focusBias += (targetFocusBias - focusBias) * 0.10;
 
+      // Synchronize docking interval with GSAP ScrollTrigger 'section02-hold'
+      const st = ScrollTrigger.getById('section02-hold');
+      const dockStart = st ? st.start : anchors.dockScrollY;
+      const dockEnd = st ? st.end : anchors.dockScrollY + (isMobile ? 350 : 600);
+
       // Master Travel Choreography
-      // Progress t: 0.0 at top of page -> 1.0 when Section 02 is centered
-      const t = Math.min(1, Math.max(0, scrollY / anchors.dockScrollY));
+      // Progress t: 0.0 at top of page -> 1.0 when dockStart is reached
+      const t = Math.min(1, Math.max(0, scrollY / (dockStart || 1)));
 
       // Smooth cubic ease-in-out
       const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -330,7 +339,25 @@ export function OstrumContinuousJourney() {
       let targetScreenY: number;
       let targetScale: number;
 
-      const isDocked = scrollY >= anchors.dockScrollY;
+      const isDocked = scrollY >= dockStart;
+      const isHold = scrollY >= dockStart && scrollY <= dockEnd;
+
+      // Subtle warm champagne specular highlight sweep on arrival
+      if (isDocked && !hasPlayedArrival) {
+        hasPlayedArrival = true;
+        gsap.to(keyLight, {
+          intensity: 2.85,
+          duration: 0.45,
+          ease: 'power2.out',
+          yoyo: true,
+          repeat: 1,
+          onComplete: () => {
+            keyLight.intensity = 2.2;
+          },
+        });
+      } else if (scrollY < dockStart - 80) {
+        hasPlayedArrival = false;
+      }
 
       if (!isDocked) {
         // JOURNEY PHASE (Hero 'O' -> Section 02 Centerpiece)
@@ -344,11 +371,18 @@ export function OstrumContinuousJourney() {
 
         // Scale: smoothly scales from hero silhouette scale up to centerpiece scale
         targetScale = anchors.heroScale + (anchors.slotScale - anchors.heroScale) * ease;
-      } else {
-        // DOCKED PHASE (Firmly locked to Section 02 slot in document space)
+      } else if (isHold) {
+        // EDITORIAL PINNED HOLD PHASE (Locks firmly to Section 02 center)
         // Stays perfectly centered between "01 · FOR BUSINESS" and "02 · FOR WHAT'S NEXT"
+        // Zero drift, zero bounce, zero jumping, zero cropping at top of viewport!
         targetScreenX = anchors.slotDocX;
-        targetScreenY = anchors.slotDocY - scrollY;
+        targetScreenY = window.innerHeight * 0.50;
+        targetScale = anchors.slotScale;
+      } else {
+        // UNPINNED EXIT PHASE (Follows Section 02 as it scrolls up into Section 04)
+        const exitOffset = scrollY - dockEnd;
+        targetScreenX = anchors.slotDocX;
+        targetScreenY = window.innerHeight * 0.50 - exitOffset;
         targetScale = anchors.slotScale;
       }
 

@@ -27,6 +27,7 @@ export function OstrumEngineSection() {
   const kickerRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const descRef = useRef<HTMLDivElement>(null);
+  const compositionWrapperRef = useRef<HTMLDivElement>(null);
   const sculptureWrapperRef = useRef<HTMLDivElement>(null);
   const leftBlockRef = useRef<HTMLDivElement>(null);
   const rightBlockRef = useRef<HTMLDivElement>(null);
@@ -63,8 +64,25 @@ export function OstrumEngineSection() {
       return;
     }
 
-
     const ctx = gsap.context(() => {
+      const isMobile = window.innerWidth < 768;
+      const holdDistance = isMobile ? 350 : 600;
+
+      // Section 02 Editorial Pinned Hold: Locks the tripartite composition
+      // ("01 · FOR BUSINESS", 3D Sculpture, "02 · FOR WHAT'S NEXT") firmly in the center
+      // of the viewport for holdDistance px of scroll without jumping, drifting, or cropping.
+      if (compositionWrapperRef.current) {
+        ScrollTrigger.create({
+          trigger: compositionWrapperRef.current,
+          start: 'center center',
+          end: `+=${holdDistance}`,
+          pin: true,
+          pinSpacing: true,
+          id: 'section02-hold',
+          anticipatePin: 1,
+        });
+      }
+
       // Create master scrubbed timeline
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -209,7 +227,10 @@ export function OstrumEngineSection() {
             Sculpture travels from high into central focal space
             Flanked by 01 / FOR BUSINESS and 02 / FOR WHAT'S NEXT
             ============================================================== */}
-        <div className="w-full mt-12 md:mt-16 lg:mt-20 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-6 relative bg-transparent">
+        <div
+          ref={compositionWrapperRef}
+          className="w-full mt-12 md:mt-16 lg:mt-20 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-6 relative bg-transparent"
+        >
           {/* ============================================================
               LEFT IDENTITY ANCHOR: 01 / FOR BUSINESS
               ============================================================ */}

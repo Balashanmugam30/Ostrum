@@ -233,10 +233,10 @@ export function BackgroundCaustics() {
         vec2 uv = vUv;
         float time = uTime;
 
-        // Overscan factor 1.20 provides safe margin for parallax without border clipping
-        vec2 texUV = coverUV(uv, uResolution, uTextureResolution, 1.20);
-        // Liquid responsive scroll parallax: 0.14 texture travel across page scroll
-        float yParallax = - (uScrollY - 0.5) * 0.14;
+        // Overscan factor 1.25 provides safe margin for parallax without border clipping
+        vec2 texUV = coverUV(uv, uResolution, uTextureResolution, 1.25);
+        // Liquid responsive scroll parallax: 0.16 texture travel across page scroll
+        float yParallax = - (uScrollY - 0.5) * 0.16;
         texUV.y += yParallax;
 
         vec2 distortion = waterDistortion(uv, time);
@@ -247,6 +247,22 @@ export function BackgroundCaustics() {
 
         vec3 color = texture2D(uTexture, texUV).rgb;
 
+        // ============================================
+        // CLARTÉ ATMOSPHERIC BURGUNDY VIGNETTE & CONTRAST
+        // ============================================
+        // Aspect-corrected radial coordinate from optical center (50% x, 46% y)
+        float aspect = uResolution.x / uResolution.y;
+        vec2 vCoord = vec2((uv.x - 0.5) * aspect, uv.y - 0.46);
+        float vDist = length(vCoord);
+
+        // Smooth gradual organic vignette falloff:
+        // Inside vDist < 0.38: saturated luminous scarlet focal core
+        // Between 0.38 and 1.25: deepens into obsidian burgundy (#0d0103 to #050001)
+        float vignette = smoothstep(1.25, 0.38, vDist);
+        vec3 deepBurgundy = vec3(0.042, 0.006, 0.010);
+        color = mix(deepBurgundy, color * vec3(1.08, 0.98, 0.95), vignette);
+
+        // Radiant cursor halo over focal core
         vec3 halo = mouseHalo(uv, uMouse);
         color += halo;
 
@@ -345,7 +361,7 @@ export function BackgroundCaustics() {
       const elapsed = ((performance.now() - startTime) * 0.001) % 3600.0;
       mousePos.x += (targetPos.x - mousePos.x) * 0.08;
       mousePos.y += (targetPos.y - mousePos.y) * 0.08;
-      scrollY += (targetScrollY - scrollY) * 0.1;
+      scrollY += (targetScrollY - scrollY) * 0.16;
 
       const uniforms = material.uniforms;
       uniforms.uTime.value = elapsed;
@@ -388,13 +404,22 @@ export function BackgroundCaustics() {
   return (
     <div
       ref={containerRef}
-      className="background-webgl fixed inset-0 pointer-events-none z-0 bg-black"
+      className="background-webgl fixed inset-0 pointer-events-none z-0 bg-black overflow-hidden"
       style={{
         backgroundImage: 'url(/images/bg.webp)',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center center',
         backgroundSize: 'cover',
       }}
-    />
+    >
+      {/* Non-interactive Atmospheric Burgundy Vignette Layer */}
+      <div
+        className="absolute inset-0 pointer-events-none z-[1]"
+        style={{
+          background:
+            'radial-gradient(ellipse 95% 85% at 50% 46%, transparent 35%, rgba(20, 2, 5, 0.45) 72%, rgba(6, 1, 2, 0.88) 100%)',
+        }}
+      />
+    </div>
   );
 }
