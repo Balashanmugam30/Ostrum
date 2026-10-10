@@ -32,7 +32,6 @@ export function OstrumEngineSection() {
   const leftBlockRef = useRef<HTMLDivElement>(null);
   const rightBlockRef = useRef<HTMLDivElement>(null);
   const threadWrapperRef = useRef<HTMLDivElement>(null);
-  const backingRef = useRef<HTMLDivElement>(null);
 
   // 3D imperative handle for high-performance zero-render updates
   const core3DRef = useRef<OstrumCore3DHandle>(null);
@@ -58,7 +57,6 @@ export function OstrumEngineSection() {
       }
       if (leftBlockRef.current) leftBlockRef.current.style.opacity = '1';
       if (rightBlockRef.current) rightBlockRef.current.style.opacity = '1';
-      if (backingRef.current) backingRef.current.style.opacity = '1';
       core3DRef.current?.setTravelProgress(1);
       core3DRef.current?.setScrollProgress(0.5);
       return;
@@ -156,13 +154,29 @@ export function OstrumEngineSection() {
         );
       }
 
-      // Sequence Stage 5: Bottom Backing Culmination Narrative
-      tl.fromTo(
-        backingRef.current,
-        { y: 38, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.30, ease: 'power2.out' },
-        0.58
-      );
+      // Sequence Stage 5: Clean Exit Fadeout as visitor scrolls towards Section 03
+      // Ensures Section 02 side columns, headline, and thread dissolve smoothly
+      // so the Möbius sculpture appears alone against the dark cinematic field.
+      ScrollTrigger.create({
+        trigger: compositionWrapperRef.current,
+        start: () => `bottom+=${holdDistance} center`,
+        end: () => `bottom+=${holdDistance + 260} top`,
+        scrub: true,
+        onUpdate: (self) => {
+          const fadeOut = Math.max(0, 1 - self.progress * 1.4);
+          if (leftBlockRef.current) leftBlockRef.current.style.opacity = `${fadeOut}`;
+          if (rightBlockRef.current) rightBlockRef.current.style.opacity = `${fadeOut}`;
+          if (headlineRef.current) headlineRef.current.style.opacity = `${fadeOut}`;
+          if (descRef.current) descRef.current.style.opacity = `${fadeOut}`;
+          if (kickerRef.current) kickerRef.current.style.opacity = `${fadeOut}`;
+          if (threadWrapperRef.current) threadWrapperRef.current.style.opacity = `${fadeOut}`;
+
+          // Smooth background darkening transition from Section 02 into Section 03
+          window.dispatchEvent(
+            new CustomEvent('ostrum:bg-darken', { detail: self.progress })
+          );
+        },
+      });
     }, section);
 
     return () => {
@@ -359,29 +373,6 @@ export function OstrumEngineSection() {
                 ORIGINAL VENTURES
               </span>
             </div>
-          </div>
-        </div>
-
-        {/* ==============================================================
-            BOTTOM NARRATIVE CULMINATION: BACKING & CO-BUILDING
-            Floating spacious statement — Zero card container
-            ============================================================== */}
-        <div
-          ref={backingRef}
-          className="mt-20 md:mt-28 max-w-[780px] mx-auto flex flex-col items-center"
-        >
-          <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-[#ff5c4a]/60 to-transparent mb-6" />
-
-          <p className="font-serif text-xl sm:text-2xl md:text-[27px] text-white font-normal leading-[1.3] tracking-[-0.02em] drop-shadow-sm">
-            "{engine.backing.statement}"
-          </p>
-
-          <p className="mt-3 text-xs sm:text-sm text-white/70 max-w-[540px] leading-relaxed">
-            {engine.backing.subtext}
-          </p>
-
-          <div className="mt-6 flex items-center gap-3 text-[10px] sm:text-[11px] font-mono tracking-[0.28em] text-[#ff8f7e] uppercase font-medium">
-            <span>{engine.backing.triad}</span>
           </div>
         </div>
       </div>

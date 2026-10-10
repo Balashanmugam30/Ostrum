@@ -4,7 +4,6 @@ import { LanguageProvider } from '@/context/LanguageContext';
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
 import { CustomCursor } from '@/components/ui/CustomCursor';
-import { OrderModal } from '@/components/modal/OrderModal';
 import { SmoothScroll } from '@/components/providers/SmoothScroll';
 
 export const metadata: Metadata = {
@@ -59,9 +58,6 @@ export default function RootLayout({
 
             {/* Page Main Content */}
             <main className="relative z-10">{children}</main>
-
-            {/* Global Order Checkout Modal */}
-            <OrderModal />
           </SmoothScroll>
         </LanguageProvider>
       </body>

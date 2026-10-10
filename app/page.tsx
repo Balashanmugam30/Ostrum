@@ -3,8 +3,6 @@ import { OstrumContinuousJourney } from '@/components/visuals/OstrumContinuousJo
 import { IntroHero } from '@/components/sections/IntroHero';
 import { OstrumEngineSection } from '@/components/sections/OstrumEngineSection';
 import { OstrumEnergyNarrativeSection } from '@/components/sections/OstrumEnergyNarrativeSection';
-import { FooterCta } from '@/components/sections/FooterCta';
-import { Footer } from '@/components/footer/Footer';
 
 export default function HomePage() {
   return (
@@ -21,11 +19,11 @@ export default function HomePage() {
       {/* SECTION 03: The Energy Continuum (Cinematic 3D Scroll Narrative) */}
       <OstrumEnergyNarrativeSection />
 
-      {/* SECTION 05: Climactic Perspective Statement & Optical Serif Highlights */}
-      <FooterCta />
-
-      {/* SECTION 06: Epilogue & Monumental Footer with Floral Flame and Centered CTA */}
-      <Footer />
+      {/* Clean Release Spacer: Allows natural unpinning and upward scroll-out */}
+      <div
+        className="w-full min-h-[60vh] bg-black pointer-events-none"
+        aria-hidden="true"
+      />
     </div>
   );
 }

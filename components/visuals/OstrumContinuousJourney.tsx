@@ -477,10 +477,10 @@ export function OstrumContinuousJourney() {
         targetScreenX = window.innerWidth * 0.50;
         targetScreenY = window.innerHeight * 0.50;
         targetScale = anchors.slotScale + (anchors.energyScale - anchors.slotScale) * easeTrans;
-        targetRotY = Math.PI * 2 + easeTrans * (Math.PI * 0.15);
-        targetEnergyLevel = easeTrans * 0.25;
+        targetRotY = Math.PI * 2;
+        targetEnergyLevel = easeTrans * 0.20;
       }
-      // Stage 4: Section 03 Pinned Energy Narrative (Beats 01, 02, 03)
+      // Stage 4: Section 03 Pinned Energy Narrative (Beats 01 to 05)
       else if (scrollY <= energyEnd) {
         const energySpan = Math.max(1, energyEnd - energyStart);
         const pEnergy = Math.min(1, Math.max(0, (scrollY - energyStart) / energySpan));
@@ -489,11 +489,11 @@ export function OstrumContinuousJourney() {
         targetScreenY = window.innerHeight * 0.50;
         targetScale = anchors.energyScale;
 
-        // Controlled rotation across the 3 narrative beats: from 2.15π to 4.0π (settles poise)
-        targetRotY = (2.15 + pEnergy * 1.85) * Math.PI;
+        // Controlled rotation across the 5 narrative beats: from 2.0π to 4.0π (settles front pose)
+        targetRotY = (2.0 + pEnergy * 2.0) * Math.PI;
 
         // High-energy illuminated material response
-        targetEnergyLevel = Math.min(1, 0.25 + pEnergy * 0.75);
+        targetEnergyLevel = Math.min(1, 0.20 + pEnergy * 0.80);
       }
       // Stage 5: Exit from Section 03 into Footer
       else {

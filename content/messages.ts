@@ -33,43 +33,15 @@ export interface ContentMessages {
     };
   };
   energyNarrative: {
-    badge: string;
+    badge?: string;
     beats: Array<{
       id: string;
       number: string;
-      tag: string;
       primary: string;
-      supporting: string;
+      highlight?: string;
+      highlight2?: string;
+      supporting?: string;
     }>;
-  };
-  footerCta: {
-    line1: string;
-    line1Highlight: string;
-    line2: string;
-    line2Highlight: string;
-    line3: string;
-    line3Highlight: string;
-    line3Suffix: string;
-    cta: string;
-    sublabel: string;
-  };
-  footer: {
-    instagram: string;
-    contact: string;
-    copyright: string;
-    cta: string;
-  };
-  modal: {
-    closeLabel: string;
-    physicalTab: string;
-    digitalTab: string;
-    physicalPrice: string;
-    physicalShipping: string;
-    physicalDetails: string[];
-    physicalBuyCta: string;
-    digitalPrice: string;
-    digitalDetails: string[];
-    digitalBuyCta: string;
   };
 }
 
@@ -110,66 +82,39 @@ export const messages: Record<Locale, ContentMessages> = {
       badge: "03 / THE CONTINUUM",
       beats: [
         {
-          id: "systems",
+          id: "problem",
           number: "01",
-          tag: "SYSTEMS ARCHITECTURE",
-          primary: "Complexity, made coherent.",
-          supporting: "We connect technology, people and operations into systems that work together.",
+          primary: "Disconnected systems. Scattered intelligence. Lost momentum.",
+          supporting: "",
         },
         {
-          id: "intelligence",
+          id: "punchline",
           number: "02",
-          tag: "APPLIED INTELLIGENCE",
-          primary: "Intelligence, put to work.",
-          supporting: "We turn ambitious ideas into useful software, automation and intelligent tools.",
+          primary: "Complexity, made coherent.",
+          highlight: "coherent",
+          supporting: "",
         },
         {
-          id: "future",
+          id: "connect",
           number: "03",
-          tag: "WHAT COMES NEXT",
-          primary: "We build what doesn't exist yet.",
-          supporting: "We discover unmet needs and create original products around real problems.",
+          primary: "We connect systems, software and intelligence—turning operational complexity into momentum.",
+          supporting: "Flagship engineering, custom tools and automated workflows built for compound advantage.",
+        },
+        {
+          id: "products-ventures",
+          number: "04",
+          primary: "Some ideas become products. Some products become ventures.",
+          highlight: "products",
+          highlight2: "ventures",
+          supporting: "Selected high-conviction initiatives receive dedicated Ostrum product, engineering, and venture backing.",
+        },
+        {
+          id: "closing",
+          number: "05",
+          primary: "Build what doesn't exist yet.",
+          supporting: "We discover unmet needs and engineer original software around real problems.",
         },
       ],
-    },
-    footerCta: {
-      line1: "A year ago, on the other side of the ",
-      line1Highlight: "ocean",
-      line2: "everything shifted into a ",
-      line2Highlight: "new perspective",
-      line3: "This book ",
-      line3Highlight: "was born",
-      line3Suffix: " from that.",
-      cta: "Get the book",
-      sublabel: "Also available as a digital edition",
-    },
-    footer: {
-      instagram: "Instagram",
-      contact: "Contact",
-      copyright: "© 2026",
-      cta: "Get the book",
-    },
-    modal: {
-      closeLabel: "Close",
-      physicalTab: "Physical book",
-      digitalTab: "Digital edition",
-      physicalPrice: "22€",
-      physicalShipping: "+ €4 worldwide shipping",
-      physicalDetails: [
-        "Hardcover with matte finish",
-        "High-quality colour print on coated paper",
-        "A beautiful object to keep or give as a gift",
-        "Access to all 6 generative digital experiences",
-        "Worldwide shipping",
-      ],
-      physicalBuyCta: "Buy the book",
-      digitalPrice: "8€",
-      digitalDetails: [
-        "High-quality PDF",
-        "Access to all 6 generative digital experiences",
-        "Instant download after purchase",
-      ],
-      digitalBuyCta: "Buy the ebook",
     },
   },
   fr: {
@@ -208,66 +153,39 @@ export const messages: Record<Locale, ContentMessages> = {
       badge: "03 / LE CONTINUUM",
       beats: [
         {
-          id: "systems",
+          id: "problem",
           number: "01",
-          tag: "ARCHITECTURE DES SYSTÈMES",
-          primary: "La complexité, rendue cohérente.",
-          supporting: "Nous unissons technologie, équipes et opérations au sein de systèmes synchronisés.",
+          primary: "Systèmes déconnectés. Intelligence dispersée. Élan perdu.",
+          supporting: "",
         },
         {
-          id: "intelligence",
+          id: "punchline",
           number: "02",
-          tag: "INTELLIGENCE APPLIQUÉE",
-          primary: "L'intelligence, mise à l'œuvre.",
-          supporting: "Nous transformons les idées ambitieuses en logiciels utiles, automatisations et outils intelligents.",
+          primary: "La complexité, rendue cohérente.",
+          highlight: "cohérente",
+          supporting: "",
         },
         {
-          id: "future",
+          id: "connect",
           number: "03",
-          tag: "PERSPECTIVES & PRODUITS",
-          primary: "Nous construisons ce qui n'existe pas encore.",
-          supporting: "Nous identifions les frictions réelles et concevons des produits originaux pour des besoins cruciaux.",
+          primary: "Nous relions systèmes, logiciels et intelligence—transformant la complexité opérationnelle en élan.",
+          supporting: "Ingénierie de pointe, outils sur-mesure et flux automatisés conçus pour créer un avantage durable.",
+        },
+        {
+          id: "products-ventures",
+          number: "04",
+          primary: "Certaines idées deviennent des produits. Certains produits deviennent des ventures.",
+          highlight: "produits",
+          highlight2: "ventures",
+          supporting: "Les initiatives à forte conviction sélectionnées reçoivent un soutien technique, produit et opérationnel d'Ostrum.",
+        },
+        {
+          id: "closing",
+          number: "05",
+          primary: "Construire ce qui n'existe pas encore.",
+          supporting: "Nous identifions les frictions réelles et concevons des logiciels originaux pour les défis majeurs.",
         },
       ],
-    },
-    footerCta: {
-      line1: "Il y a un an, à l'autre bout de l'",
-      line1Highlight: "océan",
-      line2: "tout a pris une ",
-      line2Highlight: "autre perspective",
-      line3: "Ce livre ",
-      line3Highlight: "est né",
-      line3Suffix: " de là.",
-      cta: "Obtenir le livre",
-      sublabel: "Existe aussi en version numérique",
-    },
-    footer: {
-      instagram: "Instagram",
-      contact: "Contact",
-      copyright: "© 2026",
-      cta: "Obtenir le livre",
-    },
-    modal: {
-      closeLabel: "Fermer",
-      physicalTab: "Livre physique",
-      digitalTab: "Version numérique",
-      physicalPrice: "22€",
-      physicalShipping: "+ 4€ de livraison",
-      physicalDetails: [
-        "Couverture rigide, finition mat",
-        "Impression couleur haute qualité sur papier couché",
-        "Un bel objet à garder ou à offrir",
-        "Accès aux 6 expériences numériques génératives",
-        "Livraison mondiale",
-      ],
-      physicalBuyCta: "Acheter le livre",
-      digitalPrice: "8€",
-      digitalDetails: [
-        "PDF haute qualité",
-        "Accès aux 6 expériences numériques génératives",
-        "Téléchargement immédiat après achat",
-      ],
-      digitalBuyCta: "Acheter le ebook",
     },
   },
 };

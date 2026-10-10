@@ -266,14 +266,17 @@ export function BackgroundCaustics() {
 
         // Concentrated atmosphere darkening for Energy Narrative
         if (uDarken > 0.001) {
-          vec3 darkAtmosphere = color * vec3(0.24, 0.05, 0.08) + vec3(0.018, 0.004, 0.008);
+          // Pure obsidian dark base (#030204) matching Ignite reference
+          vec3 nearBlack = vec3(0.012, 0.008, 0.016);
           float aspect = uResolution.x / uResolution.y;
           vec2 screenCenter = vec2(0.5 * aspect, 0.5);
           vec2 currentCoord = vec2(uv.x * aspect, uv.y);
           float distToCenter = length(currentCoord - screenCenter);
-          float coreSpotlight = smoothstep(0.48, 0.0, distToCenter);
-          vec3 centralRadiance = vec3(0.62, 0.07, 0.03) * pow(coreSpotlight, 1.6) * 0.82;
-          color = mix(color, darkAtmosphere + centralRadiance, uDarken);
+          // Restrained ruby radiance centered directly behind the Möbius sculpture
+          float coreSpotlight = smoothstep(0.42, 0.0, distToCenter);
+          vec3 centralRadiance = vec3(0.42, 0.05, 0.03) * pow(coreSpotlight, 1.8);
+          vec3 cinematicField = nearBlack + centralRadiance;
+          color = mix(color, cinematicField, uDarken);
         }
 
         color = color + (grain - 0.5) * uGrainIntensity;
@@ -343,6 +346,16 @@ export function BackgroundCaustics() {
     const onScroll = () => {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       targetScrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+
+      const energyEl = document.getElementById('energy-narrative');
+      if (energyEl) {
+        const rect = energyEl.getBoundingClientRect();
+        if (rect.top <= 80) {
+          targetDarken = 1.0;
+        } else if (rect.top <= 450) {
+          targetDarken = Math.max(targetDarken, (450 - rect.top) / 370);
+        }
+      }
     };
 
     const onVisibilityChange = () => {
@@ -382,7 +395,7 @@ export function BackgroundCaustics() {
       uniforms.uMouse.value.set(mousePos.x, mousePos.y);
       // Continuous scroll progression mapping through 2532px vertical artwork
       uniforms.uScrollY.value = scrollY * 0.84;
-      currentDarken += (targetDarken - currentDarken) * 0.08;
+      currentDarken += (targetDarken - currentDarken) * 0.22;
       uniforms.uDarken.value = currentDarken;
 
       renderer.render(scene, camera);
