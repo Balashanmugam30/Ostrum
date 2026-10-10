@@ -64,51 +64,26 @@ export function OstrumEngineSection() {
 
     const ctx = gsap.context(() => {
       const isMobile = window.innerWidth < 768;
-      const holdDistance = isMobile ? 350 : 600;
+      const holdDistance = isMobile ? 650 : 1000;
 
-      // Section 02 Editorial Pinned Hold: Locks the tripartite composition
-      // ("01 · FOR BUSINESS", 3D Sculpture, "02 · FOR WHAT'S NEXT") firmly in the center
-      // of the viewport for holdDistance px of scroll without jumping, drifting, or cropping.
-      if (compositionWrapperRef.current) {
-        ScrollTrigger.create({
-          trigger: compositionWrapperRef.current,
-          start: 'center center',
-          end: `+=${holdDistance}`,
-          pin: true,
-          pinSpacing: true,
-          id: 'section02-hold',
-          anticipatePin: 1,
-        });
-      }
-
-      // Create master scrubbed timeline
-      const tl = gsap.timeline({
+      // 1. Header Elements Entrance (Reveals as section enters viewport before pin)
+      const headerTl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: 'top 85%',
-          end: 'bottom 15%',
-          scrub: 1.0,
-          onUpdate: (self) => {
-            const p = self.progress; // 0 to 1
-            // 1. Direct update to 3D rotation
-            core3DRef.current?.setScrollProgress(p);
-
-            // 2. Direct update to 3D travel (starts high, arrives at center by 0.55 progress)
-            const travelNorm = Math.min(1, Math.max(0, (p - 0.08) / 0.44));
-            core3DRef.current?.setTravelProgress(travelNorm);
-          },
+          end: 'top 25%',
+          scrub: 0.8,
         },
       });
 
-      // Sequence Stage 1: Header Elements Reveal (Kicker -> Headline -> Philosophy)
-      tl.fromTo(
+      headerTl.fromTo(
         kickerRef.current,
         { y: 24, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.18, ease: 'power2.out' },
         0
       );
 
-      tl.fromTo(
+      headerTl.fromTo(
         headlineRef.current,
         { y: 36, opacity: 0, filter: 'blur(3px)' },
         {
@@ -118,65 +93,109 @@ export function OstrumEngineSection() {
           duration: 0.28,
           ease: 'power2.out',
         },
-        0.05
+        0.06
       );
 
-      tl.fromTo(
+      headerTl.fromTo(
         descRef.current,
         { y: 22, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.25, ease: 'power2.out' },
         0.12
       );
 
+      // 2. Section 02 Master Pinned Hold and Choreography Timeline:
+      // Locks the tripartite composition ("01 · FOR BUSINESS", 3D Sculpture, "02 · FOR WHAT'S NEXT")
+      // firmly in the center. Side blocks reveal sequentially, lock at 100% opacity, provide an
+      // intentional reading hold, and dissolve gracefully only before the sculpture departs.
+      if (compositionWrapperRef.current) {
+        const holdTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: compositionWrapperRef.current,
+            start: 'center center',
+            end: `+=${holdDistance}`,
+            pin: true,
+            pinSpacing: true,
+            id: 'section02-hold',
+            scrub: 0.6,
+            anticipatePin: 1,
+            onUpdate: (self) => {
+              const p = self.progress;
+              // Smooth background darkening transition near exit (0.72 -> 1.00)
+              if (p >= 0.72) {
+                const darkProgress = Math.min(1, (p - 0.72) / 0.28);
+                window.dispatchEvent(
+                  new CustomEvent('ostrum:bg-darken', { detail: darkProgress })
+                );
+              } else {
+                window.dispatchEvent(
+                  new CustomEvent('ostrum:bg-darken', { detail: 0.0 })
+                );
+              }
+            },
+          },
+        });
 
-      // Sequence Stage 3: Left & Right Identity Blocks Reveal in Coordinated Stagger
-      tl.fromTo(
-        leftBlockRef.current,
-        { y: 45, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.32, ease: 'power2.out' },
-        0.24
-      );
+        // Step A: Left "01 · FOR BUSINESS" block enters (0.00 -> 0.22)
+        holdTl.fromTo(
+          leftBlockRef.current,
+          { y: 40, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.22, ease: 'power2.out' },
+          0.0
+        );
 
-      tl.fromTo(
-        rightBlockRef.current,
-        { y: 45, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.32, ease: 'power2.out' },
-        0.30
-      );
+        // Step B: Right "02 · FOR WHAT'S NEXT" block enters (0.12 -> 0.34)
+        holdTl.fromTo(
+          rightBlockRef.current,
+          { y: 40, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.22, ease: 'power2.out' },
+          0.12
+        );
 
-      // Sequence Stage 4: Living Connection Thread Activates
-      if (threadWrapperRef.current) {
-        tl.fromTo(
-          threadWrapperRef.current,
-          { opacity: 0.15 },
-          { opacity: 1, duration: 0.35, ease: 'power2.out' },
-          0.28
+        // Step C: Living Connection Threads activate (0.15 -> 0.35)
+        if (threadWrapperRef.current) {
+          holdTl.fromTo(
+            threadWrapperRef.current,
+            { opacity: 0.15 },
+            { opacity: 1, duration: 0.20, ease: 'power2.out' },
+            0.15
+          );
+        }
+
+        // Step D: INTENTIONAL READING HOLD (0.34 -> 0.72)
+        // Both blocks remain 100% visible at full opacity, locked and readable.
+        // Sculpture is completely stationary at rest in center slot.
+        holdTl.to(
+          [leftBlockRef.current, rightBlockRef.current],
+          { opacity: 1, y: 0, duration: 0.38 },
+          0.34
+        );
+
+        // Step E: Exit Dissolve (0.72 -> 1.00)
+        // Only after the reading hold has elapsed do the elements fade out
+        // allowing the sculpture to appear isolated and transition to Section 03.
+        holdTl.to(
+          leftBlockRef.current,
+          { opacity: 0, y: -20, duration: 0.24, ease: 'power2.in' },
+          0.72
+        );
+        holdTl.to(
+          rightBlockRef.current,
+          { opacity: 0, y: -20, duration: 0.24, ease: 'power2.in' },
+          0.74
+        );
+        if (threadWrapperRef.current) {
+          holdTl.to(
+            threadWrapperRef.current,
+            { opacity: 0, duration: 0.22, ease: 'power2.in' },
+            0.74
+          );
+        }
+        holdTl.to(
+          [headlineRef.current, descRef.current, kickerRef.current],
+          { opacity: 0, y: -20, duration: 0.22, ease: 'power2.in' },
+          0.76
         );
       }
-
-      // Sequence Stage 5: Clean Exit Fadeout as visitor scrolls towards Section 03
-      // Ensures Section 02 side columns, headline, and thread dissolve smoothly
-      // so the Möbius sculpture appears alone against the dark cinematic field.
-      ScrollTrigger.create({
-        trigger: compositionWrapperRef.current,
-        start: () => `bottom+=${holdDistance} center`,
-        end: () => `bottom+=${holdDistance + 260} top`,
-        scrub: true,
-        onUpdate: (self) => {
-          const fadeOut = Math.max(0, 1 - self.progress * 1.4);
-          if (leftBlockRef.current) leftBlockRef.current.style.opacity = `${fadeOut}`;
-          if (rightBlockRef.current) rightBlockRef.current.style.opacity = `${fadeOut}`;
-          if (headlineRef.current) headlineRef.current.style.opacity = `${fadeOut}`;
-          if (descRef.current) descRef.current.style.opacity = `${fadeOut}`;
-          if (kickerRef.current) kickerRef.current.style.opacity = `${fadeOut}`;
-          if (threadWrapperRef.current) threadWrapperRef.current.style.opacity = `${fadeOut}`;
-
-          // Smooth background darkening transition from Section 02 into Section 03
-          window.dispatchEvent(
-            new CustomEvent('ostrum:bg-darken', { detail: self.progress })
-          );
-        },
-      });
     }, section);
 
     return () => {

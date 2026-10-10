@@ -30,9 +30,7 @@ export function Header() {
     const handleDarken = (e: Event) => {
       const customEvent = e as CustomEvent<number>;
       const darken = typeof customEvent.detail === 'number' ? customEvent.detail : 0;
-      if (darken > 0.15) {
-        setIsCinematic(true);
-      }
+      setIsCinematic(darken > 0.15);
     };
 
     handleScroll();

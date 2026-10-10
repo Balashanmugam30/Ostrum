@@ -334,7 +334,9 @@ export function BackgroundCaustics() {
 
     const onBgDarken = (e: Event) => {
       const customEvent = e as CustomEvent<number>;
-      targetDarken = typeof customEvent.detail === 'number' ? Math.max(0, Math.min(1, customEvent.detail)) : 0;
+      if (typeof customEvent.detail === 'number') {
+        targetDarken = Math.max(0, Math.min(1, customEvent.detail));
+      }
     };
     window.addEventListener('ostrum:bg-darken', onBgDarken);
 
@@ -350,11 +352,21 @@ export function BackgroundCaustics() {
       const energyEl = document.getElementById('energy-narrative');
       if (energyEl) {
         const rect = energyEl.getBoundingClientRect();
-        if (rect.top <= 80) {
+        const winH = window.innerHeight || 800;
+        const transitionDistance = Math.min(winH * 0.8, 600);
+
+        if (rect.top >= transitionDistance) {
+          // Fully above Section 03 (Hero & Section 02 hold): 100% normal crimson caustics
+          targetDarken = 0.0;
+        } else if (rect.top > 0) {
+          // Continuous reversible transition entering/leaving Section 03
+          targetDarken = Math.max(0, Math.min(1, (transitionDistance - rect.top) / transitionDistance));
+        } else {
+          // Inside Section 03 pinned narrative & subsequent release spacer: pitch black
           targetDarken = 1.0;
-        } else if (rect.top <= 450) {
-          targetDarken = Math.max(targetDarken, (450 - rect.top) / 370);
         }
+      } else {
+        targetDarken = 0.0;
       }
     };
 

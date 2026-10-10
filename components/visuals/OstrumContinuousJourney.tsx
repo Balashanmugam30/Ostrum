@@ -417,11 +417,11 @@ export function OstrumContinuousJourney() {
       // ScrollTrigger Intervals
       const st02 = ScrollTrigger.getById('section02-hold');
       const dockStart = st02 ? st02.start : anchors.dockScrollY;
-      const dockEnd = st02 ? st02.end : anchors.dockScrollY + (isMobile ? 350 : 600);
+      const dockEnd = st02 ? st02.end : anchors.dockScrollY + (isMobile ? 650 : 1000);
 
       const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
       const energyStart = stEnergy ? stEnergy.start : dockEnd + (isMobile ? 500 : 800);
-      const energyEnd = stEnergy ? stEnergy.end : energyStart + (isMobile ? 1400 : 2200);
+      const energyEnd = stEnergy ? stEnergy.end : energyStart + (isMobile ? 1800 : 2600);
 
       let targetScreenX: number;
       let targetScreenY: number;
@@ -480,7 +480,7 @@ export function OstrumContinuousJourney() {
         targetRotY = Math.PI * 2;
         targetEnergyLevel = easeTrans * 0.20;
       }
-      // Stage 4: Section 03 Pinned Energy Narrative (Beats 01 to 05)
+      // Stage 4: Section 03 Pinned Energy Narrative (Beats 01 to 04)
       else if (scrollY <= energyEnd) {
         const energySpan = Math.max(1, energyEnd - energyStart);
         const pEnergy = Math.min(1, Math.max(0, (scrollY - energyStart) / energySpan));
