@@ -359,16 +359,26 @@ export function OstrumEnergyNarrativeSection() {
   const renderLine = (
     lineWords: WordToken[],
     keyPrefix: string,
-    globalLineIdx: number
+    globalLineIdx: number,
+    isSupporting = false
   ) => {
+    const fontClass = isSupporting
+      ? 'font-sans font-medium text-[clamp(18px,1.8vw,26px)] leading-[1.2] tracking-[-0.01em]'
+      : 'font-sans font-medium text-[clamp(28px,3.8vw,62px)] leading-[1.08] tracking-[-0.015em]';
+
     return (
       <div
         key={`${keyPrefix}-${globalLineIdx}`}
-        className="narrative-line-container relative inline-block my-1 sm:my-1.5 md:my-2 text-center"
+        className={`narrative-line-container relative inline-block my-0 text-center whitespace-nowrap ${
+          isSupporting ? 'mt-6 md:mt-8' : ''
+        }`}
         data-line-index={globalLineIdx}
+        data-is-supporting={isSupporting ? 'true' : 'false'}
       >
         {/* Base Layer: Inactive Solid Muted Grey Letters */}
-        <div className="narrative-line-base font-sans font-medium text-[clamp(28px,3.5vw,60px)] leading-[1.18] tracking-[-0.015em] text-white/30 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] select-none">
+        <div
+          className={`narrative-line-base ${fontClass} text-white/30 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] select-none`}
+        >
           {lineWords.map((word, wIdx) => (
             <span key={wIdx} className="inline-block whitespace-nowrap">
               {word.chars.map((ch, cIdx) => (
@@ -389,7 +399,7 @@ export function OstrumEnergyNarrativeSection() {
           ))}
         </div>
 
-        {/* Fill Layer: Absolute Overlay with Pure White / Coral Highlights, Horizontally Clipped */}
+        {/* Fill Layer: Absolute Overlay with Pure White / Crimson OSTRUM Highlight, Horizontally Clipped */}
         <div
           className="narrative-line-fill absolute inset-0 pointer-events-none select-none overflow-hidden"
           data-fill-line-index={globalLineIdx}
@@ -399,16 +409,20 @@ export function OstrumEnergyNarrativeSection() {
             WebkitClipPath: 'inset(0 100% 0 0)',
           }}
         >
-          <div className="font-sans font-medium text-[clamp(28px,3.5vw,60px)] leading-[1.18] tracking-[-0.015em] drop-shadow-[0_4px_32px_rgba(255,255,255,0.25)]">
+          <div
+            className={`${fontClass} ${
+              isSupporting
+                ? 'text-white'
+                : 'drop-shadow-[0_4px_32px_rgba(255,255,255,0.25)]'
+            }`}
+          >
             {lineWords.map((word, wIdx) => (
               <span key={wIdx} className="inline-block whitespace-nowrap">
                 {word.chars.map((ch, cIdx) => (
                   <span
                     key={cIdx}
                     className={`narrative-char-filled inline-block ${
-                      ch.isHighlight
-                        ? 'text-[#ff5c4a] drop-shadow-[0_0_16px_rgba(255,92,74,0.65)]'
-                        : 'text-white'
+                      ch.isHighlight ? 'text-[#C01832]' : 'text-white'
                     }`}
                     data-char={ch.char}
                     data-line={globalLineIdx}
@@ -438,12 +452,15 @@ export function OstrumEnergyNarrativeSection() {
       {/* Offscreen Measurement DOM: Accurately computes visual line wrapping with final font */}
       <div
         ref={measureContainerRef}
-        className="opacity-0 pointer-events-none fixed -top-[9999px] -left-[9999px] w-[90vw] max-w-[1580px] px-4 sm:px-6 md:px-8 text-center"
+        className="opacity-0 pointer-events-none fixed -top-[9999px] -left-[9999px] w-[88vw] max-w-[1540px] px-4 sm:px-6 md:px-8 text-center"
         aria-hidden="true"
       >
         {narrative.beats.map((beat) => (
           <div key={beat.id} data-measure-beat={beat.id}>
-            <div className="measure-primary font-sans font-medium text-[clamp(28px,3.5vw,60px)] leading-[1.18] tracking-[-0.015em] text-center">
+            <div
+              className="measure-primary font-sans font-medium text-[clamp(28px,3.8vw,62px)] leading-[1.08] tracking-[-0.015em] text-center"
+              style={{ textWrap: 'balance' }}
+            >
               {tokenizeTextWithHighlights(beat.primary).map((word, wIdx) => (
                 <span
                   key={wIdx}
@@ -455,7 +472,7 @@ export function OstrumEnergyNarrativeSection() {
               ))}
             </div>
             {beat.supporting ? (
-              <div className="measure-supporting font-sans font-medium text-[clamp(28px,3.5vw,60px)] leading-[1.18] tracking-[-0.015em] text-center mt-6">
+              <div className="measure-supporting font-sans font-medium text-[clamp(18px,1.8vw,26px)] leading-[1.2] tracking-[-0.01em] text-center mt-6 md:mt-8">
                 {tokenizeTextWithHighlights(
                   beat.supporting,
                   beat.highlight,
@@ -478,7 +495,7 @@ export function OstrumEnergyNarrativeSection() {
       {/* Pinned Viewport Stage Container */}
       <div
         ref={pinContainerRef}
-        className="w-full h-screen min-h-[640px] flex items-center justify-center relative px-4 sm:px-6 md:px-8 overflow-hidden pointer-events-auto"
+        className="w-full h-screen min-h-[640px] flex items-center justify-center relative overflow-hidden pointer-events-auto"
       >
         {/* Center Slot for Continuous 3D Sculpture Alignment */}
         <div
@@ -487,10 +504,10 @@ export function OstrumEnergyNarrativeSection() {
           className="absolute inset-0 m-auto w-full aspect-square max-w-[340px] sm:max-w-[440px] md:max-w-[540px] lg:max-w-[620px] pointer-events-none z-10 flex items-center justify-center"
         />
 
-        {/* Centered Narrative Statements Container (Expanded to 90vw max 1580px) */}
+        {/* Centered Narrative Statements Container (Expanded to 88vw max 1540px) */}
         <div
           ref={beatsContainerRef}
-          className="w-[90vw] max-w-[1580px] h-full relative z-20 flex items-center justify-center pointer-events-none mx-auto"
+          className="w-[88vw] max-w-[1540px] h-full relative z-20 flex items-center justify-center pointer-events-none mx-auto"
         >
           {narrative.beats.map((beat) => {
             const beatData = linesByBeat ? linesByBeat[beat.id] : null;
@@ -501,37 +518,38 @@ export function OstrumEnergyNarrativeSection() {
                 className="narrative-beat-card absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-auto w-full"
                 style={{ opacity: 0 }}
               >
-                <div className="w-full max-w-[1580px] mx-auto px-4 sm:px-6 md:px-8 text-center flex flex-col items-center justify-center">
+                <div className="w-full max-w-[1540px] mx-auto px-4 sm:px-6 md:px-8 text-center flex flex-col items-center justify-center">
                   {beatData ? (
-                    <>
-                      {/* Primary Lines */}
+                    <div className="w-full flex flex-col items-center">
+                      {/* Primary Statement Lines */}
                       <div className="w-full flex flex-col items-center">
                         {beatData.primaryLines.map((lineWords, lineIdx) =>
-                          renderLine(lineWords, `${beat.id}-p`, lineIdx)
+                          renderLine(lineWords, `${beat.id}-p`, lineIdx, false)
                         )}
                       </div>
 
-                      {/* Supporting Lines (same typography, same size, same importance) */}
+                      {/* Supporting Line (Only Beat 05) */}
                       {beatData.supportingLines.length > 0 && (
-                        <div className="w-full flex flex-col items-center mt-6 md:mt-8 lg:mt-10">
+                        <div className="w-full flex flex-col items-center">
                           {beatData.supportingLines.map((lineWords, lineIdx) =>
                             renderLine(
                               lineWords,
                               `${beat.id}-s`,
-                              beatData.primaryLines.length + lineIdx
+                              beatData.primaryLines.length + lineIdx,
+                              true
                             )
                           )}
                         </div>
                       )}
-                    </>
+                    </div>
                   ) : (
                     // Fallback before measurement finishes
                     <div className="w-full flex flex-col items-center">
-                      <div className="font-sans font-medium text-[clamp(28px,3.5vw,60px)] leading-[1.18] tracking-[-0.015em] text-white/30 text-center">
+                      <div className="font-sans font-medium text-[clamp(28px,3.8vw,62px)] leading-[1.08] tracking-[-0.015em] text-white/30 text-center">
                         {beat.primary}
                       </div>
                       {beat.supporting ? (
-                        <div className="font-sans font-medium text-[clamp(28px,3.5vw,60px)] leading-[1.18] tracking-[-0.015em] text-white/30 text-center mt-6 md:mt-8 lg:mt-10">
+                        <div className="font-sans font-medium text-[clamp(18px,1.8vw,26px)] leading-[1.2] tracking-[-0.01em] text-white/30 text-center mt-6 md:mt-8">
                           {beat.supporting}
                         </div>
                       ) : null}
