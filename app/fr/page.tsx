@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { IntroHero } from '@/components/sections/IntroHero';
 import { OstrumEngineSection } from '@/components/sections/OstrumEngineSection';
-import { GallerySection } from '@/components/sections/GallerySection';
+import { OstrumEnergyNarrativeSection } from '@/components/sections/OstrumEnergyNarrativeSection';
 import { FooterCta } from '@/components/sections/FooterCta';
 import { Footer } from '@/components/footer/Footer';
 
@@ -23,8 +23,8 @@ export default function FrenchPage() {
       {/* SECTION 02: The Ostrum Engine (One Core · Two Engines · Studio & Foundry) */}
       <OstrumEngineSection />
 
-      {/* SECTION 04: The Experiential Space (3D Interactive Fan Carousel) */}
-      <GallerySection />
+      {/* SECTION 03: The Energy Continuum (Cinematic 3D Scroll Narrative) */}
+      <OstrumEnergyNarrativeSection />
 
       {/* SECTION 05: Climactic Perspective Statement & Optical Serif Highlights */}
       <FooterCta />

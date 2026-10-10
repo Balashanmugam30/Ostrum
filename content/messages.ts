@@ -32,17 +32,14 @@ export interface ContentMessages {
       triad: string;
     };
   };
-  gallery: {
-    title: string;
-    subtitleLine1: string;
-    subtitleLine2: string;
-    hintDesktop: string;
-    hintMobile: string;
-    chapters: Array<{
+  energyNarrative: {
+    badge: string;
+    beats: Array<{
       id: string;
       number: string;
-      title: string;
-      image: string;
+      tag: string;
+      primary: string;
+      supporting: string;
     }>;
   };
   footerCta: {
@@ -109,19 +106,30 @@ export const messages: Record<Locale, ContentMessages> = {
         triad: "BUILD · DISCOVER · BACK",
       },
     },
-    gallery: {
-      title: "The Experiences",
-      subtitleLine1: "Each chapter opens a digital space.",
-      subtitleLine2: "To explore, feel, generate.",
-      hintDesktop: "Move your mouse to navigate the spaces",
-      hintMobile: "Touch and drag to explore",
-      chapters: [
-        { id: "xp-1", number: "01", title: "First Signs", image: "/images/teaser/xp-1.webp" },
-        { id: "xp-2", number: "02", title: "The Wait", image: "/images/teaser/xp-2.webp" },
-        { id: "xp-3", number: "03", title: "The Verdict", image: "/images/teaser/xp-3.webp" },
-        { id: "xp-4", number: "04", title: "The Body", image: "/images/teaser/xp-4.webp" },
-        { id: "xp-5", number: "05", title: "The Return", image: "/images/teaser/xp-5.webp" },
-        { id: "xp-6", number: "06", title: "Clarity", image: "/images/teaser/xp-6.webp" },
+    energyNarrative: {
+      badge: "03 / THE CONTINUUM",
+      beats: [
+        {
+          id: "systems",
+          number: "01",
+          tag: "SYSTEMS ARCHITECTURE",
+          primary: "Complexity, made coherent.",
+          supporting: "We connect technology, people and operations into systems that work together.",
+        },
+        {
+          id: "intelligence",
+          number: "02",
+          tag: "APPLIED INTELLIGENCE",
+          primary: "Intelligence, put to work.",
+          supporting: "We turn ambitious ideas into useful software, automation and intelligent tools.",
+        },
+        {
+          id: "future",
+          number: "03",
+          tag: "WHAT COMES NEXT",
+          primary: "We build what doesn't exist yet.",
+          supporting: "We discover unmet needs and create original products around real problems.",
+        },
       ],
     },
     footerCta: {
@@ -196,19 +204,30 @@ export const messages: Record<Locale, ContentMessages> = {
         triad: "CONSTRUIRE · DÉCOUVRIR · SOUTENIR",
       },
     },
-    gallery: {
-      title: "Les expériences",
-      subtitleLine1: "Chaque chapitre ouvre un espace numérique.",
-      subtitleLine2: "À explorer, ressentir, générer.",
-      hintDesktop: "Déplacez votre curseur pour naviguer les espaces",
-      hintMobile: "Touchez et glissez pour explorer",
-      chapters: [
-        { id: "xp-1", number: "01", title: "Premiers signes", image: "/images/teaser/xp-1.webp" },
-        { id: "xp-2", number: "02", title: "L'attente", image: "/images/teaser/xp-2.webp" },
-        { id: "xp-3", number: "03", title: "Le verdict", image: "/images/teaser/xp-3.webp" },
-        { id: "xp-4", number: "04", title: "Le corps", image: "/images/teaser/xp-4.webp" },
-        { id: "xp-5", number: "05", title: "Le retour", image: "/images/teaser/xp-5.webp" },
-        { id: "xp-6", number: "06", title: "Clarté", image: "/images/teaser/xp-6.webp" },
+    energyNarrative: {
+      badge: "03 / LE CONTINUUM",
+      beats: [
+        {
+          id: "systems",
+          number: "01",
+          tag: "ARCHITECTURE DES SYSTÈMES",
+          primary: "La complexité, rendue cohérente.",
+          supporting: "Nous unissons technologie, équipes et opérations au sein de systèmes synchronisés.",
+        },
+        {
+          id: "intelligence",
+          number: "02",
+          tag: "INTELLIGENCE APPLIQUÉE",
+          primary: "L'intelligence, mise à l'œuvre.",
+          supporting: "Nous transformons les idées ambitieuses en logiciels utiles, automatisations et outils intelligents.",
+        },
+        {
+          id: "future",
+          number: "03",
+          tag: "PERSPECTIVES & PRODUITS",
+          primary: "Nous construisons ce qui n'existe pas encore.",
+          supporting: "Nous identifions les frictions réelles et concevons des produits originaux pour des besoins cruciaux.",
+        },
       ],
     },
     footerCta: {

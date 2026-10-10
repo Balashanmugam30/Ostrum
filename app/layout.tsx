@@ -3,6 +3,7 @@ import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
+import { CustomCursor } from '@/components/ui/CustomCursor';
 import { OrderModal } from '@/components/modal/OrderModal';
 import { SmoothScroll } from '@/components/providers/SmoothScroll';
 
@@ -49,6 +50,9 @@ export default function RootLayout({
           <SmoothScroll>
             {/* Fixed Luminous Caustics WebGL Background */}
             <BackgroundCaustics />
+
+            {/* Custom Precision Desktop Circular Cursor */}
+            <CustomCursor />
 
             {/* Minimalist Floating Global Header */}
             <Header />

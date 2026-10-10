@@ -73,6 +73,9 @@ export function BackgroundCaustics() {
       uniform float uHaloSize;
       uniform vec3 uHaloColor;
 
+      // Section Darkening for Energy Narrative
+      uniform float uDarken;
+
       // ============================================
       // SIMPLEX 3D NOISE
       // ============================================
@@ -261,6 +264,18 @@ export function BackgroundCaustics() {
         float grain3 = filmGrain(uv * 3.0, time * 1.5);
         float grain = grain1 * 0.5 + grain2 * 0.3 + grain3 * 0.2;
 
+        // Concentrated atmosphere darkening for Energy Narrative
+        if (uDarken > 0.001) {
+          vec3 darkAtmosphere = color * vec3(0.24, 0.05, 0.08) + vec3(0.018, 0.004, 0.008);
+          float aspect = uResolution.x / uResolution.y;
+          vec2 screenCenter = vec2(0.5 * aspect, 0.5);
+          vec2 currentCoord = vec2(uv.x * aspect, uv.y);
+          float distToCenter = length(currentCoord - screenCenter);
+          float coreSpotlight = smoothstep(0.48, 0.0, distToCenter);
+          vec3 centralRadiance = vec3(0.62, 0.07, 0.03) * pow(coreSpotlight, 1.6) * 0.82;
+          color = mix(color, darkAtmosphere + centralRadiance, uDarken);
+        }
+
         color = color + (grain - 0.5) * uGrainIntensity;
         color = clamp(color, 0.0, 1.0);
 
@@ -288,6 +303,7 @@ export function BackgroundCaustics() {
         uHaloIntensity: { value: isMobile ? 0 : 0.75 },
         uHaloSize: { value: 0.5 },
         uHaloColor: { value: new THREE.Color(0.91, 0.063, 0.0) },
+        uDarken: { value: 0 },
       },
     });
 
@@ -308,8 +324,16 @@ export function BackgroundCaustics() {
     const targetPos = { x: 0.5, y: 0.5 };
     let scrollY = 0;
     let targetScrollY = 0;
+    let currentDarken = 0;
+    let targetDarken = 0;
     let isVisible = true;
     let isContextLost = false;
+
+    const onBgDarken = (e: Event) => {
+      const customEvent = e as CustomEvent<number>;
+      targetDarken = typeof customEvent.detail === 'number' ? Math.max(0, Math.min(1, customEvent.detail)) : 0;
+    };
+    window.addEventListener('ostrum:bg-darken', onBgDarken);
 
     const onMouseMove = (e: MouseEvent) => {
       targetPos.x = e.clientX / window.innerWidth;
@@ -358,6 +382,8 @@ export function BackgroundCaustics() {
       uniforms.uMouse.value.set(mousePos.x, mousePos.y);
       // Continuous scroll progression mapping through 2532px vertical artwork
       uniforms.uScrollY.value = scrollY * 0.84;
+      currentDarken += (targetDarken - currentDarken) * 0.08;
+      uniforms.uDarken.value = currentDarken;
 
       renderer.render(scene, camera);
     };
@@ -380,6 +406,7 @@ export function BackgroundCaustics() {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('ostrum:bg-darken', onBgDarken);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
       renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);

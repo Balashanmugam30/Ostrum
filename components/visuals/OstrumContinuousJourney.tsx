@@ -71,7 +71,7 @@ export function OstrumContinuousJourney() {
     renderer.domElement.addEventListener('webglcontextlost', onContextLost, false);
     renderer.domElement.addEventListener('webglcontextrestored', onContextRestored, false);
 
-    // 3. Studio 4-point Lighting Rig
+    // 3. Studio 4-point Lighting Rig + Energy Accent Lights
     const keyLight = new THREE.DirectionalLight('#fff7ee', 2.2);
     keyLight.position.set(-2.5, 3.6, 3.2);
     scene.add(keyLight);
@@ -88,9 +88,25 @@ export function OstrumContinuousJourney() {
     fillLight.position.set(1.8, 1.2, 2.0);
     scene.add(fillLight);
 
-    // 4. Crimson Porcelain Material (Performance-first, zero transmission)
+    // Dynamic Energy Accent Lights (Local to the sculpture)
+    const energyRubyLight = new THREE.PointLight('#ff1e2e', 0, 10, 1.6);
+    energyRubyLight.position.set(0, 0, 0);
+    scene.add(energyRubyLight);
+
+    const energyAmberLight = new THREE.PointLight('#ff9933', 0, 8, 1.8);
+    energyAmberLight.position.set(1.8, 0.8, -1.0);
+    scene.add(energyAmberLight);
+
+    // 4. Crimson Porcelain Material with Dynamic Energy Response
+    const porcelainColor = new THREE.Color('#f7eee8');
+    const rubyChampagneColor = new THREE.Color('#d98a8a');
+    const sheenColorNormal = new THREE.Color('#ffdcd8');
+    const sheenColorScarlet = new THREE.Color('#ff2a3e');
+    const emissiveBlack = new THREE.Color(0x000000);
+    const emissiveScarlet = new THREE.Color('#550b12');
+
     const material = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#f7eee8'),
+      color: porcelainColor.clone(),
       roughness: 0.26,
       metalness: 0.06,
       clearcoat: 0.58,
@@ -98,12 +114,14 @@ export function OstrumContinuousJourney() {
       transmission: 0,
       ior: 1.50,
       sheen: 0.65,
-      sheenColor: new THREE.Color('#ffdcd8'),
+      sheenColor: sheenColorNormal.clone(),
       sheenRoughness: 0.35,
       specularColor: new THREE.Color('#ffffff'),
       specularIntensity: 0.95,
       iridescence: 0.06,
       iridescenceIOR: 1.32,
+      emissive: emissiveBlack.clone(),
+      emissiveIntensity: 0,
       side: THREE.DoubleSide,
     });
 
@@ -115,6 +133,84 @@ export function OstrumContinuousJourney() {
     modelRoot.add(pivotGroup);
     pivotGroup.rotation.x = 0.20;
     pivotGroup.rotation.z = -0.05;
+
+    // 6. Luminous Energy Filaments (Threaded around the Möbius geometry)
+    const filamentsGroup = new THREE.Group();
+    pivotGroup.add(filamentsGroup);
+
+    const createFilamentCurve = (paramFn: (t: number) => THREE.Vector3, pointsCount = 72) => {
+      const points: THREE.Vector3[] = [];
+      for (let i = 0; i <= pointsCount; i++) {
+        const t = (i / pointsCount) * Math.PI * 2;
+        points.push(paramFn(t));
+      }
+      return new THREE.CatmullRomCurve3(points, true);
+    };
+
+    // Filament 1: Scarlet Core Wave (threads through center cavity)
+    const curve1 = createFilamentCurve((t) => {
+      const r = 1.62 + 0.22 * Math.cos(2 * t);
+      return new THREE.Vector3(
+        r * Math.cos(t),
+        1.92 * Math.sin(t),
+        0.92 * Math.sin(2 * t)
+      );
+    });
+
+    // Filament 2: Warm Amber / Champagne Orbital Arc
+    const curve2 = createFilamentCurve((t) => {
+      const r = 1.72 - 0.18 * Math.sin(2 * t);
+      return new THREE.Vector3(
+        r * Math.cos(t + 0.8),
+        1.72 * Math.sin(t + 0.8),
+        -1.08 * Math.sin(2 * t + 0.5)
+      );
+    });
+
+    // Filament 3: Ivory Lightning Trace
+    const curve3 = createFilamentCurve((t) => {
+      return new THREE.Vector3(
+        1.42 * Math.cos(t - 1.2),
+        2.08 * Math.sin(t - 1.2) * (1 + 0.12 * Math.cos(2 * t)),
+        0.82 * Math.sin(3 * t)
+      );
+    });
+
+    const filamentMat1 = new THREE.MeshBasicMaterial({
+      color: new THREE.Color('#ff203a'),
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+
+    const filamentMat2 = new THREE.MeshBasicMaterial({
+      color: new THREE.Color('#ffaa38'),
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+
+    const filamentMat3 = new THREE.MeshBasicMaterial({
+      color: new THREE.Color('#fff2e8'),
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+
+    const tubeGeom1 = new THREE.TubeGeometry(curve1, isMobile ? 48 : 72, 0.024, 6, true);
+    const tubeGeom2 = new THREE.TubeGeometry(curve2, isMobile ? 48 : 72, 0.018, 6, true);
+    const tubeGeom3 = new THREE.TubeGeometry(curve3, isMobile ? 48 : 72, 0.014, 6, true);
+
+    const tubeMesh1 = new THREE.Mesh(tubeGeom1, filamentMat1);
+    const tubeMesh2 = new THREE.Mesh(tubeGeom2, filamentMat2);
+    const tubeMesh3 = new THREE.Mesh(tubeGeom3, filamentMat3);
+
+    filamentsGroup.add(tubeMesh1);
+    filamentsGroup.add(tubeMesh2);
+    filamentsGroup.add(tubeMesh3);
 
     const setupModelMesh = (rawGroup: THREE.Group) => {
       rawGroup.traverse((child) => {
@@ -157,8 +253,7 @@ export function OstrumContinuousJourney() {
       });
     }
 
-    // 6. Mathematical Screen-to-World Projection
-    // FOV 34 at z = 7.5
+    // 7. Mathematical Screen-to-World Projection
     const getVisibleWorldDimensions = () => {
       const vHeight = 2 * Math.tan((34 * Math.PI) / 360) * 7.5;
       const vWidth = vHeight * (window.innerWidth / window.innerHeight);
@@ -172,7 +267,7 @@ export function OstrumContinuousJourney() {
       return { x: worldX, y: worldY };
     };
 
-    // 7. Cached Anchor Geometry & Dynamic Tracking
+    // 8. Dynamic Anchor Geometry
     interface AnchorData {
       heroDocX: number;
       heroDocY: number;
@@ -180,6 +275,7 @@ export function OstrumContinuousJourney() {
       slotDocX: number;
       slotDocY: number;
       slotScale: number;
+      energyScale: number;
       dockScrollY: number;
       exitScrollY: number;
     }
@@ -191,8 +287,9 @@ export function OstrumContinuousJourney() {
       slotDocX: window.innerWidth * 0.50,
       slotDocY: window.innerHeight * 1.8,
       slotScale: 0.55,
+      energyScale: 0.62,
       dockScrollY: 1000,
-      exitScrollY: 2200,
+      exitScrollY: 3800,
     };
 
     const updateAnchors = () => {
@@ -208,22 +305,17 @@ export function OstrumContinuousJourney() {
       if (heroSvg) {
         const svgRect = heroSvg.getBoundingClientRect();
         const svgScale = svgRect.width / 1253;
-        // In SVG viewBox 0 0 1253 360, the optical center of 'O' is at x = 104, y = 171
         hDocX = svgRect.left + 104 * svgScale;
         hDocY = svgRect.top + 171 * svgScale + window.scrollY;
         hWidth = 185 * svgScale;
       }
 
-      // Hero scale: fit comfortably inside 'O' counter footprint with zero collision with 'S'
-      // Scaled strictly proportional to measured 'O' width
       const heroPixelTarget = Math.max(32, hWidth * 0.72);
       const heroWorldUnits = (heroPixelTarget / window.innerHeight) * vHeight;
       const hScale = Math.max(0.05, Math.min(0.24, heroWorldUnits / 3.35));
 
       // 2. Measure Section 02 Slot
       const engineSlot = document.getElementById('section02-sculpture-slot');
-      const engineSection = document.getElementById('engine');
-
       let sDocX = window.innerWidth * 0.50;
       let sDocY = window.innerHeight * 1.8;
       let sWidth = isMob ? 320 : 470;
@@ -235,24 +327,24 @@ export function OstrumContinuousJourney() {
         sWidth = slotRect.width;
       }
 
-      // Section 02 scale: fit cleanly within the slot with ample breathing room
       const slotPixelTarget = isMob
         ? Math.min(220, window.innerWidth * 0.58)
         : Math.min(330, sWidth * 0.70);
       const slotWorldUnits = (slotPixelTarget / window.innerHeight) * vHeight;
       const sScale = Math.max(0.25, Math.min(0.55, slotWorldUnits / 3.35));
 
-      // Dock scroll position: synchronized with Section 02 editorial hold ScrollTrigger
+      // 3. Section 03 Scale Target (Majestic focal presence)
+      const energyPixelTarget = isMob
+        ? Math.min(270, window.innerWidth * 0.68)
+        : Math.min(420, window.innerWidth * 0.32);
+      const energyWorldUnits = (energyPixelTarget / window.innerHeight) * vHeight;
+      const eScale = Math.max(0.32, Math.min(0.68, energyWorldUnits / 3.35));
+
       const st = ScrollTrigger.getById('section02-hold');
-      const holdDist = isMob ? 350 : 600;
       const dScrollY = st ? st.start : Math.max(1, sDocY - window.innerHeight * 0.50);
 
-      let exitY = sDocY + 600;
-      if (engineSection) {
-        const engRect = engineSection.getBoundingClientRect();
-        exitY = engRect.bottom + window.scrollY;
-      }
-      exitY = Math.max(exitY, dScrollY + holdDist + window.innerHeight * 0.8);
+      const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
+      let exitY = stEnergy ? stEnergy.end + 400 : dScrollY + 3000;
 
       anchors = {
         heroDocX: hDocX,
@@ -261,6 +353,7 @@ export function OstrumContinuousJourney() {
         slotDocX: sDocX,
         slotDocY: sDocY,
         slotScale: sScale,
+        energyScale: eScale,
         dockScrollY: dScrollY,
         exitScrollY: exitY,
       };
@@ -274,14 +367,12 @@ export function OstrumContinuousJourney() {
     let targetFocusBias = 0;
     const pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
 
-    // Listen for hover bias events from Section 02
     const handleFocusBias = (e: Event) => {
       const customEvent = e as CustomEvent<number>;
       targetFocusBias = typeof customEvent.detail === 'number' ? customEvent.detail : 0;
     };
     window.addEventListener('ostrum:focus-bias', handleFocusBias);
 
-    // Pointer move
     const handleMouseMove = (e: MouseEvent) => {
       if (isMobile || prefersReducedMotion) return;
       pointer.targetX = ((e.clientX / window.innerWidth) * 2 - 1) * 0.12;
@@ -289,11 +380,12 @@ export function OstrumContinuousJourney() {
     };
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
-    // 8. Render Animation Loop
+    // 9. Master Continuous Render Loop
     let currentX = 0;
     let currentY = 0;
     let currentScale = anchors.heroScale;
     let currentRotationY = 0;
+    let currentEnergy = 0;
     let isInitialized = false;
     let hasPlayedArrival = false;
 
@@ -305,7 +397,7 @@ export function OstrumContinuousJourney() {
 
       const scrollY = window.scrollY;
 
-      // Offscreen culling: if scrolled well past Section 02, pause rendering to save GPU
+      // Offscreen culling: if scrolled well past Section 03, pause rendering to save GPU
       const isPastExit = scrollY > anchors.exitScrollY + 250;
       if (isPastExit) {
         if (container.style.opacity !== '0') {
@@ -318,115 +410,173 @@ export function OstrumContinuousJourney() {
         }
       }
 
-      // Damped pointer & focus bias
       pointer.x += (pointer.targetX - pointer.x) * 0.06;
       pointer.y += (pointer.targetY - pointer.y) * 0.06;
       focusBias += (targetFocusBias - focusBias) * 0.10;
 
-      // Synchronize docking interval with GSAP ScrollTrigger 'section02-hold'
-      const st = ScrollTrigger.getById('section02-hold');
-      const dockStart = st ? st.start : anchors.dockScrollY;
-      const dockEnd = st ? st.end : anchors.dockScrollY + (isMobile ? 350 : 600);
+      // ScrollTrigger Intervals
+      const st02 = ScrollTrigger.getById('section02-hold');
+      const dockStart = st02 ? st02.start : anchors.dockScrollY;
+      const dockEnd = st02 ? st02.end : anchors.dockScrollY + (isMobile ? 350 : 600);
 
-      // Master Travel Choreography
-      // Progress t: 0.0 at top of page -> 1.0 when dockStart is reached
-      const t = Math.min(1, Math.max(0, scrollY / (dockStart || 1)));
-
-      // Smooth cubic ease-in-out
-      const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
+      const energyStart = stEnergy ? stEnergy.start : dockEnd + (isMobile ? 500 : 800);
+      const energyEnd = stEnergy ? stEnergy.end : energyStart + (isMobile ? 1400 : 2200);
 
       let targetScreenX: number;
       let targetScreenY: number;
       let targetScale: number;
+      let targetRotY: number;
+      let targetEnergyLevel = 0;
 
-      const isDocked = scrollY >= dockStart;
-      const isHold = scrollY >= dockStart && scrollY <= dockEnd;
+      // Stage 1: Journey (Hero 'O' -> Section 02)
+      if (scrollY < dockStart) {
+        const t = Math.min(1, Math.max(0, scrollY / (dockStart || 1)));
+        const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-      // Subtle warm champagne specular highlight sweep on arrival
-      if (isDocked && !hasPlayedArrival) {
-        hasPlayedArrival = true;
-        gsap.to(keyLight, {
-          intensity: 2.85,
-          duration: 0.45,
-          ease: 'power2.out',
-          yoyo: true,
-          repeat: 1,
-          onComplete: () => {
-            keyLight.intensity = 2.2;
-          },
-        });
-      } else if (scrollY < dockStart - 80) {
-        hasPlayedArrival = false;
-      }
-
-      if (!isDocked) {
-        // JOURNEY PHASE (Hero 'O' -> Section 02 Centerpiece)
-        // Horizontal: glides smoothly from Hero 'O' center to viewport center
         targetScreenX = anchors.heroDocX + (anchors.slotDocX - anchors.heroDocX) * ease;
-
-        // Vertical: descends smoothly from initial Hero 'O' elevation to viewport center
         const startScreenY = anchors.heroDocY;
         const targetCenterY = window.innerHeight * 0.50;
         targetScreenY = startScreenY + (targetCenterY - startScreenY) * ease;
-
-        // Scale: smoothly scales from hero silhouette scale up to centerpiece scale
         targetScale = anchors.heroScale + (anchors.slotScale - anchors.heroScale) * ease;
-      } else if (isHold) {
-        // EDITORIAL PINNED HOLD PHASE (Locks firmly to Section 02 center)
-        // Stays perfectly centered between "01 · FOR BUSINESS" and "02 · FOR WHAT'S NEXT"
-        // Zero drift, zero bounce, zero jumping, zero cropping at top of viewport!
+        targetRotY = t * Math.PI * 2;
+        targetEnergyLevel = 0;
+
+        if (scrollY < dockStart - 80) {
+          hasPlayedArrival = false;
+        }
+      }
+      // Stage 2: Section 02 Editorial Pinned Hold
+      else if (scrollY <= dockEnd) {
         targetScreenX = anchors.slotDocX;
         targetScreenY = window.innerHeight * 0.50;
         targetScale = anchors.slotScale;
-      } else {
-        // UNPINNED EXIT PHASE (Follows Section 02 as it scrolls up into Section 04)
-        const exitOffset = scrollY - dockEnd;
-        targetScreenX = anchors.slotDocX;
+        targetRotY = Math.PI * 2 + focusBias;
+        targetEnergyLevel = 0;
+
+        if (!hasPlayedArrival) {
+          hasPlayedArrival = true;
+          gsap.to(keyLight, {
+            intensity: 2.85,
+            duration: 0.45,
+            ease: 'power2.out',
+            yoyo: true,
+            repeat: 1,
+            onComplete: () => {
+              keyLight.intensity = 2.2;
+            },
+          });
+        }
+      }
+      // Stage 3: Transition (Section 02 -> Section 03)
+      else if (scrollY < energyStart) {
+        const transSpan = Math.max(1, energyStart - dockEnd);
+        const tTrans = Math.min(1, Math.max(0, (scrollY - dockEnd) / transSpan));
+        const easeTrans = tTrans < 0.5 ? 4 * tTrans * tTrans * tTrans : 1 - Math.pow(-2 * tTrans + 2, 3) / 2;
+
+        targetScreenX = window.innerWidth * 0.50;
+        targetScreenY = window.innerHeight * 0.50;
+        targetScale = anchors.slotScale + (anchors.energyScale - anchors.slotScale) * easeTrans;
+        targetRotY = Math.PI * 2 + easeTrans * (Math.PI * 0.15);
+        targetEnergyLevel = easeTrans * 0.25;
+      }
+      // Stage 4: Section 03 Pinned Energy Narrative (Beats 01, 02, 03)
+      else if (scrollY <= energyEnd) {
+        const energySpan = Math.max(1, energyEnd - energyStart);
+        const pEnergy = Math.min(1, Math.max(0, (scrollY - energyStart) / energySpan));
+
+        targetScreenX = window.innerWidth * 0.50;
+        targetScreenY = window.innerHeight * 0.50;
+        targetScale = anchors.energyScale;
+
+        // Controlled rotation across the 3 narrative beats: from 2.15π to 4.0π (settles poise)
+        targetRotY = (2.15 + pEnergy * 1.85) * Math.PI;
+
+        // High-energy illuminated material response
+        targetEnergyLevel = Math.min(1, 0.25 + pEnergy * 0.75);
+      }
+      // Stage 5: Exit from Section 03 into Footer
+      else {
+        const exitOffset = scrollY - energyEnd;
+        targetScreenX = window.innerWidth * 0.50;
         targetScreenY = window.innerHeight * 0.50 - exitOffset;
-        targetScale = anchors.slotScale;
+        targetScale = anchors.energyScale;
+        targetRotY = 4.0 * Math.PI;
+        targetEnergyLevel = Math.max(0, 1 - exitOffset / 400);
       }
 
-      // Convert target screen pixel coords to 3D world coords
+      // Screen to 3D World conversion
       const targetWorld = screenToWorld(targetScreenX, targetScreenY);
 
-      // On first frame, initialize coordinates immediately to prevent lerp jumps
       if (!isInitialized) {
         currentX = targetWorld.x;
         currentY = targetWorld.y;
         currentScale = targetScale;
-        currentRotationY = t * Math.PI * 2;
+        currentRotationY = targetRotY;
+        currentEnergy = targetEnergyLevel;
         isInitialized = true;
       } else {
-        // Snappy tracking when docked to eliminate trailing lag; smooth glide during journey
-        const posLerp = isDocked ? 0.35 : 0.18;
+        const isPinnedState = scrollY >= dockStart && scrollY <= energyEnd;
+        const posLerp = isPinnedState ? 0.35 : 0.18;
         currentX += (targetWorld.x - currentX) * posLerp;
         currentY += (targetWorld.y - currentY) * posLerp;
         currentScale += (targetScale - currentScale) * 0.16;
+        currentRotationY += (targetRotY - currentRotationY) * 0.12;
+        currentEnergy += (targetEnergyLevel - currentEnergy) * 0.10;
       }
 
-      // Zero-G subtle organic breathing float: active ONLY during journey, strictly ZERO when docked
-      const floatOffset = isDocked ? 0 : Math.sin(time * 0.0016) * 0.04 * currentScale * (1 - ease);
+      // Zero-G float: active during journey only
+      const isTraveling = scrollY < dockStart;
+      const floatOffset = isTraveling ? Math.sin(time * 0.0016) * 0.04 * currentScale : 0;
 
       modelRoot.position.set(currentX, currentY + floatOffset, 0);
       modelRoot.scale.set(currentScale, currentScale, currentScale);
-
-      // Continuous 360-degree rotation across journey + focus bias
-      const targetRotY = (isDocked ? Math.PI * 2 : t * Math.PI * 2) + focusBias;
-      currentRotationY += (targetRotY - currentRotationY) * 0.14;
       modelRoot.rotation.y = currentRotationY;
 
-      // Subtle spatial pointer tilt: vertical pitch and camera elevation zeroed when docked
+      // Dynamic Material & Energy Updates (Zero React renders)
+      const E = currentEnergy;
+
+      // Base color & specular reflections
+      material.color.lerpColors(porcelainColor, rubyChampagneColor, E * 0.75);
+      material.roughness = 0.26 - E * 0.10; // Becomes ultra-glossy liquid glass
+      material.metalness = 0.06 + E * 0.12;
+      material.clearcoat = 0.58 + E * 0.38;
+      material.clearcoatRoughness = 0.18 - E * 0.06;
+      material.sheen = 0.65 + E * 0.35;
+      material.sheenColor.lerpColors(sheenColorNormal, sheenColorScarlet, E);
+      material.emissive.lerpColors(emissiveBlack, emissiveScarlet, E);
+      material.emissiveIntensity = E * 1.4;
+
+      // Local energy point lights
+      energyRubyLight.intensity = E * 2.2;
+      energyRubyLight.position.set(currentX, currentY, 0.4);
+
+      energyAmberLight.intensity = E * 1.6;
+      energyAmberLight.position.set(currentX + 1.2 * currentScale, currentY + 0.6 * currentScale, -0.8);
+
+      // Energy Filaments Luminous Radiance & Flowing Currents
+      filamentMat1.opacity = E * 0.85;
+      filamentMat2.opacity = E * 0.70;
+      filamentMat3.opacity = E * 0.55;
+
+      if (E > 0.01) {
+        filamentsGroup.rotation.y = currentRotationY * 0.2 + (time * 0.0006);
+        filamentsGroup.rotation.z = Math.sin(time * 0.001) * 0.08;
+      }
+
+      // Spatial Pointer Tilt
       if (!isMobile && !prefersReducedMotion) {
-        if (isDocked) {
-          modelRoot.rotation.x = 0;
-          modelRoot.rotation.z = 0;
+        const isPinnedState = scrollY >= dockStart && scrollY <= energyEnd;
+        if (isPinnedState) {
+          modelRoot.rotation.x = pointer.y * 0.08;
+          modelRoot.rotation.z = -pointer.x * 0.06;
           camera.position.x = pointer.x * 0.08;
           camera.position.y = 0;
         } else {
-          modelRoot.rotation.x = pointer.y * 0.16 * (1 - ease);
-          modelRoot.rotation.z = -pointer.x * 0.12 * (1 - ease);
+          modelRoot.rotation.x = pointer.y * 0.16;
+          modelRoot.rotation.z = -pointer.x * 0.12;
           camera.position.x = pointer.x * 0.18;
-          camera.position.y = pointer.y * 0.14 * (1 - ease);
+          camera.position.y = pointer.y * 0.14;
         }
       }
       camera.lookAt(0, 0, 0);
@@ -436,7 +586,7 @@ export function OstrumContinuousJourney() {
 
     animId = requestAnimationFrame(animate);
 
-    // 9. Resize Handling
+    // 10. Resize Handling
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -463,6 +613,12 @@ export function OstrumContinuousJourney() {
       }
       renderer.dispose();
       material.dispose();
+      tubeGeom1.dispose();
+      tubeGeom2.dispose();
+      tubeGeom3.dispose();
+      filamentMat1.dispose();
+      filamentMat2.dispose();
+      filamentMat3.dispose();
     };
   }, []);
 

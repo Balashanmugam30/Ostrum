@@ -2,14 +2,14 @@ import React from 'react';
 import { OstrumContinuousJourney } from '@/components/visuals/OstrumContinuousJourney';
 import { IntroHero } from '@/components/sections/IntroHero';
 import { OstrumEngineSection } from '@/components/sections/OstrumEngineSection';
-import { GallerySection } from '@/components/sections/GallerySection';
+import { OstrumEnergyNarrativeSection } from '@/components/sections/OstrumEnergyNarrativeSection';
 import { FooterCta } from '@/components/sections/FooterCta';
 import { Footer } from '@/components/footer/Footer';
 
 export default function HomePage() {
   return (
     <div className="relative w-full flex flex-col items-center">
-      {/* CONTINUOUS 3D JOURNEY: Single unified sculpture from Hero 'O' into Section 02 */}
+      {/* CONTINUOUS 3D JOURNEY: Single unified sculpture from Hero 'O' into Section 02 and Section 03 */}
       <OstrumContinuousJourney />
 
       {/* SECTION 01: Monumental Hero Narrative & Parallax Logo */}
@@ -18,8 +18,8 @@ export default function HomePage() {
       {/* SECTION 02: The Ostrum Engine (One Core · Two Engines · Studio & Foundry) */}
       <OstrumEngineSection />
 
-      {/* SECTION 04: The Experiential Space (3D Interactive Fan Carousel) */}
-      <GallerySection />
+      {/* SECTION 03: The Energy Continuum (Cinematic 3D Scroll Narrative) */}
+      <OstrumEnergyNarrativeSection />
 
       {/* SECTION 05: Climactic Perspective Statement & Optical Serif Highlights */}
       <FooterCta />
