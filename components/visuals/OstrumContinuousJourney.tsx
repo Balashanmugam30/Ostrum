@@ -345,7 +345,8 @@ export function OstrumContinuousJourney() {
       const dScrollY = st ? st.start : Math.max(1, sDocY - window.innerHeight * 0.50);
 
       const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
-      let exitY = stEnergy ? stEnergy.end + 400 : dScrollY + 3000;
+      // Selected Work panel rises and fully covers the sculpture over ~window.innerHeight after energyEnd
+      let exitY = stEnergy ? stEnergy.end + window.innerHeight : dScrollY + 3000;
 
       anchors = {
         heroDocX: hDocX,
@@ -496,14 +497,16 @@ export function OstrumContinuousJourney() {
         // High-energy illuminated material response
         targetEnergyLevel = Math.min(1, 0.20 + pEnergy * 0.80);
       }
-      // Stage 5: Exit from Section 03 into Footer
+      // Stage 5: Transition into Selected Work
       else {
-        const exitOffset = scrollY - energyEnd;
+        // Sculpture settles permanently in its final centered resting pose.
+        // As Selected Work rises up from the bottom edge of the viewport (z-[20]),
+        // it physically covers and obscures the sculpture from the bottom up.
         targetScreenX = window.innerWidth * 0.50;
-        targetScreenY = window.innerHeight * 0.50 - exitOffset;
+        targetScreenY = window.innerHeight * 0.50;
         targetScale = anchors.energyScale;
         targetRotY = 4.0 * Math.PI;
-        targetEnergyLevel = Math.max(0, 1 - exitOffset / 400);
+        targetEnergyLevel = 1.0;
       }
 
       // Screen to 3D World conversion

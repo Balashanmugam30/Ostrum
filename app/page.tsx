@@ -3,6 +3,7 @@ import { OstrumContinuousJourney } from '@/components/visuals/OstrumContinuousJo
 import { IntroHero } from '@/components/sections/IntroHero';
 import { OstrumEngineSection } from '@/components/sections/OstrumEngineSection';
 import { OstrumEnergyNarrativeSection } from '@/components/sections/OstrumEnergyNarrativeSection';
+import { OstrumSelectedWorkSection } from '@/components/sections/OstrumSelectedWorkSection';
 
 export default function HomePage() {
   return (
@@ -19,11 +20,8 @@ export default function HomePage() {
       {/* SECTION 03: The Energy Continuum (Cinematic 3D Scroll Narrative) */}
       <OstrumEnergyNarrativeSection />
 
-      {/* Clean Release Spacer: Allows natural unpinning and upward scroll-out */}
-      <div
-        className="w-full min-h-[60vh] bg-black pointer-events-none"
-        aria-hidden="true"
-      />
+      {/* SECTION 04: Selected Work Showcase & Layered Entrance */}
+      <OstrumSelectedWorkSection />
     </div>
   );
 }
