@@ -23,6 +23,8 @@ export type AnodizedInkColors = {
 };
 
 export const ANODIZED_INK_PRESETS = {
+  lusion: { deep: "#f1f1fa", ink: "#362beb", sheen: "#ffffff" },
+  light: { deep: "#f1f1fa", ink: "#362beb", sheen: "#ffffff" },
   crimson: { deep: "#040104", ink: "#850b1b", sheen: "#d8c9c5" },
   bordeaux: { deep: "#030103", ink: "#6e0a15", sheen: "#e2d5d1" },
   obsidian: { deep: "#020102", ink: "#4d060e", sheen: "#cfc2be" },
@@ -37,7 +39,7 @@ export type AnodizedInkPreset = keyof typeof ANODIZED_INK_PRESETS;
 export type AnodizedInkProps = {
   /** Explicit height. Default "100%". */
   height?: string;
-  /** Named palette preset. Default "crimson". */
+  /** Named palette preset. Default "lusion". */
   preset?: AnodizedInkPreset;
   /** Override colors. */
   colors?: Partial<AnodizedInkColors>;
@@ -214,6 +216,92 @@ void main() {
     float env = exp(-x * x * 55.0) * exp(-age * 1.15) * rp.w;
     p += (dd / max(rr, 1e-3)) * sin(x * 40.0) * env * 0.035;
     ring += env * (0.5 + 0.5 * sin(x * 40.0));
+  }
+
+  // ========================================================
+  // LUSION LIGHT IRIDESCENT FLUID METAL & COBALT ARC EFFECT
+  // Triggered when uDeep is light (uDeep.r > 0.5)
+  // ========================================================
+  if (uDeep.r > 0.5) {
+    // Base light background: pale cool white / lavender (#F1F1FA)
+    vec3 baseBg = uDeep;
+
+    // 1. Diagonal Sweeping Translucent Fluid-Metal Form
+    // Sweeps from lower-left to upper-right behind typography
+    vec2 qLight = p * 1.5 * uScale + vec2(0.2, -0.1);
+    vec2 w1 = vec2(
+      fbm(qLight * 1.1 + vec2(t * 0.08, -t * 0.04)),
+      fbm(qLight * 1.1 + vec2(1.8 - t * 0.05, 2.1))
+    );
+    qLight += w1 * 0.35 * uTurbulence;
+
+    // Distance to diagonal ribbon axis
+    float diagDist = abs(qLight.x * 0.72 - qLight.y * 1.05 + 0.05);
+    float ribbon = smoothstep(0.72, 0.06, diagDist);
+
+    // Wave ridges within the fluid metal
+    float fluidRidge = sin(qLight.x * 3.8 + qLight.y * 3.4 + t * 0.42) * 0.5
+                     + cos(qLight.x * 5.2 - qLight.y * 4.1 - t * 0.28) * 0.5;
+    float crest = 1.0 - abs(fluidRidge);
+    crest = crest * crest;
+
+    // Fluid surface normal via finite difference
+    float eps = 0.015;
+    float hCenter = ribbon * (0.35 + 0.65 * crest);
+    float hX = smoothstep(0.72, 0.06, abs((qLight.x + eps) * 0.72 - qLight.y * 1.05 + 0.05)) * (0.35 + 0.65 * crest);
+    float hY = smoothstep(0.72, 0.06, abs(qLight.x * 0.72 - (qLight.y + eps) * 1.05 + 0.05)) * (0.35 + 0.65 * crest);
+    vec3 nLight = normalize(vec3((hCenter - hX) / eps * 0.3, (hCenter - hY) / eps * 0.3, 1.0));
+
+    // Specular lighting from virtual key light + mouse
+    vec3 LLight = normalize(vec3(0.4, 0.7, 0.8) + vec3(uMouse - uv, 0.0) * 0.5);
+    vec3 HLight = normalize(LLight + vec3(0.0, 0.0, 1.0));
+    float specLight = pow(max(dot(nLight, HLight), 0.0), 38.0);
+    float fresLight = pow(1.0 - nLight.z, 2.2);
+
+    // Thin-film pearlescent iridescence:
+    // Delicate lavender, opalescent blue/cyan, and soft pearl peach/pink
+    float iridPhase = dot(nLight.xy, vec2(1.2, 0.9)) * 1.5 + fresLight * 2.0 + t * 0.15;
+    vec3 iridColor = vec3(0.84, 0.86, 0.95) + vec3(0.16, 0.14, 0.12) * cos(6.28318 * (vec3(1.0) * iridPhase + vec3(0.60, 0.70, 0.88)));
+
+    // Blend fluid-metal into the light background
+    vec3 col = baseBg;
+    // Translucent fluid-metal wash
+    col = mix(col, iridColor, ribbon * 0.48);
+    // Silver pearlescent specular crests
+    col += vec3(0.95, 0.97, 1.0) * specLight * ribbon * uSheenAmt * 0.85;
+    // Subtle opalescent rim fresnel
+    col = mix(col, vec3(0.75, 0.82, 0.98), fresLight * ribbon * 0.32);
+
+    // 2. Bold Cobalt Curved Stroke on the Left
+    // Enters from the left margin and curves gracefully
+    vec2 strokeCoord = p;
+    float strokeCurve = (strokeCoord.y - 0.06) - 0.85 * pow(strokeCoord.x + 0.42, 2.0);
+    float strokeDist = abs(strokeCurve);
+    float strokeEnvelope = smoothstep(-0.95, -0.22, strokeCoord.x) * smoothstep(0.18, -0.45, strokeCoord.x);
+    float strokeMask = smoothstep(0.068, 0.008, strokeDist) * strokeEnvelope;
+
+    if (strokeMask > 0.001) {
+      // Vivid cobalt blue (#362BEB) with subtle depth gradient
+      vec3 cobaltCol = uInk;
+      cobaltCol = mix(cobaltCol, vec3(0.35, 0.42, 0.98), clamp(p.y * 0.8 + 0.3, 0.0, 0.5));
+      col = mix(col, cobaltCol, strokeMask * 0.95);
+    }
+
+    // 3. Local Mouse Reactive Glow & Specular Sparkle
+    float pointerGlow = pow(mouseInfluence, 2.0) * (0.3 + 0.7 * uHover);
+    col = mix(col, vec3(0.78, 0.84, 0.99), pointerGlow * 0.18);
+    col += vec3(1.0) * pow(mouseInfluence, 4.0) * uHover * 0.12;
+
+    // 4. Subtle Tactile Film Grain
+    float g = hash21(gl_FragCoord.xy + fract(t * 7.13) * vec2(97.3, 41.7));
+    col += (g - 0.5) * 0.022 * uGrain;
+
+    // 5. Very subtle, airy corner softening (not dark vignette!)
+    float vigLight = smoothstep(1.6, 0.85, length(uv * vec2(0.85, 1.0)));
+    col = mix(col * 0.975, col, vigLight);
+
+    outColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+    return;
   }
 
   // Spatial scaling for pattern

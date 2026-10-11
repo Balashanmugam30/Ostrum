@@ -346,7 +346,9 @@ export function OstrumContinuousJourney() {
 
       const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
       // Selected Work panel rises and fully covers the sculpture over ~window.innerHeight after energyEnd
-      let exitY = stEnergy ? stEnergy.end + window.innerHeight : dScrollY + 3000;
+      const exitY = stEnergy
+        ? stEnergy.end + window.innerHeight
+        : dScrollY + (isMob ? 5000 : 7500);
 
       anchors = {
         heroDocX: hDocX,
@@ -364,6 +366,11 @@ export function OstrumContinuousJourney() {
     updateAnchors();
     const anchorTimer1 = setTimeout(updateAnchors, 100);
     const anchorTimer2 = setTimeout(updateAnchors, 500);
+    const anchorTimer3 = setTimeout(updateAnchors, 1500);
+
+    const onNarrativeReady = () => updateAnchors();
+    window.addEventListener('ostrum:narrative-ready', onNarrativeReady);
+    ScrollTrigger.addEventListener('refresh', updateAnchors);
 
     let focusBias = 0;
     let targetFocusBias = 0;
@@ -399,8 +406,19 @@ export function OstrumContinuousJourney() {
 
       const scrollY = window.scrollY;
 
-      // Offscreen culling: if scrolled well past Section 03, pause rendering to save GPU
-      const isPastExit = scrollY > anchors.exitScrollY + 250;
+      // ScrollTrigger Intervals
+      const st02 = ScrollTrigger.getById('section02-hold');
+      const dockStart = st02 ? st02.start : anchors.dockScrollY;
+      const dockEnd = st02 ? st02.end : anchors.dockScrollY + (isMobile ? 650 : 1000);
+
+      const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
+      const energyStart = stEnergy ? stEnergy.start : dockEnd + (isMobile ? 500 : 800);
+      const energyEnd = stEnergy ? stEnergy.end : energyStart + (isMobile ? 3600 : 5000) + window.innerHeight;
+
+      // Dynamic exit boundary: only cull when Works Wheel has fully covered the sculpture
+      const exitBoundary = stEnergy ? stEnergy.end + window.innerHeight : Math.max(anchors.exitScrollY, energyEnd + window.innerHeight);
+      const isPastExit = scrollY > exitBoundary + 250;
+
       if (isPastExit) {
         if (container.style.opacity !== '0') {
           container.style.opacity = '0';
@@ -411,19 +429,6 @@ export function OstrumContinuousJourney() {
           container.style.opacity = '1';
         }
       }
-
-      pointer.x += (pointer.targetX - pointer.x) * 0.06;
-      pointer.y += (pointer.targetY - pointer.y) * 0.06;
-      focusBias += (targetFocusBias - focusBias) * 0.10;
-
-      // ScrollTrigger Intervals
-      const st02 = ScrollTrigger.getById('section02-hold');
-      const dockStart = st02 ? st02.start : anchors.dockScrollY;
-      const dockEnd = st02 ? st02.end : anchors.dockScrollY + (isMobile ? 650 : 1000);
-
-      const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
-      const energyStart = stEnergy ? stEnergy.start : dockEnd + (isMobile ? 500 : 800);
-      const energyEnd = stEnergy ? stEnergy.end : energyStart + (isMobile ? 1800 : 2600);
 
       let targetScreenX: number;
       let targetScreenY: number;
@@ -605,10 +610,13 @@ export function OstrumContinuousJourney() {
       isDisposed = true;
       clearTimeout(anchorTimer1);
       clearTimeout(anchorTimer2);
+      clearTimeout(anchorTimer3);
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('ostrum:focus-bias', handleFocusBias);
+      window.removeEventListener('ostrum:narrative-ready', onNarrativeReady);
+      ScrollTrigger.removeEventListener('refresh', updateAnchors);
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
       renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
 

@@ -75,19 +75,39 @@ const rad = (deg: number) => (deg * Math.PI) / 180;
 const bowAt = (drumDeg: number, bow: number) =>
   -bow * (1 - Math.cos(rad(drumDeg)));
 
-/** Places each card in the 3D space across ring (m=0) and drum (m=1) states. */
-function place(
+/** Places each card in the 3D space across wide oval (m=0) and drum (m=1) states without distorting card aspect ratios. */
+function placeOval(
   ringDeg: number,
   drumDeg: number,
-  ringR: number,
+  ringRx: number,
+  ringRy: number,
   drumR: number,
   bow: number,
   m: number,
 ) {
+  // Elliptical coordinate on the horizontal oval at angle ringDeg
+  const rRad = rad(ringDeg);
+  const ringX = ringRx * Math.sin(rRad);
+  const ringY = -ringRy * Math.cos(rRad);
+
+  // Tangent / normal orientation around the ellipse curve
+  const ringRotZ =
+    (Math.atan2(ringRy * Math.sin(rRad), ringRx * Math.cos(rRad)) * 180) /
+    Math.PI;
+
+  // Drum coordinate at angle drumDeg
+  const drumX = bowAt(drumDeg, bow);
+
+  // Smooth interpolation from oval to drum
+  const curX = lerp(ringX, drumX, m);
+  const curY = (1 - m) * ringY;
+  const curZ = m * drumR;
+  const rotZ = (1 - m) * ringRotZ;
+  const rotX = m * drumDeg;
+
   return (
-    `translateX(${m * bowAt(drumDeg, bow)}px)` +
-    ` rotateZ(${(1 - m) * ringDeg}deg) translateY(${-(1 - m) * ringR}px)` +
-    ` rotateX(${m * drumDeg}deg) translateZ(${m * drumR}px)`
+    `translateX(${curX}px) translateY(${curY}px) translateZ(${curZ}px)` +
+    ` rotateZ(${rotZ}deg) rotateX(${rotX}deg)`
   );
 }
 
@@ -143,15 +163,16 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
       return () => ro.disconnect();
     }, []);
 
-    // Geometry calculations: Large initial ring (71% viewport height) + large right drum thumbnail (44% width)
+    // Geometry calculations: Wide horizontal oval (82-88% width, 58-66% height) + large right drum thumbnail (44% width)
     const metrics = React.useMemo(() => {
       const { w, h } = stage;
       if (!h || !w) {
         return {
           cardW: 420,
           cardH: 290,
-          ringR: 260,
-          ringScale: 0.28,
+          ringRx: 480,
+          ringRy: 220,
+          ringScale: 0.26,
           drumR: 500,
           bow: 380,
           depth: 650,
@@ -178,19 +199,30 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
       // In drum mode, shift the drum to the right on desktop to create a 2-column layout
       const drumShiftX = isDesktop ? w * 0.20 : 0;
 
-      // In ring mode (m = 0), target total ring height footprint: 70-73% of viewport height
-      const targetRingH = isMobile
-        ? Math.min(h * 0.56, w * 0.88)
+      // In oval mode (m = 0):
+      // Desktop target footprint: 82-88% width, 58-66% height
+      // Tablet target footprint: 86-90% width, 58-64% height
+      // Mobile target footprint: 88-92% width, 48-56% height
+      const targetRingW = isMobile
+        ? Math.min(w * 0.90, 360)
         : isTablet
-        ? h * 0.66
-        : h * 0.71;
+        ? w * 0.88
+        : w * 0.86;
 
-      // Card scale inside ring mode
-      const ringScale = isMobile ? 0.36 : isTablet ? 0.32 : 0.28;
+      const targetRingH = isMobile
+        ? Math.min(h * 0.52, 420)
+        : isTablet
+        ? h * 0.62
+        : h * 0.62;
+
+      // Card scale inside oval mode (undistorted aspect ratio)
+      const ringScale = isMobile ? 0.35 : isTablet ? 0.30 : 0.26;
+      const visualCardW = cardW * ringScale;
       const visualCardH = cardH * ringScale;
 
-      // Ring radius calibrated so outer card bounds equal targetRingH
-      const ringR = Math.max(10, (targetRingH - visualCardH) / 2);
+      // Elliptical horizontal and vertical radii:
+      const ringRx = Math.max(10, (targetRingW - visualCardW) / 2);
+      const ringRy = Math.max(10, (targetRingH - visualCardH) / 2);
 
       const drumR = cardH * DRUM;
       const bow = cardH * BOW;
@@ -199,7 +231,8 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
       return {
         cardW,
         cardH,
-        ringR,
+        ringRx,
+        ringRy,
         ringScale,
         drumR,
         bow,
@@ -214,7 +247,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
     const animFrame = React.useRef(0);
 
     const renderScene = React.useCallback(() => {
-      const { ringR, ringScale, drumR, bow, drumShiftX } = metrics;
+      const { ringRx, ringRy, ringScale, drumR, bow, drumShiftX } = metrics;
       const t = turn.current;
       const m = clamp(t, 0, 1);
       const pos = Math.max(0, t - 1);
@@ -229,10 +262,11 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         const drumDeg = d * STEP;
         const card = cardRefs.current[i];
         if (card) {
-          card.style.transform = place(
+          card.style.transform = placeOval(
             d * (360 / count),
             drumDeg,
-            ringR,
+            ringRx,
+            ringRy,
             drumR,
             bow,
             m,
@@ -534,7 +568,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                     marginTop: -metrics.cardH / 2,
                   }}
                 >
-                  <span className="relative block size-full overflow-hidden rounded-2xl shadow-[0_24px_50px_-12px_rgba(0,0,0,0.55)] border border-white/10 bg-black/40 transition-all duration-300 group-hover:border-[#850b1b]/40 group-hover:shadow-[0_25px_50px_-12px_rgba(133,11,27,0.30)]">
+                  <span className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(11,11,16,0.18)] border border-black/[0.08] bg-white/40 backdrop-blur-sm transition-all duration-300 group-hover:border-[#362beb]/50 group-hover:shadow-[0_25px_50px_-10px_rgba(54,43,235,0.25)]">
                     <img
                       src={item.image}
                       alt={item.title}
@@ -544,10 +578,10 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                     />
                     {/* Subtle live destination indicator on front card */}
                     {item.href?.startsWith("http") && (
-                      <span className="pointer-events-none absolute right-3.5 bottom-3.5 flex translate-y-1 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium opacity-0 backdrop-blur-md transition group-hover:translate-y-0 group-hover:opacity-100 shadow-sm bg-black/80 text-white border border-white/15">
+                      <span className="pointer-events-none absolute right-3.5 bottom-3.5 flex translate-y-1 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium opacity-0 backdrop-blur-md transition group-hover:translate-y-0 group-hover:opacity-100 shadow-sm bg-white/95 text-[#0b0b10] border border-black/10">
                         <svg
                           viewBox="0 0 12 12"
-                          className="size-2.5 text-[#850b1b]"
+                          className="size-2.5 text-[#362beb]"
                           aria-hidden="true"
                         >
                           <path
@@ -574,7 +608,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
           ref={labelRef}
           className="pointer-events-none absolute inset-0 grid place-items-center select-none z-10"
         >
-          <span className="font-sans font-semibold tracking-tight text-xl sm:text-2xl md:text-3xl text-white/90">
+          <span className="font-sans font-semibold tracking-tight text-xl sm:text-2xl md:text-3xl text-[#0b0b10]/85">
             {label}
           </span>
         </div>
@@ -585,10 +619,10 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
           className="pointer-events-none absolute top-1/2 left-[6%] sm:left-[8%] lg:left-[9%] -translate-y-1/2 max-w-[85vw] sm:max-w-[42vw] lg:max-w-[36vw] z-20 select-none"
           style={{ opacity: 0 }}
         >
-          <h3 className="font-sans font-bold tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-[1.08] mb-4">
+          <h3 className="font-sans font-bold tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#0b0b10] leading-[1.08] mb-4">
             {items[active]?.title}
           </h3>
-          <p className="font-sans text-sm sm:text-base lg:text-lg text-white/75 leading-relaxed mb-6 max-w-[32ch] sm:max-w-[38ch]">
+          <p className="font-sans text-sm sm:text-base lg:text-lg text-[#0b0b10]/75 leading-relaxed mb-6 max-w-[32ch] sm:max-w-[38ch]">
             {items[active]?.description}
           </p>
           {items[active]?.href?.startsWith("http") && (
@@ -597,7 +631,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                 href={items[active]?.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm sm:text-base font-medium text-[#d1001c] hover:text-white transition-colors group"
+                className="inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-[#362beb] hover:text-[#1e14c7] transition-colors group"
               >
                 <span>Visit Platform</span>
                 <span
