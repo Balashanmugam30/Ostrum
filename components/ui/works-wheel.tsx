@@ -1,41 +1,26 @@
 "use client";
 
-// A portfolio index built as a wheel you turn.
+// A portfolio showcase built as a circular ring that opens into a large 3D perspective drum.
 //
-// At rest the work sits in a ring around a title, each card tangent to the
-// circle. The first notch of scroll blows the ring open into a vertical drum:
-// the card at the front lies flat and full size, the ones above and below
-// rotate away into hard perspective and run off the top and bottom of the
-// frame. Keep turning and the drum carries the next piece round to the front.
+// At rest (turn = 0), the projects form a generous circular ring (68–74% viewport height)
+// around a minimal, restrained central label ("Selected Work").
 //
-// The whole thing is one number - `turn` - read by a single demand-driven rAF
-// loop that writes transforms straight to the DOM. 0 is the ring, 1 is the drum
-// with item 0 at the front, and every whole number after that is one more item.
+// As the user turns the wheel (turn >= 1), the ring transitions into a two-column drum:
+// - RIGHT: The active project artwork moves to the front as a large, cinematic thumbnail (42–46% width, 48–56% height).
+// - LEFT: Clean, prominent project information (title, description, and live destination link).
+// - Surrounding cards curve back into 3D perspective above and below.
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export interface ProjectTheme {
-  bg: string;
-  text: string;
-  subtext: string;
-  accent: string;
-  badgeBg: string;
-  badgeText: string;
-}
-
 export interface WorksWheelItem {
-  /** Project name. Shown beside the front card and in the index. */
+  /** Project name. Displayed prominently on the left panel. */
   title: string;
-  /** Short category / capability descriptor */
-  category: string;
-  /** Cover art. Local path under /images/works/ or remote URL */
+  /** Short, meaningful editorial description. */
+  description: string;
+  /** Cover art. Local path under /images/works/ or remote URL. */
   image: string;
-  /** Where the card links to. Real HTTPS URL or anchor */
+  /** Where the card links to (live HTTPS URL or anchor). */
   href?: string;
-  /** Whether the project is an experimental studio concept */
-  isConcept?: boolean;
-  /** Bespoke pastel theme for this project */
-  theme: ProjectTheme;
 }
 
 export interface WorksWheelProps extends Omit<
@@ -43,25 +28,17 @@ export interface WorksWheelProps extends Omit<
   "children"
 > {
   items: WorksWheelItem[];
-  /** Sits in the middle of the ring. @default "OSTRUM / WORKS" */
+  /** Sits in the middle of the ring at rest. @default "Selected Work" */
   label?: string;
-  /** Label on the card's hover affordance. @default "View" */
-  action?: string;
-  /** Callback fired when the active project index changes */
+  /** Callback fired when the active project index changes. */
   onActiveChange?: (index: number) => void;
-  /** Active project theme passed down for styling labels and indexes */
-  activeTheme?: ProjectTheme;
 }
 
-/* Sizing and geometry calibrated so ring occupies 65-70% of viewport height at rest,
-   leaving 15-18% breathing room above and below to prevent clipping. */
-const CARD_H = 0.24; // front card height, ratio of stage height (desktop)
-const CARD_MAX_W = 0.22; // max width ratio of stage width (desktop)
+/* Sizing and geometry calibrated for large circular catalogue and large right-side drum presentation */
 const CARD_RATIO = 1.45; // card width / height
-const STEP = 40; // degrees between cards on the drum
+const STEP = 38; // degrees between cards on the drum
 const DRUM = 2.22; // drum radius, in card heights
 const LENS = 2.7; // perspective distance
-const RING_R = 1.14; // ring radius
 const BOW = 1.82; // arc bow offset
 const CULL = 1.6; // cull cards far behind perspective
 
@@ -71,7 +48,7 @@ const DRAG_UNITS = 420;
 /** Quiet time after the last wheel event before the wheel settles on an item. */
 const SETTLE = 140;
 /** Fraction of the remaining distance closed each frame. 1 = no smoothing. */
-const EASE = 0.12;
+const EASE = 0.28;
 
 const clamp = (v: number, lo: number, hi: number) =>
   Math.min(hi, Math.max(lo, v));
@@ -81,13 +58,11 @@ type Stage = { w: number; h: number };
 
 const rad = (deg: number) => (deg * Math.PI) / 180;
 
-/** How far left the arc has carried something that has turned `drumDeg` off the
-    front. Zero at the front, so the piece being read stays centred. */
+/** How far left the arc has carried something that has turned `drumDeg` off the front. */
 const bowAt = (drumDeg: number, bow: number) =>
   -bow * (1 - Math.cos(rad(drumDeg)));
 
-/** Both states in one chain: the ring terms fall away as `m` reaches the drum,
-    and the drum terms are still zero while the ring is up. */
+/** Places each card in the 3D space across ring (m=0) and drum (m=1) states. */
 function place(
   ringDeg: number,
   drumDeg: number,
@@ -105,10 +80,8 @@ function place(
 
 export function WorksWheel({
   items,
-  label = "OSTRUM / WORKS",
-  action = "View",
+  label = "Selected Work",
   onActiveChange,
-  activeTheme,
   className,
   ...props
 }: WorksWheelProps) {
@@ -116,10 +89,9 @@ export function WorksWheel({
   const wheelRef = React.useRef<HTMLDivElement>(null);
   const cardRefs = React.useRef<(HTMLElement | null)[]>([]);
   const labelRef = React.useRef<HTMLDivElement>(null);
-  const titleRef = React.useRef<HTMLDivElement>(null);
+  const leftPanelRef = React.useRef<HTMLDivElement>(null);
 
-  // The wheel's position, and where it is heading. Only `active` is state -
-  // everything else is written to the DOM, so turning the wheel is not a render.
+  // The wheel's position and target
   const turn = React.useRef(0);
   const target = React.useRef(0);
   const activeRef = React.useRef(0);
@@ -143,7 +115,6 @@ export function WorksWheel({
   React.useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
-    (el as any)._worksWheel = { turn, target, to };
     const read = () => setStage({ w: el.clientWidth, h: el.clientHeight });
     read();
     const ro = new ResizeObserver(read);
@@ -151,32 +122,58 @@ export function WorksWheel({
     return () => ro.disconnect();
   }, []);
 
+  // Geometry calculations: Large initial ring (71% viewport height) + large right drum thumbnail (44% width)
   const metrics = React.useMemo(() => {
     const { w, h } = stage;
     if (!h || !w) {
       return {
-        cardW: 280,
-        cardH: 193,
-        ringR: 220,
-        ringScale: 0.5,
-        drumR: 430,
-        bow: 350,
-        depth: 520,
-        title: 32,
-        index: 14,
+        cardW: 420,
+        cardH: 290,
+        ringR: 260,
+        ringScale: 0.28,
+        drumR: 500,
+        bow: 380,
+        depth: 650,
+        drumShiftX: 0,
+        isDesktop: true,
       };
     }
-    const isMob = w < 768;
-    // Sizing calibrated so ring occupies 65-70% of viewport height at rest
-    const cardH = isMob
-      ? Math.min(h * 0.20, 160)
-      : Math.min(h * CARD_H, (w * CARD_MAX_W) / CARD_RATIO);
-    const cardW = cardH * CARD_RATIO;
+
+    const isDesktop = w >= 1024;
+    const isTablet = w >= 768 && w < 1024;
+    const isMobile = w < 768;
+
+    // Drum mode thumbnail size:
+    // Desktop: 42-46% viewport width, 48-56% viewport height
+    // Tablet/Mobile: responsive width
+    const cardW = isDesktop
+      ? Math.min(w * 0.44, h * 0.54 * CARD_RATIO)
+      : isTablet
+      ? Math.min(w * 0.58, h * 0.48 * CARD_RATIO)
+      : Math.min(w * 0.82, 340);
+
+    const cardH = cardW / CARD_RATIO;
+
+    // In drum mode, shift the drum to the right on desktop to create a 2-column layout
+    const drumShiftX = isDesktop ? w * 0.20 : 0;
+
+    // In ring mode (m = 0), target total ring height footprint: 70-72% of viewport height
+    const targetRingH = isMobile
+      ? Math.min(h * 0.56, w * 0.88)
+      : isTablet
+      ? h * 0.66
+      : h * 0.71;
+
+    // Card scale inside ring mode
+    const ringScale = isMobile ? 0.36 : isTablet ? 0.32 : 0.28;
+    const visualCardH = cardH * ringScale;
+
+    // Ring radius calibrated so outer card bounds equal targetRingH
+    const ringR = Math.max(10, (targetRingH - visualCardH) / 2);
+
     const drumR = cardH * DRUM;
-    const ringR = cardH * RING_R;
-    const ringScale = count
-      ? clamp((((2 * Math.PI * ringR) / count) * 0.82) / (cardW || 1), 0.22, 1)
-      : 1;
+    const bow = cardH * BOW;
+    const depth = cardH * LENS;
 
     return {
       cardW,
@@ -184,25 +181,26 @@ export function WorksWheel({
       ringR,
       ringScale,
       drumR,
-      bow: cardH * BOW,
-      depth: cardH * LENS,
-      title: Math.max(18, Math.min(44, cardH * 0.16)),
-      index: Math.max(11, Math.min(15, cardH * 0.065)),
+      bow,
+      depth,
+      drumShiftX,
+      isDesktop,
     };
   }, [stage, count]);
 
-  // Demand-driven rAF loop: sleeps when settled, wakes when target changes
+  // Demand-driven rAF loop: sleeps when settled, wakes when turning
   const isAnimating = React.useRef(false);
   const animFrame = React.useRef(0);
 
   const renderScene = React.useCallback(() => {
-    const { ringR, ringScale, drumR, bow } = metrics;
+    const { ringR, ringScale, drumR, bow, drumShiftX } = metrics;
     const t = turn.current;
     const m = clamp(t, 0, 1);
     const pos = Math.max(0, t - 1);
 
+    // Drum shifts toward the right as it opens, making space for the left text column
     if (wheelRef.current) {
-      wheelRef.current.style.transform = `translateZ(${-m * drumR}px)`;
+      wheelRef.current.style.transform = `translateX(${m * drumShiftX}px) translateZ(${-m * drumR}px)`;
     }
 
     for (let i = 0; i < count; i++) {
@@ -225,8 +223,14 @@ export function WorksWheel({
       if (face) face.style.transform = `scale(${lerp(ringScale, 1, m)})`;
     }
 
-    if (labelRef.current) labelRef.current.style.opacity = String(1 - m);
-    if (titleRef.current) titleRef.current.style.opacity = String(m);
+    // Central label fades away as drum opens
+    if (labelRef.current) {
+      labelRef.current.style.opacity = String(Math.max(0, 1 - m * 2.2));
+    }
+    // Left text panel fades in smoothly
+    if (leftPanelRef.current) {
+      leftPanelRef.current.style.opacity = String(Math.max(0, (m - 0.15) / 0.85));
+    }
 
     const near = clamp(Math.round(pos), 0, last);
     if (near !== activeRef.current) {
@@ -236,23 +240,26 @@ export function WorksWheel({
     }
   }, [metrics, count, last, onActiveChange]);
 
+  const renderSceneRef = React.useRef(renderScene);
+  renderSceneRef.current = renderScene;
+
   const wakeLoop = React.useCallback(() => {
     if (isAnimating.current) return;
     isAnimating.current = true;
 
     const step = () => {
       const gap = target.current - turn.current;
-      if (Math.abs(gap) < 0.0005) {
+      if (Math.abs(gap) < 0.003) {
         turn.current = target.current;
       } else {
         turn.current += gap * (reduced ? 1 : EASE);
       }
 
-      renderScene();
+      renderSceneRef.current();
 
-      if (Math.abs(target.current - turn.current) < 0.0005) {
+      if (Math.abs(target.current - turn.current) < 0.003) {
         turn.current = target.current;
-        renderScene();
+        renderSceneRef.current();
         isAnimating.current = false;
         return;
       }
@@ -261,22 +268,32 @@ export function WorksWheel({
     };
 
     animFrame.current = requestAnimationFrame(step);
-  }, [reduced, renderScene]);
+  }, [reduced]);
 
   const to = React.useCallback(
     (next: number) => {
       target.current = clamp(next, 0, last + 1);
-      const targetPos = Math.max(0, target.current - 1);
-      const targetNear = clamp(Math.round(targetPos), 0, last);
-      if (targetNear !== activeRef.current) {
-        activeRef.current = targetNear;
-        setActive(targetNear);
-        onActiveChange?.(targetNear);
-      }
       wakeLoop();
     },
-    [last, wakeLoop, onActiveChange],
+    [last, wakeLoop],
   );
+
+  // Expose imperative wheel controls on stage DOM element for tests & external drivers
+  React.useEffect(() => {
+    if (stageRef.current) {
+      (stageRef.current as any)._worksWheel = {
+        turn,
+        target,
+        to,
+        snapTo: (next: number) => {
+          const val = clamp(next, 0, last + 1);
+          target.current = val;
+          turn.current = val;
+          renderSceneRef.current();
+        },
+      };
+    }
+  });
 
   // Initial draw & re-render on stage metrics update
   React.useEffect(() => {
@@ -289,7 +306,7 @@ export function WorksWheel({
     };
   }, [stage.h, renderScene, wakeLoop]);
 
-  // Native wheel listener with natural scroll continuation
+  // Native wheel listener with natural scroll continuation at boundaries
   React.useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
@@ -297,12 +314,11 @@ export function WorksWheel({
     const onWheel = (event: WheelEvent) => {
       const rect = el.getBoundingClientRect();
 
-      // If the section is scrolling into view from below, let the page scroll
+      // If scrolling into view from below or above, let the page scroll naturally
       if (rect.top > 10 && event.deltaY > 0) {
         el.removeAttribute("data-lenis-prevent");
         return;
       }
-      // If at bottom and scrolling up into view, let the page scroll
       if (rect.bottom < window.innerHeight - 10 && event.deltaY < 0) {
         el.removeAttribute("data-lenis-prevent");
         return;
@@ -382,7 +398,6 @@ export function WorksWheel({
     pointerStart.current = null;
 
     if (isDragging.current) {
-      // Land cleanly on an item
       if (target.current > 1) to(Math.round(target.current));
       setTimeout(() => {
         isDragging.current = false;
@@ -400,7 +415,7 @@ export function WorksWheel({
       return;
     }
 
-    // Clicking an off-front card rotates it to the front
+    // Clicking an off-front card smoothly brings it to front
     if (index !== active) {
       e.preventDefault();
       to(index + 1);
@@ -417,19 +432,13 @@ export function WorksWheel({
     }
   };
 
-  const currentTheme = items[active]?.theme || activeTheme;
-
   return (
     <section
       aria-label={label}
       className={cn(
-        "relative h-full min-h-[24rem] w-full overflow-hidden select-none transition-colors duration-700 ease-out",
+        "relative h-full min-h-[24rem] w-full overflow-hidden select-none",
         className,
       )}
-      style={{
-        backgroundColor: currentTheme?.bg,
-        color: currentTheme?.text,
-      }}
       {...props}
     >
       <div
@@ -455,12 +464,13 @@ export function WorksWheel({
           className="absolute top-1/2 left-1/2 [transform-style:preserve-3d]"
         >
           {items.map((item, i) => {
+            const isCurrent = i === active;
             return (
               <div
                 key={item.title}
                 id={`works-wheel-${i}`}
                 role="option"
-                aria-selected={i === active}
+                aria-selected={isCurrent}
                 ref={(node: HTMLElement | null) => {
                   cardRefs.current[i] = node;
                 }}
@@ -473,7 +483,7 @@ export function WorksWheel({
                   marginTop: -metrics.cardH / 2,
                 }}
               >
-                <span className="relative block size-full overflow-hidden rounded-xl shadow-[0_20px_45px_-15px_rgba(0,0,0,0.18)] border border-black/5 bg-black/5">
+                <span className="relative block size-full overflow-hidden rounded-2xl shadow-[0_24px_50px_-12px_rgba(0,0,0,0.55)] border border-white/10 bg-black/40 transition-all duration-300 group-hover:border-[#d1001c]/40 group-hover:shadow-[0_25px_50px_-12px_rgba(209,0,28,0.25)]">
                   <img
                     src={item.image}
                     alt={item.title}
@@ -481,18 +491,12 @@ export function WorksWheel({
                     className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="eager"
                   />
-                  {/* Subtle hover badge */}
-                  {item.href?.startsWith("http") ? (
-                    <span
-                      className="pointer-events-none absolute right-3 bottom-3 flex translate-y-1 items-center gap-1.5 rounded-full px-3 py-1 text-[0.72rem] font-medium opacity-0 backdrop-blur-md transition group-hover:translate-y-0 group-hover:opacity-100 shadow-sm"
-                      style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.94)",
-                        color: "#181411",
-                      }}
-                    >
+                  {/* Subtle live destination indicator on front card */}
+                  {item.href?.startsWith("http") && (
+                    <span className="pointer-events-none absolute right-3.5 bottom-3.5 flex translate-y-1 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium opacity-0 backdrop-blur-md transition group-hover:translate-y-0 group-hover:opacity-100 shadow-sm bg-black/80 text-white border border-white/15">
                       <svg
                         viewBox="0 0 12 12"
-                        className="size-2.5 text-[#d93829]"
+                        className="size-2.5 text-[#d1001c]"
                         aria-hidden="true"
                       >
                         <path
@@ -504,17 +508,7 @@ export function WorksWheel({
                           strokeLinejoin="round"
                         />
                       </svg>
-                      Live System
-                    </span>
-                  ) : (
-                    <span
-                      className="pointer-events-none absolute right-3 bottom-3 flex translate-y-1 items-center gap-1 rounded-full px-2.5 py-1 text-[0.70rem] font-mono uppercase tracking-wider opacity-0 backdrop-blur-md transition group-hover:translate-y-0 group-hover:opacity-100 shadow-sm"
-                      style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.94)",
-                        color: "#5c5248",
-                      }}
-                    >
-                      Concept
+                      Live Platform
                     </span>
                   )}
                 </span>
@@ -524,106 +518,47 @@ export function WorksWheel({
         </div>
       </div>
 
-      {/* Ring center label (visible at rest when turn === 0) */}
+      {/* Minimal Central Label: "Selected Work" (visible at rest when turn === 0) */}
       <div
         ref={labelRef}
-        className="pointer-events-none absolute inset-0 grid place-items-center select-none"
+        className="pointer-events-none absolute inset-0 grid place-items-center select-none z-10"
       >
-        <div className="flex flex-col items-center justify-center text-center px-4">
-          <span
-            className="font-mono uppercase tracking-[0.28em] text-[10px] sm:text-xs font-semibold mb-2"
-            style={{ color: "#d93829" }}
-          >
-            SELECTED WORK
-          </span>
-          <h2
-            className="font-sans font-bold tracking-tight text-2xl sm:text-4xl md:text-5xl"
-            style={{ color: currentTheme?.text }}
-          >
-            OSTRUM <span style={{ color: "#d93829" }}>/</span> WORKS
-          </h2>
-          <p
-            className="font-mono text-[10px] sm:text-xs tracking-wider uppercase mt-3 opacity-60"
-            style={{ color: currentTheme?.subtext }}
-          >
-            Scroll or drag to explore
-          </p>
-        </div>
+        <span className="font-sans font-semibold tracking-tight text-xl sm:text-2xl md:text-3xl text-white/90">
+          {label}
+        </span>
       </div>
 
-      {/* Front-card editorial title display (visible when turn >= 1) */}
+      {/* Left Column: Active Project Information in Drum Mode */}
       <div
-        ref={titleRef}
-        className="pointer-events-none absolute top-1/2 left-[5%] sm:left-[8%] -translate-y-1/2 opacity-0 max-w-[34vw] sm:max-w-[28vw] z-10 select-none"
+        ref={leftPanelRef}
+        className="pointer-events-none absolute top-1/2 left-[6%] sm:left-[8%] lg:left-[9%] -translate-y-1/2 max-w-[85vw] sm:max-w-[42vw] lg:max-w-[36vw] z-20 select-none"
+        style={{ opacity: 0 }}
       >
-        <div className="flex items-center gap-2 mb-2 sm:mb-3">
-          <span
-            className="inline-flex items-center px-2 py-0.5 rounded text-[10px] sm:text-xs font-mono font-medium uppercase tracking-wider"
-            style={{
-              backgroundColor: items[active]?.theme.badgeBg,
-              color: items[active]?.theme.badgeText,
-            }}
-          >
-            {items[active]?.isConcept ? "Concept" : "Verified Client"}
-          </span>
-        </div>
-        <h3
-          className="font-sans font-bold tracking-tight text-xl sm:text-3xl md:text-4xl lg:text-5xl leading-[1.08] mb-2 sm:mb-3"
-          style={{ color: items[active]?.theme.text }}
-        >
+        <h3 className="font-sans font-bold tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white leading-[1.08] mb-4">
           {items[active]?.title}
         </h3>
-        <p
-          className="font-mono text-xs sm:text-sm tracking-wide"
-          style={{ color: items[active]?.theme.subtext }}
-        >
-          {items[active]?.category}
+        <p className="font-sans text-sm sm:text-base lg:text-lg text-white/75 leading-relaxed mb-6 max-w-[32ch] sm:max-w-[38ch]">
+          {items[active]?.description}
         </p>
         {items[active]?.href?.startsWith("http") && (
-          <div
-            className="mt-3 sm:mt-4 flex items-center gap-1.5 text-xs sm:text-sm font-medium"
-            style={{ color: "#d93829" }}
-          >
-            <span>Visit Live Platform</span>
-            <span aria-hidden="true">↗</span>
+          <div className="pointer-events-auto">
+            <a
+              href={items[active]?.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm sm:text-base font-medium text-[#d1001c] hover:text-white transition-colors group"
+            >
+              <span>Visit Platform</span>
+              <span
+                className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                aria-hidden="true"
+              >
+                ↗
+              </span>
+            </a>
           </div>
         )}
       </div>
-
-      {/* Side project index on right edge */}
-      <ol
-        className="absolute top-[8%] right-[3%] sm:right-[4%] text-right leading-[1.8] z-10 hidden sm:block select-none"
-        style={{ fontSize: metrics.index }}
-      >
-        {items.map((item, i) => {
-          const isCurrent = i === active;
-          return (
-            <li key={item.title}>
-              <button
-                type="button"
-                onClick={() => to(i + 1)}
-                className="cursor-pointer transition-all duration-300 outline-none flex items-center justify-end gap-2 group ml-auto"
-                style={{
-                  color: isCurrent ? item.theme.text : item.theme.subtext,
-                  fontWeight: isCurrent ? 600 : 400,
-                  opacity: isCurrent ? 1 : 0.65,
-                }}
-              >
-                <span className="font-mono text-[10px] opacity-60">0{i + 1}</span>
-                <span className="group-hover:translate-x-[-2px] transition-transform">
-                  {item.title}
-                </span>
-                {isCurrent && (
-                  <span
-                    className="inline-block w-1.5 h-1.5 rounded-full bg-[#d93829]"
-                    aria-hidden="true"
-                  />
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ol>
     </section>
   );
 }
@@ -632,145 +567,73 @@ export function WorksWheel({
 export const OSTRUM_WORKS: WorksWheelItem[] = [
   {
     title: "TMR AI Car Care",
-    category: "Automotive Intelligence System",
+    description:
+      "Autonomous workflow and client intelligence platform built for high-precision luxury automotive detailing studios.",
     image: "/images/works/tmr-ai-car-care.jpg",
     href: "https://tmraicarcare.com/",
-    isConcept: false,
-    theme: {
-      bg: "#F2E3D6",
-      text: "#181411",
-      subtext: "#5c5248",
-      accent: "#d93829",
-      badgeBg: "rgba(217, 56, 41, 0.12)",
-      badgeText: "#b91c1c",
-    },
   },
   {
     title: "Saraswati Driving School",
-    category: "Fleet Logistics & Booking",
+    description:
+      "Modern booking and fleet logistics infrastructure engineered for certified driver training and student dispatch.",
     image: "/images/works/saraswati-driving-school.jpg",
     href: "https://saraswati-driving-school.vercel.app/",
-    isConcept: false,
-    theme: {
-      bg: "#DDE8D9",
-      text: "#141a15",
-      subtext: "#4d5b4e",
-      accent: "#2563eb",
-      badgeBg: "rgba(37, 99, 235, 0.12)",
-      badgeText: "#1d4ed8",
-    },
   },
   {
     title: "Signal",
-    category: "Autonomous Market Infrastructure",
+    description:
+      "Decentralized real-time market telemetry and quantitative data streaming engine for autonomous trading protocols.",
     image: "/images/works/signal.jpg",
     href: "#signal",
-    isConcept: true,
-    theme: {
-      bg: "#DFE8F3",
-      text: "#131822",
-      subtext: "#4e596b",
-      accent: "#e11d48",
-      badgeBg: "rgba(19, 24, 34, 0.08)",
-      badgeText: "#475569",
-    },
   },
   {
     title: "Atlas",
-    category: "Spatial Resource Ledger",
+    description:
+      "Spatial ledger and geographic information platform coordinating urban logistics and infrastructure deployment.",
     image: "/images/works/atlas.jpg",
     href: "#atlas",
-    isConcept: true,
-    theme: {
-      bg: "#E1E9ED",
-      text: "#141a1d",
-      subtext: "#50595e",
-      accent: "#d93829",
-      badgeBg: "rgba(20, 26, 29, 0.08)",
-      badgeText: "#475569",
-    },
   },
   {
     title: "MNESA",
-    category: "Neural Retrieval Architecture",
+    description:
+      "High-dimensional neural memory retrieval system enabling persistent context indexing across distributed intelligence nodes.",
     image: "/images/works/mnesa.jpg",
     href: "#mnesa",
-    isConcept: true,
-    theme: {
-      bg: "#EAE1F2",
-      text: "#1a1322",
-      subtext: "#5b4e6b",
-      accent: "#7c3aed",
-      badgeBg: "rgba(26, 19, 34, 0.08)",
-      badgeText: "#475569",
-    },
   },
   {
     title: "NeuroMove",
-    category: "Biomechanical Telemetry Studio",
+    description:
+      "Biomechanical telemetry studio translating kinematic sensor streams into adaptive motor rehabilitation diagnostics.",
     image: "/images/works/neuromove.jpg",
     href: "#neuromove",
-    isConcept: true,
-    theme: {
-      bg: "#DCEFE7",
-      text: "#121b16",
-      subtext: "#46594f",
-      accent: "#059669",
-      badgeBg: "rgba(18, 27, 22, 0.08)",
-      badgeText: "#475569",
-    },
   },
   {
     title: "Form",
-    category: "Generative Product Synthesis",
+    description:
+      "Parametric digital synthesis workspace uniting generative geometry, material constraints and industrial tooling pipelines.",
     image: "/images/works/form.jpg",
     href: "#form",
-    isConcept: true,
-    theme: {
-      bg: "#F1DFE1",
-      text: "#221316",
-      subtext: "#6b4e54",
-      accent: "#e11d48",
-      badgeBg: "rgba(34, 19, 22, 0.08)",
-      badgeText: "#475569",
-    },
   },
   {
     title: "Orbit",
-    category: "Kinetic Protocol Network",
+    description:
+      "Distributed edge computing protocol managing synchronized state validation across autonomous physical devices.",
     image: "/images/works/orbit.jpg",
     href: "#orbit",
-    isConcept: true,
-    theme: {
-      bg: "#DCEDEF",
-      text: "#121a1d",
-      subtext: "#46585f",
-      accent: "#0284c7",
-      badgeBg: "rgba(18, 26, 29, 0.08)",
-      badgeText: "#475569",
-    },
   },
   {
     title: "Origin",
-    category: "Venture Genesis Engine",
+    description:
+      "Algorithmic venture formulation framework transforming high-entropy market opportunities into production-ready software ventures.",
     image: "/images/works/origin.jpg",
     href: "#origin",
-    isConcept: true,
-    theme: {
-      bg: "#F2E9D8",
-      text: "#1c1711",
-      subtext: "#5f5344",
-      accent: "#d97706",
-      badgeBg: "rgba(28, 23, 17, 0.08)",
-      badgeText: "#475569",
-    },
   },
 ];
 
 export function WorksWheelDemo() {
   return (
     <div className="w-full h-screen">
-      <WorksWheel items={OSTRUM_WORKS} label="OSTRUM / WORKS" action="View" />
+      <WorksWheel items={OSTRUM_WORKS} label="Selected Work" />
     </div>
   );
 }
