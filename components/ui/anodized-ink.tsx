@@ -3,20 +3,22 @@
 import * as React from "react";
 
 /**
- * Anodized Ink — an interactive full-bleed shader background of crimson ink suspended in
- * obsidian black, lit like anodized metal.
+ * Anodized Ink — Crimson Orbit: an interactive full-bleed shader background of
+ * polished crimson liquid suspended in dark oxblood space, lit like anodized metal.
  *
- * Built with raw WebGL2 and zero external dependencies (React is the only import).
- * Features animated iterated sine warping, finite-difference surface normals,
- * thin-film oxide sheen glints, interactive pointer light & swirl, and click ripple propagation.
+ * Features:
+ * - Curvilinear liquid contour field with high-contrast oxblood negative space
+ * - Localized fluid stirring and velocity-reactive metallic glints on pointer movement
+ * - Elimination of broad diagonal red streaks and oversaturated ribbons
+ * - Zero external dependencies, raw WebGL2, graceful CSS fallback
  */
 
 export type AnodizedInkColors = {
-  /** The black the ink is suspended in. */
+  /** The deep black/oxblood the liquid is suspended in. */
   deep: string;
-  /** The ink itself. */
+  /** The rich ruby liquid itself. */
   ink: string;
-  /** Highlight colour of the metallic glints. */
+  /** Warm ivory or champagne metallic specular highlights. */
   sheen: string;
 };
 
@@ -39,21 +41,21 @@ export type AnodizedInkProps = {
   preset?: AnodizedInkPreset;
   /** Override colors. */
   colors?: Partial<AnodizedInkColors>;
-  /** Flow speed multiplier. Default 0.65. */
+  /** Flow speed multiplier. Default 0.38. */
   speed?: number;
-  /** How hard the field folds over itself. Default 0.85. */
+  /** How hard the field folds over itself. Default 0.72. */
   turbulence?: number;
-  /** Zoom scale of pattern. Default 0.9. */
+  /** Zoom scale of pattern. Default 1.05. */
   scale?: number;
-  /** Strength of metallic glints and anodized sheen. Default 0.65. */
+  /** Strength of metallic glints and anodized sheen. Default 0.52. */
   sheen?: number;
-  /** Film grain amount. Default 0.25. */
+  /** Film grain amount. Default 0.18. */
   grain?: number;
-  /** Brightness of the light that follows pointer. Default 0.65. */
+  /** Brightness of local pointer glow. Default 0.32. */
   glow?: number;
-  /** How strongly the pointer twists the ink. Default 0.6. */
+  /** How strongly the pointer twists the fluid locally. Default 0.55. */
   swirl?: number;
-  /** Edge darkening vignette. Default 0.78. */
+  /** Edge darkening vignette. Default 0.88. */
   vignette?: number;
   /** Whether pointer light and swirl react to mouse. Default true. */
   interactive?: boolean;
@@ -143,18 +145,37 @@ float fbm(vec2 p) {
   return v;
 }
 
-float inkField(vec2 p, float t) {
-  vec2 q = p + 0.45 * uTurbulence * vec2(
-    fbm(p * 0.9 + vec2(t * 0.07, 0.0)),
-    fbm(p * 0.9 + vec2(3.1, -t * 0.05))
+// Crimson Orbit: Curvilinear liquid contour potential field
+float liquidField(vec2 p, float t) {
+  // Dual orbital circulation centers
+  vec2 o1 = vec2(cos(t * 0.15) * 0.38, sin(t * 0.12) * 0.28);
+  vec2 o2 = vec2(sin(t * 0.14 + 1.2) * 0.45, -cos(t * 0.17 + 0.8) * 0.34);
+
+  // Multi-scale domain warping
+  vec2 q = p;
+  vec2 w1 = vec2(
+    fbm(q * 1.15 + vec2(t * 0.05, -t * 0.025)),
+    fbm(q * 1.15 + vec2(2.8 + t * 0.03, 1.4))
   );
-  float s = 0.5 * uTurbulence;
-  for (float i = 1.0; i < 5.0; i++) {
-    q.x += s * sin(q.y * i + t * 0.5);
-    q.y += s * cos(q.x * i + t * 0.5);
-    s *= 0.6;
-  }
-  return sin(q.x * 2.0 + q.y * 2.0);
+  q += w1 * 0.42 * uTurbulence;
+
+  vec2 w2 = vec2(
+    fbm(q * 1.85 + w1 * 0.55 + vec2(-t * 0.04, 3.1)),
+    fbm(q * 1.85 + w1 * 0.55 + vec2(1.3, t * 0.04))
+  );
+  q += w2 * 0.26 * uTurbulence;
+
+  // Concentric liquid contour potentials
+  float r1 = length(q - o1);
+  float r2 = length(q - o2);
+
+  // Curving contour wave fronts with ridge shaping
+  float waves = sin(r1 * 5.4 - t * 0.32) * 0.52 + cos(r2 * 4.4 + t * 0.26) * 0.48;
+  waves += 0.22 * sin((q.x * 0.8 + q.y * 1.2) * 2.8 + t * 0.35);
+
+  // Polish into smooth ridges (liquid metal crests)
+  float ridge = 1.0 - abs(waves);
+  return ridge * ridge;
 }
 
 void main() {
@@ -162,14 +183,26 @@ void main() {
   float t = uTime;
   vec2 m = uMouse;
 
-  vec2 p = uv - m * 0.05;
+  vec2 p = uv;
 
+  // 1. Localized fluid displacement around mouse (restrained & bounded)
   vec2 d = p - m;
-  float twist = uSwirl * (0.45 * uHover + uEnergy) * 1.5 * exp(-dot(d, d) * 9.0);
-  float cs = cos(twist);
-  float sn = sin(twist);
-  p = m + mat2(cs, -sn, sn, cs) * d;
+  float dist = length(d);
+  float mouseRadius = 0.48; // Local boundary region (~48% of screen height)
+  float mouseInfluence = smoothstep(mouseRadius, 0.0, dist);
 
+  if (mouseInfluence > 0.0) {
+    // Localized fluid swirl: rotates liquid locally without moving the rest of the canvas
+    float twist = uSwirl * (0.35 * uHover + uEnergy * 0.75) * 2.2 * mouseInfluence * mouseInfluence;
+    float cs = cos(twist);
+    float sn = sin(twist);
+    vec2 rotatedD = mat2(cs, -sn, sn, cs) * d;
+    p = m + mix(d, rotatedD, mouseInfluence);
+    // Subtle physical displacement along velocity direction
+    p += (d / max(dist, 1e-3)) * (uEnergy * 0.032) * mouseInfluence;
+  }
+
+  // 2. Click / Tap Ripple Waves
   float ring = 0.0;
   for (int i = 0; i < 6; i++) {
     vec4 rp = uRipples[i];
@@ -179,46 +212,55 @@ void main() {
     float rr = length(dd);
     float x = rr - age * 0.42;
     float env = exp(-x * x * 55.0) * exp(-age * 1.15) * rp.w;
-    p += (dd / max(rr, 1e-3)) * sin(x * 40.0) * env * 0.04;
+    p += (dd / max(rr, 1e-3)) * sin(x * 40.0) * env * 0.035;
     ring += env * (0.5 + 0.5 * sin(x * 40.0));
   }
 
-  vec2 q = p * 2.4 * uScale + vec2(0.9, 0.5);
+  // Spatial scaling for pattern
+  vec2 q = p * 2.2 * uScale + vec2(0.9, 0.5);
 
-  float e = 0.01;
-  float h = inkField(q, t);
-  float hx = inkField(q + vec2(e, 0.0), t);
-  float hy = inkField(q + vec2(0.0, e), t);
-  vec3 n = normalize(vec3((h - hx) / e * 0.11, (h - hy) / e * 0.11, 1.0));
+  // Surface normal via finite differences
+  float e = 0.012;
+  float h = liquidField(q, t);
+  float hx = liquidField(q + vec2(e, 0.0), t);
+  float hy = liquidField(q + vec2(0.0, e), t);
+  vec3 n = normalize(vec3((h - hx) / e * 0.14, (h - hy) / e * 0.14, 1.0));
 
-  float pattern = smoothstep(0.3, 0.7, h);
-  vec3 col = mix(uDeep, uInk, pattern);
-  col *= 0.6 + 0.6 * smoothstep(0.5, 1.0, h);
+  // High-contrast, dark oxblood negative space:
+  // Liquid ribbons only occupy a controlled zone (no broad full-screen stripes)
+  float ribbon = smoothstep(0.46, 0.86, h);
 
-  vec3 L = normalize(vec3((m - uv) * 1.4, 0.0) + vec3(-0.35, 0.5, 0.8));
+  // Base ambient color: mostly deep obsidian/oxblood with subtle dark ruby undertone
+  vec3 col = mix(uDeep, uInk * 0.42, ribbon * 0.5);
+  // Richer saturated core inside the thickest veins
+  col += uInk * 0.52 * smoothstep(0.72, 1.0, h);
+
+  // Surface lighting: specular glint from virtual key light + mouse light
+  vec3 L = normalize(vec3((m - uv) * 1.2, 0.0) + vec3(-0.35, 0.45, 0.85));
   vec3 H = normalize(L + vec3(0.0, 0.0, 1.0));
-  float spec = pow(max(dot(n, H), 0.0), 56.0);
-  float fres = pow(1.0 - n.z, 1.5);
+  float spec = pow(max(dot(n, H), 0.0), 64.0);
+  float fres = pow(1.0 - n.z, 2.0);
 
-  // Sophisticated champagne/metallic specular response without rainbow dispersion
+  // Champagne metallic sheen along the liquid crests (monochromatic, no rainbow)
   vec3 sheenCol = uSheen * (1.0 + 0.35 * fres);
-  col += sheenCol * spec * uSheenAmt * (0.10 + 0.90 * pattern);
-  col += uInk * fres * 0.35 * pattern * uSheenAmt;
+  col += sheenCol * spec * uSheenAmt * ribbon * 1.2;
+  col += uInk * fres * 0.28 * ribbon * uSheenAmt;
 
-  // Restrained pointer light
-  float dist = length(uv - m);
-  col += uInk * (0.05 / (dist + 0.14)) * 0.18 * uGlow * (0.45 + 0.55 * uHover);
+  // Restrained pointer light & local specular glint
+  float pointerGlow = pow(mouseInfluence, 2.2) * (0.4 + 0.6 * uHover);
+  col += uSheen * pointerGlow * 0.24 * uSheenAmt; // subtle champagne glint right under pointer
+  col += uInk * pointerGlow * 0.26 * (0.5 + 0.5 * uEnergy); // subtle ruby ambient warmth
 
   // Subtle ripple wave
-  col += (uInk * 0.25 + uSheen * 0.05) * ring;
+  col += (uInk * 0.22 + uSheen * 0.05) * ring;
 
-  // Deep cinematic vignette for dramatic high-contrast framing
-  float vig = smoothstep(1.28, 0.20, length(uv * vec2(0.85, 1.0)));
+  // Deep cinematic vignette: corners recede into obsidian black
+  float vig = smoothstep(1.25, 0.22, length(uv * vec2(0.92, 1.05)));
   col *= mix(1.0, vig, uVignette);
 
-  // Film grain
+  // Fine, low-contrast film grain
   float g = hash21(gl_FragCoord.xy + fract(t * 7.13) * vec2(97.3, 41.7));
-  col += (g - 0.5) * 0.05 * uGrain;
+  col += (g - 0.5) * 0.035 * uGrain;
   col += (hash21(gl_FragCoord.yx + 13.7) - 0.5) / 255.0;
 
   outColor = vec4(clamp(col, 0.0, 1.0), 1.0);
@@ -269,12 +311,12 @@ export function AnodizedInk({
   height = "100%",
   preset = "crimson",
   colors,
-  speed = 0.42,
-  turbulence = 0.75,
-  scale = 1.10,
-  sheen = 0.48,
-  grain = 0.20,
-  glow = 0.30,
+  speed = 0.38,
+  turbulence = 0.72,
+  scale = 1.05,
+  sheen = 0.52,
+  grain = 0.18,
+  glow = 0.32,
   swirl = 0.55,
   vignette = 0.88,
   interactive = true,
@@ -402,19 +444,19 @@ export function AnodizedInk({
         simTime += dt * P.speed;
         if (hoverTarget === 0) {
           const aspect = canvas.width / canvas.height;
-          target.x = Math.sin(clock * 0.21) * 0.32 * aspect;
-          target.y = Math.sin(clock * 0.17 + 1.3) * 0.22;
+          target.x = Math.sin(clock * 0.18) * 0.28 * aspect;
+          target.y = Math.sin(clock * 0.15 + 1.1) * 0.18;
         }
         const px = mouse.x;
         const py = mouse.y;
-        const k = 1 - Math.exp(-dt * (hoverTarget ? 7 : 1.5));
+        const k = 1 - Math.exp(-dt * (hoverTarget ? 8.5 : 1.8));
         mouse.x += (target.x - mouse.x) * k;
         mouse.y += (target.y - mouse.y) * k;
-        hover += (hoverTarget - hover) * (1 - Math.exp(-dt * 3));
+        hover += (hoverTarget - hover) * (1 - Math.exp(-dt * 3.5));
         const v = hoverTarget
           ? Math.hypot(mouse.x - px, mouse.y - py) / Math.max(dt, 1e-3)
           : 0;
-        energy += (Math.min(v * 0.6, 1.4) - energy) * (1 - Math.exp(-dt * 4));
+        energy += (Math.min(v * 0.45, 1.2) - energy) * (1 - Math.exp(-dt * 4));
       }
 
       gl.viewport(0, 0, canvas.width, canvas.height);
@@ -460,34 +502,44 @@ export function AnodizedInk({
     });
     visibility.observe(root);
 
-    const toShader = (e: PointerEvent) => {
+    // Global pointer tracking when section is visible
+    const onWindowMove = (e: PointerEvent) => {
+      if (!interactive || !visible) return;
       const rect = root.getBoundingClientRect();
+      const inX = e.clientX >= rect.left && e.clientX <= rect.right;
+      const inY = e.clientY >= rect.top && e.clientY <= rect.bottom;
+      if (!inX || !inY) {
+        hoverTarget = 0;
+        return;
+      }
       const h = rect.height || 1;
-      return {
-        x: (e.clientX - rect.left - rect.width / 2) / h,
-        y: -(e.clientY - rect.top - rect.height / 2) / h,
-      };
-    };
-    const onMove = (e: PointerEvent) => {
-      if (!interactive) return;
-      const p = toShader(e);
-      target.x = p.x;
-      target.y = p.y;
+      target.x = (e.clientX - rect.left - rect.width / 2) / h;
+      target.y = -(e.clientY - rect.top - rect.height / 2) / h;
       hoverTarget = 1;
       if (reduced) kick();
     };
-    const onLeave = () => {
+
+    const onWindowLeave = () => {
       hoverTarget = 0;
       if (reduced) kick();
     };
-    const onDown = (e: PointerEvent) => {
-      if (!interactive) return;
-      onMove(e);
-      if (reduced || !paramsRef.current.ripples) return;
-      const p = toShader(e);
+
+    const onWindowDown = (e: PointerEvent) => {
+      if (!interactive || !visible || reduced || !paramsRef.current.ripples) return;
+      const rect = root.getBoundingClientRect();
+      if (
+        e.clientX < rect.left ||
+        e.clientX > rect.right ||
+        e.clientY < rect.top ||
+        e.clientY > rect.bottom
+      )
+        return;
+      const h = rect.height || 1;
+      const px = (e.clientX - rect.left - rect.width / 2) / h;
+      const py = -(e.clientY - rect.top - rect.height / 2) / h;
       const i = (nextDrop++ % MAX_RIPPLES) * 4;
-      drops[i] = p.x;
-      drops[i + 1] = p.y;
+      drops[i] = px;
+      drops[i + 1] = py;
       drops[i + 2] = simTime;
       drops[i + 3] = 1;
     };
@@ -509,10 +561,9 @@ export function AnodizedInk({
     };
     const onRestored = () => setGeneration((g) => g + 1);
 
-    root.addEventListener("pointermove", onMove);
-    root.addEventListener("pointerdown", onDown);
-    root.addEventListener("pointerleave", onLeave);
-    root.addEventListener("pointercancel", onLeave);
+    window.addEventListener("pointermove", onWindowMove, { passive: true });
+    window.addEventListener("pointerdown", onWindowDown, { passive: true });
+    window.addEventListener("pointerleave", onWindowLeave, { passive: true });
     canvas.addEventListener("webglcontextlost", onLost);
     canvas.addEventListener("webglcontextrestored", onRestored);
 
@@ -522,10 +573,9 @@ export function AnodizedInk({
       window.clearInterval(retire);
       resizeObserver.disconnect();
       visibility.disconnect();
-      root.removeEventListener("pointermove", onMove);
-      root.removeEventListener("pointerdown", onDown);
-      root.removeEventListener("pointerleave", onLeave);
-      root.removeEventListener("pointercancel", onLeave);
+      window.removeEventListener("pointermove", onWindowMove);
+      window.removeEventListener("pointerdown", onWindowDown);
+      window.removeEventListener("pointerleave", onWindowLeave);
       canvas.removeEventListener("webglcontextlost", onLost);
       canvas.removeEventListener("webglcontextrestored", onRestored);
       gl.deleteProgram(program);
@@ -536,6 +586,7 @@ export function AnodizedInk({
   return (
     <div
       ref={rootRef}
+      data-testid="anodized-ink-stage"
       className={"relative w-full overflow-hidden " + className}
       style={{ height, background: palette.deep }}
     >
@@ -545,13 +596,13 @@ export function AnodizedInk({
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 60% 45% at 30% 35%, " +
+              "radial-gradient(ellipse 65% 50% at 30% 35%, " +
               palette.ink +
-              "cc, transparent 70%), " +
-              "radial-gradient(ellipse 50% 40% at 75% 70%, " +
+              "99, transparent 72%), " +
+              "radial-gradient(ellipse 55% 42% at 75% 68%, " +
               palette.ink +
-              "88, transparent 70%), " +
-              "radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.8) 100%), " +
+              "66, transparent 70%), " +
+              "radial-gradient(circle at 50% 50%, transparent 35%, rgba(4,1,4,0.92) 100%), " +
               palette.deep,
           }}
         />

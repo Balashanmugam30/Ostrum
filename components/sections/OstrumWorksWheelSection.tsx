@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { WorksWheel, OSTRUM_WORKS, WorksWheelHandle } from '@/components/ui/works-wheel';
 import { AnodizedInk } from '@/components/ui/anodized-ink';
+import { WorksWheelCurios, WorksWheelCuriosHandle } from '@/components/ui/works-wheel-curios';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -15,6 +16,7 @@ export function OstrumWorksWheelSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const worksWheelRef = useRef<WorksWheelHandle>(null);
+  const curiosRef = useRef<WorksWheelCuriosHandle>(null);
   const [activeProject, setActiveProject] = useState(0);
 
   // Smooth programmatic project selection (via card click or keyboard)
@@ -46,6 +48,16 @@ export function OstrumWorksWheelSection() {
   // Pointer drag gesture on stage translates directly to scroll movement
   const handleDragScroll = useCallback((deltaY: number) => {
     window.scrollBy({ top: deltaY * 1.6, behavior: 'auto' });
+  }, []);
+
+  // Pointer parallax tracking for floating side curios
+  const handleStagePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const el = pinContainerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const nx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+    const ny = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+    curiosRef.current?.setPointer(nx, ny);
   }, []);
 
   // Master ScrollTrigger setup for Full-Viewport Pinning and Synchronised Expansion
@@ -115,6 +127,7 @@ export function OstrumWorksWheelSection() {
             }
 
             worksWheelRef.current?.setTurn(targetTurn);
+            curiosRef.current?.setTurn(targetTurn);
           },
         });
       });
@@ -159,19 +172,20 @@ export function OstrumWorksWheelSection() {
       {/* Works Wheel Pinned Container - 100svh Full Screen Stage with Persistent Anodized Ink Background */}
       <div
         ref={pinContainerRef}
+        onPointerMove={handleStagePointerMove}
         className="w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative overflow-hidden bg-[#040104]"
       >
-        {/* Anodized Ink WebGL2 Shader Background */}
+        {/* Anodized Ink WebGL2 Shader Background (Crimson Orbit) */}
         <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
           <AnodizedInk
             preset="crimson"
-            speed={0.42}
-            turbulence={0.75}
-            scale={1.1}
-            sheen={0.48}
-            glow={0.30}
-            swirl={0.5}
-            grain={0.20}
+            speed={0.38}
+            turbulence={0.72}
+            scale={1.05}
+            sheen={0.52}
+            glow={0.32}
+            swirl={0.55}
+            grain={0.18}
             vignette={0.88}
             interactive={true}
             ripples={true}
@@ -180,14 +194,18 @@ export function OstrumWorksWheelSection() {
           />
         </div>
 
+        {/* Floating Sculptural Curios in Empty Side Spaces (Active in Ring Mode, Dissolves in Drum Mode) */}
+        <WorksWheelCurios ref={curiosRef} />
+
         {/* Works Wheel Stage (Controlled by ScrollTrigger) */}
-        <div className="relative z-10 w-full h-full">
+        <div className="relative z-20 w-full h-full">
           <WorksWheel
             ref={worksWheelRef}
             items={OSTRUM_WORKS}
             label="Selected Work"
             controlled={true}
             onActiveChange={setActiveProject}
+            onTurnChange={(t) => curiosRef.current?.setTurn(t)}
             onSelectProject={handleSelectProject}
             onDragScroll={handleDragScroll}
             className="w-full h-full"

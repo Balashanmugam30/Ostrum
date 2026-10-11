@@ -39,6 +39,8 @@ export interface WorksWheelProps extends Omit<
   label?: string;
   /** Callback fired when the active project index changes. */
   onActiveChange?: (index: number) => void;
+  /** Callback fired whenever the wheel turn value updates (for curios sync) */
+  onTurnChange?: (turn: number) => void;
   /** Optional callback fired when an off-front card is clicked or navigated to */
   onSelectProject?: (index: number) => void;
   /** Optional callback fired when dragging vertically on the stage */
@@ -95,6 +97,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
       items,
       label = "Selected Work",
       onActiveChange,
+      onTurnChange,
       onSelectProject,
       onDragScroll,
       controlled = false,
@@ -256,7 +259,8 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         setActive(near);
         onActiveChange?.(near);
       }
-    }, [metrics, count, last, onActiveChange]);
+      onTurnChange?.(t);
+    }, [metrics, count, last, onActiveChange, onTurnChange]);
 
     const renderSceneRef = React.useRef(renderScene);
     renderSceneRef.current = renderScene;

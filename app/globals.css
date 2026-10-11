@@ -375,6 +375,34 @@ body {
   animation: scrollCueBounce 2.2s ease-in-out infinite;
 }
 
+/* Floating Sculptural Curios Animations */
+@keyframes curioFloatA {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -9px, 0) rotate(2deg);
+  }
+}
+
+@keyframes curioFloatB {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -11px, 0) rotate(-2.5deg);
+  }
+}
+
+@keyframes curioFloatC {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -7px, 0) scale(1.03);
+  }
+}
+
 /* Reduced Motion Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .line-by-line,
@@ -383,7 +411,9 @@ body {
   .primary-btn *,
   .scroll-cue-arrow,
   .ostrum-engine-section,
-  .ostrum-engine-section * {
+  .ostrum-engine-section *,
+  [data-testid="works-wheel-curios"],
+  [data-testid="works-wheel-curios"] * {
     transition: none !important;
     animation: none !important;
     transform: none !important;
@@ -391,4 +421,5 @@ body {
     filter: none !important;
   }
 }
+
 
