@@ -227,7 +227,7 @@ export function OstrumEnergyNarrativeSection() {
         gsap.set(el, { opacity: idx === 2 ? 1 : 0, y: 0 });
         const fills = el.querySelectorAll<HTMLElement>('.narrative-line-fill');
         fills.forEach((fill) => {
-          gsap.set(fill, { clipPath: 'inset(0 0% 0 0)' });
+          gsap.set(fill, { clipPath: 'inset(-35% 0% -45% 0px)' });
         });
       });
       return;
@@ -288,7 +288,7 @@ export function OstrumEnergyNarrativeSection() {
         gsap.set(card, { opacity: 0, y: 24 });
         const lineFills = card.querySelectorAll<HTMLElement>('.narrative-line-fill');
         lineFills.forEach((fill) => {
-          gsap.set(fill, { clipPath: 'inset(0 100% 0 0)' });
+          gsap.set(fill, { clipPath: 'inset(-35% 100% -45% 0px)' });
         });
       });
 
@@ -334,9 +334,9 @@ export function OstrumEnergyNarrativeSection() {
 
             tl.fromTo(
               lineFill,
-              { clipPath: 'inset(0 100% 0 0)' },
+              { clipPath: 'inset(-35% 100% -45% 0px)' },
               {
-                clipPath: 'inset(0 0% 0 0)',
+                clipPath: 'inset(-35% 0% -45% 0px)',
                 duration: sliceDuration,
                 ease: 'none',
               },
@@ -416,14 +416,14 @@ export function OstrumEnergyNarrativeSection() {
           ))}
         </div>
 
-        {/* Fill Layer: Absolute Overlay with Pure White / Crimson OSTRUM Highlight, Horizontally Clipped */}
+        {/* Fill Layer: Absolute Overlay with Pure White / Crimson OSTRUM Highlight, Horizontally Clipped with Complete Glyphs Clearance */}
         <div
-          className="narrative-line-fill absolute inset-0 pointer-events-none select-none overflow-hidden"
+          className="narrative-line-fill absolute inset-0 pointer-events-none select-none"
           data-fill-line-index={globalLineIdx}
           aria-hidden="true"
           style={{
-            clipPath: 'inset(0 100% 0 0)',
-            WebkitClipPath: 'inset(0 100% 0 0)',
+            clipPath: 'inset(-35% 100% -45% 0px)',
+            WebkitClipPath: 'inset(-35% 100% -45% 0px)',
           }}
         >
           <div

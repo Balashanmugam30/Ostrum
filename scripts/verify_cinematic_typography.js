@@ -219,8 +219,15 @@ async function runAudit() {
         return lines.map((line, idx) => {
           const comp = window.getComputedStyle(line);
           const clip = comp.clipPath;
-          const match = clip.match(/inset\([^)]*?(\d+(?:\.\d+)?)%\s+0(?:px)?\s+0(?:px)?\)/);
-          const rightInset = match ? parseFloat(match[1]) : (clip.includes('0px 0px 0px 0px') || clip.includes('0% 0% 0% 0%') ? 0 : 100);
+          let rightInset = 100;
+          const inner = clip.replace(/^inset\(/, '').replace(/\)$/, '').trim();
+          const tokens = inner.split(/[\s,]+/);
+          if (tokens.length >= 2) {
+            const rMatch = tokens[1].match(/(\d+(?:\.\d+)?)/);
+            if (rMatch) rightInset = parseFloat(rMatch[1]);
+          } else if (clip.includes('0%') || clip.includes('0px')) {
+            rightInset = 0;
+          }
           const percentRevealed = (100 - rightInset).toFixed(1);
           return {
             lineIdx: idx,
