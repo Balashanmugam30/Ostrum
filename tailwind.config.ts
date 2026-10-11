@@ -10,6 +10,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        background: '#000000',
+        foreground: '#ffffff',
+        muted: {
+          DEFAULT: '#141416',
+          foreground: '#8a8f98',
+        },
         canvas: {
           warm: '#FAF7F2',
           pearl: '#FCFAF7',
