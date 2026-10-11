@@ -482,16 +482,16 @@ export function OstrumContinuousJourney() {
         targetRotY = Math.PI * 2;
         targetEnergyLevel = easeTrans * 0.20;
       }
-      // Stage 4: Section 03 Pinned Energy Narrative (Beats 01 to 04)
+      // Stage 4: Section 03 Pinned Energy Narrative (Beats 01 to 05 + stationary handoff)
       else if (scrollY <= energyEnd) {
-        const energySpan = Math.max(1, energyEnd - energyStart);
-        const pEnergy = Math.min(1, Math.max(0, (scrollY - energyStart) / energySpan));
+        const narrativeSpan = isMobile ? 3600 : 5000;
+        const pEnergy = Math.min(1, Math.max(0, (scrollY - energyStart) / narrativeSpan));
 
         targetScreenX = window.innerWidth * 0.50;
         targetScreenY = window.innerHeight * 0.50;
         targetScale = anchors.energyScale;
 
-        // Controlled rotation across the 5 narrative beats: from 2.0π to 4.0π (settles front pose)
+        // Controlled rotation across the 5 narrative beats: from 2.0π to 4.0π (settles front pose at beat 05)
         targetRotY = (2.0 + pEnergy * 2.0) * Math.PI;
 
         // High-energy illuminated material response

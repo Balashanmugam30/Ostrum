@@ -236,19 +236,23 @@ export function OstrumEnergyNarrativeSection() {
     const ctx = gsap.context(() => {
       const isMobile = window.innerWidth < 768;
       const scrollDistance = isMobile ? 3600 : 5000;
+      const handoffDistance = window.innerHeight;
+      const totalPinDistance = scrollDistance + handoffDistance;
 
       // 1. Master Pinned Trigger for the Energy Narrative
       ScrollTrigger.create({
         trigger: section,
         start: 'top top',
-        end: `+=${scrollDistance}`,
+        end: `+=${totalPinDistance}`,
         pin: pinContainer,
         pinSpacing: true,
         scrub: 0.6,
         id: 'energy-narrative-pin',
         anticipatePin: 1,
         onUpdate: (self) => {
-          const p = self.progress;
+          // Progress through narrative reveals is mapped across [0, scrollDistance]:
+          const rawProgress = (self.scroll() - self.start) / scrollDistance;
+          const narrativeProgress = Math.max(0, Math.min(1, rawProgress));
 
           // Beat intervals:
           // Stage 0: [0.00, 0.12)
@@ -258,11 +262,11 @@ export function OstrumEnergyNarrativeSection() {
           // Beat 04: [0.63, 0.80)
           // Beat 05: [0.81, 1.00]
           let currentBeat = -1;
-          if (p >= 0.81) currentBeat = 4;
-          else if (p >= 0.63) currentBeat = 3;
-          else if (p >= 0.45) currentBeat = 2;
-          else if (p >= 0.29) currentBeat = 1;
-          else if (p >= 0.12) currentBeat = 0;
+          if (narrativeProgress >= 0.81) currentBeat = 4;
+          else if (narrativeProgress >= 0.63) currentBeat = 3;
+          else if (narrativeProgress >= 0.45) currentBeat = 2;
+          else if (narrativeProgress >= 0.29) currentBeat = 1;
+          else if (narrativeProgress >= 0.12) currentBeat = 0;
 
           setActiveBeat(currentBeat);
 
@@ -274,7 +278,7 @@ export function OstrumEnergyNarrativeSection() {
           // Continuous 3D journey sync
           window.dispatchEvent(
             new CustomEvent('ostrum:energy-progress', {
-              detail: { progress: p, beat: currentBeat },
+              detail: { progress: narrativeProgress, beat: currentBeat },
             })
           );
         },
