@@ -25,6 +25,7 @@ export interface WordToken {
 
 export interface BeatLineData {
   primaryLines: WordToken[][];
+  brandLines: WordToken[][];
   supportingLines: WordToken[][];
   allLines: WordToken[][];
 }
@@ -82,6 +83,9 @@ export function OstrumEnergyNarrativeSection() {
     return narrative.beats.map((beat) => ({
       id: beat.id,
       primaryTokens: tokenizeTextWithHighlights(beat.primary),
+      brandTokens: beat.brandSignoff
+        ? tokenizeTextWithHighlights(beat.brandSignoff, beat.brandSignoff)
+        : [],
       supportingTokens: tokenizeTextWithHighlights(
         beat.supporting || '',
         beat.highlight,
@@ -139,6 +143,12 @@ export function OstrumEnergyNarrativeSection() {
         '.measure-primary',
         tokenizeTextWithHighlights(beat.primary)
       );
+      const brandLines = beat.brandSignoff
+        ? groupWordsIntoLines(
+            '.measure-brand',
+            tokenizeTextWithHighlights(beat.brandSignoff, beat.brandSignoff)
+          )
+        : [];
       const supportingLines = beat.supporting
         ? groupWordsIntoLines(
             '.measure-supporting',
@@ -152,8 +162,9 @@ export function OstrumEnergyNarrativeSection() {
 
       result[beat.id] = {
         primaryLines,
+        brandLines,
         supportingLines,
-        allLines: [...primaryLines, ...supportingLines],
+        allLines: [...primaryLines, ...brandLines, ...supportingLines],
       };
     });
 
@@ -360,7 +371,8 @@ export function OstrumEnergyNarrativeSection() {
     lineWords: WordToken[],
     keyPrefix: string,
     globalLineIdx: number,
-    isSupporting = false
+    isSupporting = false,
+    isBrandSignoff = false
   ) => {
     const fontClass = isSupporting
       ? 'font-sans font-medium text-[clamp(18px,1.8vw,26px)] leading-[1.2] tracking-[-0.01em]'
@@ -370,10 +382,15 @@ export function OstrumEnergyNarrativeSection() {
       <div
         key={`${keyPrefix}-${globalLineIdx}`}
         className={`narrative-line-container relative inline-block my-0 text-center whitespace-nowrap ${
-          isSupporting ? 'mt-6 md:mt-8' : ''
+          isSupporting
+            ? 'mt-6 md:mt-8'
+            : isBrandSignoff
+            ? 'mt-2 sm:mt-3 md:mt-4'
+            : ''
         }`}
         data-line-index={globalLineIdx}
         data-is-supporting={isSupporting ? 'true' : 'false'}
+        data-is-brand={isBrandSignoff ? 'true' : 'false'}
       >
         {/* Base Layer: Inactive Solid Muted Grey Letters */}
         <div
@@ -413,6 +430,8 @@ export function OstrumEnergyNarrativeSection() {
             className={`${fontClass} ${
               isSupporting
                 ? 'text-white'
+                : isBrandSignoff
+                ? ''
                 : 'drop-shadow-[0_4px_32px_rgba(255,255,255,0.25)]'
             }`}
           >
@@ -422,7 +441,9 @@ export function OstrumEnergyNarrativeSection() {
                   <span
                     key={cIdx}
                     className={`narrative-char-filled inline-block ${
-                      ch.isHighlight ? 'text-[#C01832]' : 'text-white'
+                      isBrandSignoff || ch.isHighlight
+                        ? 'text-[#C01832]'
+                        : 'text-white'
                     }`}
                     data-char={ch.char}
                     data-line={globalLineIdx}
@@ -471,6 +492,21 @@ export function OstrumEnergyNarrativeSection() {
                 </span>
               ))}
             </div>
+            {beat.brandSignoff ? (
+              <div
+                className="measure-brand font-sans font-medium text-[clamp(28px,3.8vw,62px)] leading-[1.08] tracking-[-0.015em] text-center mt-2 sm:mt-3 md:mt-4"
+              >
+                {tokenizeTextWithHighlights(beat.brandSignoff, beat.brandSignoff).map((word, wIdx) => (
+                  <span
+                    key={wIdx}
+                    className="measure-word inline-block whitespace-nowrap"
+                    data-word={word.text}
+                  >
+                    {word.text}{' '}
+                  </span>
+                ))}
+              </div>
+            ) : null}
             {beat.supporting ? (
               <div className="measure-supporting font-sans font-medium text-[clamp(18px,1.8vw,26px)] leading-[1.2] tracking-[-0.01em] text-center mt-6 md:mt-8">
                 {tokenizeTextWithHighlights(
@@ -524,19 +560,37 @@ export function OstrumEnergyNarrativeSection() {
                       {/* Primary Statement Lines */}
                       <div className="w-full flex flex-col items-center">
                         {beatData.primaryLines.map((lineWords, lineIdx) =>
-                          renderLine(lineWords, `${beat.id}-p`, lineIdx, false)
+                          renderLine(lineWords, `${beat.id}-p`, lineIdx, false, false)
                         )}
                       </div>
 
-                      {/* Supporting Line (Only Beat 05) */}
+                      {/* Brand Signoff Line (OSTRUM) */}
+                      {beatData.brandLines && beatData.brandLines.length > 0 && (
+                        <div className="w-full flex flex-col items-center">
+                          {beatData.brandLines.map((lineWords, lineIdx) =>
+                            renderLine(
+                              lineWords,
+                              `${beat.id}-b`,
+                              beatData.primaryLines.length + lineIdx,
+                              false,
+                              true
+                            )
+                          )}
+                        </div>
+                      )}
+
+                      {/* Supporting Line */}
                       {beatData.supportingLines.length > 0 && (
                         <div className="w-full flex flex-col items-center">
                           {beatData.supportingLines.map((lineWords, lineIdx) =>
                             renderLine(
                               lineWords,
                               `${beat.id}-s`,
-                              beatData.primaryLines.length + lineIdx,
-                              true
+                              beatData.primaryLines.length +
+                                (beatData.brandLines?.length || 0) +
+                                lineIdx,
+                              true,
+                              false
                             )
                           )}
                         </div>
@@ -548,6 +602,11 @@ export function OstrumEnergyNarrativeSection() {
                       <div className="font-sans font-medium text-[clamp(28px,3.8vw,62px)] leading-[1.08] tracking-[-0.015em] text-white/30 text-center">
                         {beat.primary}
                       </div>
+                      {beat.brandSignoff ? (
+                        <div className="font-sans font-medium text-[clamp(28px,3.8vw,62px)] leading-[1.08] tracking-[-0.015em] text-white/30 text-center mt-2 sm:mt-3 md:mt-4">
+                          {beat.brandSignoff}
+                        </div>
+                      ) : null}
                       {beat.supporting ? (
                         <div className="font-sans font-medium text-[clamp(18px,1.8vw,26px)] leading-[1.2] tracking-[-0.01em] text-white/30 text-center mt-6 md:mt-8">
                           {beat.supporting}

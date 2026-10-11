@@ -38,6 +38,7 @@ export interface ContentMessages {
       id: string;
       number: string;
       primary: string;
+      brandSignoff?: string;
       highlight?: string;
       highlight2?: string;
       supporting?: string;
@@ -82,35 +83,30 @@ export const messages: Record<Locale, ContentMessages> = {
       badge: "03 / THE CONTINUUM",
       beats: [
         {
-          id: "business-better",
+          id: "business-as-one",
           number: "01",
-          primary: "Your business should work better.",
-          supporting: "",
+          primary: "Make your business work as one.",
         },
         {
-          id: "tools-together",
+          id: "less-busywork",
           number: "02",
-          primary: "Your tools should work together.",
-          supporting: "",
+          primary: "Less busywork. More room to grow.",
         },
         {
-          id: "build-systems",
+          id: "everything-connects",
           number: "03",
-          primary: "We build websites, software and automation that work together.",
-          supporting: "",
+          primary: "Your business works better when everything connects.",
         },
         {
-          id: "solve-problem",
+          id: "ideas-to-products",
           number: "04",
-          primary: "Got a problem existing products cannot solve?",
-          supporting: "",
+          primary: "Turn good ideas into products people need.",
         },
         {
           id: "ready-next",
           number: "05",
-          primary: "Ready for what comes next?",
-          supporting: "Build it with OSTRUM.",
-          highlight: "OSTRUM",
+          primary: "Ready for what's next?",
+          brandSignoff: "OSTRUM",
         },
       ],
     },
@@ -151,35 +147,30 @@ export const messages: Record<Locale, ContentMessages> = {
       badge: "03 / LE CONTINUUM",
       beats: [
         {
-          id: "business-better",
+          id: "business-as-one",
           number: "01",
-          primary: "Votre entreprise devrait mieux fonctionner.",
-          supporting: "",
+          primary: "Faites fonctionner votre entreprise comme un tout.",
         },
         {
-          id: "tools-together",
+          id: "less-busywork",
           number: "02",
-          primary: "Vos outils devraient fonctionner ensemble.",
-          supporting: "",
+          primary: "Moins de frictions. Plus d'espace pour grandir.",
         },
         {
-          id: "build-systems",
+          id: "everything-connects",
           number: "03",
-          primary: "Nous concevons des sites web, des logiciels et de l'automatisation qui fonctionnent ensemble.",
-          supporting: "",
+          primary: "Votre entreprise fonctionne mieux quand tout est connecté.",
         },
         {
-          id: "solve-problem",
+          id: "ideas-to-products",
           number: "04",
-          primary: "Un problème qu'aucun produit existant ne peut résoudre ?",
-          supporting: "",
+          primary: "Transformez les bonnes idées en produits indispensables.",
         },
         {
           id: "ready-next",
           number: "05",
           primary: "Prêt pour ce qui vient ensuite ?",
-          supporting: "Bâtissez-le avec OSTRUM.",
-          highlight: "OSTRUM",
+          brandSignoff: "OSTRUM",
         },
       ],
     },

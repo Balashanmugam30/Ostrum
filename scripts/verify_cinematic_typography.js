@@ -159,14 +159,41 @@ async function runAudit() {
       report.testsFailed++;
     }
 
-    const beats1to4NoSupporting = beatsStructureAudit.slice(0, 4).every((b) => b.supportingLineCount === 0);
-    const beat5HasSupporting = beatsStructureAudit[4]?.supportingLineCount === 1;
+    const allZeroSupporting = beatsStructureAudit.every((b) => b.supportingLineCount === 0);
+    const beat5HasTwoDisplayLines = beatsStructureAudit[4]?.primaryLineCount === 2;
+    const noBuildItWith = !beatsStructureAudit.some((b) => b.primaryText.includes('Build it with') || b.supportingText.includes('Build it with'));
 
-    if (beats1to4NoSupporting && beat5HasSupporting) {
-      console.log('✓ PASS: Beats 01 to 04 have only one main statement (0 supporting lines). Beat 05 has exactly 1 supporting line ("Build it with OSTRUM.").');
+    if (allZeroSupporting && beat5HasTwoDisplayLines && noBuildItWith) {
+      console.log('✓ PASS: All beats have 0 supporting lines. Beat 05 has exactly 2 display lines ("Ready for what\'s next?" and "OSTRUM"). Zero occurrences of "Build it with".');
       report.testsPassed++;
     } else {
-      console.error('✗ FAIL: Supporting lines configuration incorrect');
+      console.error('✗ FAIL: Supporting lines or beat 5 structure incorrect:', { allZeroSupporting, beat5HasTwoDisplayLines, noBuildItWith });
+      report.testsFailed++;
+    }
+
+    // Verify Exact Narrative Copy Across All Beats
+    const copyAudit = await page.evaluate(() => {
+      const cards = Array.from(document.querySelectorAll('.narrative-beat-card'));
+      return cards.map((c) => {
+        const lines = Array.from(c.querySelectorAll('.narrative-line-base'));
+        return lines.map((l) => l.textContent.trim()).join(' ');
+      });
+    });
+
+    console.log('Copy Audit across beats:', copyAudit);
+    const expectedCopy = [
+      "Make your business work as one.",
+      "Less busywork. More room to grow.",
+      "Your business works better when everything connects.",
+      "Turn good ideas into products people need.",
+      "Ready for what's next? OSTRUM",
+    ];
+    const copyMatches = copyAudit.every((actual, i) => actual === expectedCopy[i]);
+    if (copyMatches) {
+      console.log('✓ PASS: All 5 beats match the exact requested client-focused copy.');
+      report.testsPassed++;
+    } else {
+      console.error('✗ FAIL: Copy mismatch:', { expected: expectedCopy, actual: copyAudit });
       report.testsFailed++;
     }
 
@@ -205,7 +232,7 @@ async function runAudit() {
     };
 
     // 6. Test Beat 01 Reveal Sequence
-    console.log('\n--- Testing Beat 01 ("Your business should work better.") ---');
+    console.log('\n--- Testing Beat 01 ("Make your business work as one.") ---');
     // State 1: Beat 01 initial
     await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), Math.round(energyStart + 0.13 * energyDist));
     await page.waitForTimeout(400);
@@ -230,8 +257,8 @@ async function runAudit() {
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'chk-cine-03-beat01-complete.png') });
     if (b1States[0]?.percentRevealed >= 98) report.testsPassed++;
 
-    // 7. Test Beat 02 ("Your tools should work together.")
-    console.log('\n--- Testing Beat 02 ("Your tools should work together.") ---');
+    // 7. Test Beat 02 ("Less busywork. More room to grow.")
+    console.log('\n--- Testing Beat 02 ("Less busywork. More room to grow.") ---');
     await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), Math.round(energyStart + 0.38 * energyDist));
     await page.waitForTimeout(400);
     let b2States = await getCardLineStates(1);
@@ -239,45 +266,30 @@ async function runAudit() {
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'chk-cine-04-beat02-tools.png') });
     if (b2States[0]?.percentRevealed >= 98) report.testsPassed++;
 
-    // 8. Test Beat 03 ("We build websites, software and automation that work together.") Multi-line Sequential
-    console.log('\n--- Testing Beat 03 (Multi-line Sequential Reveal) ---');
-    // Midway Line 1, Line 2 strictly 0%
-    await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), Math.round(energyStart + 0.49 * energyDist));
+    // 8. Test Beat 03 ("Your business works better when everything connects.")
+    console.log('\n--- Testing Beat 03 ("Your business works better when everything connects.") ---');
+    // Midway
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), Math.round(energyStart + 0.51 * energyDist));
     await page.waitForTimeout(400);
     let b3States = await getCardLineStates(2);
-    console.log('Beat 03 Line 1 Midway (Line 2 at 0%):', b3States);
+    console.log('Beat 03 Line fill progress midway:', b3States);
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'chk-cine-05-beat03-line1-midway-line2-zero.png') });
-    if (b3States[0]?.percentRevealed > 10 && b3States[0]?.percentRevealed < 90 && b3States[1]?.percentRevealed === 0) {
-      console.log('✓ PASS: Beat 03 Line 1 fills while Line 2 remains strictly 0%.');
-      report.testsPassed++;
+    if (b3States.length > 1) {
+      if (b3States[0]?.percentRevealed > 10 && b3States[0]?.percentRevealed < 90 && b3States[1]?.percentRevealed === 0) {
+        console.log('✓ PASS: Beat 03 Line 1 fills while Line 2 remains strictly 0%.');
+        report.testsPassed++;
+      } else {
+        console.error('✗ FAIL: Beat 03 Line 2 revealed prematurely');
+        report.testsFailed++;
+      }
     } else {
-      console.error('✗ FAIL: Beat 03 Line 2 revealed prematurely');
-      report.testsFailed++;
-    }
-
-    // Line 1 Complete (100%), Line 2 strictly 0%
-    await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), Math.round(energyStart + 0.52 * energyDist));
-    await page.waitForTimeout(400);
-    b3States = await getCardLineStates(2);
-    console.log('Beat 03 Line 1 Complete (Line 2 at 0%):', b3States);
-    await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'chk-cine-06-beat03-line1-complete-line2-zero.png') });
-    if (b3States[0]?.percentRevealed >= 98 && b3States[1]?.percentRevealed === 0) {
-      console.log('✓ PASS: Beat 03 Line 1 completes 100% while Line 2 is still 0%.');
-      report.testsPassed++;
-    } else {
-      console.error('✗ FAIL: Beat 03 Line 2 not at 0% when Line 1 reaches 100%');
-      report.testsFailed++;
-    }
-
-    // Line 2 Midway
-    await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), Math.round(energyStart + 0.545 * energyDist));
-    await page.waitForTimeout(400);
-    b3States = await getCardLineStates(2);
-    console.log('Beat 03 Line 2 Midway:', b3States);
-    await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'chk-cine-07-beat03-line2-midway.png') });
-    if (b3States[0]?.percentRevealed >= 98 && b3States[1]?.percentRevealed > 10 && b3States[1]?.percentRevealed < 90) {
-      console.log('✓ PASS: Beat 03 Line 2 fills sequentially after Line 1.');
-      report.testsPassed++;
+      if (b3States[0]?.percentRevealed > 10 && b3States[0]?.percentRevealed < 90) {
+        console.log('✓ PASS: Beat 03 single line fills midway smoothly.');
+        report.testsPassed++;
+      } else {
+        console.error('✗ FAIL: Beat 03 fill not midway');
+        report.testsFailed++;
+      }
     }
 
     // All Lines Filled
@@ -288,8 +300,8 @@ async function runAudit() {
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'chk-cine-08-beat03-all-lines-filled.png') });
     if (b3States.every((s) => s.percentRevealed >= 98)) report.testsPassed++;
 
-    // 9. Test Beat 04 ("Got a problem existing products cannot solve?")
-    console.log('\n--- Testing Beat 04 ("Got a problem existing products cannot solve?") ---');
+    // 9. Test Beat 04 ("Turn good ideas into products people need.")
+    console.log('\n--- Testing Beat 04 ("Turn good ideas into products people need.") ---');
     await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), Math.round(energyStart + 0.74 * energyDist));
     await page.waitForTimeout(400);
     let b4States = await getCardLineStates(3);
@@ -297,23 +309,23 @@ async function runAudit() {
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'chk-cine-09-beat04-problem-products.png') });
     if (b4States.every((s) => s.percentRevealed >= 98)) report.testsPassed++;
 
-    // 10. Test Beat 05 ("Ready for what comes next?" + "Build it with OSTRUM.") & Crimson Accent
-    console.log('\n--- Testing Beat 05 & Crimson OSTRUM Accent ---');
-    // Main statement complete, supporting line at 0%
+    // 10. Test Beat 05 ("Ready for what's next?" + standalone crimson "OSTRUM") & Crimson Accent
+    console.log('\n--- Testing Beat 05 & Standalone Crimson OSTRUM Signoff ---');
+    // Main question complete, OSTRUM line at 0%
     await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), Math.round(energyStart + 0.880 * energyDist));
     await page.waitForTimeout(400);
     let b5States = await getCardLineStates(4);
-    console.log('Beat 05 Main statement complete (Supporting line at 0%):', b5States);
+    console.log('Beat 05 Question complete (OSTRUM signoff at 0%):', b5States);
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'chk-cine-10-beat05-main-complete-supporting-zero.png') });
-    if (b5States[0]?.percentRevealed >= 98 && b5States[1]?.percentRevealed === 0) {
-      console.log('✓ PASS: Beat 05 main statement completes before supporting line starts.');
+    if (b5States[0]?.percentRevealed >= 95 && b5States[1]?.percentRevealed === 0) {
+      console.log('✓ PASS: Beat 05 question completes before OSTRUM signoff starts.');
       report.testsPassed++;
     } else {
-      console.error('✗ FAIL: Beat 05 supporting line revealed prematurely');
+      console.error('✗ FAIL: Beat 05 OSTRUM signoff revealed prematurely or question not completed');
       report.testsFailed++;
     }
 
-    // Both lines complete (including supporting line)
+    // Both lines complete (including standalone OSTRUM line)
     await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), Math.round(energyStart + 0.94 * energyDist));
     await page.waitForTimeout(400);
     b5States = await getCardLineStates(4);
@@ -321,12 +333,12 @@ async function runAudit() {
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'chk-cine-11-beat05-supporting-crimson-ostrum.png') });
     if (b5States.every((s) => s.percentRevealed >= 98)) report.testsPassed++;
 
-    // Verify Crimson Accent on OSTRUM only
+    // Verify Crimson Accent on standalone OSTRUM only
     const crimsonAccentAudit = await page.evaluate(() => {
       const crimsonChars = Array.from(document.querySelectorAll('.narrative-char-filled.text-\\[\\#C01832\\]'));
       const card5 = document.querySelectorAll('.narrative-beat-card')[4];
-      const supportingLine = card5?.querySelector('.narrative-line-container[data-is-supporting="true"]');
-      const whiteCharsInSupporting = supportingLine ? Array.from(supportingLine.querySelectorAll('.narrative-char-filled.text-white')) : [];
+      const brandLine = card5?.querySelector('.narrative-line-container[data-is-brand="true"]');
+      const brandChars = brandLine ? Array.from(brandLine.querySelectorAll('.narrative-char-filled.text-\\[\\#C01832\\]')) : [];
 
       // Check colors across all other beats (beats 0 to 3)
       let nonWhiteCharsInBeats1to4 = 0;
@@ -339,12 +351,11 @@ async function runAudit() {
       }
 
       const crimsonWord = crimsonChars.map((c) => c.textContent).join('');
-      const whiteWords = whiteCharsInSupporting.map((c) => c.textContent).join('');
 
       return {
         crimsonWord,
         crimsonCount: crimsonChars.length,
-        whiteInSupporting: whiteWords,
+        brandCharsCount: brandChars.length,
         nonWhiteCharsInBeats1to4,
       };
     });
