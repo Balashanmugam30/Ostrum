@@ -359,6 +359,8 @@ export function OstrumEnergyNarrativeSection() {
           tl.to(card, { opacity: 0, y: -20, duration: timing.exitEnd - timing.holdEnd, ease: 'power2.in' }, timing.holdEnd);
         }
       });
+      ScrollTrigger.refresh();
+      window.dispatchEvent(new CustomEvent('ostrum:narrative-ready'));
     }, section);
 
     return () => {

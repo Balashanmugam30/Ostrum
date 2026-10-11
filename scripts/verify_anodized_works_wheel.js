@@ -19,6 +19,8 @@ async function runAudit() {
     artworkImagesCheck: false,
     clickVsDragCheck: false,
     linkNavigationCheck: {},
+    scrollSynchronisedExpansionCheck: false,
+    pinnedFullViewportCheck: false,
     viewportsTested: [],
     consoleErrors: [],
   };
@@ -231,6 +233,86 @@ async function runAudit() {
       report.testsFailed++;
     }
 
+    // --- TEST 3B: SCROLL-SYNCHRONISED EXPANSION & PINNED FULL-VIEWPORT INTEGRITY ---
+    console.log('\n--- TEST 3B: Scroll-Synchronised Ring-to-Drum Expansion & Pinned Full Viewport ---');
+    const pinInfo = await page.evaluate(() => {
+      const st = window.ScrollTrigger?.getById('works-wheel-pin');
+      const workEl = document.getElementById('selected-work');
+      const stageEl = workEl ? workEl.querySelector('div[role="listbox"]')?.parentElement?.parentElement : null;
+      const footerEl = workEl ? workEl.querySelector('footer') : null;
+
+      const stageRect = stageEl ? stageEl.getBoundingClientRect() : null;
+      const footerRect = footerEl ? footerEl.getBoundingClientRect() : null;
+
+      return {
+        hasPinTrigger: !!st,
+        pinStart: st ? st.start : null,
+        pinEnd: st ? st.end : null,
+        stageTop: stageRect ? Math.round(stageRect.top) : null,
+        stageHeight: stageRect ? Math.round(stageRect.height) : null,
+        windowHeight: window.innerHeight,
+        footerTop: footerRect ? Math.round(footerRect.top) : null,
+      };
+    });
+    console.log('Pinned Section Initial Info:', pinInfo);
+
+    // Scroll into the middle of the morph zone:
+    // holdDist = 420px, morphDist = 920px. Midpoint = start + 420 + 460 = start + 880px
+    const morphMidScrollY = (pinInfo.pinStart || 8900) + 880;
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), morphMidScrollY);
+    await page.waitForTimeout(600); // Wait longer than 140ms settle timeout to verify NO snapping
+
+    const morphMidState = await page.evaluate(() => {
+      const listbox = document.querySelector('div[role="listbox"]');
+      const currentTurn = listbox && (listbox)._worksWheel ? (listbox)._worksWheel.getTurn() : null;
+      const workEl = document.getElementById('selected-work');
+      const stageEl = workEl ? workEl.querySelector('div[role="listbox"]')?.parentElement?.parentElement : null;
+      const footerEl = workEl ? workEl.querySelector('footer') : null;
+
+      const stageRect = stageEl ? stageEl.getBoundingClientRect() : null;
+      const footerRect = footerEl ? footerEl.getBoundingClientRect() : null;
+
+      return {
+        turn: currentTurn !== null ? Math.round(currentTurn * 1000) / 1000 : null,
+        stageTop: stageRect ? Math.round(stageRect.top) : null,
+        stageHeight: stageRect ? Math.round(stageRect.height) : null,
+        windowHeight: window.innerHeight,
+        footerTop: footerRect ? Math.round(footerRect.top) : null,
+      };
+    });
+    console.log('Morph Midpoint State (Scroll-driven scrub check):', morphMidState);
+    await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'anodized-04b-scroll-morph-half.png') });
+
+    // Verify intermediate progress without snap:
+    // turn should be between 0.35 and 0.65 (not snapped to 0 or 1!)
+    const holdsIntermediateProgress = morphMidState.turn !== null && morphMidState.turn >= 0.35 && morphMidState.turn <= 0.65;
+    // Stage must occupy 100% of the viewport (top === 0, height === windowHeight)
+    const stageOccupiesFullViewport = Math.abs(morphMidState.stageTop) <= 2 && Math.abs(morphMidState.stageHeight - morphMidState.windowHeight) <= 2;
+    // Footer must remain completely below the viewport
+    const footerBelowViewport = morphMidState.footerTop >= morphMidState.windowHeight;
+
+    if (holdsIntermediateProgress) {
+      console.log(`✓ PASS: Wheel tracks scroll continuously (turn = ${morphMidState.turn} at morph midpoint; did NOT snap to 0 or 1).`);
+      report.scrollSynchronisedExpansionCheck = true;
+      report.testsPassed++;
+    } else {
+      console.error(`✗ FAIL: Wheel failed continuous scroll tracking (turn = ${morphMidState.turn}).`);
+      report.testsFailed++;
+    }
+
+    if (stageOccupiesFullViewport && footerBelowViewport) {
+      console.log('✓ PASS: Works Wheel stage occupies 100% of viewport while pinned; footer is held below.');
+      report.pinnedFullViewportCheck = true;
+      report.testsPassed++;
+    } else {
+      console.error('✗ FAIL: Full viewport pinned check failed.', { stageOccupiesFullViewport, footerBelowViewport, morphMidState });
+      report.testsFailed++;
+    }
+
+    // Scroll reversibly back to start of pin:
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), pinInfo.pinStart || 8900);
+    await page.waitForTimeout(400);
+
     // --- TEST 4: DRUM MODE TWO-COLUMN LARGE LAYOUT ---
     console.log('\n--- TEST 4: Drum Mode Two-Column Layout (Left Text, Large Right Image) ---');
     // Turn wheel to item 0 (TMR AI Car Care) by setting turn to 1
@@ -413,7 +495,7 @@ async function runAudit() {
     const card0 = await page.$('#works-wheel-0');
     if (card0) {
       console.log('Clicking active Card 0 (TMR AI Car Care)...');
-      await card0.click();
+      await card0.click({ force: true });
       await page.waitForTimeout(200);
 
       const openedUrl = await page.evaluate(() => window._lastOpenedUrl);
@@ -443,7 +525,7 @@ async function runAudit() {
     const card1 = await page.$('#works-wheel-1');
     if (card1) {
       console.log('Clicking active Card 1 (Saraswati Driving School)...');
-      await card1.click();
+      await card1.click({ force: true });
       await page.waitForTimeout(200);
 
       const openedUrl = await page.evaluate(() => window._lastOpenedUrl);

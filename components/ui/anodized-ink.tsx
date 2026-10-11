@@ -21,7 +21,9 @@ export type AnodizedInkColors = {
 };
 
 export const ANODIZED_INK_PRESETS = {
-  crimson: { deep: "#030000", ink: "#d1001c", sheen: "#c9c9c9" },
+  crimson: { deep: "#040104", ink: "#850b1b", sheen: "#d8c9c5" },
+  bordeaux: { deep: "#030103", ink: "#6e0a15", sheen: "#e2d5d1" },
+  obsidian: { deep: "#020102", ink: "#4d060e", sheen: "#cfc2be" },
   cobalt: { deep: "#00020a", ink: "#1f4dff", sheen: "#d4ddff" },
   venom: { deep: "#000401", ink: "#1fd65f", sheen: "#dcffe8" },
   aurum: { deep: "#040200", ink: "#d49a12", sheen: "#fff0c4" },
@@ -198,21 +200,25 @@ void main() {
   float spec = pow(max(dot(n, H), 0.0), 56.0);
   float fres = pow(1.0 - n.z, 1.5);
 
-  vec3 film = 0.5 + 0.5 * cos(6.28318 * (fres * 1.3 + h * 0.18 + vec3(0.0, 0.33, 0.67)));
-  vec3 sheenCol = mix(uSheen, uSheen * film * 1.5, 0.3 * pattern);
-  col += sheenCol * spec * uSheenAmt * (0.12 + 0.88 * pattern);
-  col += mix(uInk, film * uInk.r + uInk * 0.5, 0.4) * fres * 0.5 * pattern * uSheenAmt;
+  // Sophisticated champagne/metallic specular response without rainbow dispersion
+  vec3 sheenCol = uSheen * (1.0 + 0.35 * fres);
+  col += sheenCol * spec * uSheenAmt * (0.10 + 0.90 * pattern);
+  col += uInk * fres * 0.35 * pattern * uSheenAmt;
 
+  // Restrained pointer light
   float dist = length(uv - m);
-  col += uInk * (0.1 / (dist + 0.1)) * 0.22 * uGlow * (0.45 + 0.55 * uHover);
+  col += uInk * (0.05 / (dist + 0.14)) * 0.18 * uGlow * (0.45 + 0.55 * uHover);
 
-  col += (uInk * 0.35 + uSheen * 0.08) * ring;
+  // Subtle ripple wave
+  col += (uInk * 0.25 + uSheen * 0.05) * ring;
 
-  float vig = smoothstep(1.25, 0.15, length(uv * vec2(0.85, 1.0)));
+  // Deep cinematic vignette for dramatic high-contrast framing
+  float vig = smoothstep(1.28, 0.20, length(uv * vec2(0.85, 1.0)));
   col *= mix(1.0, vig, uVignette);
 
+  // Film grain
   float g = hash21(gl_FragCoord.xy + fract(t * 7.13) * vec2(97.3, 41.7));
-  col += (g - 0.5) * 0.07 * uGrain;
+  col += (g - 0.5) * 0.05 * uGrain;
   col += (hash21(gl_FragCoord.yx + 13.7) - 0.5) / 255.0;
 
   outColor = vec4(clamp(col, 0.0, 1.0), 1.0);
@@ -263,14 +269,14 @@ export function AnodizedInk({
   height = "100%",
   preset = "crimson",
   colors,
-  speed = 0.65,
-  turbulence = 0.85,
-  scale = 0.9,
-  sheen = 0.65,
-  grain = 0.25,
-  glow = 0.65,
-  swirl = 0.6,
-  vignette = 0.78,
+  speed = 0.42,
+  turbulence = 0.75,
+  scale = 1.10,
+  sheen = 0.48,
+  grain = 0.20,
+  glow = 0.30,
+  swirl = 0.55,
+  vignette = 0.88,
   interactive = true,
   ripples = true,
   maxDpr = 1.25,
