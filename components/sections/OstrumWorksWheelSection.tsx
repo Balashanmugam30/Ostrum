@@ -25,9 +25,9 @@ export function OstrumWorksWheelSection() {
       return;
     }
     const isMobile = window.innerWidth < 768;
-    const holdDist = isMobile ? 280 : 420;
-    const morphDist = isMobile ? 650 : 920;
-    const projectsDist = isMobile ? 2600 : 3600;
+    const holdDist = isMobile ? 250 : 350;
+    const morphDist = isMobile ? 700 : 1000;
+    const projectsDist = isMobile ? 2100 : 3000;
     const endHoldDist = isMobile ? 250 : 350;
     const totalPinDistance = holdDist + morphDist + projectsDist + endHoldDist;
     const count = OSTRUM_WORKS.length;
@@ -67,9 +67,9 @@ export function OstrumWorksWheelSection() {
       ).matches;
 
       const isMobile = window.innerWidth < 768;
-      const holdDist = isMobile ? 280 : 420;
-      const morphDist = isMobile ? 650 : 920;
-      const projectsDist = isMobile ? 2600 : 3600;
+      const holdDist = isMobile ? 250 : 350;
+      const morphDist = isMobile ? 700 : 1000;
+      const projectsDist = isMobile ? 2100 : 3000;
       const endHoldDist = isMobile ? 250 : 350;
       const totalPinDistance = holdDist + morphDist + projectsDist + endHoldDist;
 
@@ -99,14 +99,14 @@ export function OstrumWorksWheelSection() {
             let targetTurn = 0;
 
             if (p <= p1) {
-              // Phase 1: Ring at rest with minimal center label
+              // Phase 1: Oval at rest with minimal center label
               targetTurn = 0;
             } else if (p <= p2) {
-              // Phase 2: Smooth, continuous scroll-scrubbed ring-to-drum expansion
+              // Phase 2: Smooth, continuous scroll-scrubbed oval-to-drum expansion
               const tMorph = (p - p1) / (p2 - p1);
               targetTurn = tMorph * 1.0;
             } else if (p <= p3) {
-              // Phase 3: Project-by-project browsing across the 9 projects
+              // Phase 3: Project-by-project browsing across the 4 genuine projects (1000px per project)
               const tProj = (p - p2) / (p3 - p2);
               targetTurn = 1.0 + tProj * last;
             } else {

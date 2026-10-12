@@ -75,7 +75,7 @@ const rad = (deg: number) => (deg * Math.PI) / 180;
 const bowAt = (drumDeg: number, bow: number) =>
   -bow * (1 - Math.cos(rad(drumDeg)));
 
-/** Places each card in the 3D space across wide oval (m=0) and drum (m=1) states without distorting card aspect ratios. */
+/** Places each card in 3D space across wide oval (m=0) and 3D perspective drum (m=1) states without distorting card aspect ratios. */
 function placeOval(
   ringDeg: number,
   drumDeg: number,
@@ -83,32 +83,33 @@ function placeOval(
   ringRy: number,
   drumR: number,
   bow: number,
+  drumShiftX: number,
+  drumShiftY: number,
+  scale: number,
   m: number,
 ) {
-  // Elliptical coordinate on the horizontal oval at angle ringDeg
+  // 1. Ring (m = 0): Wide horizontal ellipse
   const rRad = rad(ringDeg);
   const ringX = ringRx * Math.sin(rRad);
   const ringY = -ringRy * Math.cos(rRad);
+  // Restrained radial tilt around Z (max +/- 8 deg), never inverted upside down
+  const ringRotZ = Math.sin(rRad) * 8;
 
-  // Tangent / normal orientation around the ellipse curve
-  const ringRotZ =
-    (Math.atan2(ringRy * Math.sin(rRad), ringRx * Math.cos(rRad)) * 180) /
-    Math.PI;
+  // 2. Drum (m = 1): 3D Cylinder on the right
+  const dRad = rad(drumDeg);
+  const drumX = drumShiftX - bow * (1 - Math.cos(dRad));
+  const drumY = drumShiftY - drumR * Math.sin(dRad);
+  const drumZ = drumR * (Math.cos(dRad) - 1);
+  const drumRotX = drumDeg;
 
-  // Drum coordinate at angle drumDeg
-  const drumX = bowAt(drumDeg, bow);
-
-  // Smooth interpolation from oval to drum
+  // 3. Smooth continuous interpolation between oval and drum
   const curX = lerp(ringX, drumX, m);
-  const curY = (1 - m) * ringY;
-  const curZ = m * drumR;
-  const rotZ = (1 - m) * ringRotZ;
-  const rotX = m * drumDeg;
+  const curY = lerp(ringY, drumY, m);
+  const curZ = lerp(0, drumZ, m);
+  const curRotZ = (1 - m) * ringRotZ;
+  const curRotX = m * drumRotX;
 
-  return (
-    `translateX(${curX}px) translateY(${curY}px) translateZ(${curZ}px)` +
-    ` rotateZ(${rotZ}deg) rotateX(${rotX}deg)`
-  );
+  return `translate3d(${curX.toFixed(2)}px, ${curY.toFixed(2)}px, ${curZ.toFixed(2)}px) rotateZ(${curRotZ.toFixed(2)}deg) rotateX(${curRotX.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
 }
 
 export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
@@ -170,13 +171,14 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         return {
           cardW: 420,
           cardH: 290,
-          ringRx: 480,
-          ringRy: 220,
-          ringScale: 0.26,
+          ringRx: 450,
+          ringRy: 180,
+          ringScale: 0.50,
           drumR: 500,
           bow: 380,
           depth: 650,
           drumShiftX: 0,
+          drumShiftY: 0,
           isDesktop: true,
         };
       }
@@ -187,36 +189,38 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
 
       // Drum mode thumbnail size:
       // Desktop: 42-46% viewport width, 48-56% viewport height
-      // Tablet/Mobile: responsive width
+      // Tablet: 48-54% viewport width
+      // Mobile: 82-86% viewport width
       const cardW = isDesktop
         ? Math.min(w * 0.44, h * 0.54 * CARD_RATIO)
         : isTablet
-        ? Math.min(w * 0.58, h * 0.48 * CARD_RATIO)
-        : Math.min(w * 0.82, 340);
+        ? Math.min(w * 0.52, h * 0.46 * CARD_RATIO)
+        : Math.min(w * 0.84, 340);
 
       const cardH = cardW / CARD_RATIO;
 
-      // In drum mode, shift the drum to the right on desktop to create a 2-column layout
-      const drumShiftX = isDesktop ? w * 0.20 : 0;
+      // In drum mode, shift the drum to the right on desktop/tablet to create the 2-column layout
+      const drumShiftX = isDesktop ? w * 0.22 : isTablet ? w * 0.20 : 0;
+      const drumShiftY = isMobile ? -h * 0.12 : 0;
 
       // In oval mode (m = 0):
       // Desktop target footprint: 82-88% width, 58-66% height
-      // Tablet target footprint: 86-90% width, 58-64% height
-      // Mobile target footprint: 88-92% width, 48-56% height
+      // Tablet target footprint: 84-88% width, 58-64% height
+      // Mobile target footprint: 86-90% width, 50-56% height
       const targetRingW = isMobile
-        ? Math.min(w * 0.90, 360)
+        ? Math.min(w * 0.88, 360)
         : isTablet
-        ? w * 0.88
-        : w * 0.86;
+        ? w * 0.86
+        : w * 0.85;
 
       const targetRingH = isMobile
-        ? Math.min(h * 0.52, 420)
+        ? Math.min(h * 0.54, 440)
         : isTablet
         ? h * 0.62
         : h * 0.62;
 
       // Card scale inside oval mode (undistorted aspect ratio)
-      const ringScale = isMobile ? 0.35 : isTablet ? 0.30 : 0.26;
+      const ringScale = isMobile ? 0.48 : isTablet ? 0.44 : 0.42;
       const visualCardW = cardW * ringScale;
       const visualCardH = cardH * ringScale;
 
@@ -238,6 +242,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         bow,
         depth,
         drumShiftX,
+        drumShiftY,
         isDesktop,
       };
     }, [stage, count]);
@@ -247,14 +252,14 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
     const animFrame = React.useRef(0);
 
     const renderScene = React.useCallback(() => {
-      const { ringRx, ringRy, ringScale, drumR, bow, drumShiftX } = metrics;
+      const { ringRx, ringRy, ringScale, drumR, bow, drumShiftX, drumShiftY } = metrics;
       const t = turn.current;
       const m = clamp(t, 0, 1);
       const pos = Math.max(0, t - 1);
+      const curScale = lerp(ringScale, 1, m);
 
-      // Drum shifts toward the right as it opens, making space for the left text column
       if (wheelRef.current) {
-        wheelRef.current.style.transform = `translateX(${m * drumShiftX}px) translateZ(${-m * drumR}px)`;
+        wheelRef.current.style.transform = "translate3d(0, 0, 0)";
       }
 
       for (let i = 0; i < count; i++) {
@@ -263,28 +268,53 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         const card = cardRefs.current[i];
         if (card) {
           card.style.transform = placeOval(
-            d * (360 / count),
+            i * (360 / count),
             drumDeg,
             ringRx,
             ringRy,
             drumR,
             bow,
+            drumShiftX,
+            drumShiftY,
+            curScale,
             m,
           );
-          card.style.opacity = m > 0.5 && Math.abs(d) > CULL ? "0" : "1";
-          card.style.zIndex = String(Math.round(100 - Math.abs(d) * 2));
+
+          // Card opacity rule:
+          // Front card (dist <= 0.45) is always fully visible (dominant presentation).
+          // Off-front cards (dist > 0.45) are fully visible in the resting oval (m=0),
+          // recede into perspective as the ring opens (m -> 0.4), and on the drum (m=1)
+          // only appear when transitioning nearby (dist < 0.85).
+          const dist = Math.abs(d);
+          let cardOpacity = 0;
+          if (dist <= 0.45) {
+            cardOpacity = 1;
+          } else {
+            const ovalFade = Math.max(0, 1 - m * 2.5);
+            let drumFade = 0;
+            if (dist < 0.85) {
+              const f = (0.85 - dist) / 0.40;
+              drumFade = f * f;
+            }
+            cardOpacity = lerp(ovalFade, drumFade, m);
+          }
+
+          card.style.opacity = cardOpacity.toFixed(3);
+          card.style.zIndex = String(Math.round(100 - dist * 10));
+          card.style.pointerEvents = (m > 0.7 && dist > 0.45) || cardOpacity < 0.05 ? "none" : "auto";
         }
-        const face = card?.firstElementChild as HTMLElement | null;
-        if (face) face.style.transform = `scale(${lerp(ringScale, 1, m)})`;
       }
 
       // Central label fades away as drum opens
       if (labelRef.current) {
         labelRef.current.style.opacity = String(Math.max(0, 1 - m * 2.2));
       }
-      // Left text panel fades in smoothly
+      // Left text panel fades in as drum opens, with subtle sync during project changes
       if (leftPanelRef.current) {
-        leftPanelRef.current.style.opacity = String(Math.max(0, (m - 0.15) / 0.85));
+        const morphFade = Math.max(0, (m - 0.20) / 0.80);
+        const projectDistFromInt = Math.abs(pos - Math.round(pos));
+        const projectFade = m > 0.8 ? Math.max(0.15, 1 - projectDistFromInt * 1.8) : 1;
+        leftPanelRef.current.style.opacity = (morphFade * projectFade).toFixed(3);
       }
 
       const near = clamp(Math.round(pos), 0, last);
@@ -649,7 +679,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
   },
 );
 
-// 9 Bespoke Ostrum Projects: 2 Verified Client Systems + 7 Studio Concept Explorations
+// 4 Genuine Ostrum Projects: 2 Verified Client Systems + 2 Original Studio Ventures
 export const OSTRUM_WORKS: WorksWheelItem[] = [
   {
     title: "TMR AI Car Care",
@@ -666,53 +696,16 @@ export const OSTRUM_WORKS: WorksWheelItem[] = [
     href: "https://saraswati-driving-school.vercel.app/",
   },
   {
-    title: "Signal",
-    description:
-      "Decentralized real-time market telemetry and quantitative data streaming engine for autonomous trading protocols.",
-    image: "/images/works/signal.jpg",
-    href: "#signal",
-  },
-  {
-    title: "Atlas",
-    description:
-      "Spatial ledger and geographic information platform coordinating urban logistics and infrastructure deployment.",
-    image: "/images/works/atlas.jpg",
-    href: "#atlas",
-  },
-  {
     title: "MNESA",
     description:
       "High-dimensional neural memory retrieval system enabling persistent context indexing across distributed intelligence nodes.",
     image: "/images/works/mnesa.jpg",
-    href: "#mnesa",
   },
   {
     title: "NeuroMove",
     description:
       "Biomechanical telemetry studio translating kinematic sensor streams into adaptive motor rehabilitation diagnostics.",
     image: "/images/works/neuromove.jpg",
-    href: "#neuromove",
-  },
-  {
-    title: "Form",
-    description:
-      "Parametric digital synthesis workspace uniting generative geometry, material constraints and industrial tooling pipelines.",
-    image: "/images/works/form.jpg",
-    href: "#form",
-  },
-  {
-    title: "Orbit",
-    description:
-      "Distributed edge computing protocol managing synchronized state validation across autonomous physical devices.",
-    image: "/images/works/orbit.jpg",
-    href: "#orbit",
-  },
-  {
-    title: "Origin",
-    description:
-      "Algorithmic venture formulation framework transforming high-entropy market opportunities into production-ready software ventures.",
-    image: "/images/works/origin.jpg",
-    href: "#origin",
   },
 ];
 
