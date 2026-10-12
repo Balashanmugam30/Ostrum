@@ -204,6 +204,8 @@ async function runAudit() {
     // Check heading computed styles and line-wrapping
     const hStyle = heading ? window.getComputedStyle(heading) : null;
     const hLines = heading ? heading.getClientRects().length : 0;
+    const aStyle = anchor ? window.getComputedStyle(anchor) : null;
+    const pStyle = pinContainer ? window.getComputedStyle(pinContainer) : null;
 
     return {
       anchorRect: aRect ? { left: Math.round(aRect.left), top: Math.round(aRect.top), width: Math.round(aRect.width), height: Math.round(aRect.height) } : null,
@@ -211,12 +213,18 @@ async function runAudit() {
       headingRect: hRect ? { left: Math.round(hRect.left), top: Math.round(hRect.top), width: Math.round(hRect.width), height: Math.round(hRect.height) } : null,
       headingFontSize: hStyle ? hStyle.fontSize : null,
       headingLineCount: hLines,
+      anchorOpacity: aStyle ? aStyle.opacity : null,
+      anchorShadow: aStyle ? aStyle.boxShadow : null,
+      containerOpacity: pStyle ? pStyle.opacity : null,
       containerTransform: pinContainer ? pinContainer.style.transform : null,
     };
   });
 
   assert('Section container is transformed via scale()', geomSettled.containerTransform && geomSettled.containerTransform.includes('scale'), geomSettled);
   assert('Section container matches anchor dimensions (~560x350)', geomSettled.containerRect && Math.abs(geomSettled.containerRect.width - geomSettled.anchorRect.width) < 10, geomSettled);
+  assert('Frame Zero: Capabilities section has full opacity in thumbnail (opacity === 1)', parseFloat(geomSettled.containerOpacity || '0') >= 0.95, geomSettled);
+  assert('Single Surface: Card 4 anchor is transparent (opacity === 0, no shadow)', geomSettled.anchorOpacity === '0' && (geomSettled.anchorShadow === 'none' || !geomSettled.anchorShadow), geomSettled);
+  assert('Frame Zero: Capabilities heading is rendered inside thumbnail bounds', geomSettled.headingRect && geomSettled.headingRect.top >= geomSettled.containerRect.top, geomSettled);
 
   await page.screenshot({
     path: path.join(ARTIFACTS_DIR, 'final-01-thumbnail-settled.png'),

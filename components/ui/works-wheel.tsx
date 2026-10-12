@@ -227,6 +227,18 @@ function InteractiveCardArtwork({
     }
   };
 
+  if (isCapabilities) {
+    return (
+      <span
+        ref={containerRef}
+        data-testid="capabilities-transition-anchor"
+        data-transition-anchor="capabilities"
+        className="relative block size-full pointer-events-none opacity-0"
+        aria-hidden="true"
+      />
+    );
+  }
+
   return (
     <span
       ref={containerRef}
@@ -234,22 +246,14 @@ function InteractiveCardArtwork({
       onPointerLeave={handlePointerLeave}
       className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(11,11,16,0.18)] border border-black/[0.08] bg-white/40 backdrop-blur-sm transition-all duration-300 group-hover:border-[#362beb]/50 group-hover:shadow-[0_25px_50px_-10px_rgba(54,43,235,0.25)]"
     >
-      {isCapabilities ? (
-        <div
-          data-testid="capabilities-transition-anchor"
-          data-transition-anchor="capabilities"
-          className="size-full overflow-hidden rounded-2xl bg-white/40"
-        />
-      ) : (
-        <img
-          ref={imgRef}
-          src={src}
-          alt={alt}
-          draggable={false}
-          className="size-full object-cover transition-transform duration-300 ease-out will-change-transform"
-          loading="eager"
-        />
-      )}
+      <img
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        draggable={false}
+        className="size-full object-cover transition-transform duration-300 ease-out will-change-transform"
+        loading="eager"
+      />
       {/* Subtle fluid pearlescent reflection sheen */}
       <span
         ref={sheenRef}

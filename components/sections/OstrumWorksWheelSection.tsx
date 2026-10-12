@@ -196,9 +196,9 @@ export function OstrumWorksWheelSection() {
               targetTurn = 1.0 + tProj * last;
               worksWheelRef.current?.setLeftPanelOpacity?.(1);
 
-              if (tProj >= 0.96) {
-                // Settle live Capabilities section into anchor as project 4 finishes rotation
-                const settleFade = Math.min(1, Math.max(0, (tProj - 0.96) / 0.04));
+              if (tProj >= 0.70) {
+                // Settle live Capabilities section into anchor as project 4 rotates into position, fully visible by tProj >= 0.95
+                const settleFade = Math.min(1, Math.max(0, (tProj - 0.70) / 0.25));
                 notifyCapabilities({
                   active: true,
                   progress: 0,
@@ -211,8 +211,8 @@ export function OstrumWorksWheelSection() {
             } else {
               // Phase 4: Capabilities Shared-Element Expansion into Section 05
               targetTurn = 1.0 + last; // 4.0
-              const tExp = (p - p3) / (1.0 - p3);
-              const textOp = Math.max(0, 1 - tExp * 3);
+              const tExp = Math.min(1, Math.max(0, (p - p3) / (1.0 - p3)));
+              const textOp = Math.max(0, 1 - tExp * 4.5);
               worksWheelRef.current?.setLeftPanelOpacity?.(textOp);
 
               notifyCapabilities({
