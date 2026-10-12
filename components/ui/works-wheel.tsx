@@ -23,6 +23,76 @@ export interface WorksWheelItem {
   href?: string;
 }
 
+export interface ProjectTheme {
+  /** Bold primary project color */
+  primary: string;
+  /** Distinct countertone or accent */
+  secondary: string;
+  /** Deep base atmosphere for negative space and contrast */
+  deep: string;
+  /** Specular metallic or pearl highlight */
+  sheen: string;
+  /** High-contrast text color for titles */
+  textColor: string;
+  /** Legible secondary text color for descriptions */
+  textMuted: string;
+  /** Theme-coordinated call-to-action link color */
+  linkColor: string;
+}
+
+export const LIGHT_OVAL_THEME: ProjectTheme = {
+  primary: "#362BEB",
+  secondary: "#7482F8",
+  deep: "#F1F1FA",
+  sheen: "#FFFFFF",
+  textColor: "#0B0B10",
+  textMuted: "rgba(11, 11, 16, 0.75)",
+  linkColor: "#362BEB",
+};
+
+export const PROJECT_THEMES: ProjectTheme[] = [
+  // 1. TMR AI Car Care (Vermilion / Copper)
+  {
+    primary: "#C9362B",
+    secondary: "#F19A68",
+    deep: "#42100F",
+    sheen: "#F8D7BD",
+    textColor: "#FFF8F5",
+    textMuted: "rgba(255, 248, 245, 0.82)",
+    linkColor: "#F8D7BD",
+  },
+  // 2. Saraswati Driving School (Cobalt / Electric Blue)
+  {
+    primary: "#3047E8",
+    secondary: "#68BDEB",
+    deep: "#0F1A4E",
+    sheen: "#D7E9FF",
+    textColor: "#F4F8FF",
+    textMuted: "rgba(244, 248, 255, 0.82)",
+    linkColor: "#8EC8FF",
+  },
+  // 3. MNESA (Violet / Electric Purple)
+  {
+    primary: "#7438D8",
+    secondary: "#B58AF0",
+    deep: "#230E48",
+    sheen: "#E4D5FF",
+    textColor: "#FAF6FF",
+    textMuted: "rgba(250, 246, 255, 0.82)",
+    linkColor: "#D4B8FF",
+  },
+  // 4. NeuroMove (Jade / Emerald Green)
+  {
+    primary: "#078567",
+    secondary: "#56CDAA",
+    deep: "#063028",
+    sheen: "#C7F0E2",
+    textColor: "#F0FDF8",
+    textMuted: "rgba(240, 253, 248, 0.82)",
+    linkColor: "#7AEAC7",
+  },
+];
+
 export interface WorksWheelHandle {
   setTurn: (val: number) => void;
   to: (next: number) => void;
@@ -37,6 +107,8 @@ export interface WorksWheelProps extends Omit<
   items: WorksWheelItem[];
   /** Sits in the middle of the ring at rest. @default "Selected Work" */
   label?: string;
+  /** Dynamic color theme for typography and atmosphere */
+  theme?: ProjectTheme;
   /** Callback fired when the active project index changes. */
   onActiveChange?: (index: number) => void;
   /** Callback fired whenever the wheel turn value updates (for curios sync) */
@@ -200,6 +272,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
     {
       items,
       label = "Selected Work",
+      theme,
       onActiveChange,
       onTurnChange,
       onSelectProject,
@@ -222,6 +295,12 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
     const activeRef = React.useRef(0);
     const [active, setActive] = React.useState(0);
     const [stage, setStage] = React.useState<Stage>({ w: 0, h: 0 });
+
+    const activeTheme =
+      theme ??
+      (active < PROJECT_THEMES.length
+        ? PROJECT_THEMES[active]
+        : LIGHT_OVAL_THEME);
 
     const count = items.length;
     const last = Math.max(count - 1, 0);
@@ -697,7 +776,10 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
           ref={labelRef}
           className="pointer-events-none absolute inset-0 grid place-items-center select-none z-10"
         >
-          <span className="font-sans font-semibold tracking-tight text-xl sm:text-2xl md:text-3xl text-[#0b0b10]/85">
+          <span
+            className="font-sans font-semibold tracking-tight text-xl sm:text-2xl md:text-3xl transition-colors duration-300 ease-out"
+            style={{ color: activeTheme.textColor }}
+          >
             {label}
           </span>
         </div>
@@ -708,10 +790,16 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
           className="pointer-events-none absolute top-1/2 left-[6%] sm:left-[8%] lg:left-[9%] -translate-y-1/2 max-w-[85vw] sm:max-w-[42vw] lg:max-w-[36vw] z-20 select-none"
           style={{ opacity: 0 }}
         >
-          <h3 className="font-sans font-bold tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#0b0b10] leading-[1.08] mb-4">
+          <h3
+            className="font-sans font-bold tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.08] mb-4 transition-colors duration-300 ease-out"
+            style={{ color: activeTheme.textColor }}
+          >
             {items[active]?.title}
           </h3>
-          <p className="font-sans text-sm sm:text-base lg:text-lg text-[#0b0b10]/75 leading-relaxed mb-6 max-w-[32ch] sm:max-w-[38ch]">
+          <p
+            className="font-sans text-sm sm:text-base lg:text-lg leading-relaxed mb-6 max-w-[32ch] sm:max-w-[38ch] transition-colors duration-300 ease-out"
+            style={{ color: activeTheme.textMuted }}
+          >
             {items[active]?.description}
           </p>
           {items[active]?.href?.startsWith("http") && (
@@ -720,7 +808,8 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                 href={items[active]?.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm sm:text-base font-semibold text-[#362beb] hover:text-[#1e14c7] transition-colors group"
+                className="inline-flex items-center gap-2 text-sm sm:text-base font-semibold transition-colors duration-300 ease-out group"
+                style={{ color: activeTheme.linkColor }}
               >
                 <span>Visit Platform</span>
                 <span

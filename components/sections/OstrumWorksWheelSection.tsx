@@ -3,7 +3,13 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { WorksWheel, OSTRUM_WORKS, WorksWheelHandle } from '@/components/ui/works-wheel';
+import {
+  WorksWheel,
+  OSTRUM_WORKS,
+  WorksWheelHandle,
+  LIGHT_OVAL_THEME,
+  PROJECT_THEMES,
+} from '@/components/ui/works-wheel';
 import { AnodizedInk } from '@/components/ui/anodized-ink';
 
 if (typeof window !== 'undefined') {
@@ -16,6 +22,16 @@ export function OstrumWorksWheelSection() {
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const worksWheelRef = useRef<WorksWheelHandle>(null);
   const [activeProject, setActiveProject] = useState(0);
+  const [isDrumActive, setIsDrumActive] = useState(false);
+
+  // Derive authoritative theme: light white/lavender in oval state, rich project theme in drum mode
+  const currentTheme = isDrumActive
+    ? (PROJECT_THEMES[activeProject] ?? LIGHT_OVAL_THEME)
+    : LIGHT_OVAL_THEME;
+
+  const handleTurnChange = useCallback((turn: number) => {
+    setIsDrumActive(turn >= 0.45);
+  }, []);
 
   // Smooth programmatic project selection (via card click or keyboard)
   const handleSelectProject = useCallback((index: number) => {
@@ -82,6 +98,7 @@ export function OstrumWorksWheelSection() {
 
       if (prefersReducedMotion) {
         worksWheelRef.current?.setTurn(1);
+        setIsDrumActive(true);
         return;
       }
 
@@ -115,6 +132,7 @@ export function OstrumWorksWheelSection() {
             }
 
             worksWheelRef.current?.setTurn(targetTurn);
+            setIsDrumActive(targetTurn >= 0.45);
           },
         });
       });
@@ -152,19 +170,30 @@ export function OstrumWorksWheelSection() {
       id="selected-work"
       ref={sectionRef}
       data-testid="selected-work-section"
-      className="relative z-[20] w-full bg-[#f1f1fa] text-[#0b0b10]"
-      style={{ marginTop: '-100vh' }}
+      className="relative z-[20] w-full transition-colors duration-300 ease-out"
+      style={{
+        marginTop: '-100vh',
+        backgroundColor: currentTheme.deep,
+        color: currentTheme.textColor,
+      }}
       aria-label="Selected Works"
     >
-      {/* Works Wheel Pinned Container - 100svh Full Screen Stage with Lusion Light Iridescent Fluid Background */}
+      {/* Works Wheel Pinned Container - 100svh Full Screen Stage with Lusion Light / Project Theme Fluid Background */}
       <div
         ref={pinContainerRef}
-        className="w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative overflow-hidden bg-[#f1f1fa]"
+        className="w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative overflow-hidden transition-colors duration-300 ease-out"
+        style={{ backgroundColor: currentTheme.deep }}
       >
-        {/* Lusion Light Iridescent Fluid Metal & Cobalt Arc Background */}
+        {/* Dynamic Project Fluid & Pointer Reactive Background */}
         <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
           <AnodizedInk
             preset="lusion"
+            colors={{
+              deep: currentTheme.deep,
+              ink: currentTheme.primary,
+              secondary: currentTheme.secondary,
+              sheen: currentTheme.sheen,
+            }}
             speed={0.34}
             turbulence={0.68}
             scale={1.05}
@@ -187,7 +216,9 @@ export function OstrumWorksWheelSection() {
             items={OSTRUM_WORKS}
             label="Selected Work"
             controlled={true}
+            theme={currentTheme}
             onActiveChange={setActiveProject}
+            onTurnChange={handleTurnChange}
             onSelectProject={handleSelectProject}
             onDragScroll={handleDragScroll}
             className="w-full h-full"
@@ -196,17 +227,28 @@ export function OstrumWorksWheelSection() {
       </div>
 
       {/* Natural scroll continuation footer below the wheel */}
-      <footer className="w-full py-20 sm:py-28 flex flex-col items-center justify-center border-t border-black/[0.08] bg-[#f1f1fa]/95 backdrop-blur-md text-center px-4 relative z-10">
-        <p className="font-mono text-xs uppercase tracking-[0.24em] mb-3 font-semibold text-[#362beb]">
+      <footer
+        className="w-full py-20 sm:py-28 flex flex-col items-center justify-center border-t text-center px-4 relative z-10 transition-colors duration-300 ease-out backdrop-blur-md"
+        style={{
+          backgroundColor: currentTheme.deep,
+          borderColor: isDrumActive ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+        }}
+      >
+        <p
+          className="font-mono text-xs uppercase tracking-[0.24em] mb-3 font-semibold transition-colors duration-300 ease-out"
+          style={{ color: currentTheme.primary }}
+        >
           OSTRUM STUDIO · SELECTED WORK
         </p>
         <a
           href="mailto:hello@ostrum.co"
-          className="text-base sm:text-lg font-medium text-[#0b0b10]/90 hover:text-[#0b0b10] transition-colors flex items-center gap-2 group"
+          className="text-base sm:text-lg font-medium transition-colors duration-300 ease-out flex items-center gap-2 group"
+          style={{ color: currentTheme.textColor }}
         >
           <span>Have a system to build or venture to launch? Start a Conversation</span>
           <span
-            className="transition-transform group-hover:translate-x-1 text-[#362beb]"
+            className="transition-transform group-hover:translate-x-1"
+            style={{ color: currentTheme.primary }}
             aria-hidden="true"
           >
             →

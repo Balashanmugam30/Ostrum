@@ -14,24 +14,26 @@ import * as React from "react";
  */
 
 export type AnodizedInkColors = {
-  /** The deep black/oxblood the liquid is suspended in. */
+  /** The deep black/oxblood or light base the liquid is suspended in. */
   deep: string;
-  /** The rich ruby liquid itself. */
+  /** The rich primary liquid/accent color. */
   ink: string;
-  /** Warm ivory or champagne metallic specular highlights. */
+  /** Secondary countertone or opalescent wash color. */
+  secondary?: string;
+  /** Warm ivory, champagne, or pearl specular highlights. */
   sheen: string;
 };
 
 export const ANODIZED_INK_PRESETS = {
-  lusion: { deep: "#f1f1fa", ink: "#362beb", sheen: "#ffffff" },
-  light: { deep: "#f1f1fa", ink: "#362beb", sheen: "#ffffff" },
-  crimson: { deep: "#040104", ink: "#850b1b", sheen: "#d8c9c5" },
-  bordeaux: { deep: "#030103", ink: "#6e0a15", sheen: "#e2d5d1" },
-  obsidian: { deep: "#020102", ink: "#4d060e", sheen: "#cfc2be" },
-  cobalt: { deep: "#00020a", ink: "#1f4dff", sheen: "#d4ddff" },
-  venom: { deep: "#000401", ink: "#1fd65f", sheen: "#dcffe8" },
-  aurum: { deep: "#040200", ink: "#d49a12", sheen: "#fff0c4" },
-  orchid: { deep: "#030007", ink: "#a51cff", sheen: "#ecd9ff" },
+  lusion: { deep: "#f1f1fa", ink: "#362beb", secondary: "#7482f8", sheen: "#ffffff" },
+  light: { deep: "#f1f1fa", ink: "#362beb", secondary: "#7482f8", sheen: "#ffffff" },
+  crimson: { deep: "#040104", ink: "#850b1b", secondary: "#f19a68", sheen: "#d8c9c5" },
+  bordeaux: { deep: "#030103", ink: "#6e0a15", secondary: "#e2a898", sheen: "#e2d5d1" },
+  obsidian: { deep: "#020102", ink: "#4d060e", secondary: "#a03028", sheen: "#cfc2be" },
+  cobalt: { deep: "#00020a", ink: "#1f4dff", secondary: "#68bdeb", sheen: "#d4ddff" },
+  venom: { deep: "#000401", ink: "#1fd65f", secondary: "#56cdaa", sheen: "#dcffe8" },
+  aurum: { deep: "#040200", ink: "#d49a12", secondary: "#f8d7bd", sheen: "#fff0c4" },
+  orchid: { deep: "#030007", ink: "#a51cff", secondary: "#b58af0", sheen: "#ecd9ff" },
 } satisfies Record<string, AnodizedInkColors>;
 
 export type AnodizedInkPreset = keyof typeof ANODIZED_INK_PRESETS;
@@ -105,9 +107,10 @@ uniform vec2 uMouse;        // centred, y up, in units of the canvas height
 uniform vec2 uVelocity;     // smoothed pointer velocity vector
 uniform float uHover;       // 0 idle drift, 1 pointer inside
 uniform float uEnergy;      // smoothed pointer speed
-uniform vec3 uDeep;         // base light background #F1F1FA
-uniform vec3 uInk;          // cobalt accent #362BEB
-uniform vec3 uSheen;        // pearl highlight
+uniform vec3 uDeep;         // deep base background
+uniform vec3 uInk;          // primary project theme color
+uniform vec3 uSecondary;    // secondary project countertone
+uniform vec3 uSheen;        // metallic specular highlight
 uniform float uTurbulence;
 uniform float uScale;
 uniform float uSheenAmt;
@@ -252,23 +255,36 @@ void main() {
 
   float fres = pow(1.0 - norm.z, 2.2);
 
-  // Pearlescent Iridescence (pale lavender, soft pearl peach, muted opalescent cyan)
+  // Luminance factor to detect light resting oval vs rich dark project themes
+  float lumDeep = dot(uDeep, vec3(0.299, 0.587, 0.114));
+  float isLight = smoothstep(0.35, 0.65, lumDeep);
+
+  // Pearlescent Iridescence for light theme (pale lavender, soft pearl peach, muted opalescent cyan)
   float iridPhase = dot(norm.xy, vec2(1.3, 0.95)) * 1.6 + fres * 1.8 + t * 0.1;
   vec3 iridColor = vec3(0.86, 0.88, 0.96) + vec3(0.14, 0.12, 0.10) * cos(6.28318 * (vec3(1.0) * iridPhase + vec3(0.60, 0.70, 0.88)));
 
-  // Base background: #F1F1FA
-  vec3 col = uDeep;
+  // Base background: uDeep
+  // In project themes, add subtle atmospheric gradient to prevent flat rectangle
+  float ambientGrad = 0.45 + 0.55 * (0.5 + 0.5 * uv.y - 0.25 * uv.x);
+  vec3 baseProjectCol = mix(uDeep * 0.88, mix(uDeep, uInk, 0.38), ambientGrad);
+  vec3 col = mix(baseProjectCol, uDeep, isLight);
 
   // Translucent fluid-metal wash
-  col = mix(col, iridColor, hCenter * 0.48);
-  // Opalescent rim fresnel
-  col = mix(col, vec3(0.74, 0.82, 0.98), fres * hCenter * 0.32);
-  // Silvery champagne specular crests
-  col += vec3(0.96, 0.98, 1.0) * spec_key * hCenter * uSheenAmt * 0.90;
-  // Dynamic specular glints along the stirred crests under cursor
-  col += vec3(0.96, 0.98, 1.0) * spec_ptr * hCenter * uSheenAmt * 1.20;
+  vec3 projectFluidBody = mix(uDeep, uInk, 0.72) + uSecondary * 0.28;
+  vec3 fluidBody = mix(projectFluidBody, iridColor, isLight);
+  col = mix(col, fluidBody, hCenter * mix(0.62, 0.48, isLight));
 
-  // Restrained Cobalt Curved Accent on left perimeter (framing without colliding with text)
+  // Opalescent / Countertone rim fresnel
+  vec3 fresnelTint = mix(uSecondary, vec3(0.74, 0.82, 0.98), isLight);
+  col = mix(col, fresnelTint, fres * hCenter * 0.34);
+
+  // Metallic specular crests
+  vec3 specTint = mix(uSheen, vec3(0.96, 0.98, 1.0), isLight);
+  col += specTint * spec_key * hCenter * uSheenAmt * 0.90;
+  // Dynamic specular glints along stirred crests under cursor
+  col += specTint * spec_ptr * hCenter * uSheenAmt * 1.20;
+
+  // Restrained Curved Accent on left perimeter
   vec2 cbCoord = p;
   float cbPath = 0.65 * (cbCoord.x + 0.58) * (cbCoord.x + 0.58) + 0.25 * cbCoord.x - 0.08;
   float cbDist = abs(cbCoord.y - cbPath);
@@ -276,14 +292,15 @@ void main() {
   float cbMask = smoothstep(0.026, 0.006, cbDist) * cbEnvelope;
 
   if (cbMask > 0.001) {
-    vec3 cobalt = uInk; // #362BEB
-    float cbSheen = pow(max(dot(norm, H_key), 0.0), 28.0) * 0.4;
-    cobalt += vec3(0.28, 0.36, 0.96) * cbSheen;
-    col = mix(col, cobalt, cbMask * 0.94);
+    vec3 arcColor = mix(uSecondary, uInk, 0.42);
+    float cbSheen = pow(max(dot(norm, H_key), 0.0), 28.0) * 0.42;
+    arcColor += mix(uSheen, vec3(0.28, 0.36, 0.96), isLight) * cbSheen;
+    col = mix(col, arcColor, cbMask * 0.92);
   }
 
   // Ripple addition from click / tap
-  col = mix(col, vec3(0.78, 0.84, 0.99), ring * 0.25);
+  vec3 ripTint = mix(uSecondary, vec3(0.78, 0.84, 0.99), isLight);
+  col = mix(col, ripTint, ring * 0.25);
 
   // Micro-grain to eliminate 8-bit banding
   float g = hash21(gl_FragCoord.xy + fract(t * 7.13) * vec2(97.3, 41.7));
@@ -366,6 +383,7 @@ export function AnodizedInk({
   const params = {
     deep: hexToRgb(palette.deep),
     ink: hexToRgb(palette.ink),
+    secondary: hexToRgb(palette.secondary ?? palette.ink),
     sheen: hexToRgb(palette.sheen),
     speed,
     turbulence,
@@ -419,6 +437,7 @@ export function AnodizedInk({
       energy: u("uEnergy"),
       deep: u("uDeep"),
       ink: u("uInk"),
+      secondary: u("uSecondary"),
       sheen: u("uSheen"),
       turbulence: u("uTurbulence"),
       scale: u("uScale"),
@@ -432,6 +451,11 @@ export function AnodizedInk({
 
     const drops = new Float32Array(MAX_RIPPLES * 4);
     let nextDrop = 0;
+
+    const curDeep = new Float32Array(params.deep);
+    const curInk = new Float32Array(params.ink);
+    const curSecondary = new Float32Array(params.secondary);
+    const curSheen = new Float32Array(params.sheen);
 
     const target = { x: 0.18, y: 0.08 };
     const mouse = { x: 0.18, y: 0.08 };
@@ -492,6 +516,31 @@ export function AnodizedInk({
         energy += (Math.min(v * 0.45, 1.2) - energy) * (1 - Math.exp(-dt * 4));
       }
 
+      // Smooth exponential color lerp across ~450ms
+      const colRate = 1 - Math.exp(-dt * 4.2);
+      let colorsSettled = true;
+
+      for (let c = 0; c < 3; c++) {
+        const dDeep = P.deep[c] - curDeep[c];
+        const dInk = P.ink[c] - curInk[c];
+        const dSec = P.secondary[c] - curSecondary[c];
+        const dSheen = P.sheen[c] - curSheen[c];
+
+        if (
+          Math.abs(dDeep) > 0.001 ||
+          Math.abs(dInk) > 0.001 ||
+          Math.abs(dSec) > 0.001 ||
+          Math.abs(dSheen) > 0.001
+        ) {
+          colorsSettled = false;
+        }
+
+        curDeep[c] += dDeep * (reduced ? 1 : colRate);
+        curInk[c] += dInk * (reduced ? 1 : colRate);
+        curSecondary[c] += dSec * (reduced ? 1 : colRate);
+        curSheen[c] += dSheen * (reduced ? 1 : colRate);
+      }
+
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.useProgram(program);
       gl.bindVertexArray(vao);
@@ -501,9 +550,10 @@ export function AnodizedInk({
       gl.uniform2f(loc.velocity, velocity.x, velocity.y);
       gl.uniform1f(loc.hover, hover);
       gl.uniform1f(loc.energy, energy);
-      gl.uniform3fv(loc.deep, P.deep);
-      gl.uniform3fv(loc.ink, P.ink);
-      gl.uniform3fv(loc.sheen, P.sheen);
+      gl.uniform3fv(loc.deep, curDeep);
+      gl.uniform3fv(loc.ink, curInk);
+      gl.uniform3fv(loc.secondary, curSecondary);
+      gl.uniform3fv(loc.sheen, curSheen);
       gl.uniform1f(loc.turbulence, P.turbulence);
       gl.uniform1f(loc.scale, P.scale);
       gl.uniform1f(loc.sheenAmt, P.sheenAmt);
@@ -515,7 +565,7 @@ export function AnodizedInk({
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       gl.bindVertexArray(null);
 
-      if (!reduced && visible) raf = requestAnimationFrame(draw);
+      if (!reduced && (visible || !colorsSettled)) raf = requestAnimationFrame(draw);
     };
 
     const kick = () => {
