@@ -365,19 +365,19 @@ async function runMasterAudit() {
   const initialOvalState = await page.evaluate(() => {
     const sec = document.getElementById('selected-work');
     const secBg = sec ? window.getComputedStyle(sec).backgroundColor : '';
-    const label = document.querySelector('#selected-work span');
-    const labelText = label ? label.innerText : '';
+    const label = document.querySelector('[data-testid="works-wheel-center-label"]') || document.querySelector('#selected-work div.pointer-events-none.absolute.inset-0.grid span');
+    const labelText = label ? label.innerText.trim() : '';
     const items = Array.from(document.querySelectorAll('#selected-work img')).length;
     return { secBg, labelText, itemsCount: items };
   });
   console.log('Initial Oval State:', initialOvalState);
   report.checkpoints['E_initial_oval'] = initialOvalState;
 
-  if (isColorMatch(initialOvalState.secBg, 'rgb(241, 241, 250)')) {
-    console.log('✓ PASS: Initial oval retains Lusion light background (rgb(241, 241, 250)).');
+  if (isColorMatch(initialOvalState.secBg, 'rgb(241, 241, 250)') && initialOvalState.labelText === 'Selected Work') {
+    console.log('✓ PASS: Initial oval retains Lusion light background and "Selected Work" center label.');
     report.testsPassed++;
   } else {
-    console.error('✗ FAIL: Initial oval background mismatch:', initialOvalState.secBg);
+    console.error('✗ FAIL: Initial oval background or label mismatch:', initialOvalState);
     report.testsFailed++;
   }
 

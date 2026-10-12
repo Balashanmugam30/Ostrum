@@ -777,6 +777,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
           className="pointer-events-none absolute inset-0 grid place-items-center select-none z-10"
         >
           <span
+            data-testid="works-wheel-center-label"
             className="font-sans font-semibold tracking-tight text-xl sm:text-2xl md:text-3xl transition-colors duration-300 ease-out"
             style={{ color: activeTheme.textColor }}
           >
