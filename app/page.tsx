@@ -4,7 +4,6 @@ import { IntroHero } from '@/components/sections/IntroHero';
 import { OstrumEngineSection } from '@/components/sections/OstrumEngineSection';
 import { OstrumEnergyNarrativeSection } from '@/components/sections/OstrumEnergyNarrativeSection';
 import { OstrumWorksWheelSection } from '@/components/sections/OstrumWorksWheelSection';
-import { OstrumProjectExpansionHandoff } from '@/components/sections/OstrumProjectExpansionHandoff';
 import { OstrumCapabilitiesSection } from '@/components/sections/OstrumCapabilitiesSection';
 import { OstrumStudioFooter } from '@/components/sections/OstrumStudioFooter';
 
@@ -26,10 +25,7 @@ export default function HomePage() {
       {/* SECTION 04: Works Wheel Showcase (Selected Work) */}
       <OstrumWorksWheelSection />
 
-      {/* SECTION 04.5: Cinematic Project Media Expansion Handoff */}
-      <OstrumProjectExpansionHandoff />
-
-      {/* SECTION 05: What We Build · Our Capabilities */}
+      {/* SECTION 05: Our Capabilities */}
       <OstrumCapabilitiesSection />
 
       {/* STUDIO FOOTER: Final Contact Conversation & Signoff */}

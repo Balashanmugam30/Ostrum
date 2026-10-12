@@ -197,12 +197,6 @@ export function OstrumCapabilitiesSection() {
         <header className="w-full px-6 sm:px-12 md:px-16 lg:px-20 z-20 shrink-0">
           <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8">
             <div>
-              <p
-                data-testid="capabilities-overline"
-                className="font-mono text-xs sm:text-sm font-semibold tracking-[0.24em] uppercase text-[#362BEB] mb-2 sm:mb-3"
-              >
-                WHAT WE BUILD
-              </p>
               <h2
                 data-testid="capabilities-heading"
                 className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#0B0B10]"

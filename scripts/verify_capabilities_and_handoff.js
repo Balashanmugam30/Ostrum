@@ -56,9 +56,9 @@ const EXPECTED_CARDS = [
 ];
 
 async function runVerification() {
-  console.log('===============================================================');
-  console.log('   OSTRUM PHASE 5: CAPABILITIES & HANDOFF AUDIT SUITE          ');
-  console.log('===============================================================\n');
+  console.log('======================================================================');
+  console.log('   OSTRUM PHASE 5.1: SELECTED WORK -> CAPABILITIES AUDIT SUITE        ');
+  console.log('======================================================================\n');
 
   const report = {
     timestamp: new Date().toISOString(),
@@ -67,7 +67,8 @@ async function runVerification() {
     assertions: [],
     consoleErrors: [],
     pageErrors: [],
-    handoffMetrics: {},
+    wheelProjects: [],
+    expansionMetrics: {},
     capabilitiesMetrics: {},
     responsiveResults: [],
   };
@@ -123,17 +124,19 @@ async function runVerification() {
   assert('Hero has pure dark background', heroData.bodyBg === 'rgb(0, 0, 0)', heroData);
   assert('Hero wordmark is present', heroData.hasWordmark, heroData);
 
-  // Scroll to Works Wheel
-  console.log('\nScrolling to Works Wheel entrance...');
-  await page.evaluate(() => {
+  // -------------------------------------------------------------------------
+  // PART 2: WORKS WHEEL PROJECTS & OUR CAPABILITIES IN 4TH POSITION
+  // -------------------------------------------------------------------------
+  console.log('\n--- PART 2: Works Wheel Projects (TMR -> Saraswati -> MNESA -> Our Capabilities) ---');
+
+  const wheelTrigger = await page.evaluate(() => {
     const st = window.ScrollTrigger ? window.ScrollTrigger.getById('works-wheel-pin') : null;
-    if (st) {
-      window.scrollTo(0, st.start + 50);
-    } else {
-      const el = document.getElementById('selected-work');
-      if (el) window.scrollTo(0, el.offsetTop);
-    }
+    return st ? { start: st.start, end: st.end, distance: st.vars.end } : null;
   });
+  assert('Works Wheel ScrollTrigger is registered', !!wheelTrigger, wheelTrigger);
+
+  // At rest (turn = 0)
+  await page.evaluate((pos) => window.scrollTo(0, pos), wheelTrigger.start + 50);
   await page.waitForTimeout(600);
 
   const wheelAtRest = await page.evaluate(() => {
@@ -142,129 +145,147 @@ async function runVerification() {
     return {
       label: label ? label.textContent.trim() : null,
       bg: sec ? window.getComputedStyle(sec).backgroundColor : null,
-      scrollY: window.scrollY,
     };
   });
   assert('Works Wheel center label at rest is "Selected Work"', wheelAtRest.label === 'Selected Work', wheelAtRest);
 
-  // Advance through Works Wheel to Project 4 (NeuroMove)
-  console.log('\nAdvancing through Works Wheel to NeuroMove (Project 4)...');
-  await page.evaluate(() => {
-    const st = window.ScrollTrigger ? window.ScrollTrigger.getById('works-wheel-pin') : null;
-    if (st) {
-      // Scroll to end of Works Wheel pin (just before unpinning, where NeuroMove is front and held)
-      window.scrollTo(0, st.end - 100);
-    }
+  const totalDist = wheelTrigger.end - wheelTrigger.start;
+  // Sample progress points for projects
+  // Total pin distance = 400 (hold) + 900 (morph) + 3000 (projects) + 1600 (expand) = 5900
+  // p1 = 400/5900 = 0.0678
+  // p2 = 1300/5900 = 0.2203
+  // p3 = 4300/5900 = 0.7288
+  // Entry 1 (TMR): tProj ~ 0 => p ~ 0.2203
+  // Entry 2 (Saraswati): tProj ~ 0.333 => p ~ 0.3898
+  // Entry 3 (MNESA): tProj ~ 0.666 => p ~ 0.5593
+  // Entry 4 (Our Capabilities): tProj ~ 1.0 => p ~ 0.7288
+
+  // Project 1: TMR
+  await page.evaluate((pos) => window.scrollTo(0, pos), wheelTrigger.start + totalDist * 0.23);
+  await page.waitForTimeout(400);
+  const p1Data = await page.evaluate(() => {
+    const title = document.querySelector('#selected-work h3')?.textContent?.trim();
+    return { title };
   });
-  await page.waitForTimeout(600);
+  assert('Project 1 is "TMR AI Car Care"', p1Data.title === 'TMR AI Car Care', p1Data);
 
-  const project4State = await page.evaluate(() => {
-    const sec = document.getElementById('selected-work');
-    const title = sec ? sec.querySelector('h3')?.textContent : null;
-    const bg = sec ? window.getComputedStyle(sec).backgroundColor : null;
-    return { title, bg, scrollY: window.scrollY };
+  // Project 2: Saraswati
+  await page.evaluate((pos) => window.scrollTo(0, pos), wheelTrigger.start + totalDist * 0.40);
+  await page.waitForTimeout(400);
+  const p2Data = await page.evaluate(() => {
+    const title = document.querySelector('#selected-work h3')?.textContent?.trim();
+    return { title };
   });
-  assert('Works Wheel ends on NeuroMove project', project4State.title === 'NeuroMove', project4State);
+  assert('Project 2 is "Saraswati Driving School"', p2Data.title === 'Saraswati Driving School', p2Data);
 
-  // -------------------------------------------------------------------------
-  // PART 2: CINEMATIC PROJECT MEDIA EXPANSION HANDOFF
-  // -------------------------------------------------------------------------
-  console.log('\n--- PART 2: Verifying Cinematic Project Media Expansion Handoff ---');
-
-  const handoffTrigger = await page.evaluate(() => {
-    const st = window.ScrollTrigger ? window.ScrollTrigger.getById('project-expansion-pin') : null;
-    return st ? { start: st.start, end: st.end, distance: st.vars.end } : null;
+  // Project 3: MNESA
+  await page.evaluate((pos) => window.scrollTo(0, pos), wheelTrigger.start + totalDist * 0.58);
+  await page.waitForTimeout(400);
+  const p3Data = await page.evaluate(() => {
+    const title = document.querySelector('#selected-work h3')?.textContent?.trim();
+    return { title };
   });
-  assert('Project Expansion Handoff ScrollTrigger is registered', !!handoffTrigger, handoffTrigger);
+  assert('Project 3 is "MNESA"', p3Data.title === 'MNESA', p3Data);
 
-  // Step 2.1: Start of handoff (p = 0.0)
-  await page.evaluate((pos) => window.scrollTo(0, pos), handoffTrigger.start + 10);
+  // Project 4: Our Capabilities (p = p3, ~ 0.73)
+  await page.evaluate((pos) => window.scrollTo(0, pos), wheelTrigger.start + totalDist * 0.728);
   await page.waitForTimeout(400);
 
-  const handoffStart = await page.evaluate(() => {
-    const card = document.querySelector('[data-testid="expanding-project-card"]');
-    const rect = card ? card.getBoundingClientRect() : null;
-    const img = card ? card.querySelector('img')?.getAttribute('src') : null;
-    const overlay = document.querySelector('[data-testid="handoff-light-overlay"]');
-    const overlayOpacity = overlay ? parseFloat(window.getComputedStyle(overlay).opacity) : null;
+  const p4Data = await page.evaluate(() => {
+    const title =
+      document.querySelector('[data-testid="works-wheel-project-title"]')?.textContent?.trim() ||
+      document.querySelector('#selected-work h3')?.textContent?.trim();
+    const desc =
+      document.querySelector('[data-testid="works-wheel-project-description"]')?.textContent?.trim() ||
+      document.querySelector('#selected-work [data-testid="works-wheel-left-panel"] p')?.textContent?.trim();
+    const liveLink = document.querySelector('#selected-work a[href^="http"]');
+    const preview = document.querySelector('[data-testid="capabilities-transition-preview"]');
+    const previewRect = preview ? preview.getBoundingClientRect() : null;
     return {
-      cardRect: rect ? { width: Math.round(rect.width), height: Math.round(rect.height), left: Math.round(rect.left), top: Math.round(rect.top) } : null,
-      imgSrc: img,
-      overlayOpacity,
+      title,
+      desc,
+      hasLiveLink: !!liveLink,
+      hasPreview: !!preview,
+      previewBounds: previewRect ? { width: Math.round(previewRect.width), height: Math.round(previewRect.height) } : null,
     };
   });
-  assert('Expanding card has NeuroMove source (/images/works/neuromove.jpg)', handoffStart.imgSrc === '/images/works/neuromove.jpg', handoffStart);
-  assert('Expanding card starts in compact card dimensions (< 700px width on 1440px viewport)', handoffStart.cardRect && handoffStart.cardRect.width < 700, handoffStart);
-  assert('Light overlay starts fully transparent (opacity 0)', handoffStart.overlayOpacity === 0, handoffStart);
 
-  // Step 2.2: Expansion mid-point (p ~ 0.50)
-  const dist = handoffTrigger.end - handoffTrigger.start;
-  await page.evaluate((pos) => window.scrollTo(0, pos), handoffTrigger.start + dist * 0.45);
+  assert('Entry 4 title is "Our Capabilities"', p4Data.title === 'Our Capabilities', p4Data);
+  assert(
+    'Entry 4 description matches exact prompt specification',
+    p4Data.desc === 'From digital experiences and intelligent AI systems to business platforms, product engineering and connected hardware, we build the technology that moves businesses forward.',
+    p4Data
+  );
+  assert('Entry 4 has NO external client link', !p4Data.hasLiveLink, p4Data);
+  assert('Entry 4 card displays capabilities preview thumbnail', p4Data.hasPreview && p4Data.previewBounds && p4Data.previewBounds.width > 0, p4Data);
+
+  // Check no duplicate NeuroMove exists anywhere
+  const noNeuroMove = await page.evaluate(() => {
+    const titles = Array.from(document.querySelectorAll('h3, h2, h4')).map((el) => el.textContent.trim());
+    return {
+      hasNeuroMoveTitle: titles.some((t) => t.includes('NeuroMove')),
+      hasHandoffCard: !!document.querySelector('[data-testid="expanding-project-card"]'),
+    };
+  });
+  assert('NeuroMove is NOT in Selected Work or headings', !noNeuroMove.hasNeuroMoveTitle, noNeuroMove);
+  assert('Old intermediate handoff card is completely removed from DOM', !noNeuroMove.hasHandoffCard, noNeuroMove);
+
+  // -------------------------------------------------------------------------
+  // PART 3: SHARED-ELEMENT EXPANSION INTO CAPABILITIES
+  // -------------------------------------------------------------------------
+  console.log('\n--- PART 3: Verifying Shared-Element Thumbnail Expansion ---');
+
+  // Mid-expansion (p ~ 0.85)
+  await page.evaluate((pos) => window.scrollTo(0, pos), wheelTrigger.start + totalDist * 0.85);
   await page.waitForTimeout(400);
 
-  const handoffMid = await page.evaluate(() => {
-    const card = document.querySelector('[data-testid="expanding-project-card"]');
-    const rect = card ? card.getBoundingClientRect() : null;
+  const expMid = await page.evaluate(() => {
+    const expLayer = document.querySelector('[data-testid="expanding-capabilities-preview"]');
+    const rect = expLayer ? expLayer.getBoundingClientRect() : null;
+    const style = expLayer ? window.getComputedStyle(expLayer) : null;
     return {
       width: rect ? Math.round(rect.width) : 0,
       height: rect ? Math.round(rect.height) : 0,
-      left: rect ? Math.round(rect.left) : 0,
+      opacity: style ? parseFloat(style.opacity) : 0,
+      borderRadius: style ? style.borderRadius : null,
     };
   });
-  assert('Card expands during scroll scrub (> 800px width)', handoffMid.width > 800, handoffMid);
+  assert('Expanding preview is visible (opacity > 0.8)', expMid.opacity > 0.8, expMid);
+  assert('Expanding preview has grown larger than initial card (> 700px width)', expMid.width > 700, expMid);
 
   await page.screenshot({
     path: path.join(ARTIFACTS_DIR, 'capabilities-01-handoff-expansion.png'),
     fullPage: false,
   });
 
-  // Step 2.3: Full Viewport Hold Beat (p ~ 0.65)
-  await page.evaluate((pos) => window.scrollTo(0, pos), handoffTrigger.start + dist * 0.65);
+  // Full expansion hold (p ~ 0.98)
+  await page.evaluate((pos) => window.scrollTo(0, pos), wheelTrigger.start + totalDist * 0.98);
   await page.waitForTimeout(400);
 
-  const handoffHold = await page.evaluate(() => {
-    const card = document.querySelector('[data-testid="expanding-project-card"]');
-    const rect = card ? card.getBoundingClientRect() : null;
-    const borderRadius = card ? window.getComputedStyle(card).borderRadius : null;
-    const overlay = document.querySelector('[data-testid="handoff-light-overlay"]');
-    const overlayOpacity = overlay ? parseFloat(window.getComputedStyle(overlay).opacity) : null;
+  const expFull = await page.evaluate(() => {
+    const expLayer = document.querySelector('[data-testid="expanding-capabilities-preview"]');
+    const rect = expLayer ? expLayer.getBoundingClientRect() : null;
+    const style = expLayer ? window.getComputedStyle(expLayer) : null;
     return {
       width: rect ? Math.round(rect.width) : 0,
       height: rect ? Math.round(rect.height) : 0,
-      borderRadius,
-      overlayOpacity,
+      borderRadius: style ? style.borderRadius : null,
       viewportW: window.innerWidth,
       viewportH: window.innerHeight,
     };
   });
-  assert('Card covers full viewport during hold beat (width == 1440, height == 900)', handoffHold.width >= 1440 && handoffHold.height >= 900, handoffHold);
-  assert('Card border radius is 0px at full expansion', handoffHold.borderRadius === '0px' || parseFloat(handoffHold.borderRadius) === 0, handoffHold);
+  assert('Expanding preview reaches 100vw x 100vh full viewport (1440x900)', expFull.width >= 1440 && expFull.height >= 900, expFull);
+  assert('Border radius reaches 0px at full expansion', expFull.borderRadius === '0px' || parseFloat(expFull.borderRadius) === 0, expFull);
 
   await page.screenshot({
     path: path.join(ARTIFACTS_DIR, 'capabilities-02-handoff-fullscreen-hold.png'),
     fullPage: false,
   });
 
-  // Step 2.4: Cross-dissolve into Capabilities light canvas (p ~ 0.95)
-  await page.evaluate((pos) => window.scrollTo(0, pos), handoffTrigger.start + dist * 0.95);
-  await page.waitForTimeout(400);
-
-  const handoffDissolve = await page.evaluate(() => {
-    const overlay = document.querySelector('[data-testid="handoff-light-overlay"]');
-    const overlayOpacity = overlay ? parseFloat(window.getComputedStyle(overlay).opacity) : null;
-    return { overlayOpacity };
-  });
-  assert('Light overlay dissolves into white canvas (opacity > 0.85)', handoffDissolve.overlayOpacity > 0.85, handoffDissolve);
-
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, 'capabilities-03-handoff-dissolve.png'),
-    fullPage: false,
-  });
-
   // -------------------------------------------------------------------------
-  // PART 3: CAPABILITIES SECTION AUDIT
+  // PART 4: CAPABILITIES SECTION AUDIT
   // -------------------------------------------------------------------------
-  console.log('\n--- PART 3: Verifying Capabilities Section ---');
+  console.log('\n--- PART 4: Verifying Capabilities Section ---');
 
   const capTrigger = await page.evaluate(() => {
     const st = window.ScrollTrigger ? window.ScrollTrigger.getById('capabilities-pin') : null;
@@ -278,7 +299,7 @@ async function runVerification() {
 
   const capHeaderData = await page.evaluate(() => {
     const sec = document.getElementById('capabilities');
-    const overline = document.querySelector('[data-testid="capabilities-overline"]')?.textContent?.trim();
+    const overline = document.querySelector('[data-testid="capabilities-overline"]');
     const heading = document.querySelector('[data-testid="capabilities-heading"]')?.textContent?.trim();
     const statement = document.querySelector('[data-testid="capabilities-supporting-statement"]')?.textContent?.trim();
     const edgeLeft = document.querySelector('[data-testid="capabilities-edge-fade-left"]');
@@ -288,8 +309,13 @@ async function runVerification() {
     // Strict check: NO CTA INSIDE CAPABILITIES
     const ctaLinks = sec ? sec.querySelectorAll('a[href*="mailto"], a[href*="contact"], button:not([role="tab"])') : [];
 
+    // Check that "WHAT WE BUILD" text is NOT present anywhere in #capabilities
+    const textContent = sec ? sec.textContent : '';
+    const hasWhatWeBuild = textContent.includes('WHAT WE BUILD');
+
     return {
-      overline,
+      hasOverlineElem: !!overline,
+      hasWhatWeBuild,
       heading,
       statement,
       hasEdgeLeft: !!edgeLeft,
@@ -299,7 +325,7 @@ async function runVerification() {
     };
   });
 
-  assert('Overline is "WHAT WE BUILD"', capHeaderData.overline === 'WHAT WE BUILD', capHeaderData);
+  assert('"WHAT WE BUILD" overline is REMOVED from Capabilities', !capHeaderData.hasOverlineElem && !capHeaderData.hasWhatWeBuild, capHeaderData);
   assert('Heading is "Our Capabilities"', capHeaderData.heading === 'Our Capabilities', capHeaderData);
   assert(
     'Supporting statement matches exact copy',
@@ -389,9 +415,9 @@ async function runVerification() {
   });
 
   // -------------------------------------------------------------------------
-  // PART 4: STUDIO FOOTER AUDIT
+  // PART 5: STUDIO FOOTER AUDIT
   // -------------------------------------------------------------------------
-  console.log('\n--- PART 4: Verifying Studio Footer ---');
+  console.log('\n--- PART 5: Verifying Studio Footer ---');
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(600);
 
@@ -418,11 +444,10 @@ async function runVerification() {
   });
 
   // -------------------------------------------------------------------------
-  // PART 5: REVERSIBLE SCROLL AUDIT
+  // PART 6: REVERSIBLE SCROLL AUDIT
   // -------------------------------------------------------------------------
-  console.log('\n--- PART 5: Verifying Reversible Scroll Upward to Hero ---');
-  // Scroll back to top in smooth steps
-  for (let y = window_scrollY = await page.evaluate(() => window.scrollY); y >= 0; y -= 1500) {
+  console.log('\n--- PART 6: Verifying Reversible Scroll Upward to Hero ---');
+  for (let y = await page.evaluate(() => window.scrollY); y >= 0; y -= 1500) {
     await page.evaluate((top) => window.scrollTo(0, top), Math.max(0, y));
     await page.waitForTimeout(100);
   }
@@ -441,9 +466,9 @@ async function runVerification() {
   });
 
   // -------------------------------------------------------------------------
-  // PART 6: RESPONSIVE MATRIX AUDIT
+  // PART 7: RESPONSIVE MATRIX AUDIT
   // -------------------------------------------------------------------------
-  console.log('\n--- PART 6: Responsive Matrix Audit ---');
+  console.log('\n--- PART 7: Responsive Matrix Audit ---');
   const viewports = [
     { name: 'desktop-1920x1080', width: 1920, height: 1080 },
     { name: 'desktop-1440x900', width: 1440, height: 900 },
@@ -481,9 +506,9 @@ async function runVerification() {
   }
 
   // -------------------------------------------------------------------------
-  // PART 7: PREFERS-REDUCED-MOTION AUDIT
+  // PART 8: PREFERS-REDUCED-MOTION AUDIT
   // -------------------------------------------------------------------------
-  console.log('\n--- PART 7: Reduced Motion Audit ---');
+  console.log('\n--- PART 8: Reduced Motion Audit ---');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.reload({ waitUntil: 'networkidle' });
   await page.waitForTimeout(800);
@@ -502,12 +527,12 @@ async function runVerification() {
   await browser.close();
 
   // Summary
-  console.log('\n===============================================================');
+  console.log('\n======================================================================');
   console.log(`TOTAL PASSED: ${report.testsPassed}`);
   console.log(`TOTAL FAILED: ${report.testsFailed}`);
   console.log(`CONSOLE ERRORS: ${report.consoleErrors.length}`);
   console.log(`PAGE ERRORS: ${report.pageErrors.length}`);
-  console.log('===============================================================\n');
+  console.log('======================================================================\n');
 
   fs.writeFileSync(
     path.join(ARTIFACTS_DIR, 'capabilities_and_handoff_verification_report.json'),

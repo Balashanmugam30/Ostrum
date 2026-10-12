@@ -11,6 +11,7 @@
 // - Surrounding cards curve back into 3D perspective above and below.
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { CapabilitiesPreviewThumbnail } from "@/components/ui/CapabilitiesPreviewThumbnail";
 
 export interface WorksWheelItem {
   /** Project name. Displayed prominently on the left panel. */
@@ -21,6 +22,8 @@ export interface WorksWheelItem {
   image: string;
   /** Where the card links to (live HTTPS URL or anchor). */
   href?: string;
+  /** Whether this is the special capabilities transition destination. */
+  isCapabilities?: boolean;
 }
 
 export interface ProjectTheme {
@@ -81,15 +84,15 @@ export const PROJECT_THEMES: ProjectTheme[] = [
     textMuted: "rgba(250, 246, 255, 0.82)",
     linkColor: "#D4B8FF",
   },
-  // 4. NeuroMove (Jade / Emerald Green)
+  // 4. Our Capabilities (Light White / Pale Lavender Canvas)
   {
-    primary: "#078567",
-    secondary: "#56CDAA",
-    deep: "#063028",
-    sheen: "#C7F0E2",
-    textColor: "#F0FDF8",
-    textMuted: "rgba(240, 253, 248, 0.82)",
-    linkColor: "#7AEAC7",
+    primary: "#362BEB",
+    secondary: "#7482F8",
+    deep: "#F8F9FE",
+    sheen: "#FFFFFF",
+    textColor: "#0B0B10",
+    textMuted: "rgba(11, 11, 16, 0.75)",
+    linkColor: "#362BEB",
   },
 ];
 
@@ -98,6 +101,7 @@ export interface WorksWheelHandle {
   to: (next: number) => void;
   snapTo: (next: number) => void;
   getTurn: () => number;
+  setLeftPanelOpacity?: (opacity: number) => void;
 }
 
 export interface WorksWheelProps extends Omit<
@@ -188,10 +192,12 @@ function InteractiveCardArtwork({
   src,
   alt,
   href,
+  isCapabilities,
 }: {
   src: string;
   alt: string;
   href?: string;
+  isCapabilities?: boolean;
 }) {
   const containerRef = React.useRef<HTMLSpanElement>(null);
   const imgRef = React.useRef<HTMLImageElement>(null);
@@ -229,14 +235,18 @@ function InteractiveCardArtwork({
       onPointerLeave={handlePointerLeave}
       className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(11,11,16,0.18)] border border-black/[0.08] bg-white/40 backdrop-blur-sm transition-all duration-300 group-hover:border-[#362beb]/50 group-hover:shadow-[0_25px_50px_-10px_rgba(54,43,235,0.25)]"
     >
-      <img
-        ref={imgRef}
-        src={src}
-        alt={alt}
-        draggable={false}
-        className="size-full object-cover transition-transform duration-300 ease-out will-change-transform"
-        loading="eager"
-      />
+      {isCapabilities ? (
+        <CapabilitiesPreviewThumbnail className="size-full" />
+      ) : (
+        <img
+          ref={imgRef}
+          src={src}
+          alt={alt}
+          draggable={false}
+          className="size-full object-cover transition-transform duration-300 ease-out will-change-transform"
+          loading="eager"
+        />
+      )}
       {/* Subtle fluid pearlescent reflection sheen */}
       <span
         ref={sheenRef}
@@ -550,6 +560,11 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         to,
         snapTo: (next: number) => setTurn(next),
         getTurn: () => turn.current,
+        setLeftPanelOpacity: (op: number) => {
+          if (leftPanelRef.current) {
+            leftPanelRef.current.style.opacity = String(op);
+          }
+        },
       }),
       [setTurn, to],
     );
@@ -764,6 +779,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                     src={item.image}
                     alt={item.title}
                     href={item.href}
+                    isCapabilities={item.isCapabilities}
                   />
                 </div>
               );
@@ -788,16 +804,19 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         {/* Left Column: Active Project Information in Drum Mode */}
         <div
           ref={leftPanelRef}
+          data-testid="works-wheel-left-panel"
           className="pointer-events-none absolute top-1/2 left-[6%] sm:left-[8%] lg:left-[9%] -translate-y-1/2 max-w-[85vw] sm:max-w-[42vw] lg:max-w-[36vw] z-20 select-none"
           style={{ opacity: 0 }}
         >
           <h3
+            data-testid="works-wheel-project-title"
             className="font-sans font-bold tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.08] mb-4 transition-colors duration-300 ease-out"
             style={{ color: activeTheme.textColor }}
           >
             {items[active]?.title}
           </h3>
           <p
+            data-testid="works-wheel-project-description"
             className="font-sans text-sm sm:text-base lg:text-lg leading-relaxed mb-6 max-w-[32ch] sm:max-w-[38ch] transition-colors duration-300 ease-out"
             style={{ color: activeTheme.textMuted }}
           >
@@ -851,10 +870,11 @@ export const OSTRUM_WORKS: WorksWheelItem[] = [
     image: "/images/works/mnesa.jpg",
   },
   {
-    title: "NeuroMove",
+    title: "Our Capabilities",
     description:
-      "Biomechanical telemetry studio translating kinematic sensor streams into adaptive motor rehabilitation diagnostics.",
-    image: "/images/works/neuromove.jpg",
+      "From digital experiences and intelligent AI systems to business platforms, product engineering and connected hardware, we build the technology that moves businesses forward.",
+    image: "",
+    isCapabilities: true,
   },
 ];
 
