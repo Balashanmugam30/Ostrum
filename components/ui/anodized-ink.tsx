@@ -102,11 +102,12 @@ precision highp float;
 uniform vec2 uRes;
 uniform float uTime;
 uniform vec2 uMouse;        // centred, y up, in units of the canvas height
+uniform vec2 uVelocity;     // smoothed pointer velocity vector
 uniform float uHover;       // 0 idle drift, 1 pointer inside
 uniform float uEnergy;      // smoothed pointer speed
-uniform vec3 uDeep;
-uniform vec3 uInk;
-uniform vec3 uSheen;
+uniform vec3 uDeep;         // base light background #F1F1FA
+uniform vec3 uInk;          // cobalt accent #362BEB
+uniform vec3 uSheen;        // pearl highlight
 uniform float uTurbulence;
 uniform float uScale;
 uniform float uSheenAmt;
@@ -147,37 +148,37 @@ float fbm(vec2 p) {
   return v;
 }
 
-// Crimson Orbit: Curvilinear liquid contour potential field
-float liquidField(vec2 p, float t) {
-  // Dual orbital circulation centers
-  vec2 o1 = vec2(cos(t * 0.15) * 0.38, sin(t * 0.12) * 0.28);
-  vec2 o2 = vec2(sin(t * 0.14 + 1.2) * 0.45, -cos(t * 0.17 + 0.8) * 0.34);
+// Sculptural fluid elevation field
+float evaluateFluid(vec2 p, float t, float turb, float sc) {
+  vec2 drift = vec2(sin(t * 0.12) * 0.08, cos(t * 0.09) * 0.05);
+  vec2 q = p * 1.25 * sc + drift;
 
-  // Multi-scale domain warping
-  vec2 q = p;
+  // Domain warping (2 octaves of fbm)
   vec2 w1 = vec2(
-    fbm(q * 1.15 + vec2(t * 0.05, -t * 0.025)),
-    fbm(q * 1.15 + vec2(2.8 + t * 0.03, 1.4))
+    fbm(q * 1.15 + vec2(t * 0.04, -t * 0.02)),
+    fbm(q * 1.15 + vec2(2.1 - t * 0.03, 1.7))
   );
-  q += w1 * 0.42 * uTurbulence;
+  q += w1 * 0.40 * turb;
 
   vec2 w2 = vec2(
-    fbm(q * 1.85 + w1 * 0.55 + vec2(-t * 0.04, 3.1)),
-    fbm(q * 1.85 + w1 * 0.55 + vec2(1.3, t * 0.04))
+    fbm(q * 1.75 + w1 * 0.55 + vec2(-t * 0.03, 2.8)),
+    fbm(q * 1.75 + w1 * 0.55 + vec2(1.5, t * 0.03))
   );
-  q += w2 * 0.26 * uTurbulence;
+  q += w2 * 0.22 * turb;
 
-  // Concentric liquid contour potentials
-  float r1 = length(q - o1);
-  float r2 = length(q - o2);
+  // S-curved fluid body spine sweeping gracefully
+  float bodySpine = -0.06 + 0.36 * q.x - 0.20 * sin(q.x * 2.0 + 0.35);
+  float distToSpine = abs(q.y - bodySpine);
+  float bodyRadius = 0.56 + 0.16 * cos(q.x * 1.6 + 0.8);
+  float fluidBoundary = smoothstep(bodyRadius, 0.08, distToSpine);
 
-  // Curving contour wave fronts with ridge shaping
-  float waves = sin(r1 * 5.4 - t * 0.32) * 0.52 + cos(r2 * 4.4 + t * 0.26) * 0.48;
-  waves += 0.22 * sin((q.x * 0.8 + q.y * 1.2) * 2.8 + t * 0.35);
+  // Internal liquid metal contour waves
+  float waves = sin((q.x * 0.9 + q.y * 1.1) * 3.8 + t * 0.25) * 0.5
+              + cos((q.x * 1.3 - q.y * 0.85) * 3.2 - t * 0.2) * 0.5;
+  float crests = 1.0 - abs(waves);
+  crests = crests * crests;
 
-  // Polish into smooth ridges (liquid metal crests)
-  float ridge = 1.0 - abs(waves);
-  return ridge * ridge;
+  return fluidBoundary * (0.35 + 0.65 * crests);
 }
 
 void main() {
@@ -185,26 +186,33 @@ void main() {
   float t = uTime;
   vec2 m = uMouse;
 
+  // Pointer interaction vector relative to local fragment
+  vec2 dMouse = uv - m;
+  float rMouse = length(dMouse);
+  float mouseRadius = 0.44;
+  float wMouse = smoothstep(mouseRadius, 0.0, rMouse);
+
+  // Local fluid displacement
   vec2 p = uv;
+  if (wMouse > 0.0) {
+    // 1. Viscous velocity wake: drags fluid contours along pointer motion
+    vec2 wake = uVelocity * (0.16 * wMouse * (1.0 - wMouse * 0.35));
 
-  // 1. Localized fluid displacement around mouse (restrained & bounded)
-  vec2 d = p - m;
-  float dist = length(d);
-  float mouseRadius = 0.48; // Local boundary region (~48% of screen height)
-  float mouseInfluence = smoothstep(mouseRadius, 0.0, dist);
-
-  if (mouseInfluence > 0.0) {
-    // Localized fluid swirl: rotates liquid locally without moving the rest of the canvas
-    float twist = uSwirl * (0.35 * uHover + uEnergy * 0.75) * 2.2 * mouseInfluence * mouseInfluence;
+    // 2. Local vortex / stirring rotation
+    float twist = uSwirl * (0.40 * uHover + uEnergy * 0.85) * 2.4 * wMouse * wMouse;
     float cs = cos(twist);
     float sn = sin(twist);
-    vec2 rotatedD = mat2(cs, -sn, sn, cs) * d;
-    p = m + mix(d, rotatedD, mouseInfluence);
-    // Subtle physical displacement along velocity direction
-    p += (d / max(dist, 1e-3)) * (uEnergy * 0.032) * mouseInfluence;
+    vec2 rotD = mat2(cs, -sn, sn, cs) * dMouse;
+    vec2 vortex = (rotD - dMouse) * wMouse;
+
+    // 3. Dynamic ripple pressure wave
+    float ripplePhase = rMouse * 22.0 - t * 5.0;
+    vec2 waveDisplace = (dMouse / max(rMouse, 1e-3)) * sin(ripplePhase) * exp(-rMouse * 8.0) * (uEnergy * 0.035) * wMouse;
+
+    p = uv - wake + vortex + waveDisplace;
   }
 
-  // 2. Click / Tap Ripple Waves
+  // Ripple waves from click / tap
   float ring = 0.0;
   for (int i = 0; i < 6; i++) {
     vec4 rp = uRipples[i];
@@ -218,138 +226,68 @@ void main() {
     ring += env * (0.5 + 0.5 * sin(x * 40.0));
   }
 
-  // ========================================================
-  // LUSION LIGHT IRIDESCENT FLUID METAL & COBALT ARC EFFECT
-  // Triggered when uDeep is light (uDeep.r > 0.5)
-  // ========================================================
-  if (uDeep.r > 0.5) {
-    // Base light background: pale cool white / lavender (#F1F1FA)
-    vec3 baseBg = uDeep;
+  // Evaluate fluid elevation and normal via finite differences
+  float eps = 0.012;
+  float hCenter = evaluateFluid(p, t, uTurbulence, uScale);
+  float hX = evaluateFluid(p + vec2(eps, 0.0), t, uTurbulence, uScale);
+  float hY = evaluateFluid(p + vec2(0.0, eps), t, uTurbulence, uScale);
 
-    // 1. Diagonal Sweeping Translucent Fluid-Metal Form
-    // Sweeps from lower-left to upper-right behind typography
-    vec2 qLight = p * 1.5 * uScale + vec2(0.2, -0.1);
-    vec2 w1 = vec2(
-      fbm(qLight * 1.1 + vec2(t * 0.08, -t * 0.04)),
-      fbm(qLight * 1.1 + vec2(1.8 - t * 0.05, 2.1))
-    );
-    qLight += w1 * 0.35 * uTurbulence;
+  // Dynamic pointer surface dent for specular curvature
+  float dentCenter = -0.22 * pow(wMouse, 2.0) * (0.35 + 0.65 * uEnergy);
+  float dentX = -0.22 * pow(smoothstep(mouseRadius, 0.0, length(uv + vec2(eps, 0.0) - m)), 2.0) * (0.35 + 0.65 * uEnergy);
+  float dentY = -0.22 * pow(smoothstep(mouseRadius, 0.0, length(uv + vec2(0.0, eps) - m)), 2.0) * (0.35 + 0.65 * uEnergy);
 
-    // Distance to diagonal ribbon axis
-    float diagDist = abs(qLight.x * 0.72 - qLight.y * 1.05 + 0.05);
-    float ribbon = smoothstep(0.72, 0.06, diagDist);
+  float dHdx = ((hX + dentX) - (hCenter + dentCenter)) / eps;
+  float dHdy = ((hY + dentY) - (hCenter + dentCenter)) / eps;
+  vec3 norm = normalize(vec3(-dHdx * 0.32, -dHdy * 0.32, 1.0));
 
-    // Wave ridges within the fluid metal
-    float fluidRidge = sin(qLight.x * 3.8 + qLight.y * 3.4 + t * 0.42) * 0.5
-                     + cos(qLight.x * 5.2 - qLight.y * 4.1 - t * 0.28) * 0.5;
-    float crest = 1.0 - abs(fluidRidge);
-    crest = crest * crest;
+  // Lighting calculations
+  vec3 L_key = normalize(vec3(-0.35, 0.65, 0.8));
+  vec3 H_key = normalize(L_key + vec3(0.0, 0.0, 1.0));
+  float spec_key = pow(max(dot(norm, H_key), 0.0), 44.0);
 
-    // Fluid surface normal via finite difference
-    float eps = 0.015;
-    float hCenter = ribbon * (0.35 + 0.65 * crest);
-    float hX = smoothstep(0.72, 0.06, abs((qLight.x + eps) * 0.72 - qLight.y * 1.05 + 0.05)) * (0.35 + 0.65 * crest);
-    float hY = smoothstep(0.72, 0.06, abs(qLight.x * 0.72 - (qLight.y + eps) * 1.05 + 0.05)) * (0.35 + 0.65 * crest);
-    vec3 nLight = normalize(vec3((hCenter - hX) / eps * 0.3, (hCenter - hY) / eps * 0.3, 1.0));
+  vec3 L_ptr = normalize(vec3(m - uv, 0.28));
+  vec3 H_ptr = normalize(L_ptr + vec3(0.0, 0.0, 1.0));
+  float spec_ptr = pow(max(dot(norm, H_ptr), 0.0), 32.0) * wMouse * (0.45 + 0.55 * uHover);
 
-    // Specular lighting from virtual key light + mouse
-    vec3 LLight = normalize(vec3(0.4, 0.7, 0.8) + vec3(uMouse - uv, 0.0) * 0.5);
-    vec3 HLight = normalize(LLight + vec3(0.0, 0.0, 1.0));
-    float specLight = pow(max(dot(nLight, HLight), 0.0), 38.0);
-    float fresLight = pow(1.0 - nLight.z, 2.2);
+  float fres = pow(1.0 - norm.z, 2.2);
 
-    // Thin-film pearlescent iridescence:
-    // Delicate lavender, opalescent blue/cyan, and soft pearl peach/pink
-    float iridPhase = dot(nLight.xy, vec2(1.2, 0.9)) * 1.5 + fresLight * 2.0 + t * 0.15;
-    vec3 iridColor = vec3(0.84, 0.86, 0.95) + vec3(0.16, 0.14, 0.12) * cos(6.28318 * (vec3(1.0) * iridPhase + vec3(0.60, 0.70, 0.88)));
+  // Pearlescent Iridescence (pale lavender, soft pearl peach, muted opalescent cyan)
+  float iridPhase = dot(norm.xy, vec2(1.3, 0.95)) * 1.6 + fres * 1.8 + t * 0.1;
+  vec3 iridColor = vec3(0.86, 0.88, 0.96) + vec3(0.14, 0.12, 0.10) * cos(6.28318 * (vec3(1.0) * iridPhase + vec3(0.60, 0.70, 0.88)));
 
-    // Blend fluid-metal into the light background
-    vec3 col = baseBg;
-    // Translucent fluid-metal wash
-    col = mix(col, iridColor, ribbon * 0.48);
-    // Silver pearlescent specular crests
-    col += vec3(0.95, 0.97, 1.0) * specLight * ribbon * uSheenAmt * 0.85;
-    // Subtle opalescent rim fresnel
-    col = mix(col, vec3(0.75, 0.82, 0.98), fresLight * ribbon * 0.32);
+  // Base background: #F1F1FA
+  vec3 col = uDeep;
 
-    // 2. Bold Cobalt Curved Stroke on the Left
-    // Enters from the left margin and curves gracefully
-    vec2 strokeCoord = p;
-    float strokeCurve = (strokeCoord.y - 0.06) - 0.85 * pow(strokeCoord.x + 0.42, 2.0);
-    float strokeDist = abs(strokeCurve);
-    float strokeEnvelope = smoothstep(-0.95, -0.22, strokeCoord.x) * smoothstep(0.18, -0.45, strokeCoord.x);
-    float strokeMask = smoothstep(0.068, 0.008, strokeDist) * strokeEnvelope;
+  // Translucent fluid-metal wash
+  col = mix(col, iridColor, hCenter * 0.48);
+  // Opalescent rim fresnel
+  col = mix(col, vec3(0.74, 0.82, 0.98), fres * hCenter * 0.32);
+  // Silvery champagne specular crests
+  col += vec3(0.96, 0.98, 1.0) * spec_key * hCenter * uSheenAmt * 0.90;
+  // Dynamic specular glints along the stirred crests under cursor
+  col += vec3(0.96, 0.98, 1.0) * spec_ptr * hCenter * uSheenAmt * 1.20;
 
-    if (strokeMask > 0.001) {
-      // Vivid cobalt blue (#362BEB) with subtle depth gradient
-      vec3 cobaltCol = uInk;
-      cobaltCol = mix(cobaltCol, vec3(0.35, 0.42, 0.98), clamp(p.y * 0.8 + 0.3, 0.0, 0.5));
-      col = mix(col, cobaltCol, strokeMask * 0.95);
-    }
+  // Restrained Cobalt Curved Accent on left perimeter (framing without colliding with text)
+  vec2 cbCoord = p;
+  float cbPath = 0.65 * (cbCoord.x + 0.58) * (cbCoord.x + 0.58) + 0.25 * cbCoord.x - 0.08;
+  float cbDist = abs(cbCoord.y - cbPath);
+  float cbEnvelope = smoothstep(-0.95, -0.52, cbCoord.x) * smoothstep(-0.22, -0.42, cbCoord.x);
+  float cbMask = smoothstep(0.026, 0.006, cbDist) * cbEnvelope;
 
-    // 3. Local Mouse Reactive Glow & Specular Sparkle
-    float pointerGlow = pow(mouseInfluence, 2.0) * (0.3 + 0.7 * uHover);
-    col = mix(col, vec3(0.78, 0.84, 0.99), pointerGlow * 0.18);
-    col += vec3(1.0) * pow(mouseInfluence, 4.0) * uHover * 0.12;
-
-    // 4. Subtle Tactile Film Grain
-    float g = hash21(gl_FragCoord.xy + fract(t * 7.13) * vec2(97.3, 41.7));
-    col += (g - 0.5) * 0.022 * uGrain;
-
-    // 5. Very subtle, airy corner softening (not dark vignette!)
-    float vigLight = smoothstep(1.6, 0.85, length(uv * vec2(0.85, 1.0)));
-    col = mix(col * 0.975, col, vigLight);
-
-    outColor = vec4(clamp(col, 0.0, 1.0), 1.0);
-    return;
+  if (cbMask > 0.001) {
+    vec3 cobalt = uInk; // #362BEB
+    float cbSheen = pow(max(dot(norm, H_key), 0.0), 28.0) * 0.4;
+    cobalt += vec3(0.28, 0.36, 0.96) * cbSheen;
+    col = mix(col, cobalt, cbMask * 0.94);
   }
 
-  // Spatial scaling for pattern
-  vec2 q = p * 2.2 * uScale + vec2(0.9, 0.5);
+  // Ripple addition from click / tap
+  col = mix(col, vec3(0.78, 0.84, 0.99), ring * 0.25);
 
-  // Surface normal via finite differences
-  float e = 0.012;
-  float h = liquidField(q, t);
-  float hx = liquidField(q + vec2(e, 0.0), t);
-  float hy = liquidField(q + vec2(0.0, e), t);
-  vec3 n = normalize(vec3((h - hx) / e * 0.14, (h - hy) / e * 0.14, 1.0));
-
-  // High-contrast, dark oxblood negative space:
-  // Liquid ribbons only occupy a controlled zone (no broad full-screen stripes)
-  float ribbon = smoothstep(0.46, 0.86, h);
-
-  // Base ambient color: mostly deep obsidian/oxblood with subtle dark ruby undertone
-  vec3 col = mix(uDeep, uInk * 0.42, ribbon * 0.5);
-  // Richer saturated core inside the thickest veins
-  col += uInk * 0.52 * smoothstep(0.72, 1.0, h);
-
-  // Surface lighting: specular glint from virtual key light + mouse light
-  vec3 L = normalize(vec3((m - uv) * 1.2, 0.0) + vec3(-0.35, 0.45, 0.85));
-  vec3 H = normalize(L + vec3(0.0, 0.0, 1.0));
-  float spec = pow(max(dot(n, H), 0.0), 64.0);
-  float fres = pow(1.0 - n.z, 2.0);
-
-  // Champagne metallic sheen along the liquid crests (monochromatic, no rainbow)
-  vec3 sheenCol = uSheen * (1.0 + 0.35 * fres);
-  col += sheenCol * spec * uSheenAmt * ribbon * 1.2;
-  col += uInk * fres * 0.28 * ribbon * uSheenAmt;
-
-  // Restrained pointer light & local specular glint
-  float pointerGlow = pow(mouseInfluence, 2.2) * (0.4 + 0.6 * uHover);
-  col += uSheen * pointerGlow * 0.24 * uSheenAmt; // subtle champagne glint right under pointer
-  col += uInk * pointerGlow * 0.26 * (0.5 + 0.5 * uEnergy); // subtle ruby ambient warmth
-
-  // Subtle ripple wave
-  col += (uInk * 0.22 + uSheen * 0.05) * ring;
-
-  // Deep cinematic vignette: corners recede into obsidian black
-  float vig = smoothstep(1.25, 0.22, length(uv * vec2(0.92, 1.05)));
-  col *= mix(1.0, vig, uVignette);
-
-  // Fine, low-contrast film grain
+  // Micro-grain to eliminate 8-bit banding
   float g = hash21(gl_FragCoord.xy + fract(t * 7.13) * vec2(97.3, 41.7));
-  col += (g - 0.5) * 0.035 * uGrain;
-  col += (hash21(gl_FragCoord.yx + 13.7) - 0.5) / 255.0;
+  col += (g - 0.5) * 0.016 * uGrain;
 
   outColor = vec4(clamp(col, 0.0, 1.0), 1.0);
 }
@@ -476,6 +414,7 @@ export function AnodizedInk({
       res: u("uRes"),
       time: u("uTime"),
       mouse: u("uMouse"),
+      velocity: u("uVelocity"),
       hover: u("uHover"),
       energy: u("uEnergy"),
       deep: u("uDeep"),
@@ -496,6 +435,7 @@ export function AnodizedInk({
 
     const target = { x: 0.18, y: 0.08 };
     const mouse = { x: 0.18, y: 0.08 };
+    const velocity = { x: 0, y: 0 };
     let hoverTarget = 0;
     let hover = 0;
     let energy = 0;
@@ -525,6 +465,8 @@ export function AnodizedInk({
       if (reduced) {
         mouse.x = target.x;
         mouse.y = target.y;
+        velocity.x = 0;
+        velocity.y = 0;
         hover = hoverTarget;
         energy = 0;
       } else {
@@ -541,9 +483,12 @@ export function AnodizedInk({
         mouse.x += (target.x - mouse.x) * k;
         mouse.y += (target.y - mouse.y) * k;
         hover += (hoverTarget - hover) * (1 - Math.exp(-dt * 3.5));
-        const v = hoverTarget
-          ? Math.hypot(mouse.x - px, mouse.y - py) / Math.max(dt, 1e-3)
-          : 0;
+        const rawVx = hoverTarget ? (mouse.x - px) / Math.max(dt, 1e-3) : 0;
+        const rawVy = hoverTarget ? (mouse.y - py) / Math.max(dt, 1e-3) : 0;
+        const vDecay = 1 - Math.exp(-dt * 6.5);
+        velocity.x += (rawVx - velocity.x) * vDecay;
+        velocity.y += (rawVy - velocity.y) * vDecay;
+        const v = Math.hypot(velocity.x, velocity.y);
         energy += (Math.min(v * 0.45, 1.2) - energy) * (1 - Math.exp(-dt * 4));
       }
 
@@ -553,6 +498,7 @@ export function AnodizedInk({
       gl.uniform2f(loc.res, canvas.width, canvas.height);
       gl.uniform1f(loc.time, simTime);
       gl.uniform2f(loc.mouse, mouse.x, mouse.y);
+      gl.uniform2f(loc.velocity, velocity.x, velocity.y);
       gl.uniform1f(loc.hover, hover);
       gl.uniform1f(loc.energy, energy);
       gl.uniform3fv(loc.deep, P.deep);

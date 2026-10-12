@@ -112,6 +112,89 @@ function placeOval(
   return `translate3d(${curX.toFixed(2)}px, ${curY.toFixed(2)}px, ${curZ.toFixed(2)}px) rotateZ(${curRotZ.toFixed(2)}deg) rotateX(${curRotX.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
 }
 
+function InteractiveCardArtwork({
+  src,
+  alt,
+  href,
+}: {
+  src: string;
+  alt: string;
+  href?: string;
+}) {
+  const containerRef = React.useRef<HTMLSpanElement>(null);
+  const imgRef = React.useRef<HTMLImageElement>(null);
+  const sheenRef = React.useRef<HTMLSpanElement>(null);
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const nx = (e.clientX - rect.left) / rect.width - 0.5;
+    const ny = (e.clientY - rect.top) / rect.height - 0.5;
+
+    if (imgRef.current) {
+      imgRef.current.style.transform = `translate3d(${nx * 8}px, ${ny * 8}px, 0) scale(1.05)`;
+    }
+    if (sheenRef.current) {
+      sheenRef.current.style.opacity = "1";
+      sheenRef.current.style.background = `radial-gradient(circle at ${(nx + 0.5) * 100}% ${(ny + 0.5) * 100}%, rgba(255,255,255,0.32) 0%, rgba(54,43,235,0.10) 38%, transparent 68%)`;
+    }
+  };
+
+  const handlePointerLeave = () => {
+    if (imgRef.current) {
+      imgRef.current.style.transform = "translate3d(0, 0, 0) scale(1.0)";
+    }
+    if (sheenRef.current) {
+      sheenRef.current.style.opacity = "0";
+    }
+  };
+
+  return (
+    <span
+      ref={containerRef}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+      className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(11,11,16,0.18)] border border-black/[0.08] bg-white/40 backdrop-blur-sm transition-all duration-300 group-hover:border-[#362beb]/50 group-hover:shadow-[0_25px_50px_-10px_rgba(54,43,235,0.25)]"
+    >
+      <img
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        draggable={false}
+        className="size-full object-cover transition-transform duration-300 ease-out will-change-transform"
+        loading="eager"
+      />
+      {/* Subtle fluid pearlescent reflection sheen */}
+      <span
+        ref={sheenRef}
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 ease-out"
+        aria-hidden="true"
+      />
+      {/* Subtle live destination indicator on front card */}
+      {href?.startsWith("http") && (
+        <span className="pointer-events-none absolute right-3.5 bottom-3.5 flex translate-y-1 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium opacity-0 backdrop-blur-md transition group-hover:translate-y-0 group-hover:opacity-100 shadow-sm bg-white/95 text-[#0b0b10] border border-black/10">
+          <svg
+            viewBox="0 0 12 12"
+            className="size-2.5 text-[#362beb]"
+            aria-hidden="true"
+          >
+            <path
+              d="M3 9 9 3M4 3h5v5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          Live Platform
+        </span>
+      )}
+    </span>
+  );
+}
+
 export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
   function WorksWheel(
     {
@@ -598,35 +681,11 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                     marginTop: -metrics.cardH / 2,
                   }}
                 >
-                  <span className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(11,11,16,0.18)] border border-black/[0.08] bg-white/40 backdrop-blur-sm transition-all duration-300 group-hover:border-[#362beb]/50 group-hover:shadow-[0_25px_50px_-10px_rgba(54,43,235,0.25)]">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      draggable={false}
-                      className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="eager"
-                    />
-                    {/* Subtle live destination indicator on front card */}
-                    {item.href?.startsWith("http") && (
-                      <span className="pointer-events-none absolute right-3.5 bottom-3.5 flex translate-y-1 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium opacity-0 backdrop-blur-md transition group-hover:translate-y-0 group-hover:opacity-100 shadow-sm bg-white/95 text-[#0b0b10] border border-black/10">
-                        <svg
-                          viewBox="0 0 12 12"
-                          className="size-2.5 text-[#362beb]"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M3 9 9 3M4 3h5v5"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                        Live Platform
-                      </span>
-                    )}
-                  </span>
+                  <InteractiveCardArtwork
+                    src={item.image}
+                    alt={item.title}
+                    href={item.href}
+                  />
                 </div>
               );
             })}

@@ -23,6 +23,7 @@ out/
 # OS Metadata
 .DS_Store
 Thumbs.db
+*.tsbuildinfo
 
 # Research Artifacts
 reference-capture/
