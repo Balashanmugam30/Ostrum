@@ -225,36 +225,6 @@ export function OstrumWorksWheelSection() {
           />
         </div>
       </div>
-
-      {/* Natural scroll continuation footer below the wheel */}
-      <footer
-        className="w-full py-20 sm:py-28 flex flex-col items-center justify-center border-t text-center px-4 relative z-10 transition-colors duration-300 ease-out backdrop-blur-md"
-        style={{
-          backgroundColor: currentTheme.deep,
-          borderColor: isDrumActive ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
-        }}
-      >
-        <p
-          className="font-mono text-xs uppercase tracking-[0.24em] mb-3 font-semibold transition-colors duration-300 ease-out"
-          style={{ color: currentTheme.primary }}
-        >
-          OSTRUM STUDIO · SELECTED WORK
-        </p>
-        <a
-          href="mailto:hello@ostrum.co"
-          className="text-base sm:text-lg font-medium transition-colors duration-300 ease-out flex items-center gap-2 group"
-          style={{ color: currentTheme.textColor }}
-        >
-          <span>Have a system to build or venture to launch? Start a Conversation</span>
-          <span
-            className="transition-transform group-hover:translate-x-1"
-            style={{ color: currentTheme.primary }}
-            aria-hidden="true"
-          >
-            →
-          </span>
-        </a>
-      </footer>
     </section>
   );
 }

@@ -4,6 +4,9 @@ import { IntroHero } from '@/components/sections/IntroHero';
 import { OstrumEngineSection } from '@/components/sections/OstrumEngineSection';
 import { OstrumEnergyNarrativeSection } from '@/components/sections/OstrumEnergyNarrativeSection';
 import { OstrumWorksWheelSection } from '@/components/sections/OstrumWorksWheelSection';
+import { OstrumProjectExpansionHandoff } from '@/components/sections/OstrumProjectExpansionHandoff';
+import { OstrumCapabilitiesSection } from '@/components/sections/OstrumCapabilitiesSection';
+import { OstrumStudioFooter } from '@/components/sections/OstrumStudioFooter';
 
 export default function HomePage() {
   return (
@@ -20,8 +23,18 @@ export default function HomePage() {
       {/* SECTION 03: The Energy Continuum (Cinematic 3D Scroll Narrative) */}
       <OstrumEnergyNarrativeSection />
 
-      {/* SECTION 04: 21st.dev Works Wheel Showcase & Layered Entrance */}
+      {/* SECTION 04: Works Wheel Showcase (Selected Work) */}
       <OstrumWorksWheelSection />
+
+      {/* SECTION 04.5: Cinematic Project Media Expansion Handoff */}
+      <OstrumProjectExpansionHandoff />
+
+      {/* SECTION 05: What We Build · Our Capabilities */}
+      <OstrumCapabilitiesSection />
+
+      {/* STUDIO FOOTER: Final Contact Conversation & Signoff */}
+      <OstrumStudioFooter />
     </div>
   );
 }
+

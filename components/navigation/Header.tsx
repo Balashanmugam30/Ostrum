@@ -48,7 +48,7 @@ export function Header() {
 
   return (
     <header
-      className={`header fixed top-6 right-6 left-6 z-40 flex items-center transition-all duration-500 ease-out pointer-events-none ${
+      className={`header fixed top-6 right-6 left-6 z-40 flex items-center transition-all duration-500 ease-out pointer-events-none mix-blend-difference text-white ${
         scrolled ? 'justify-between' : 'justify-end'
       } ${inFooter || isCinematic ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
     >
