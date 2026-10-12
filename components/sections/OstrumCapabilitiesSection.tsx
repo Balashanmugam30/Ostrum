@@ -86,7 +86,110 @@ export function OstrumCapabilitiesSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const flowPlaceholderRef = useRef<HTMLDivElement>(null);
 
+  // Synchronised Shared-Element Transition Controller
+  useEffect(() => {
+    const pinContainer = pinContainerRef.current;
+    const placeholder = flowPlaceholderRef.current;
+    if (!pinContainer) return;
+
+    const updateTransition = ({
+      active,
+      progress = 0,
+      opacity = 1,
+      metrics,
+    }: {
+      active: boolean;
+      progress?: number;
+      opacity?: number;
+      metrics?: {
+        w: number;
+        h: number;
+        cardW: number;
+        cardH: number;
+        initLeft: number;
+        initTop: number;
+      };
+    }) => {
+      if (!pinContainer) return;
+
+      if (!active) {
+        if (placeholder) placeholder.style.display = 'none';
+        pinContainer.style.position = '';
+        pinContainer.style.top = '';
+        pinContainer.style.left = '';
+        pinContainer.style.width = '';
+        pinContainer.style.height = '';
+        pinContainer.style.zIndex = '';
+        pinContainer.style.pointerEvents = '';
+        pinContainer.style.transform = '';
+        pinContainer.style.transformOrigin = '';
+        pinContainer.style.borderRadius = '';
+        pinContainer.style.boxShadow = '';
+        pinContainer.style.border = '';
+        pinContainer.style.opacity = '1';
+        return;
+      }
+
+      if (placeholder) placeholder.style.display = 'block';
+
+      const w = metrics?.w ?? window.innerWidth;
+      const cardW = metrics?.cardW ?? 560;
+      const initLeft = metrics?.initLeft ?? 700;
+      const initTop = metrics?.initTop ?? 275;
+
+      const scale = cardW / w;
+
+      const normProgress = Math.min(1, Math.max(0, progress));
+      const isFull = normProgress >= 0.95;
+      const pClamped = isFull ? 1.0 : normProgress;
+
+      const ease =
+        pClamped < 0.5
+          ? 2 * pClamped * pClamped
+          : 1 - Math.pow(-2 * pClamped + 2, 2) / 2;
+
+      const curLeft = isFull ? 0 : initLeft * (1 - ease);
+      const curTop = isFull ? 0 : initTop * (1 - ease);
+      const curScale = isFull ? 1.0 : scale + (1.0 - scale) * ease;
+      const curRadius = isFull ? 0 : 16 * (1 - ease);
+      const shadowAlpha = isFull ? 0 : 0.18 * (1 - ease);
+      const borderAlpha = isFull ? 0 : 0.08 * (1 - ease);
+
+      pinContainer.style.position = 'fixed';
+      pinContainer.style.top = '0px';
+      pinContainer.style.left = '0px';
+      pinContainer.style.width = '100vw';
+      pinContainer.style.height = '100vh';
+      pinContainer.style.zIndex = '35';
+      pinContainer.style.pointerEvents = isFull ? 'auto' : 'none';
+      pinContainer.style.opacity = String(opacity);
+      pinContainer.style.transform = `translate(${curLeft.toFixed(2)}px, ${curTop.toFixed(2)}px) scale(${curScale.toFixed(4)})`;
+      pinContainer.style.transformOrigin = '0 0';
+      pinContainer.style.borderRadius = `${curRadius.toFixed(2)}px`;
+      pinContainer.style.boxShadow = isFull
+        ? 'none'
+        : `0 ${(20 * (1 - ease)).toFixed(1)}px ${(45 * (1 - ease)).toFixed(1)}px -10px rgba(11,11,16,${shadowAlpha.toFixed(3)})`;
+      pinContainer.style.border = isFull
+        ? 'none'
+        : `${(1 * (1 - ease)).toFixed(1)}px solid rgba(0,0,0,${borderAlpha.toFixed(3)})`;
+    };
+
+    (window as any).__ostrumUpdateCapabilitiesTransition = updateTransition;
+
+    const onCustomEvent = (e: any) => {
+      if (e.detail) updateTransition(e.detail);
+    };
+    window.addEventListener('ostrum:capabilities-transition', onCustomEvent);
+
+    return () => {
+      delete (window as any).__ostrumUpdateCapabilitiesTransition;
+      window.removeEventListener('ostrum:capabilities-transition', onCustomEvent);
+    };
+  }, []);
+
+  // Capabilities Horizontal Scroll Timeline
   useEffect(() => {
     const section = sectionRef.current;
     const pinContainer = pinContainerRef.current;
@@ -117,25 +220,24 @@ export function OstrumCapabilitiesSection() {
     const pinDistance = isMobile ? scrollDistance * 1.1 : scrollDistance * 1.35;
 
     const ctx = gsap.context(() => {
-      const tween = gsap.to(track, {
-        x: () => -getScrollDistance(),
-        ease: 'none',
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: `+=${pinDistance}`,
-          pin: pinContainer,
-          pinSpacing: true,
-          scrub: 1,
-          anticipatePin: 1,
-          id: 'capabilities-pin',
-          invalidateOnRefresh: true,
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top top',
+        end: `+=${pinDistance}`,
+        pin: pinContainer,
+        pinSpacing: true,
+        scrub: 1,
+        anticipatePin: 1,
+        id: 'capabilities-pin',
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const dist = getScrollDistance();
+          gsap.set(track, { x: -self.progress * dist });
+        },
+        onLeaveBack: () => {
+          gsap.set(track, { x: 0 });
         },
       });
-
-      return () => {
-        tween.kill();
-      };
     });
 
     ScrollTrigger.sort();
@@ -158,16 +260,25 @@ export function OstrumCapabilitiesSection() {
       id="capabilities"
       ref={sectionRef}
       data-testid="capabilities-section"
-      className="relative z-[24] w-full bg-white select-none"
+      className="relative z-[24] w-full min-h-screen bg-white select-none"
       style={{
         backgroundColor: '#FFFFFF',
       }}
       aria-label="Our Capabilities"
     >
-      {/* Pinned Stage Container with subtle top wash */}
+      {/* Flow placeholder to preserve exact document height during fixed transition mode */}
+      <div
+        ref={flowPlaceholderRef}
+        data-testid="capabilities-flow-placeholder"
+        className="w-full h-screen hidden pointer-events-none"
+        aria-hidden="true"
+      />
+
+      {/* Canonical Stage Container with subtle top wash */}
       <div
         ref={pinContainerRef}
-        className="w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-16 pb-6 sm:py-10 md:py-12"
+        data-testid="capabilities-pin-container"
+        className="w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-16 pb-6 sm:py-10 md:py-12 bg-white"
         style={{
           background:
             'linear-gradient(180deg, rgba(191,235,247,0.48) 0%, rgba(255,255,255,0.94) 13%, #FFFFFF 26%)',
@@ -193,7 +304,7 @@ export function OstrumCapabilitiesSection() {
           aria-hidden="true"
         />
 
-        {/* Editorial Section Header (No CTA inside Capabilities) */}
+        {/* Editorial Section Header (Canonical instance, zero CTA inside Capabilities) */}
         <header className="w-full px-6 sm:px-12 md:px-16 lg:px-20 z-20 shrink-0">
           <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8">
             <div>
@@ -215,7 +326,7 @@ export function OstrumCapabilitiesSection() {
           </div>
         </header>
 
-        {/* Horizontal Scroll Catalogue Track */}
+        {/* Horizontal Scroll Catalogue Track (Canonical 6 service cards) */}
         <div className="relative w-full z-10 flex items-center overflow-visible my-auto py-2">
           <div
             ref={trackRef}

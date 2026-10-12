@@ -11,7 +11,6 @@
 // - Surrounding cards curve back into 3D perspective above and below.
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { CapabilitiesPreviewThumbnail } from "@/components/ui/CapabilitiesPreviewThumbnail";
 
 export interface WorksWheelItem {
   /** Project name. Displayed prominently on the left panel. */
@@ -236,7 +235,11 @@ function InteractiveCardArtwork({
       className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(11,11,16,0.18)] border border-black/[0.08] bg-white/40 backdrop-blur-sm transition-all duration-300 group-hover:border-[#362beb]/50 group-hover:shadow-[0_25px_50px_-10px_rgba(54,43,235,0.25)]"
     >
       {isCapabilities ? (
-        <CapabilitiesPreviewThumbnail className="size-full" />
+        <div
+          data-testid="capabilities-transition-anchor"
+          data-transition-anchor="capabilities"
+          className="size-full overflow-hidden rounded-2xl bg-white/40"
+        />
       ) : (
         <img
           ref={imgRef}
@@ -422,6 +425,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
     // Demand-driven rAF loop: sleeps when settled, wakes when turning
     const isAnimating = React.useRef(false);
     const animFrame = React.useRef(0);
+    const leftPanelOpacityOverride = React.useRef<number | null>(null);
 
     const renderScene = React.useCallback(() => {
       const { ringRx, ringRy, ringScale, drumR, bow, drumShiftX, drumShiftY } = metrics;
@@ -483,10 +487,14 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
       }
       // Left text panel fades in as drum opens, with subtle sync during project changes
       if (leftPanelRef.current) {
-        const morphFade = Math.max(0, (m - 0.20) / 0.80);
-        const projectDistFromInt = Math.abs(pos - Math.round(pos));
-        const projectFade = m > 0.8 ? Math.max(0.15, 1 - projectDistFromInt * 1.8) : 1;
-        leftPanelRef.current.style.opacity = (morphFade * projectFade).toFixed(3);
+        if (leftPanelOpacityOverride.current !== null) {
+          leftPanelRef.current.style.opacity = String(leftPanelOpacityOverride.current);
+        } else {
+          const morphFade = Math.max(0, (m - 0.20) / 0.80);
+          const projectDistFromInt = Math.abs(pos - Math.round(pos));
+          const projectFade = m > 0.8 ? Math.max(0.15, 1 - projectDistFromInt * 1.8) : 1;
+          leftPanelRef.current.style.opacity = (morphFade * projectFade).toFixed(3);
+        }
       }
 
       const near = clamp(Math.round(pos), 0, last);
@@ -561,6 +569,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         snapTo: (next: number) => setTurn(next),
         getTurn: () => turn.current,
         setLeftPanelOpacity: (op: number) => {
+          leftPanelOpacityOverride.current = op;
           if (leftPanelRef.current) {
             leftPanelRef.current.style.opacity = String(op);
           }
