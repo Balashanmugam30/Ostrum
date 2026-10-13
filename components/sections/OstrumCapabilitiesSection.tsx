@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Card3DAccent } from '@/components/ui/Card3DAccent';
+import { OstrumSignatureSculpture } from '@/components/ui/OstrumSignatureSculpture';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -17,6 +17,7 @@ export interface CapabilityCardData {
   tags: string[];
   gradient: string;
   variant: 1 | 2 | 3 | 4 | 5 | 6;
+  artwork: string;
 }
 
 export const CAPABILITIES_DATA: CapabilityCardData[] = [
@@ -29,6 +30,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     gradient:
       'linear-gradient(112deg, #D7B5FA 0%, #F2D4FF 48%, #CDE6FC 100%)',
     variant: 1,
+    artwork: '/images/capabilities/digital-experiences.png',
   },
   {
     index: '02 / 06',
@@ -39,6 +41,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     gradient:
       'linear-gradient(112deg, #86FFF8 0%, #D2F6F0 52%, #F4C5CF 100%)',
     variant: 2,
+    artwork: '/images/capabilities/ai-systems-and-agents.png',
   },
   {
     index: '03 / 06',
@@ -49,6 +52,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     gradient:
       'linear-gradient(112deg, #FAC274 0%, #F2A460 100%)',
     variant: 3,
+    artwork: '/images/capabilities/business-platforms.png',
   },
   {
     index: '04 / 06',
@@ -59,6 +63,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     gradient:
       'linear-gradient(112deg, #BBCBFF 0%, #DDE4FF 53%, #EAD9FF 100%)',
     variant: 4,
+    artwork: '/images/capabilities/software-product-engineering.png',
   },
   {
     index: '05 / 06',
@@ -69,6 +74,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     gradient:
       'linear-gradient(112deg, #BDECCF 0%, #CFF7EF 55%, #C4E7F8 100%)',
     variant: 5,
+    artwork: '/images/capabilities/hardware-connected-technology.png',
   },
   {
     index: '06 / 06',
@@ -79,6 +85,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     gradient:
       'linear-gradient(112deg, #E9C9F6 0%, #F5CDD8 52%, #FFD9B7 100%)',
     variant: 6,
+    artwork: '/images/capabilities/custom-engineering.png',
   },
 ];
 
@@ -242,22 +249,11 @@ export function OstrumCapabilitiesSection() {
       });
     };
 
-    (window as any).__ostrumUpdateCapabilitiesTransition = updateTransition;
-
     const onCustomEvent = (event: Event) => {
       const detail = (event as CustomEvent).detail;
       if (detail) updateTransition(detail);
     };
-    const onWheelTurn = (event: Event) => {
-      const { turn, capabilitiesActive } = (event as CustomEvent).detail ?? {};
-      const currentProgress = Number(pinContainer.dataset.transitionProgress) || 0;
-      updateTransition({
-        active: Boolean(capabilitiesActive),
-        progress: turn >= 4 ? currentProgress : 0,
-      });
-    };
     window.addEventListener('ostrum:capabilities-transition', onCustomEvent);
-    window.addEventListener('ostrum:works-wheel-turn', onWheelTurn);
 
     const onResize = () => {
       const progress = Number(pinContainer.dataset.transitionProgress);
@@ -269,9 +265,7 @@ export function OstrumCapabilitiesSection() {
     window.addEventListener('resize', onResize);
 
     return () => {
-      delete (window as any).__ostrumUpdateCapabilitiesTransition;
       window.removeEventListener('ostrum:capabilities-transition', onCustomEvent);
-      window.removeEventListener('ostrum:works-wheel-turn', onWheelTurn);
       window.removeEventListener('resize', onResize);
     };
   }, []);
@@ -328,37 +322,56 @@ export function OstrumCapabilitiesSection() {
       };
     }
 
+    let scrollMetrics = getScrollMetrics();
+
+    const setSectionScrollHeight = () => {
+      scrollMetrics = getScrollMetrics();
+      section.style.height = `${window.innerHeight + scrollMetrics.verticalDistance}px`;
+      return scrollMetrics;
+    };
+
+    setSectionScrollHeight();
+
+    const emitVisualCoverage = (covered: boolean) => {
+      window.dispatchEvent(
+        new CustomEvent('ostrum:visual-coverage', {
+          detail: { id: 'capabilities', covered },
+        }),
+      );
+    };
+
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: section,
         start: 'top top',
-        end: () => `+=${getScrollMetrics().verticalDistance}`,
-        pin: pinContainer,
-        pinSpacing: true,
+        end: () => `+=${setSectionScrollHeight().verticalDistance}`,
         scrub: 0.6,
         anticipatePin: 1,
         id: 'capabilities-pin',
         invalidateOnRefresh: true,
         onUpdate: (self) => {
-          const { horizontalTravel } = getScrollMetrics();
-          gsap.set(track, { x: -self.progress * horizontalTravel });
+          gsap.set(track, { x: -self.progress * scrollMetrics.horizontalTravel });
+        },
+        onToggle: (self) => {
+          emitVisualCoverage(self.isActive);
         },
         onLeave: () => {
-          const { horizontalTravel } = getScrollMetrics();
-          gsap.set(track, { x: -horizontalTravel });
+          gsap.set(track, { x: -scrollMetrics.horizontalTravel });
           clearTransitionStyles(false);
           section.style.backgroundColor = 'transparent';
         },
         onEnterBack: () => {
-          section.style.backgroundColor = '#FFFFFF';
-          (window as any).__ostrumUpdateCapabilitiesTransition?.({
-            active: true,
-            progress: 1,
-          });
+          section.style.backgroundColor = 'transparent';
+          window.dispatchEvent(
+            new CustomEvent('ostrum:capabilities-transition', {
+              detail: { active: true, progress: 1 },
+            }),
+          );
         },
         onLeaveBack: () => {
-          section.style.backgroundColor = '#FFFFFF';
+          section.style.backgroundColor = 'transparent';
           gsap.set(track, { x: 0 });
+          clearTransitionStyles(false);
           const wheelTrigger = ScrollTrigger.getById('works-wheel-pin');
           if (wheelTrigger) {
             wheelTrigger.update();
@@ -371,6 +384,7 @@ export function OstrumCapabilitiesSection() {
     ScrollTrigger.refresh();
 
     const handleResize = () => {
+      setSectionScrollHeight();
       ScrollTrigger.refresh();
     };
 
@@ -378,6 +392,8 @@ export function OstrumCapabilitiesSection() {
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      section.style.height = '';
+      emitVisualCoverage(false);
       ctx.revert();
     };
   }, []);
@@ -387,9 +403,9 @@ export function OstrumCapabilitiesSection() {
       id="capabilities"
       ref={sectionRef}
       data-testid="capabilities-section"
-      className="relative z-[24] w-full min-h-screen bg-white select-none mb-[-100svh]"
+      className="relative z-[24] w-full min-h-screen select-none"
       style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'transparent',
       }}
       aria-label="Our Capabilities"
     >
@@ -397,7 +413,7 @@ export function OstrumCapabilitiesSection() {
       <div
         ref={pinContainerRef}
         data-testid="capabilities-pin-container"
-        className="w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-20 pb-6 sm:pt-20 sm:pb-10 md:pt-24 md:pb-12 bg-white"
+        className="capabilities-stage sticky top-0 w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-20 pb-6 sm:pt-20 sm:pb-10 md:pt-24 md:pb-12 bg-white"
         style={{
           background:
             'linear-gradient(180deg, rgba(191,235,247,0.48) 0%, rgba(255,255,255,0.94) 13%, #FFFFFF 26%)',
@@ -425,7 +441,7 @@ export function OstrumCapabilitiesSection() {
 
         {/* Editorial Section Header (Canonical instance, zero CTA inside Capabilities) */}
         <header className="w-full px-6 sm:px-12 md:px-16 lg:px-20 z-20 shrink-0">
-          <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8">
+          <div className="capabilities-header-inner flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8">
             <div>
               <h2
                 data-testid="capabilities-heading"
@@ -445,18 +461,27 @@ export function OstrumCapabilitiesSection() {
           </div>
         </header>
 
+        <div
+          data-testid="capabilities-signature-sculpture"
+          className="capabilities-signature-rail pointer-events-none absolute z-[5]"
+          aria-hidden="true"
+        >
+          <OstrumSignatureSculpture />
+        </div>
+
         {/* Horizontal Scroll Catalogue Track (Canonical 6 service cards) */}
         <div className="relative w-full z-10 flex items-center overflow-visible my-auto py-2">
           <div
             ref={trackRef}
             data-testid="capabilities-track"
-            className="flex items-stretch gap-6 sm:gap-7 md:gap-8 pl-6 sm:pl-12 md:pl-16 lg:pl-20 pr-12 sm:pr-20 md:pr-28 will-change-transform"
+            className="capabilities-track flex items-stretch gap-6 sm:gap-7 md:gap-8 pl-6 sm:pl-12 md:pl-16 lg:pl-20 pr-12 sm:pr-20 md:pr-28 will-change-transform"
           >
             {CAPABILITIES_DATA.map((card) => (
               <article
                 key={card.index}
                 data-testid={`capability-card-${card.variant}`}
-                className="relative shrink-0 w-[300px] sm:w-[340px] md:w-[360px] h-[450px] sm:h-[480px] md:h-[510px] rounded-[24px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_20px_50px_-15px_rgba(11,11,16,0.08)] border border-black/[0.06] transition-transform duration-300 hover:-translate-y-1.5"
+                tabIndex={0}
+                className="capability-card group relative shrink-0 w-[300px] sm:w-[340px] md:w-[360px] h-[450px] sm:h-[480px] md:h-[510px] rounded-[24px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_20px_50px_-15px_rgba(11,11,16,0.08)] border border-black/[0.06] transition-[transform,box-shadow] duration-200 ease-out outline-none"
                 style={{
                   background: card.gradient,
                 }}
@@ -473,8 +498,18 @@ export function OstrumCapabilitiesSection() {
                 </div>
 
                 {/* 3D Dimensional Accent Viewport */}
-                <div className="relative w-full h-[180px] sm:h-[200px] md:h-[210px] my-auto flex items-center justify-center">
-                  <Card3DAccent variant={card.variant} />
+                <div className="capability-art-frame relative w-full h-[180px] sm:h-[200px] md:h-[210px] my-auto flex items-center justify-center">
+                  <img
+                    data-testid={`capability-artwork-${card.variant}`}
+                    src={card.artwork}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                    width={377}
+                    height={262}
+                    decoding="async"
+                    className="capability-artwork block w-full h-full object-contain transition-transform duration-300 ease-out"
+                  />
                 </div>
 
                 {/* Card Content: Title, Description, Tags (Strictly NO CTA) */}

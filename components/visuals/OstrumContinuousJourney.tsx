@@ -29,7 +29,8 @@ export function OstrumContinuousJourney() {
 
     let isDisposed = false;
     let isContextLost = false;
-    let animId: number;
+    let animId = 0;
+    let wakeAnimation: () => void = () => {};
 
     // 1. Scene & Camera setup
     const scene = new THREE.Scene();
@@ -65,9 +66,12 @@ export function OstrumContinuousJourney() {
     const onContextLost = (e: Event) => {
       e.preventDefault();
       isContextLost = true;
+      cancelAnimationFrame(animId);
+      animId = 0;
     };
     const onContextRestored = () => {
       isContextLost = false;
+      wakeAnimation();
     };
     renderer.domElement.addEventListener('webglcontextlost', onContextLost, false);
     renderer.domElement.addEventListener('webglcontextrestored', onContextRestored, false);
@@ -345,9 +349,9 @@ export function OstrumContinuousJourney() {
       const dScrollY = st ? st.start : Math.max(1, sDocY - window.innerHeight * 0.50);
 
       const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
-      // Selected Work panel rises and fully covers the sculpture over ~window.innerHeight after energyEnd
+      // The selected-work stage covers the sculpture as soon as the energy pin releases.
       const exitY = stEnergy
-        ? stEnergy.end + window.innerHeight
+        ? stEnergy.end + 100
         : dScrollY + (isMob ? 5000 : 7500);
 
       anchors = {
@@ -399,10 +403,8 @@ export function OstrumContinuousJourney() {
     let hasPlayedArrival = false;
 
     const animate = (time: number) => {
-      if (isDisposed) return;
-      animId = requestAnimationFrame(animate);
-
-      if (isContextLost) return;
+      animId = 0;
+      if (isDisposed || isContextLost) return;
 
       const scrollY = window.scrollY;
 
@@ -415,9 +417,10 @@ export function OstrumContinuousJourney() {
       const energyStart = stEnergy ? stEnergy.start : dockEnd + (isMobile ? 500 : 800);
       const energyEnd = stEnergy ? stEnergy.end : energyStart + (isMobile ? 3600 : 5000) + window.innerHeight;
 
-      // Dynamic exit boundary: only cull when Works Wheel has fully covered the sculpture
-      const exitBoundary = stEnergy ? stEnergy.end + window.innerHeight : Math.max(anchors.exitScrollY, energyEnd + window.innerHeight);
-      const isPastExit = scrollY > exitBoundary + 250;
+      // Stop the renderer once the opaque Selected Work stage covers it. A scroll
+      // listener wakes it again when the visitor reverses into the journey.
+      const exitBoundary = stEnergy ? stEnergy.end + 100 : anchors.exitScrollY;
+      const isPastExit = scrollY > exitBoundary;
 
       if (isPastExit) {
         if (container.style.opacity !== '0') {
@@ -591,9 +594,29 @@ export function OstrumContinuousJourney() {
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
+      animId = requestAnimationFrame(animate);
     };
 
-    animId = requestAnimationFrame(animate);
+    const syncAnimation = () => {
+      const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
+      const exitBoundary = stEnergy ? stEnergy.end + 100 : anchors.exitScrollY;
+      if (window.scrollY > exitBoundary) {
+        if (container.style.opacity !== '0') container.style.opacity = '0';
+        cancelAnimationFrame(animId);
+        animId = 0;
+        return;
+      }
+
+      if (container.style.opacity !== '1') container.style.opacity = '1';
+      if (!isDisposed && !isContextLost && animId === 0) {
+        animId = requestAnimationFrame(animate);
+      }
+    };
+    wakeAnimation = syncAnimation;
+
+    window.addEventListener('scroll', syncAnimation, { passive: true });
+    ScrollTrigger.addEventListener('refresh', syncAnimation);
+    syncAnimation();
 
     // 10. Resize Handling
     const handleResize = () => {
@@ -602,6 +625,7 @@ export function OstrumContinuousJourney() {
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.35));
       updateAnchors();
+      syncAnimation();
     };
     window.addEventListener('resize', handleResize);
 
@@ -613,6 +637,8 @@ export function OstrumContinuousJourney() {
       clearTimeout(anchorTimer3);
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', syncAnimation);
+      ScrollTrigger.removeEventListener('refresh', syncAnimation);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('ostrum:focus-bias', handleFocusBias);
       window.removeEventListener('ostrum:narrative-ready', onNarrativeReady);

@@ -24,6 +24,8 @@ export function OstrumWorksWheelSection() {
 
   const [activeProject, setActiveProject] = useState(0);
   const [isDrumActive, setIsDrumActive] = useState(false);
+  const isDrumActiveRef = useRef(false);
+  const capabilitiesTransitionActiveRef = useRef(false);
 
   // Derive authoritative theme: light white/lavender in oval state, rich project theme in drum mode
   const currentTheme = isDrumActive
@@ -31,12 +33,11 @@ export function OstrumWorksWheelSection() {
     : LIGHT_OVAL_THEME;
 
   const handleTurnChange = useCallback((turn: number) => {
-    setIsDrumActive(turn >= 0.45);
-    window.dispatchEvent(
-      new CustomEvent('ostrum:works-wheel-turn', {
-        detail: { turn, capabilitiesActive: turn >= 3.5 },
-      }),
-    );
+    const nextIsDrumActive = turn >= 0.45;
+    if (nextIsDrumActive === isDrumActiveRef.current) return;
+
+    isDrumActiveRef.current = nextIsDrumActive;
+    setIsDrumActive(nextIsDrumActive);
   }, []);
 
   // Smooth programmatic project selection (via card click or keyboard)
@@ -82,10 +83,12 @@ export function OstrumWorksWheelSection() {
       active: boolean;
       progress?: number;
     }) => {
-      const fn = (window as any).__ostrumUpdateCapabilitiesTransition;
-      if (typeof fn === 'function') {
-        fn(detail);
+      const active = Boolean(detail.active);
+      if (!active && !capabilitiesTransitionActiveRef.current) {
+        return;
       }
+
+      capabilitiesTransitionActiveRef.current = active;
       window.dispatchEvent(
         new CustomEvent('ostrum:capabilities-transition', { detail })
       );
@@ -114,9 +117,16 @@ export function OstrumWorksWheelSection() {
       const p2 = (holdDist + morphDist) / totalPinDistance;
       const p3 = (holdDist + morphDist + projectsDist) / totalPinDistance;
 
+      const emitVisualCoverage = (covered: boolean) => {
+        window.dispatchEvent(
+          new CustomEvent('ostrum:visual-coverage', {
+            detail: { id: 'works-wheel', covered },
+          }),
+        );
+      };
+
       if (prefersReducedMotion) {
         worksWheelRef.current?.setTurn(1);
-        setIsDrumActive(true);
         return;
       }
 
@@ -129,6 +139,7 @@ export function OstrumWorksWheelSection() {
           pinSpacing: true,
           anticipatePin: 1,
           id: 'works-wheel-pin',
+          onToggle: (self) => emitVisualCoverage(self.isActive),
           onUpdate: (self) => {
             const p = self.progress;
             let targetTurn = 0;
@@ -137,13 +148,13 @@ export function OstrumWorksWheelSection() {
             if (p <= p1) {
               // Phase 1: Oval at rest with minimal center label
               targetTurn = 0;
-              worksWheelRef.current?.setLeftPanelOpacity?.(1);
+              worksWheelRef.current?.setLeftPanelOpacity?.(0);
               notifyCapabilities({ active: false });
             } else if (p <= p2) {
               // Phase 2: Smooth, continuous scroll-scrubbed oval-to-drum expansion
               const tMorph = (p - p1) / (p2 - p1);
               targetTurn = tMorph * 1.0;
-              worksWheelRef.current?.setLeftPanelOpacity?.(1);
+              worksWheelRef.current?.setLeftPanelOpacity?.(0);
               notifyCapabilities({ active: false });
             } else if (p <= p3) {
               // Phase 3: Project-by-project browsing across the 4 entries (1000px per project)
@@ -155,7 +166,11 @@ export function OstrumWorksWheelSection() {
                 capabilitiesActive ? 0 : 1,
               );
               worksWheelRef.current?.setWheelOpacity?.(1);
-              if (capabilitiesActive) capabilitiesProgress = 0;
+              if (capabilitiesActive) {
+                capabilitiesProgress = 0;
+              } else {
+                notifyCapabilities({ active: false });
+              }
               // The live Capabilities section follows item four's measured media bounds
               // through the same wheel rotation, via handleTurnChange above.
             } else {
@@ -171,7 +186,6 @@ export function OstrumWorksWheelSection() {
             }
 
             worksWheelRef.current?.setTurn(targetTurn);
-            setIsDrumActive(targetTurn >= 0.45);
             if (capabilitiesProgress !== null) {
               notifyCapabilities({
                 active: true,
@@ -187,7 +201,7 @@ export function OstrumWorksWheelSection() {
             });
           },
           onLeaveBack: () => {
-            worksWheelRef.current?.setLeftPanelOpacity?.(1);
+            worksWheelRef.current?.setLeftPanelOpacity?.(0);
             worksWheelRef.current?.setWheelOpacity?.(1);
             notifyCapabilities({ active: false });
           },
@@ -196,6 +210,7 @@ export function OstrumWorksWheelSection() {
 
       cleanupCtx = () => {
         notifyCapabilities({ active: false });
+        emitVisualCoverage(false);
         ctx.revert();
       };
       ScrollTrigger.sort();

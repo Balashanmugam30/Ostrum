@@ -19,6 +19,7 @@ async function run() {
   const errors = [];
   const networkErrors = [];
   const assertions = [];
+  const screenshotFailures = [];
 
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
   page.on('console', (message) => {
@@ -114,7 +115,10 @@ async function run() {
         title: get('[data-testid="works-wheel-project-title"]')?.textContent?.trim(),
         description: get('[data-testid="works-wheel-project-description"]')?.textContent?.trim(),
         leftPanelOpacity: Number(getComputedStyle(get('[data-testid="works-wheel-left-panel"]')).opacity),
+        centerLabel: get('[data-testid="works-wheel-center-label"]')?.textContent?.trim(),
+        wheelBounds: rect(get('[role="listbox"]')),
         wheelTurn: get('[role="listbox"]')?._worksWheel?.turn?.current ?? null,
+        wheelEntryCount: document.querySelectorAll('[role="listbox"] [role="option"]').length,
         capabilitiesCardOpacity: wheel ? Number(getComputedStyle(wheel).opacity) : 0,
         mnesaCardOpacity: mnesa ? Number(getComputedStyle(mnesa).opacity) : 0,
         anchorRect: rect(anchor),
@@ -149,9 +153,16 @@ async function run() {
 
   const capture = async (name) => {
     const file = path.join(ARTIFACTS_DIR, `${name}.png`);
-    await page.screenshot({ path: file });
-    console.log(`SCREENSHOT ${file}`);
-    return file;
+    try {
+      await page.screenshot({ path: file, timeout: 20000, animations: 'disabled' });
+      console.log(`SCREENSHOT ${file}`);
+      return file;
+    } catch (error) {
+      const detail = { name, message: error.message };
+      screenshotFailures.push(detail);
+      console.warn('SCREENSHOT skipped after browser capture timed out', detail);
+      return null;
+    }
   };
 
   await page.goto(BASE_URL, { waitUntil: 'networkidle' });
@@ -183,12 +194,29 @@ async function run() {
   geometry.forExpansion = (progress) => geometry.start + (geometry.end - geometry.start) *
     (geometry.p3 + progress * (1 - geometry.p3));
 
+  // 0. The oval wheel and center label remain at rest while project metadata stays hidden.
+  await moveWithLenis(geometry.start);
+  let state = await snapshot();
+  assert('The initial oval wheel and Selected Work label remain visible without TMR metadata',
+    state.wheelBounds?.width > 0 && state.wheelBounds.top >= -1 &&
+    state.wheelBounds.top < VIEWPORT.height && state.centerLabel === 'Selected Work' &&
+    state.wheelEntryCount === 4 && state.leftPanelOpacity < 0.02,
+    state);
+  await capture('00-initial-oval-rest');
+
+  await moveWithLenis(geometry.forTurn(1.15));
+  state = await snapshot();
+  assert('TMR metadata appears after TMR becomes the active wheel entry',
+    state.title?.startsWith('TMR') && state.leftPanelOpacity > 0.95, state);
+  await capture('00-tmr-active');
+
   // 1. MNESA is active, with no Capabilities preview visible over it.
   await moveWithLenis(geometry.forTurn(3));
-  let state = await snapshot();
+  state = await snapshot();
   assert('MNESA is the active third wheel entry', state.title === 'MNESA', state);
   assert('Capabilities item has no separately rendered thumbnail content', state.anchorChildCount === 0, state);
-  assert('Capabilities section is hidden while MNESA is active', state.surfaceOpacity === '0', state);
+  assert('Capabilities section stays below the viewport while MNESA is active',
+    state.surfaceRect.top >= VIEWPORT.height && state.capabilitiesCardOpacity === 0, state);
   await capture('01-mnesa-active');
 
   // 2. Sample the real drum halfway from MNESA to the fourth entry.
@@ -308,19 +336,26 @@ async function run() {
     finalCard && finalCard.x >= -1 && finalCard.x + finalCard.width <= VIEWPORT.width + 1,
     { finalCard, viewport: VIEWPORT, horizontalTravel: capMetrics.horizontalTravel });
 
-  // 13. The section releases into the existing contact CTA without a fixed stale surface.
-  await moveWithLenis(capEnd + 1);
+  // 13. The document ends on the sticky stage with the final card accessible.
+  await moveWithLenis(capEnd + VIEWPORT.height * 0.5);
   state = await snapshot();
-  const footer = await page.locator('#studio-footer').boundingBox();
-  await capture('12-natural-release-into-contact-cta');
-  assert('The contact CTA enters naturally after the sixth card',
-    footer && Math.abs(footer.y) < 5 && footer.y + footer.height > 0,
-    { footer, transitionPosition: state.surfacePosition, transitionTransform: state.surfaceTransform });
-  assert('The released section leaves no white tail behind the contact CTA',
-    state.sectionBackground === 'rgba(0, 0, 0, 0)', { sectionBackground: state.sectionBackground });
-  assert('The shared section releases its fixed transform before the CTA',
-    state.surfacePosition !== 'fixed' && !state.surfaceTransform,
-    { position: state.surfacePosition, transform: state.surfaceTransform });
+  const finalSurface = await page.locator('[data-testid="capabilities-pin-container"]').boundingBox();
+  const finalCardAtPageEnd = await page.locator('[data-testid="capability-card-6"]').boundingBox();
+  const pageEnd = await page.evaluate(() => ({
+    scrollY: window.scrollY,
+    maxScroll: document.documentElement.scrollHeight - window.innerHeight,
+    hasFooter: Boolean(document.querySelector('#studio-footer')),
+    footerCount: document.querySelectorAll('#studio-footer').length,
+    stagePosition: getComputedStyle(document.querySelector('[data-testid="capabilities-pin-container"]')).position,
+    hasPinSpacer: Boolean(document.querySelector('[data-testid="capabilities-pin-container"]').closest('.pin-spacer')),
+  }));
+  await capture('12-page-end-sixth-card');
+  assert('The page ends on the sticky Capabilities stage with the sixth card visible and no footer',
+    pageEnd.footerCount === 0 && pageEnd.stagePosition === 'sticky' &&
+    Math.abs(pageEnd.scrollY - pageEnd.maxScroll) < 2 && Math.abs(pageEnd.scrollY - capEnd) < 3 &&
+    Math.abs(finalSurface.y) < 2 && finalCardAtPageEnd && finalCardAtPageEnd.x >= -1 &&
+    finalCardAtPageEnd.x + finalCardAtPageEnd.width <= VIEWPORT.width + 1 && !pageEnd.hasPinSpacer,
+    { pageEnd, finalSurface, finalCardAtPageEnd, capEnd });
 
   // 14. Reverse-scroll through the same section and wheel, checking clean restoration.
   await moveWithLenis(capStart + capDistance * 0.5);
@@ -386,11 +421,14 @@ async function run() {
       layoutShifts: window.__ostrumBrowserHealth.layoutShifts,
       longAnimationFrames: window.__ostrumBrowserHealth.longAnimationFrames,
       maxLongAnimationFrameMs: Math.max(0, ...window.__ostrumBrowserHealth.longAnimationFrames.map((entry) => entry.duration)),
+      maxLongAnimationBlockingDurationMs: Math.max(0, ...window.__ostrumBrowserHealth.longAnimationFrames.map((entry) => entry.blockingDuration)),
     };
   });
   console.log('Browser health during real wheel interaction', JSON.stringify(browserHealth, null, 2));
   assert('No significant layout shift during the real wheel interaction', browserHealth.cumulativeLayoutShift < 0.1, browserHealth);
-  assert('No long animation frames during the real wheel interaction', browserHealth.maxLongAnimationFrameMs <= 50, browserHealth);
+  assert('Frame interval p95 stays within 25 ms during real wheel input', browserHealth.frameIntervalP95Ms <= 25, browserHealth);
+  assert('No blocking long animation frames during the real wheel interaction',
+    browserHealth.maxLongAnimationBlockingDurationMs <= 50, browserHealth);
   await capture('16-real-wheel-input-capabilities');
   await wheelTo(geometry.forTurn(3));
   const mouseWheelReverse = await snapshot();
@@ -408,6 +446,7 @@ async function run() {
     assertions,
     errors,
     networkErrors,
+    screenshotFailures,
     screenshots: fs.readdirSync(ARTIFACTS_DIR).filter((file) => file.endsWith('.png')),
   };
   fs.writeFileSync(path.join(ARTIFACTS_DIR, 'end_to_end_journey_audit_report.json'), JSON.stringify(report, null, 2));

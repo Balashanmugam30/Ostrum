@@ -67,18 +67,25 @@ async function run() {
       const get = (selector) => document.querySelector(selector);
       const surface = get('[data-testid="capabilities-pin-container"]');
       const anchor = get('[data-testid="capabilities-transition-anchor"]');
+      const signatureRail = get('[data-testid="capabilities-signature-sculpture"]');
+      const track = get('[data-testid="capabilities-track"]');
+      const firstCard = get('[data-testid="capability-card-1"]');
       const rect = (element) => {
         if (!element) return null;
         const r = element.getBoundingClientRect();
         return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
       };
       return {
+        scrollY: window.scrollY,
         title: get('[data-testid="works-wheel-project-title"]')?.textContent?.trim(),
+        leftPanelOpacity: Number(getComputedStyle(get('[data-testid="works-wheel-left-panel"]')).opacity),
         wheelTurn: get('[role="listbox"]')?._worksWheel?.turn?.current ?? null,
+        wheelEntryCount: document.querySelectorAll('[role="listbox"] [role="option"]').length,
         anchor: rect(anchor),
         anchorChildren: anchor?.children.length ?? -1,
         surface: rect(surface),
         surfacePosition: surface?.style.position ?? '',
+        surfaceComputedPosition: getComputedStyle(surface).position,
         surfaceOpacity: getComputedStyle(surface).opacity,
         surfaceTransform: surface?.style.transform ?? '',
         transitionProgress: Number(surface?.dataset.transitionProgress ?? -1),
@@ -89,6 +96,13 @@ async function run() {
         sectionCount: document.querySelectorAll('[data-testid="capabilities-section"]').length,
         sectionBackground: getComputedStyle(get('[data-testid="capabilities-section"]')).backgroundColor,
         cardCount: document.querySelectorAll('#capabilities article').length,
+        artworkCount: document.querySelectorAll('#capabilities [data-testid^="capability-artwork-"]').length,
+        signatureSculptureCount: document.querySelectorAll('[data-testid="capabilities-signature-sculpture"] svg').length,
+        signatureDisplay: getComputedStyle(signatureRail).display,
+        signatureRail: rect(signatureRail),
+        firstCard: rect(firstCard),
+        trackPaddingLeft: getComputedStyle(track).paddingLeft,
+        footerCount: document.querySelectorAll('#studio-footer').length,
       };
     });
     const screenshot = async (name) => {
@@ -98,14 +112,36 @@ async function run() {
       return file;
     };
 
+    // The wheel is visible at rest with its center label; only project metadata is hidden.
+    await scroll(geometry.wheelStart);
+    let state = await getState();
+    const initialWheel = await page.locator('[role="listbox"]').boundingBox();
+    const centerLabel = await page.locator('[data-testid="works-wheel-center-label"]').innerText();
+    assert(`${viewport.name}: initial oval wheel and Selected Work label are visible without TMR metadata`,
+      initialWheel && initialWheel.width > 0 && initialWheel.y >= -1 &&
+      initialWheel.y < geometry.height && centerLabel === 'Selected Work' &&
+      state.wheelEntryCount === 4 && state.leftPanelOpacity < 0.02,
+      { initialWheel, centerLabel, ...state });
+    await screenshot('initial-oval-rest');
+
     // MNESA remains the third item; the old floating fake preview is absent.
     const mnesaProgress = geometry.p2 + (2 / 3) * (geometry.p3 - geometry.p2);
     await scroll(toProgress(mnesaProgress));
-    let state = await getState();
+    state = await getState();
     assert(`${viewport.name}: MNESA is active before the fourth entry`, state.title === 'MNESA', state);
     assert(`${viewport.name}: one canonical section and an empty wheel anchor`,
       state.sectionCount === 1 && state.headingCount === 1 && state.cardCount === 6 && state.anchorChildren === 0,
       { sections: state.sectionCount, headings: state.headingCount, cards: state.cardCount, anchorChildren: state.anchorChildren });
+
+    const tmrProgress = geometry.p2 + (geometry.p3 - geometry.p2) * 0.05;
+    await scroll(toProgress(tmrProgress));
+    state = await getState();
+    assert(`${viewport.name}: TMR metadata appears when TMR becomes active`,
+      state.title?.startsWith('TMR') && state.leftPanelOpacity > 0.95, state);
+    await screenshot('tmr-active');
+    await scroll(toProgress(mnesaProgress));
+    state = await getState();
+    assert(`${viewport.name}: MNESA remains the third item after TMR`, state.title === 'MNESA', state);
 
     // At the fourth entry, the canonical content is clipped to the measured media rectangle.
     const settledY = toProgress(geometry.p3);
@@ -160,6 +196,9 @@ async function run() {
         start: trigger.start,
         end: trigger.end,
         horizontalTravel: Math.max(0, track.scrollWidth - surface.clientWidth),
+        sectionHeight: document.querySelector('[data-testid="capabilities-section"]').getBoundingClientRect().height,
+        documentMaxScroll: document.documentElement.scrollHeight - window.innerHeight,
+        hasPinSpacer: Boolean(surface.closest('.pin-spacer')),
         viewportHeight: window.innerHeight,
         cardHeight: firstCard.getBoundingClientRect().height,
         steps: track.children.length - 1,
@@ -185,14 +224,50 @@ async function run() {
     await screenshot('sixth-card');
 
     await scroll(capTrigger.end + geometry.height * 0.5);
-    const footer = await page.locator('#studio-footer').boundingBox();
     const released = await getState();
-    assert(`${viewport.name}: contact CTA follows the catalogue without a blank release`,
-      footer && Math.abs(footer.y) < 5 && footer.y + footer.height > 0 &&
-      released.sectionBackground === 'rgba(0, 0, 0, 0)' &&
-      released.surfacePosition !== 'fixed' && !released.surfaceTransform,
-      { footer, sectionBackground: released.sectionBackground, surfacePosition: released.surfacePosition, surfaceTransform: released.surfaceTransform });
-    await screenshot('contact-cta-release');
+    const endCard = await page.locator('[data-testid="capability-card-6"]').boundingBox();
+    assert(`${viewport.name}: page ends on the sticky Capabilities stage with no trailing footer`,
+      released.footerCount === 0 && released.surfaceComputedPosition === 'sticky' &&
+      Math.abs(released.surface.top) < 2 && endCard && endCard.x >= -1 &&
+      endCard.x + endCard.width <= geometry.width + 1 &&
+      Math.abs(released.scrollY - capTrigger.end) < 3 &&
+      Math.abs(capTrigger.documentMaxScroll - capTrigger.end) < 3 &&
+      !capTrigger.hasPinSpacer,
+      { ...released, endCard, viewportWidth: geometry.width, triggerEnd: capTrigger.end,
+        documentMaxScroll: capTrigger.documentMaxScroll, hasPinSpacer: capTrigger.hasPinSpacer });
+    assert(`${viewport.name}: one six-card catalogue and a local signature sculpture`,
+      released.cardCount === 6 && released.artworkCount === 6 &&
+      released.signatureSculptureCount === 1 &&
+      (geometry.width < 1280 || (full.signatureDisplay === 'block' &&
+        full.signatureRail.width > 0 && full.firstCard.left > full.signatureRail.right)),
+      { cards: released.cardCount, artworks: released.artworkCount, sculpture: released.signatureSculptureCount,
+        signatureDisplay: full.signatureDisplay, signatureRail: full.signatureRail,
+        firstCard: full.firstCard, trackPaddingLeft: full.trackPaddingLeft });
+    await screenshot('page-end-sixth-card');
+
+    const card = page.locator('[data-testid="capability-card-6"]');
+    const beforeHover = await card.boundingBox();
+    await card.hover();
+    await page.waitForTimeout(420);
+    const afterHover = await card.boundingBox();
+    assert(`${viewport.name}: card hover lifts and enlarges the selected card`,
+      afterHover && beforeHover && afterHover.y < beforeHover.y && afterHover.width > beforeHover.width,
+      { beforeHover, afterHover });
+    await screenshot('sixth-card-hover');
+    await page.mouse.move(geometry.width - 1, geometry.height - 1);
+    await page.waitForTimeout(420);
+    const afterHoverExit = await card.boundingBox();
+    assert(`${viewport.name}: card returns to baseline after hover`,
+      afterHoverExit && beforeHover && Math.abs(afterHoverExit.y - beforeHover.y) < 1 &&
+      Math.abs(afterHoverExit.width - beforeHover.width) < 1,
+      { beforeHover, afterHoverExit });
+    await card.focus();
+    await page.waitForTimeout(420);
+    const afterFocus = await card.boundingBox();
+    assert(`${viewport.name}: keyboard focus emphasizes the selected card`,
+      afterFocus && beforeHover && afterFocus.y < beforeHover.y && afterFocus.width > beforeHover.width,
+      { beforeHover, afterFocus });
+    await screenshot('sixth-card-keyboard-focus');
 
     // Reverse through the same live section and back into the drum; no fixed state remains.
     await scroll(settledY);

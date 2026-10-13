@@ -13,7 +13,7 @@ export function BackgroundCaustics() {
     const isMobile = window.innerWidth < 768;
     if (isMobile) return;
 
-    let animationFrameId: number;
+    let animationFrameId = 0;
     const size = { width: container.clientWidth || window.innerWidth, height: container.clientHeight || window.innerHeight };
 
     const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' });
@@ -329,8 +329,9 @@ export function BackgroundCaustics() {
     let targetScrollY = 0;
     let currentDarken = 0;
     let targetDarken = 0;
-    let isVisible = true;
+    let isVisible = document.visibilityState === 'visible';
     let isContextLost = false;
+    const coveredSurfaces = new Set<string>();
 
     const onBgDarken = (e: Event) => {
       const customEvent = e as CustomEvent<number>;
@@ -390,17 +391,17 @@ export function BackgroundCaustics() {
       }
     };
 
-    const onVisibilityChange = () => {
-      isVisible = document.visibilityState === 'visible';
-    };
-
     const onContextLost = (e: Event) => {
       e.preventDefault();
       isContextLost = true;
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = 0;
     };
 
     const onContextRestored = () => {
       isContextLost = false;
+      updateVisibility();
+      scheduleFrame();
     };
 
     renderer.domElement.addEventListener('webglcontextlost', onContextLost, false);
@@ -408,13 +409,12 @@ export function BackgroundCaustics() {
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('scroll', onScroll, { passive: true });
-    document.addEventListener('visibilitychange', onVisibilityChange);
     onScroll();
 
     const startTime = performance.now();
 
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
+      animationFrameId = 0;
       if (!isVisible || isContextLost) return;
 
       const elapsed = ((performance.now() - startTime) * 0.001) % 3600.0;
@@ -431,9 +431,42 @@ export function BackgroundCaustics() {
       uniforms.uDarken.value = currentDarken;
 
       renderer.render(scene, camera);
+      animationFrameId = requestAnimationFrame(animate);
     };
 
-    animate();
+    const scheduleFrame = () => {
+      if (isVisible && !isContextLost && animationFrameId === 0) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+
+    const updateVisibility = () => {
+      const nextIsVisible =
+        document.visibilityState === 'visible' && coveredSurfaces.size === 0;
+      if (nextIsVisible === isVisible && !isContextLost) return;
+
+      isVisible = nextIsVisible;
+      if (isVisible && !isContextLost) {
+        scheduleFrame();
+      } else {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = 0;
+      }
+    };
+
+    const onVisualCoverage = (event: Event) => {
+      const { id, covered } = (event as CustomEvent).detail ?? {};
+      if (typeof id !== 'string') return;
+      if (covered) coveredSurfaces.add(id);
+      else coveredSurfaces.delete(id);
+      updateVisibility();
+    };
+
+    const onVisibilityChange = () => updateVisibility();
+    window.addEventListener('ostrum:visual-coverage', onVisualCoverage);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    updateVisibility();
+    scheduleFrame();
 
     const onResize = () => {
       size.width = container.clientWidth || window.innerWidth;
@@ -442,6 +475,7 @@ export function BackgroundCaustics() {
       material.uniforms.uResolution.value.set(size.width, size.height);
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       targetScrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      scheduleFrame();
     };
 
     window.addEventListener('resize', onResize);
@@ -452,6 +486,7 @@ export function BackgroundCaustics() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('ostrum:bg-darken', onBgDarken);
+      window.removeEventListener('ostrum:visual-coverage', onVisualCoverage);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
       renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
