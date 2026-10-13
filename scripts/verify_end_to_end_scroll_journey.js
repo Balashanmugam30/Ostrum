@@ -110,13 +110,15 @@ async function runEndToEndVerification() {
     const anchor = document.querySelector('[data-testid="capabilities-transition-anchor"]');
     const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
     return {
-      anchorVisible: anchor ? window.getComputedStyle(anchor).opacity !== '0' : false,
+      anchorExists: !!anchor,
+      anchorHasZeroFakeElements: anchor ? anchor.children.length === 0 : false,
+      anchorOpacity: anchor ? window.getComputedStyle(anchor).opacity : null,
       isOverlayFixed: pinContainer ? pinContainer.style.position === 'fixed' : false,
     };
   });
 
-  assert('Card 4 on Works Wheel drum is VISIBLE during cylinder rotation', rotState.anchorVisible, rotState);
-  assert('Capabilities 2D overlay remains inactive during drum rotation', !rotState.isOverlayFixed, rotState);
+  assert('Card 4 transition anchor has ZERO fake elements/children', rotState.anchorHasZeroFakeElements, rotState);
+  assert('Card 4 transition anchor is transparent (opacity 0)', rotState.anchorOpacity === '0', rotState);
 
   await page.screenshot({
     path: path.join(ARTIFACTS_DIR, 'journey-02-drum-rotation-midpoint.png'),
@@ -136,17 +138,27 @@ async function runEndToEndVerification() {
     const lpDesc = document.querySelector('[data-testid="works-wheel-project-description"]')?.textContent?.trim();
     const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
     const pRect = pinContainer ? pinContainer.getBoundingClientRect() : null;
+    const isOverlayFixed = pinContainer ? pinContainer.style.position === 'fixed' : false;
+    const capHeading = document.querySelector('[data-testid="capabilities-heading"]')?.textContent?.trim();
+    const mnesaCard = document.getElementById('works-wheel-2');
+    const mnesaOpacity = mnesaCard ? parseFloat(window.getComputedStyle(mnesaCard).opacity) : 0;
+
     return {
       title: lpTitle,
       description: lpDesc,
+      isOverlayFixed,
       containerWidth: pRect ? Math.round(pRect.width) : 0,
-      containerTransform: pinContainer ? pinContainer.style.transform : null,
+      capHeading,
+      mnesaOpacity,
     };
   });
 
   assert('Our Capabilities is active entry title', settledState.title === 'Our Capabilities', settledState);
   assert('Our Capabilities description is present', settledState.description?.includes('digital experiences and intelligent AI systems'), settledState);
+  assert('Live Capabilities section is active in thumbnail state', settledState.isOverlayFixed, settledState);
   assert('Capabilities section sits at thumbnail width (~635px)', settledState.containerWidth > 500 && settledState.containerWidth < 700, settledState);
+  assert('Live Capabilities section heading "Our Capabilities" is visible inside thumbnail', settledState.capHeading === 'Our Capabilities', settledState);
+  assert('MNESA card on drum is faded out (opacity 0)', settledState.mnesaOpacity < 0.05, settledState);
 
   await page.screenshot({
     path: path.join(ARTIFACTS_DIR, 'journey-03-capabilities-settled.png'),
@@ -181,6 +193,33 @@ async function runEndToEndVerification() {
     path: path.join(ARTIFACTS_DIR, 'journey-04-expansion-full.png'),
     fullPage: false,
   });
+
+  // -------------------------------------------------------------------------
+  // STAGE 4B: CONTINUOUS HANDOFF VERIFICATION (ZERO BLANK GAP)
+  // -------------------------------------------------------------------------
+  console.log('\n--- STAGE 4B: Zero Blank Gap Continuous Check ---');
+  let blankGapFrames = 0;
+  for (let step = 0; step <= 8; step++) {
+    const testPos = wheelSt.end - 50 + step * 25; // Spanning through the exact handoff
+    await page.evaluate((pos) => window.scrollTo(0, pos), testPos);
+    await page.waitForTimeout(100);
+
+    const check = await page.evaluate(() => {
+      const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
+      if (!pinContainer) return { visible: false };
+      const r = pinContainer.getBoundingClientRect();
+      const style = window.getComputedStyle(pinContainer);
+      const isVisible = r.width >= 1400 && r.height >= 850 && parseFloat(style.opacity) >= 0.95 && r.top <= 10;
+      return { visible: isVisible, width: r.width, height: r.height, opacity: style.opacity, top: r.top };
+    });
+
+    if (!check.visible) {
+      blankGapFrames++;
+      console.error(`Blank frame detected at scroll ${testPos}:`, check);
+    }
+  }
+
+  assert('ZERO blank frames during works-wheel to capabilities handoff', blankGapFrames === 0, { blankGapFrames });
 
   // -------------------------------------------------------------------------
   // STAGE 5: HORIZONTAL SERVICE CATALOGUE (Cards 01 to 06)

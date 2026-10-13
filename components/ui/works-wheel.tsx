@@ -125,7 +125,7 @@ export interface WorksWheelProps extends Omit<
 }
 
 /* Sizing and geometry calibrated for large circular catalogue and large right-side drum presentation */
-const CARD_RATIO = 1.45; // card width / height
+export const CARD_RATIO = 1.45; // card width / height
 const STEP = 38; // degrees between cards on the drum
 const DRUM = 2.22; // drum radius, in card heights
 const LENS = 2.7; // perspective distance
@@ -233,52 +233,9 @@ function InteractiveCardArtwork({
         ref={containerRef}
         data-testid="capabilities-transition-anchor"
         data-transition-anchor="capabilities"
-        className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(11,11,16,0.18)] border border-black/[0.08] bg-white transition-all duration-300 pointer-events-none"
-      >
-        {/* Subtle top wash matching Capabilities section */}
-        <span
-          className="pointer-events-none absolute inset-0 block"
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(191,235,247,0.48) 0%, rgba(255,255,255,0.94) 22%, #FFFFFF 45%)',
-          }}
-          aria-hidden="true"
-        />
-        {/* Miniature preview representation of Capabilities */}
-        <span className="relative z-10 flex flex-col justify-between size-full p-4 sm:p-5 select-none pointer-events-none">
-          <span className="block">
-            <span className="block font-sans font-bold tracking-tight text-xs sm:text-sm text-[#0B0B10]">
-              Our Capabilities
-            </span>
-            <span className="block font-sans text-[10px] text-[#0B0B10]/60 line-clamp-2 mt-1">
-              We design and engineer the systems that move businesses forward.
-            </span>
-          </span>
-          <span className="flex items-center gap-2 overflow-hidden py-1">
-            <span
-              className="shrink-0 w-16 h-20 rounded-lg p-1.5 flex flex-col justify-between shadow-sm border border-black/5"
-              style={{ background: 'linear-gradient(135deg, #BFFAF3 0%, #D8FFF9 45%, #EAFEFA 100%)' }}
-            >
-              <span className="font-mono text-[8px] font-bold text-black/50">01</span>
-              <span className="font-sans font-bold text-[8px] text-black/80 leading-tight">DIGITAL</span>
-            </span>
-            <span
-              className="shrink-0 w-16 h-20 rounded-lg p-1.5 flex flex-col justify-between shadow-sm border border-black/5"
-              style={{ background: 'linear-gradient(135deg, #CFE0FE 0%, #DFEBFF 50%, #EDF3FE 100%)' }}
-            >
-              <span className="font-mono text-[8px] font-bold text-black/50">02</span>
-              <span className="font-sans font-bold text-[8px] text-black/80 leading-tight">AI</span>
-            </span>
-            <span
-              className="shrink-0 w-16 h-20 rounded-lg p-1.5 flex flex-col justify-between shadow-sm border border-black/5"
-              style={{ background: 'linear-gradient(135deg, #FDE6CE 0%, #FEF0DE 52%, #FFF8EF 100%)' }}
-            >
-              <span className="font-mono text-[8px] font-bold text-black/50">03</span>
-              <span className="font-sans font-bold text-[8px] text-black/80 leading-tight">PLATFORMS</span>
-            </span>
-          </span>
-        </span>
-      </span>
+        className="relative block size-full pointer-events-none opacity-0"
+        aria-hidden="true"
+      />
     );
   }
 

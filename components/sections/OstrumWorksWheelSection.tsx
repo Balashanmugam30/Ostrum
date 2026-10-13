@@ -9,6 +9,7 @@ import {
   WorksWheelHandle,
   LIGHT_OVAL_THEME,
   PROJECT_THEMES,
+  CARD_RATIO,
 } from '@/components/ui/works-wheel';
 import { AnodizedInk } from '@/components/ui/anodized-ink';
 
@@ -16,8 +17,6 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
   (window as any).ScrollTrigger = ScrollTrigger;
 }
-
-const CARD_RATIO = 16 / 10;
 
 export function OstrumWorksWheelSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -179,28 +178,16 @@ export function OstrumWorksWheelSection() {
             const p = self.progress;
             let targetTurn = 0;
 
-            const anchor = document.querySelector(
-              '[data-testid="capabilities-transition-anchor"]'
-            ) as HTMLElement | null;
-
             if (p <= p1) {
               // Phase 1: Oval at rest with minimal center label
               targetTurn = 0;
               worksWheelRef.current?.setLeftPanelOpacity?.(1);
-              if (anchor) {
-                anchor.style.opacity = '1';
-                anchor.style.boxShadow = '';
-              }
               notifyCapabilities({ active: false });
             } else if (p <= p2) {
               // Phase 2: Smooth, continuous scroll-scrubbed oval-to-drum expansion
               const tMorph = (p - p1) / (p2 - p1);
               targetTurn = tMorph * 1.0;
               worksWheelRef.current?.setLeftPanelOpacity?.(1);
-              if (anchor) {
-                anchor.style.opacity = '1';
-                anchor.style.boxShadow = '';
-              }
               notifyCapabilities({ active: false });
             } else if (p <= p3) {
               // Phase 3: Project-by-project browsing across the 4 entries (1000px per project)
@@ -209,11 +196,19 @@ export function OstrumWorksWheelSection() {
               targetTurn = 1.0 + tProj * last;
               worksWheelRef.current?.setLeftPanelOpacity?.(1);
 
-              if (anchor) {
-                anchor.style.opacity = '1';
-                anchor.style.boxShadow = '';
+              if (tProj < 0.80) {
+                // MNESA and earlier projects: Capabilities overlay is completely inactive
+                notifyCapabilities({ active: false });
+              } else {
+                // Drum rotating towards Our Capabilities: smoothly fade in the live section at thumbnail scale
+                const settleFade = Math.min(1, Math.max(0, (tProj - 0.80) / 0.18));
+                notifyCapabilities({
+                  active: true,
+                  progress: 0,
+                  opacity: settleFade,
+                  metrics,
+                });
               }
-              notifyCapabilities({ active: false });
             } else {
               // Phase 4: Capabilities Shared-Element Expansion into Section 05
               // Entry 4 is fully settled on the drum (turn = 4.0).
@@ -221,12 +216,6 @@ export function OstrumWorksWheelSection() {
               const tExp = Math.min(1, Math.max(0, (p - p3) / (1.0 - p3)));
               const textOp = Math.max(0, 1 - tExp * 4.5);
               worksWheelRef.current?.setLeftPanelOpacity?.(textOp);
-
-              // Hand off anchor to live Capabilities section
-              if (anchor) {
-                anchor.style.opacity = '0';
-                anchor.style.boxShadow = 'none';
-              }
 
               notifyCapabilities({
                 active: true,
@@ -240,6 +229,15 @@ export function OstrumWorksWheelSection() {
             setIsDrumActive(targetTurn >= 0.45);
           },
           onLeave: () => {
+            // Keep Capabilities active and full-screen during handoff into capabilities-pin
+            notifyCapabilities({
+              active: true,
+              progress: 1.0,
+              opacity: 1,
+              metrics,
+            });
+          },
+          onLeaveBack: () => {
             notifyCapabilities({ active: false });
           },
         });
@@ -284,6 +282,7 @@ export function OstrumWorksWheelSection() {
       className="relative z-[20] w-full transition-colors duration-300 ease-out"
       style={{
         marginTop: '-100vh',
+        marginBottom: '-100vh',
         backgroundColor: currentTheme.deep,
         color: currentTheme.textColor,
       }}
