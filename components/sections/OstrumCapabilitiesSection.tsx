@@ -86,12 +86,10 @@ export function OstrumCapabilitiesSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const flowPlaceholderRef = useRef<HTMLDivElement>(null);
 
   // Synchronised Shared-Element Transition Controller
   useEffect(() => {
     const pinContainer = pinContainerRef.current;
-    const placeholder = flowPlaceholderRef.current;
     if (!pinContainer) return;
 
     const updateTransition = ({
@@ -115,7 +113,6 @@ export function OstrumCapabilitiesSection() {
       if (!pinContainer) return;
 
       if (!active) {
-        if (placeholder) placeholder.style.display = 'none';
         pinContainer.style.position = '';
         pinContainer.style.top = '';
         pinContainer.style.left = '';
@@ -131,8 +128,6 @@ export function OstrumCapabilitiesSection() {
         pinContainer.style.opacity = '1';
         return;
       }
-
-      if (placeholder) placeholder.style.display = 'block';
 
       const w = metrics?.w ?? window.innerWidth;
       const cardW = metrics?.cardW ?? 560;
@@ -236,6 +231,10 @@ export function OstrumCapabilitiesSection() {
         },
         onLeaveBack: () => {
           gsap.set(track, { x: 0 });
+          const wheelTrigger = ScrollTrigger.getById('works-wheel-pin');
+          if (wheelTrigger) {
+            wheelTrigger.update();
+          }
         },
       });
     });
@@ -266,11 +265,10 @@ export function OstrumCapabilitiesSection() {
       }}
       aria-label="Our Capabilities"
     >
-      {/* Flow placeholder to preserve exact document height during fixed transition mode */}
+      {/* Zero-size placeholder preserved for DOM queries */}
       <div
-        ref={flowPlaceholderRef}
         data-testid="capabilities-flow-placeholder"
-        className="w-full h-screen hidden pointer-events-none"
+        className="hidden w-0 h-0 pointer-events-none"
         aria-hidden="true"
       />
 

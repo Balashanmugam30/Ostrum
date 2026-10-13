@@ -92,8 +92,8 @@ export function OstrumWorksWheelSection() {
     const isMobile = window.innerWidth < 768;
     const holdDist = isMobile ? 250 : 350;
     const morphDist = isMobile ? 700 : 1000;
-    const projectsDist = isMobile ? 2100 : 3000;
-    const expandDist = isMobile ? 1000 : 1600;
+    const projectsDist = isMobile ? 2100 : 2950;
+    const expandDist = isMobile ? 1000 : 1650;
     const totalPinDistance = holdDist + morphDist + projectsDist + expandDist;
     const count = OSTRUM_WORKS.length;
     const last = Math.max(count - 1, 0);
@@ -149,8 +149,8 @@ export function OstrumWorksWheelSection() {
       const isMobile = window.innerWidth < 768;
       const holdDist = isMobile ? 250 : 350;
       const morphDist = isMobile ? 700 : 1000;
-      const projectsDist = isMobile ? 2100 : 3000;
-      const expandDist = isMobile ? 1000 : 1600;
+      const projectsDist = isMobile ? 2100 : 2950;
+      const expandDist = isMobile ? 1000 : 1650;
       const totalPinDistance = holdDist + morphDist + projectsDist + expandDist;
 
       const count = OSTRUM_WORKS.length;
@@ -179,41 +179,54 @@ export function OstrumWorksWheelSection() {
             const p = self.progress;
             let targetTurn = 0;
 
+            const anchor = document.querySelector(
+              '[data-testid="capabilities-transition-anchor"]'
+            ) as HTMLElement | null;
+
             if (p <= p1) {
               // Phase 1: Oval at rest with minimal center label
               targetTurn = 0;
               worksWheelRef.current?.setLeftPanelOpacity?.(1);
+              if (anchor) {
+                anchor.style.opacity = '1';
+                anchor.style.boxShadow = '';
+              }
               notifyCapabilities({ active: false });
             } else if (p <= p2) {
               // Phase 2: Smooth, continuous scroll-scrubbed oval-to-drum expansion
               const tMorph = (p - p1) / (p2 - p1);
               targetTurn = tMorph * 1.0;
               worksWheelRef.current?.setLeftPanelOpacity?.(1);
+              if (anchor) {
+                anchor.style.opacity = '1';
+                anchor.style.boxShadow = '';
+              }
               notifyCapabilities({ active: false });
             } else if (p <= p3) {
               // Phase 3: Project-by-project browsing across the 4 entries (1000px per project)
+              // Project 0 (TMR) -> Project 1 (Saraswati) -> Project 2 (MNESA) -> Project 3 (Our Capabilities)
               const tProj = (p - p2) / (p3 - p2);
               targetTurn = 1.0 + tProj * last;
               worksWheelRef.current?.setLeftPanelOpacity?.(1);
 
-              if (tProj >= 0.70) {
-                // Settle live Capabilities section into anchor as project 4 rotates into position, fully visible by tProj >= 0.95
-                const settleFade = Math.min(1, Math.max(0, (tProj - 0.70) / 0.25));
-                notifyCapabilities({
-                  active: true,
-                  progress: 0,
-                  opacity: settleFade,
-                  metrics,
-                });
-              } else {
-                notifyCapabilities({ active: false });
+              if (anchor) {
+                anchor.style.opacity = '1';
+                anchor.style.boxShadow = '';
               }
+              notifyCapabilities({ active: false });
             } else {
               // Phase 4: Capabilities Shared-Element Expansion into Section 05
+              // Entry 4 is fully settled on the drum (turn = 4.0).
               targetTurn = 1.0 + last; // 4.0
               const tExp = Math.min(1, Math.max(0, (p - p3) / (1.0 - p3)));
               const textOp = Math.max(0, 1 - tExp * 4.5);
               worksWheelRef.current?.setLeftPanelOpacity?.(textOp);
+
+              // Hand off anchor to live Capabilities section
+              if (anchor) {
+                anchor.style.opacity = '0';
+                anchor.style.boxShadow = 'none';
+              }
 
               notifyCapabilities({
                 active: true,
@@ -225,6 +238,9 @@ export function OstrumWorksWheelSection() {
 
             worksWheelRef.current?.setTurn(targetTurn);
             setIsDrumActive(targetTurn >= 0.45);
+          },
+          onLeave: () => {
+            notifyCapabilities({ active: false });
           },
         });
       });
