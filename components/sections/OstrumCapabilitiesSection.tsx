@@ -125,50 +125,48 @@ export function OstrumCapabilitiesSection() {
         pinContainer.style.borderRadius = '';
         pinContainer.style.boxShadow = '';
         pinContainer.style.border = '';
-        pinContainer.style.opacity = '1';
+        pinContainer.style.opacity = '0';
         return;
       }
 
-      const w = metrics?.w ?? window.innerWidth;
-      const cardW = metrics?.cardW ?? 560;
-      const initLeft = metrics?.initLeft ?? 700;
-      const initTop = metrics?.initTop ?? 275;
-
-      const scale = cardW / w;
-
       const normProgress = Math.min(1, Math.max(0, progress));
-      const isFull = normProgress >= 0.95;
-      const pClamped = isFull ? 1.0 : normProgress;
-
       const ease =
-        pClamped < 0.5
-          ? 2 * pClamped * pClamped
-          : 1 - Math.pow(-2 * pClamped + 2, 2) / 2;
+        normProgress < 0.5
+          ? 2 * normProgress * normProgress
+          : 1 - Math.pow(-2 * normProgress + 2, 2) / 2;
 
-      const curLeft = isFull ? 0 : initLeft * (1 - ease);
-      const curTop = isFull ? 0 : initTop * (1 - ease);
-      const curScale = isFull ? 1.0 : scale + (1.0 - scale) * ease;
-      const curRadius = isFull ? 0 : 16 * (1 - ease);
-      const shadowAlpha = isFull ? 0 : 0.18 * (1 - ease);
-      const borderAlpha = isFull ? 0 : 0.08 * (1 - ease);
-
+      // Full-bleed edge-to-edge transition surface covering 100% of the viewport
+      // Left: 0, Right: 100vw, Top: 0, Bottom: 100vh (zero margins, zero underlying page exposed)
       pinContainer.style.position = 'fixed';
       pinContainer.style.top = '0px';
       pinContainer.style.left = '0px';
       pinContainer.style.width = '100vw';
       pinContainer.style.height = '100vh';
       pinContainer.style.zIndex = '35';
-      pinContainer.style.pointerEvents = isFull ? 'auto' : 'none';
-      pinContainer.style.opacity = String(opacity);
-      pinContainer.style.transform = `translate(${curLeft.toFixed(2)}px, ${curTop.toFixed(2)}px) scale(${curScale.toFixed(4)})`;
-      pinContainer.style.transformOrigin = '0 0';
-      pinContainer.style.borderRadius = `${curRadius.toFixed(2)}px`;
-      pinContainer.style.boxShadow = isFull
-        ? 'none'
-        : `0 ${(20 * (1 - ease)).toFixed(1)}px ${(45 * (1 - ease)).toFixed(1)}px -10px rgba(11,11,16,${shadowAlpha.toFixed(3)})`;
-      pinContainer.style.border = isFull
-        ? 'none'
-        : `${(1 * (1 - ease)).toFixed(1)}px solid rgba(0,0,0,${borderAlpha.toFixed(3)})`;
+      pinContainer.style.pointerEvents = normProgress >= 0.95 ? 'auto' : 'none';
+      pinContainer.style.opacity = String(ease);
+      pinContainer.style.transform = 'none';
+      pinContainer.style.borderRadius = '0px';
+      pinContainer.style.boxShadow = 'none';
+      pinContainer.style.border = 'none';
+
+      // Subtle, coordinated entrance for content within the full-bleed canvas
+      const header = pinContainer.querySelector('header') as HTMLElement | null;
+      if (header) {
+        header.style.opacity = String(Math.min(1, ease * 1.5));
+        header.style.transform =
+          normProgress >= 0.95
+            ? 'none'
+            : `translate3d(0, ${((1 - ease) * 20).toFixed(1)}px, 0)`;
+      }
+
+      if (trackRef.current && !ScrollTrigger.getById('capabilities-pin')?.isActive) {
+        trackRef.current.style.opacity = String(Math.min(1, ease * 1.5));
+        trackRef.current.style.transform =
+          normProgress >= 0.95
+            ? 'none'
+            : `translate3d(0, ${((1 - ease) * 30).toFixed(1)}px, 0) scale(${(0.96 + 0.04 * ease).toFixed(3)})`;
+      }
     };
 
     (window as any).__ostrumUpdateCapabilitiesTransition = updateTransition;
@@ -228,6 +226,10 @@ export function OstrumCapabilitiesSection() {
         onUpdate: (self) => {
           const dist = getScrollDistance();
           gsap.set(track, { x: -self.progress * dist });
+        },
+        onLeave: () => {
+          const dist = getScrollDistance();
+          gsap.set(track, { x: -dist });
         },
         onLeaveBack: () => {
           gsap.set(track, { x: 0 });

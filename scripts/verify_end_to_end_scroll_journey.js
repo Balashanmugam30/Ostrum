@@ -107,18 +107,23 @@ async function runEndToEndVerification() {
   await page.waitForTimeout(400);
 
   const rotState = await page.evaluate(() => {
-    const anchor = document.querySelector('[data-testid="capabilities-transition-anchor"]');
+    const card4 = document.getElementById('works-wheel-3');
+    const card4Anchor = document.querySelector('[data-testid="capabilities-transition-anchor"]');
     const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
+    const card4Opacity = card4 ? parseFloat(window.getComputedStyle(card4).opacity) : 0;
+    const isOverlayActive = pinContainer ? parseFloat(window.getComputedStyle(pinContainer).opacity) > 0.05 : false;
+
     return {
-      anchorExists: !!anchor,
-      anchorHasZeroFakeElements: anchor ? anchor.children.length === 0 : false,
-      anchorOpacity: anchor ? window.getComputedStyle(anchor).opacity : null,
-      isOverlayFixed: pinContainer ? pinContainer.style.position === 'fixed' : false,
+      card4Exists: !!card4,
+      card4Opacity,
+      hasCardPreview: !!card4Anchor,
+      isOverlayActive,
     };
   });
 
-  assert('Card 4 transition anchor has ZERO fake elements/children', rotState.anchorHasZeroFakeElements, rotState);
-  assert('Card 4 transition anchor is transparent (opacity 0)', rotState.anchorOpacity === '0', rotState);
+  assert('Card 4 (Our Capabilities) exists on the Works Wheel drum', rotState.card4Exists, rotState);
+  assert('Card 4 preview is visible on rotating drum face', rotState.card4Opacity > 0.1 && rotState.hasCardPreview, rotState);
+  assert('Capabilities external overlay is completely INACTIVE during drum rotation', !rotState.isOverlayActive, rotState);
 
   await page.screenshot({
     path: path.join(ARTIFACTS_DIR, 'journey-02-drum-rotation-midpoint.png'),
@@ -136,29 +141,29 @@ async function runEndToEndVerification() {
   const settledState = await page.evaluate(() => {
     const lpTitle = document.querySelector('[data-testid="works-wheel-project-title"]')?.textContent?.trim();
     const lpDesc = document.querySelector('[data-testid="works-wheel-project-description"]')?.textContent?.trim();
-    const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
-    const pRect = pinContainer ? pinContainer.getBoundingClientRect() : null;
-    const isOverlayFixed = pinContainer ? pinContainer.style.position === 'fixed' : false;
-    const capHeading = document.querySelector('[data-testid="capabilities-heading"]')?.textContent?.trim();
+    const card4 = document.getElementById('works-wheel-3');
+    const c4Rect = card4 ? card4.getBoundingClientRect() : null;
+    const c4Opacity = card4 ? parseFloat(window.getComputedStyle(card4).opacity) : 0;
     const mnesaCard = document.getElementById('works-wheel-2');
     const mnesaOpacity = mnesaCard ? parseFloat(window.getComputedStyle(mnesaCard).opacity) : 0;
+    const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
+    const isOverlayActive = pinContainer ? parseFloat(window.getComputedStyle(pinContainer).opacity) > 0.05 : false;
 
     return {
       title: lpTitle,
       description: lpDesc,
-      isOverlayFixed,
-      containerWidth: pRect ? Math.round(pRect.width) : 0,
-      capHeading,
+      card4Width: c4Rect ? Math.round(c4Rect.width) : 0,
+      card4Opacity: c4Opacity,
       mnesaOpacity,
+      isOverlayActive,
     };
   });
 
   assert('Our Capabilities is active entry title', settledState.title === 'Our Capabilities', settledState);
   assert('Our Capabilities description is present', settledState.description?.includes('digital experiences and intelligent AI systems'), settledState);
-  assert('Live Capabilities section is active in thumbnail state', settledState.isOverlayFixed, settledState);
-  assert('Capabilities section sits at thumbnail width (~635px)', settledState.containerWidth > 500 && settledState.containerWidth < 700, settledState);
-  assert('Live Capabilities section heading "Our Capabilities" is visible inside thumbnail', settledState.capHeading === 'Our Capabilities', settledState);
+  assert('Card 4 on Works Wheel drum is front and center (opacity = 1)', settledState.card4Opacity > 0.95, settledState);
   assert('MNESA card on drum is faded out (opacity 0)', settledState.mnesaOpacity < 0.05, settledState);
+  assert('Capabilities full-bleed overlay is not yet triggered before expansion', !settledState.isOverlayActive, settledState);
 
   await page.screenshot({
     path: path.join(ARTIFACTS_DIR, 'journey-03-capabilities-settled.png'),
@@ -166,9 +171,36 @@ async function runEndToEndVerification() {
   });
 
   // -------------------------------------------------------------------------
-  // STAGE 4: THUMBNAIL EXPANDS SMOOTHLY TO FULL VIEWPORT (p ~ 0.995)
+  // STAGE 4: FULL-BLEED CAPABILITIES EXPANSION (EDGE-TO-EDGE VIEWPORT)
   // -------------------------------------------------------------------------
-  console.log('\n--- STAGE 4: Thumbnail Expansion into Section 05 ---');
+  console.log('\n--- STAGE 4: Full-Bleed Capabilities Expansion ---');
+  // Sample midway expansion (p ~ 0.86) to verify edge-to-edge coverage and zero margins
+  const scrollMidExp = wheelSt.start + wheelSt.totalDist * 0.86;
+  await page.evaluate((pos) => window.scrollTo(0, pos), scrollMidExp);
+  await page.waitForTimeout(400);
+
+  const midState = await page.evaluate(() => {
+    const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
+    const r = pinContainer ? pinContainer.getBoundingClientRect() : null;
+    const style = pinContainer ? window.getComputedStyle(pinContainer) : null;
+    return {
+      left: r ? Math.round(r.left) : -1,
+      right: r ? Math.round(r.right) : -1,
+      top: r ? Math.round(r.top) : -1,
+      bottom: r ? Math.round(r.bottom) : -1,
+      width: r ? Math.round(r.width) : 0,
+      height: r ? Math.round(r.height) : 0,
+      borderRadius: style ? style.borderRadius : null,
+      boxShadow: style ? style.boxShadow : null,
+    };
+  });
+
+  assert('Expanding surface is full-bleed from left=0 to right=1440', midState.left === 0 && midState.right === 1440, midState);
+  assert('Expanding surface is full-bleed from top=0 to bottom=900', midState.top === 0 && midState.bottom === 900, midState);
+  assert('Expanding surface has zero border radius (no rounded card container)', midState.borderRadius === '0px', midState);
+  assert('Expanding surface has no card drop shadow (not a floating card)', midState.boxShadow === 'none', midState);
+
+  // Endpoint expansion (p ~ 0.995)
   const scrollExpanded = wheelSt.start + wheelSt.totalDist * 0.995;
   await page.evaluate((pos) => window.scrollTo(0, pos), scrollExpanded);
   await page.waitForTimeout(400);
@@ -178,16 +210,19 @@ async function runEndToEndVerification() {
     const pRect = pinContainer ? pinContainer.getBoundingClientRect() : null;
     const lp = document.querySelector('[data-testid="works-wheel-left-panel"]');
     const lpOp = lp ? parseFloat(window.getComputedStyle(lp).opacity) : 1;
+    const heading = document.querySelector('[data-testid="capabilities-heading"]')?.textContent?.trim();
     return {
       width: pRect ? Math.round(pRect.width) : 0,
       height: pRect ? Math.round(pRect.height) : 0,
       leftPanelOpacity: lpOp,
+      heading,
     };
   });
 
   assert('Expanded container covers full viewport width (1440)', expState.width >= 1438, expState);
   assert('Expanded container covers full viewport height (900)', expState.height >= 898, expState);
   assert('Left panel metadata completely faded to 0', expState.leftPanelOpacity < 0.05, expState);
+  assert('Full-size Capabilities heading is displayed', expState.heading === 'Our Capabilities', expState);
 
   await page.screenshot({
     path: path.join(ARTIFACTS_DIR, 'journey-04-expansion-full.png'),
