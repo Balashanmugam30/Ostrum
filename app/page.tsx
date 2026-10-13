@@ -5,6 +5,7 @@ import { OstrumEngineSection } from '@/components/sections/OstrumEngineSection';
 import { OstrumEnergyNarrativeSection } from '@/components/sections/OstrumEnergyNarrativeSection';
 import { OstrumWorksWheelSection } from '@/components/sections/OstrumWorksWheelSection';
 import { OstrumCapabilitiesSection } from '@/components/sections/OstrumCapabilitiesSection';
+import { OstrumTestimonialsSection } from '@/components/sections/OstrumTestimonialsSection';
 
 export default function HomePage() {
   return (
@@ -26,6 +27,9 @@ export default function HomePage() {
 
       {/* SECTION 05: Our Capabilities */}
       <OstrumCapabilitiesSection />
+
+      {/* SECTION 06: Testimonials (Ignite-inspired Stacked Editorial Cards) */}
+      <OstrumTestimonialsSection />
     </div>
   );
 }
