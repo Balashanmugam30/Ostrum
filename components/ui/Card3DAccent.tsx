@@ -6,9 +6,14 @@ import * as THREE from 'three';
 export interface Card3DAccentProps {
   variant: 1 | 2 | 3 | 4 | 5 | 6;
   className?: string;
+  'data-testid'?: string;
 }
 
-export function Card3DAccent({ variant, className }: Card3DAccentProps) {
+export function Card3DAccent({
+  variant,
+  className,
+  'data-testid': testId,
+}: Card3DAccentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -347,6 +352,7 @@ export function Card3DAccent({ variant, className }: Card3DAccentProps) {
   return (
     <div
       ref={containerRef}
+      data-testid={testId}
       className={`relative w-full h-full flex items-center justify-center pointer-events-auto select-none ${className || ''}`}
       aria-hidden="true"
     >

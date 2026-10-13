@@ -2,7 +2,7 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
-const BASE_URL = process.env.OSTRUM_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.OSTRUM_BASE_URL || 'http://127.0.0.1:3000';
 const ARTIFACTS_DIR = path.join(__dirname, '..', 'rebuild-capture', 'audit', 'capabilities-viewports');
 const VIEWPORTS = [
   { name: 'desktop-1920x1080', width: 1920, height: 1080 },
@@ -33,13 +33,15 @@ async function run() {
       if (message.type() === 'error') errors.push(`${viewport.name}: console: ${message.text()}`);
     });
 
-    await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+    await page.goto(BASE_URL, { waitUntil: 'load' });
     await page.waitForFunction(
       () => window.lenis && window.ScrollTrigger?.getById('works-wheel-pin'),
       null,
       { timeout: 30000 },
     );
     await page.waitForTimeout(250);
+    await page.evaluate(() => window.ScrollTrigger?.refresh());
+    await page.waitForTimeout(400);
 
     const geometry = await page.evaluate(() => {
       const wheel = window.ScrollTrigger.getById('works-wheel-pin');
@@ -59,49 +61,79 @@ async function run() {
     });
     const toProgress = (p) => geometry.wheelStart + (geometry.wheelEnd - geometry.wheelStart) * p;
 
+    const sculptureClearsSurface = (sculpture, surface) =>
+      sculpture.rect.right <= surface.left + 1 ||
+      sculpture.rect.left >= surface.right - 1 ||
+      sculpture.rect.bottom <= surface.top + 1 ||
+      sculpture.rect.top >= surface.bottom - 1;
+
     const scroll = async (y) => {
       await page.evaluate((position) => window.lenis.scrollTo(position, { immediate: true }), y);
-      await page.waitForTimeout(160);
+      await page.waitForTimeout(500);
     };
     const getState = () => page.evaluate(() => {
       const get = (selector) => document.querySelector(selector);
       const surface = get('[data-testid="capabilities-pin-container"]');
       const anchor = get('[data-testid="capabilities-transition-anchor"]');
-      const signatureRail = get('[data-testid="capabilities-signature-sculpture"]');
+      const overviewSculpture = get('[data-testid="selected-work-overview-sculpture"]');
+      const transitionSculpture = get('[data-testid="capabilities-transition-sculpture"]');
       const track = get('[data-testid="capabilities-track"]');
       const firstCard = get('[data-testid="capability-card-1"]');
+      const heading = get('[data-testid="capabilities-heading"]');
+      const statement = get('[data-testid="capabilities-supporting-statement"]');
+      const selectedWork = get('[data-testid="selected-work-section"]');
+      const wheelStage = get('#selected-work .pin-spacer-works-wheel-pin > div');
+      const header = get('.header');
       const rect = (element) => {
         if (!element) return null;
         const r = element.getBoundingClientRect();
         return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
       };
+      const leftPanel = get('[data-testid="works-wheel-left-panel"]');
+      const capSection = get('[data-testid="capabilities-section"]');
       return {
         scrollY: window.scrollY,
         title: get('[data-testid="works-wheel-project-title"]')?.textContent?.trim(),
-        leftPanelOpacity: Number(getComputedStyle(get('[data-testid="works-wheel-left-panel"]')).opacity),
+        leftPanelOpacity: leftPanel ? Number(getComputedStyle(leftPanel).opacity) : 0,
         wheelTurn: get('[role="listbox"]')?._worksWheel?.turn?.current ?? null,
         wheelEntryCount: document.querySelectorAll('[role="listbox"] [role="option"]').length,
         anchor: rect(anchor),
         anchorChildren: anchor?.children.length ?? -1,
         surface: rect(surface),
+        overviewSculpture: {
+          rect: rect(overviewSculpture),
+          opacity: overviewSculpture ? Number(getComputedStyle(overviewSculpture).opacity) : 0,
+        },
+        transitionSculpture: {
+          rect: rect(transitionSculpture),
+          opacity: transitionSculpture ? Number(getComputedStyle(transitionSculpture).opacity) : 0,
+        },
+        selectedWorkBounds: rect(selectedWork),
+        wheelStageBounds: rect(wheelStage),
         surfacePosition: surface?.style.position ?? '',
-        surfaceComputedPosition: getComputedStyle(surface).position,
-        surfaceOpacity: getComputedStyle(surface).opacity,
+        surfaceComputedPosition: surface ? getComputedStyle(surface).position : '',
+        surfaceOpacity: surface ? getComputedStyle(surface).opacity : '0',
         surfaceTransform: surface?.style.transform ?? '',
         transitionProgress: Number(surface?.dataset.transitionProgress ?? -1),
         transitionScale: Number(surface?.dataset.transitionScale ?? -1),
         transitionSource: surface?.dataset.transitionSource ? JSON.parse(surface.dataset.transitionSource) : null,
         visibleBounds: surface?.dataset.transitionVisibleBounds ? JSON.parse(surface.dataset.transitionVisibleBounds) : null,
         headingCount: document.querySelectorAll('[data-testid="capabilities-heading"]').length,
+        headingBounds: rect(heading),
+        statementBounds: rect(statement),
+        headerControls: header && Number(getComputedStyle(header).opacity) > 0.1
+          ? Array.from(header.children).map(rect).filter((bounds) => bounds && bounds.width > 0 && bounds.height > 0)
+          : [],
         sectionCount: document.querySelectorAll('[data-testid="capabilities-section"]').length,
-        sectionBackground: getComputedStyle(get('[data-testid="capabilities-section"]')).backgroundColor,
+        sectionBackground: capSection ? getComputedStyle(capSection).backgroundColor : '',
         cardCount: document.querySelectorAll('#capabilities article').length,
         artworkCount: document.querySelectorAll('#capabilities [data-testid^="capability-artwork-"]').length,
-        signatureSculptureCount: document.querySelectorAll('[data-testid="capabilities-signature-sculpture"] svg').length,
-        signatureDisplay: getComputedStyle(signatureRail).display,
-        signatureRail: rect(signatureRail),
+        canvasArtworkCount: document.querySelectorAll('#capabilities [data-testid^="capability-artwork-"] canvas').length,
+        transitionSculptureCount: document.querySelectorAll('[data-testid="capabilities-transition-sculpture"]').length,
         firstCard: rect(firstCard),
-        trackPaddingLeft: getComputedStyle(track).paddingLeft,
+        trackPaddingLeft: track ? getComputedStyle(track).paddingLeft : '',
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: document.documentElement.clientWidth,
         footerCount: document.querySelectorAll('#studio-footer').length,
       };
     });
@@ -113,14 +145,16 @@ async function run() {
     };
 
     // The wheel is visible at rest with its center label; only project metadata is hidden.
-    await scroll(geometry.wheelStart);
+    await scroll(geometry.wheelStart + 30);
     let state = await getState();
     const initialWheel = await page.locator('[role="listbox"]').boundingBox();
     const centerLabel = await page.locator('[data-testid="works-wheel-center-label"]').innerText();
     assert(`${viewport.name}: initial oval wheel and Selected Work label are visible without TMR metadata`,
       initialWheel && initialWheel.width > 0 && initialWheel.y >= -1 &&
       initialWheel.y < geometry.height && centerLabel === 'Selected Work' &&
-      state.wheelEntryCount === 4 && state.leftPanelOpacity < 0.02,
+      state.wheelEntryCount === 4 && state.leftPanelOpacity < 0.02 &&
+      state.overviewSculpture.opacity > 0.95 &&
+      (geometry.width < 768 || state.overviewSculpture.rect.right < (await page.locator('[data-testid="works-wheel-center-label"]').boundingBox()).x),
       { initialWheel, centerLabel, ...state });
     await screenshot('initial-oval-rest');
 
@@ -162,6 +196,14 @@ async function run() {
       { anchor: state.anchor, source: state.transitionSource, visible: state.visibleBounds });
     await screenshot('thumbnail-settled');
 
+    // A few pixels into expansion verifies no misplaced floating orb is spawned.
+    await scroll(settledY + 30);
+    const transitionVisual = await getState();
+    assert(`${viewport.name}: early expansion keeps clean editorial header without misplaced floating orb`,
+      transitionVisual.transitionSculptureCount === 0,
+      { count: transitionVisual.transitionSculptureCount });
+    await screenshot('capabilities-early-expansion');
+
     // Expansion reaches the same full-screen section without mounting another composition.
     const startScale = state.transitionScale;
     await scroll(toProgress(geometry.p3 + (1 - geometry.p3) * 0.5));
@@ -185,6 +227,9 @@ async function run() {
     assert(`${viewport.name}: one heading and six canonical cards at full arrival`,
       full.sectionCount === 1 && full.headingCount === 1 && full.cardCount === 6,
       { sections: full.sectionCount, headings: full.headingCount, cards: full.cardCount });
+    assert(`${viewport.name}: full-size Capabilities editorial header is clean without misplaced top orb, and all 6 cards contain 3D artworks`,
+      full.transitionSculptureCount === 0 && full.artworkCount === 6,
+      { count: full.transitionSculptureCount, artworks: full.artworkCount });
     await screenshot('full-arrival');
 
     const capTrigger = await page.evaluate(() => {
@@ -216,6 +261,36 @@ async function run() {
       (geometry.width >= 768 || verticalPerStep <= geometry.height * 0.8),
       { ...capTrigger, verticalPerStep, minReadingDistance });
 
+    // Capture the live section shortly after release and where the previous
+    // wheel formerly appeared to linger over its upper edge.
+    await scroll(capTrigger.start + 80);
+    let horizontal = await getState();
+    const earlyHeading = await page.locator('[data-testid="capabilities-heading"]').boundingBox();
+    const earlyCard = await page.locator('[data-testid="capability-card-1"]').boundingBox();
+    assert(`${viewport.name}: early horizontal scroll shows the canonical heading and first service card`,
+      horizontal.cardCount === 6 && earlyHeading && earlyCard &&
+      earlyHeading.y >= -1 && earlyHeading.y < geometry.height &&
+      earlyCard.x < geometry.width && earlyCard.x + earlyCard.width > 0 &&
+      horizontal.documentWidth <= geometry.width + 1,
+      { ...horizontal, earlyHeading, earlyCard });
+    assert(`${viewport.name}: editorial header remains clean during horizontal card travel`,
+      horizontal.transitionSculptureCount === 0,
+      { count: horizontal.transitionSculptureCount });
+    await screenshot('capabilities-horizontal-early');
+
+    await scroll(capTrigger.start + (capTrigger.end - capTrigger.start) * 0.5);
+    horizontal = await getState();
+    const midHeading = await page.locator('[data-testid="capabilities-heading"]').boundingBox();
+    const midCard = await page.locator('[data-testid="capability-card-1"]').boundingBox();
+    assert(`${viewport.name}: Selected Work releases before the card-scroll overlap region`,
+      horizontal.selectedWorkBounds.bottom <= 1 && horizontal.wheelStageBounds.bottom <= 1 &&
+      horizontal.transitionSculptureCount === 0 &&
+      horizontal.cardCount === 6 && midHeading && midCard &&
+      midHeading.y >= -1 && midHeading.y < geometry.height &&
+      horizontal.documentWidth <= geometry.width + 1,
+      { ...horizontal, midHeading, midCard });
+    await screenshot('capabilities-horizontal-overlap-region');
+
     await scroll(capTrigger.end - 1);
     const finalCard = await page.locator('[data-testid="capability-card-6"]').boundingBox();
     assert(`${viewport.name}: sixth card is fully accessible at the end of the track`,
@@ -235,14 +310,15 @@ async function run() {
       !capTrigger.hasPinSpacer,
       { ...released, endCard, viewportWidth: geometry.width, triggerEnd: capTrigger.end,
         documentMaxScroll: capTrigger.documentMaxScroll, hasPinSpacer: capTrigger.hasPinSpacer });
-    assert(`${viewport.name}: one six-card catalogue and a local signature sculpture`,
+    assert(`${viewport.name}: restored six-card catalogue keeps its original track and responsive widths`,
       released.cardCount === 6 && released.artworkCount === 6 &&
-      released.signatureSculptureCount === 1 &&
-      (geometry.width < 1280 || (full.signatureDisplay === 'block' &&
-        full.signatureRail.width > 0 && full.firstCard.left > full.signatureRail.right)),
-      { cards: released.cardCount, artworks: released.artworkCount, sculpture: released.signatureSculptureCount,
-        signatureDisplay: full.signatureDisplay, signatureRail: full.signatureRail,
-        firstCard: full.firstCard, trackPaddingLeft: full.trackPaddingLeft });
+      released.transitionSculptureCount === 0 &&
+      released.documentWidth <= released.viewportWidth + 1 &&
+      (geometry.width < 1280 || released.trackPaddingLeft === '80px'),
+      { cards: released.cardCount, artworks: released.artworkCount,
+        sculpture: released.transitionSculptureCount,
+        firstCard: released.firstCard, trackPaddingLeft: released.trackPaddingLeft,
+        documentWidth: released.documentWidth, viewportWidth: released.viewportWidth });
     await screenshot('page-end-sixth-card');
 
     const card = page.locator('[data-testid="capability-card-6"]');
@@ -255,6 +331,11 @@ async function run() {
       { beforeHover, afterHover });
     await screenshot('sixth-card-hover');
     await page.mouse.move(geometry.width - 1, geometry.height - 1);
+    await page.waitForFunction(
+      () => !document.querySelector('[data-testid="capability-card-6"]')?.matches(':hover'),
+      null,
+      { timeout: 2000 },
+    );
     await page.waitForTimeout(420);
     const afterHoverExit = await card.boundingBox();
     assert(`${viewport.name}: card returns to baseline after hover`,

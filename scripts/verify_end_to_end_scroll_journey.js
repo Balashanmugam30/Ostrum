@@ -105,6 +105,9 @@ async function run() {
       const surface = get('[data-testid="capabilities-pin-container"]');
       const wheel = document.getElementById('works-wheel-3');
       const mnesa = document.getElementById('works-wheel-2');
+      const siteHeader = get('.header');
+      const overviewSculpture = get('[data-testid="selected-work-overview-sculpture"]');
+      const capabilitiesSculpture = get('[data-testid="capabilities-transition-sculpture"]');
       const anchor = get('[data-testid="capabilities-transition-anchor"]');
       const track = get('[data-testid="capabilities-track"]');
       const capTrigger = window.ScrollTrigger?.getById('capabilities-pin');
@@ -116,6 +119,13 @@ async function run() {
         description: get('[data-testid="works-wheel-project-description"]')?.textContent?.trim(),
         leftPanelOpacity: Number(getComputedStyle(get('[data-testid="works-wheel-left-panel"]')).opacity),
         centerLabel: get('[data-testid="works-wheel-center-label"]')?.textContent?.trim(),
+        overviewSculptureOpacity: overviewSculpture ? Number(getComputedStyle(overviewSculpture).opacity) : 0,
+        overviewSculptureVisibility: overviewSculpture ? getComputedStyle(overviewSculpture).visibility : 'missing',
+        capabilitiesSculptureRect: rect(capabilitiesSculpture),
+        capabilitiesSculptureOpacity: capabilitiesSculpture ? Number(getComputedStyle(capabilitiesSculpture).opacity) : 0,
+        capabilitiesSculptureCount: document.querySelectorAll('[data-testid="capabilities-transition-sculpture"]').length,
+        cardArtworksCount: document.querySelectorAll('#capabilities [data-testid^="capability-artwork-"]').length,
+        cardArtworksCanvasCount: document.querySelectorAll('#capabilities [data-testid^="capability-artwork-"] canvas').length,
         wheelBounds: rect(get('[role="listbox"]')),
         wheelTurn: get('[role="listbox"]')?._worksWheel?.turn?.current ?? null,
         wheelEntryCount: document.querySelectorAll('[role="listbox"] [role="option"]').length,
@@ -133,6 +143,12 @@ async function run() {
         transitionSource: surface?.dataset.transitionSource ?? null,
         transitionVisibleBounds: surface?.dataset.transitionVisibleBounds ?? null,
         headingCount: document.querySelectorAll('[data-testid="capabilities-heading"]').length,
+        headingRect: rect(get('[data-testid="capabilities-heading"]')),
+        statementRect: rect(get('[data-testid="capabilities-supporting-statement"]')),
+        firstCardRect: rect(get('[data-testid="capability-card-1"]')),
+        headerControlRects: siteHeader && Number(getComputedStyle(siteHeader).opacity) > 0.1
+          ? Array.from(siteHeader.children).map(rect).filter((bounds) => bounds && bounds.width > 0 && bounds.height > 0)
+          : [],
         sectionCount: document.querySelectorAll('[data-testid="capabilities-section"]').length,
         sectionBackground: getComputedStyle(get('[data-testid="capabilities-section"]')).backgroundColor,
         statementCount: document.querySelectorAll('[data-testid="capabilities-supporting-statement"]').length,
@@ -194,13 +210,14 @@ async function run() {
   geometry.forExpansion = (progress) => geometry.start + (geometry.end - geometry.start) *
     (geometry.p3 + progress * (1 - geometry.p3));
 
-  // 0. The oval wheel and center label remain at rest while project metadata stays hidden.
-  await moveWithLenis(geometry.start);
+  // 0. Enter the pinned overview by a small amount so its onEnter lifecycle has run.
+  await moveWithLenis(geometry.start + 30);
   let state = await snapshot();
   assert('The initial oval wheel and Selected Work label remain visible without TMR metadata',
     state.wheelBounds?.width > 0 && state.wheelBounds.top >= -1 &&
     state.wheelBounds.top < VIEWPORT.height && state.centerLabel === 'Selected Work' &&
-    state.wheelEntryCount === 4 && state.leftPanelOpacity < 0.02,
+    state.wheelEntryCount === 4 && state.leftPanelOpacity < 0.02 &&
+    state.overviewSculptureOpacity > 0.95 && state.overviewSculptureVisibility === 'visible',
     state);
   await capture('00-initial-oval-rest');
 
@@ -290,6 +307,9 @@ async function run() {
         state.surfacePosition === 'fixed' && neutralTransform &&
         state.surfaceRect.width >= VIEWPORT.width - 2 && state.surfaceRect.height >= VIEWPORT.height - 2,
         { ...state, neutralTransform });
+      assert('Full-size Capabilities editorial header is clean without misplaced top orb, and cards have 3D artworks',
+        state.capabilitiesSculptureCount === 0 && state.cardArtworksCount === 6,
+        { sculptureCount: state.capabilitiesSculptureCount, artworks: state.cardArtworksCount, canvases: state.cardArtworksCanvasCount });
     }
     await capture(name);
   }
@@ -324,9 +344,13 @@ async function run() {
     firstCard && firstCard.x < VIEWPORT.width && firstCard.x + firstCard.width > 0, firstCard);
 
   await moveWithLenis(capStart + capDistance * 0.5);
+  state = await snapshot();
   const middleTrack = await page.locator('[data-testid="capabilities-track"]').evaluate((element) => getComputedStyle(element).transform);
   await capture('10-service-catalogue-midpoint');
   assert('The catalogue advances continuously at its midpoint', middleTrack !== 'none' && middleTrack !== 'matrix(1, 0, 0, 1, 0, 0)', middleTrack);
+  assert('The Capabilities header remains clean without misplaced top orb at track midpoint',
+    state.capabilitiesSculptureCount === 0,
+    { sculptureCount: state.capabilitiesSculptureCount });
 
   await moveWithLenis(capEnd - 1);
   state = await snapshot();

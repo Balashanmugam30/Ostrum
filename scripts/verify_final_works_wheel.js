@@ -33,7 +33,7 @@ async function run() {
 
   const scroll = async (position) => {
     await page.evaluate((y) => window.lenis.scrollTo(y, { immediate: true }), position);
-    await page.waitForTimeout(180);
+    await page.waitForTimeout(500);
   };
   const capture = (name) => page.screenshot({
     path: path.join(ARTIFACTS_DIR, `${name}.png`),
@@ -47,18 +47,34 @@ async function run() {
     };
     const surface = get('[data-testid="capabilities-pin-container"]');
     const anchor = get('[data-testid="capabilities-transition-anchor"]');
+      const centerLabel = get('[data-testid="works-wheel-center-label"]');
+      const overviewSculpture = get('[data-testid="selected-work-overview-sculpture"]');
+      const transitionSculpture = get('[data-testid="capabilities-transition-sculpture"]');
     return {
       scrollY: window.scrollY,
       title: get('[data-testid="works-wheel-project-title"]')?.textContent?.trim() ?? '',
-      leftPanelOpacity: Number(getComputedStyle(get('[data-testid="works-wheel-left-panel"]')).opacity),
+      leftPanelOpacity: get('[data-testid="works-wheel-left-panel"]') ? Number(getComputedStyle(get('[data-testid="works-wheel-left-panel"]')).opacity) : 0,
       centerLabel: get('[data-testid="works-wheel-center-label"]')?.textContent?.trim() ?? '',
       wheelTurn: get('[role="listbox"]')?._worksWheel?.turn?.current ?? null,
       wheelEntryCount: document.querySelectorAll('[role="listbox"] [role="option"]').length,
       anchor: rect(anchor),
       anchorChildren: anchor?.children.length ?? -1,
+      centerLabelBounds: rect(centerLabel),
+      overviewSculpture: {
+        rect: rect(overviewSculpture),
+        opacity: overviewSculpture ? Number(getComputedStyle(overviewSculpture).opacity) : 0,
+        visibility: overviewSculpture ? getComputedStyle(overviewSculpture).visibility : 'hidden',
+      },
+      transitionSculpture: {
+        rect: rect(transitionSculpture),
+        opacity: transitionSculpture ? Number(getComputedStyle(transitionSculpture).opacity) : 0,
+        visibility: transitionSculpture ? getComputedStyle(transitionSculpture).visibility : 'hidden',
+      },
+      transitionSculptureCount: document.querySelectorAll('[data-testid="capabilities-transition-sculpture"]').length,
+      artworkCount: document.querySelectorAll('#capabilities [data-testid^="capability-artwork-"]').length,
       surface: rect(surface),
       surfacePosition: surface?.style.position ?? '',
-      surfaceOpacity: getComputedStyle(surface).opacity,
+      surfaceOpacity: surface ? getComputedStyle(surface).opacity : '0',
       surfaceTransform: surface?.style.transform ?? '',
       transitionSource: surface?.dataset.transitionSource ? JSON.parse(surface.dataset.transitionSource) : null,
       sectionCount: document.querySelectorAll('[data-testid="capabilities-section"]').length,
@@ -93,18 +109,24 @@ async function run() {
     const forExpansion = (progress) => geometry.start + (geometry.end - geometry.start) *
       (geometry.p3 + progress * (1 - geometry.p3));
 
-    await scroll(geometry.start);
+    // Enter the pin by one frame's scroll distance so ScrollTrigger has a real
+    // active update (progress is zero exactly at `start`, before onUpdate runs).
+    await scroll(geometry.start + 30);
     let state = await snapshot();
     assert('Resting oval keeps four entries and the center label while hiding TMR copy',
       state.wheelEntryCount === 4 && state.centerLabel === 'Selected Work' &&
-      state.leftPanelOpacity < 0.02 && state.surface.top > VIEWPORT.height,
+      state.leftPanelOpacity < 0.02 && state.surface.top > VIEWPORT.height &&
+      state.overviewSculpture.opacity > 0.95 &&
+      state.overviewSculpture.visibility === 'visible' &&
+      state.overviewSculpture.rect.right < state.centerLabelBounds.left,
       { ...state, viewport: VIEWPORT });
     await capture('01-initial-oval-rest');
 
     await scroll(forTurn(1.15));
     state = await snapshot();
     assert('TMR copy appears when the first project becomes active',
-      state.title.startsWith('TMR') && state.leftPanelOpacity > 0.95, state);
+      state.title.startsWith('TMR') && state.leftPanelOpacity > 0.95 &&
+      state.overviewSculpture.opacity < 0.02, state);
     await capture('02-tmr-active');
 
     await scroll(forTurn(2));
@@ -120,7 +142,9 @@ async function run() {
       state.surface.top >= VIEWPORT.height && state.anchorChildren === 0, state);
     await capture('04-mnesa-active');
 
-    await scroll(forTurn(4));
+    // Sample just inside the expansion phase. At the exact phase boundary the
+    // opacity transition is still settling from the preceding wheel state.
+    await scroll(forTurn(4) + 30);
     state = await snapshot();
     const sourceMatchesAnchor = state.transitionSource && state.anchor &&
       Math.abs(state.transitionSource.left - state.anchor.left) < 2 &&
@@ -132,6 +156,9 @@ async function run() {
       state.anchorChildren === 0 && state.sectionCount === 1 && state.headingCount === 1 &&
       state.cardCount === 6 && state.surfacePosition === 'fixed' && sourceMatchesAnchor,
       { ...state, sourceMatchesAnchor });
+    assert('Capabilities enters with no misplaced top orb and 6 service cards ready',
+      state.transitionSculptureCount === 0 && state.cardCount === 6,
+      { sculptureCount: state.transitionSculptureCount, cardCount: state.cardCount });
     await capture('05-capabilities-fourth-entry');
 
     const settledScale = Number((await snapshot()).surface?.width / VIEWPORT.width);
@@ -140,7 +167,8 @@ async function run() {
     const midScale = Number(state.surface?.width / VIEWPORT.width);
     assert('The same live Capabilities section expands smoothly from the fourth entry',
       state.sectionCount === 1 && state.headingCount === 1 && state.cardCount === 6 &&
-      midScale > settledScale && midScale < 1, { settledScale, midScale, state });
+      midScale > settledScale && midScale < 1 && state.transitionSculptureCount === 0,
+      { settledScale, midScale, state });
     await capture('06-capabilities-expansion-midpoint');
 
     await scroll(forTurn(3));

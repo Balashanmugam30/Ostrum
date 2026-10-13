@@ -427,27 +427,40 @@ body {
   top: 0;
 }
 
-.capabilities-header-inner {
-  width: 100%;
+.capabilities-transition-sculpture {
+  top: 50%;
+  left: clamp(1.5rem, 3.5vw, 4rem);
+  width: min(22vw, 26rem);
+  transform: translateY(-50%);
+  opacity: 0;
+  visibility: hidden;
+  contain: layout paint;
 }
 
-.capabilities-signature-rail {
-  display: none;
+.selected-work-overview-sculpture {
+  top: 50%;
+  left: clamp(2rem, 4vw, 4.5rem);
+  width: min(28vw, 31.25rem);
+  transform: translateY(-50%);
+  contain: layout paint;
 }
 
-.capabilities-sculpture-art {
+.ostrum-signature-sculpture {
   display: block;
   width: 100%;
   height: auto;
   overflow: visible;
-  filter: drop-shadow(0 18px 28px rgba(81, 86, 153, 0.12));
-  animation: capabilitiesSculptureDrift 10s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.ostrum-signature-sculpture--selected-work {
+  animation: selectedWorkSculptureDrift 18s ease-in-out infinite;
   transform-origin: center;
 }
 
-@keyframes capabilitiesSculptureDrift {
-  from { transform: translate3d(0, 4px, 0) rotate(-1.2deg); }
-  to { transform: translate3d(0, -5px, 0) rotate(1.2deg); }
+@keyframes selectedWorkSculptureDrift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -5px, 0); }
 }
 
 .capability-card:focus-visible {
@@ -463,25 +476,10 @@ body {
   transform: scale(1.07);
 }
 
-@media (min-width: 1280px) {
-  #capabilities {
-    --capabilities-rail-width: clamp(17rem, 25vw, 22.5rem);
-  }
-
-  .capabilities-header-inner {
-    padding-left: var(--capabilities-rail-width);
-  }
-
-  .capabilities-signature-rail {
-    display: block;
-    left: clamp(2rem, 4vw, 4rem);
-    top: 52%;
-    width: min(24vw, 390px);
-    transform: translateY(-50%);
-  }
-
-  #capabilities .capabilities-track {
-    padding-left: calc(clamp(3rem, 5.5vw, 5rem) + var(--capabilities-rail-width) + 2rem);
+@media (max-width: 1279px) {
+  .selected-work-overview-sculpture {
+    left: clamp(1.5rem, 3vw, 3rem);
+    width: min(30vw, 21.25rem);
   }
 }
 
@@ -498,8 +496,15 @@ body {
   }
 }
 
+@media (max-width: 639px) {
+  .selected-work-overview-sculpture {
+    left: 0.5rem;
+    width: min(26vw, 6.875rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .capabilities-sculpture-art,
+  .ostrum-signature-sculpture,
   .capability-card,
   .capability-artwork {
     animation: none !important;

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { OstrumSignatureSculpture } from '@/components/ui/OstrumSignatureSculpture';
+import { Card3DAccent } from '@/components/ui/Card3DAccent';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -97,6 +97,9 @@ export function OstrumCapabilitiesSection() {
 
   const clearTransitionStyles = (hide: boolean) => {
     const pinContainer = pinContainerRef.current;
+    if (sectionRef.current) {
+      sectionRef.current.style.backgroundColor = '#FFFFFF';
+    }
     if (!pinContainer) return;
 
     pinContainer.style.position = '';
@@ -225,6 +228,7 @@ export function OstrumCapabilitiesSection() {
       const visibleTop = origin.top * (1 - ease);
       const x = visibleLeft - clipLeft * scale;
       const y = visibleTop - clipTop * scale;
+
 
       pinContainer.style.position = 'fixed';
       pinContainer.style.top = '0px';
@@ -358,10 +362,10 @@ export function OstrumCapabilitiesSection() {
         onLeave: () => {
           gsap.set(track, { x: -scrollMetrics.horizontalTravel });
           clearTransitionStyles(false);
-          section.style.backgroundColor = 'transparent';
+          if (section) section.style.backgroundColor = '#FFFFFF';
         },
         onEnterBack: () => {
-          section.style.backgroundColor = 'transparent';
+          if (section) section.style.backgroundColor = '#FFFFFF';
           window.dispatchEvent(
             new CustomEvent('ostrum:capabilities-transition', {
               detail: { active: true, progress: 1 },
@@ -369,7 +373,7 @@ export function OstrumCapabilitiesSection() {
           );
         },
         onLeaveBack: () => {
-          section.style.backgroundColor = 'transparent';
+          if (section) section.style.backgroundColor = '#FFFFFF';
           gsap.set(track, { x: 0 });
           clearTransitionStyles(false);
           const wheelTrigger = ScrollTrigger.getById('works-wheel-pin');
@@ -403,9 +407,9 @@ export function OstrumCapabilitiesSection() {
       id="capabilities"
       ref={sectionRef}
       data-testid="capabilities-section"
-      className="relative z-[24] w-full min-h-screen select-none"
+      className="relative z-[24] w-full min-h-screen bg-white select-none"
       style={{
-        backgroundColor: 'transparent',
+        backgroundColor: '#FFFFFF',
       }}
       aria-label="Our Capabilities"
     >
@@ -415,8 +419,9 @@ export function OstrumCapabilitiesSection() {
         data-testid="capabilities-pin-container"
         className="capabilities-stage sticky top-0 w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-20 pb-6 sm:pt-20 sm:pb-10 md:pt-24 md:pb-12 bg-white"
         style={{
+          backgroundColor: '#FFFFFF',
           background:
-            'linear-gradient(180deg, rgba(191,235,247,0.48) 0%, rgba(255,255,255,0.94) 13%, #FFFFFF 26%)',
+            'linear-gradient(180deg, #D4EFF8 0%, #FAFDFF 13%, #FFFFFF 26%)',
         }}
       >
         {/* Soft edge fades on both left and right edges */}
@@ -441,7 +446,7 @@ export function OstrumCapabilitiesSection() {
 
         {/* Editorial Section Header (Canonical instance, zero CTA inside Capabilities) */}
         <header className="w-full px-6 sm:px-12 md:px-16 lg:px-20 z-20 shrink-0">
-          <div className="capabilities-header-inner flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8">
+          <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8">
             <div>
               <h2
                 data-testid="capabilities-heading"
@@ -461,20 +466,12 @@ export function OstrumCapabilitiesSection() {
           </div>
         </header>
 
-        <div
-          data-testid="capabilities-signature-sculpture"
-          className="capabilities-signature-rail pointer-events-none absolute z-[5]"
-          aria-hidden="true"
-        >
-          <OstrumSignatureSculpture />
-        </div>
-
         {/* Horizontal Scroll Catalogue Track (Canonical 6 service cards) */}
         <div className="relative w-full z-10 flex items-center overflow-visible my-auto py-2">
           <div
             ref={trackRef}
             data-testid="capabilities-track"
-            className="capabilities-track flex items-stretch gap-6 sm:gap-7 md:gap-8 pl-6 sm:pl-12 md:pl-16 lg:pl-20 pr-12 sm:pr-20 md:pr-28 will-change-transform"
+            className="flex items-stretch gap-6 sm:gap-7 md:gap-8 pl-6 sm:pl-12 md:pl-16 lg:pl-20 pr-12 sm:pr-20 md:pr-28 will-change-transform"
           >
             {CAPABILITIES_DATA.map((card) => (
               <article
@@ -499,16 +496,10 @@ export function OstrumCapabilitiesSection() {
 
                 {/* 3D Dimensional Accent Viewport */}
                 <div className="capability-art-frame relative w-full h-[180px] sm:h-[200px] md:h-[210px] my-auto flex items-center justify-center">
-                  <img
+                  <Card3DAccent
+                    variant={card.variant}
                     data-testid={`capability-artwork-${card.variant}`}
-                    src={card.artwork}
-                    alt=""
-                    aria-hidden="true"
-                    draggable={false}
-                    width={377}
-                    height={262}
-                    decoding="async"
-                    className="capability-artwork block w-full h-full object-contain transition-transform duration-300 ease-out"
+                    className="capability-artwork"
                   />
                 </div>
 

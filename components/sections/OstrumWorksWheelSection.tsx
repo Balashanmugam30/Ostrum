@@ -11,6 +11,7 @@ import {
   PROJECT_THEMES,
 } from '@/components/ui/works-wheel';
 import { AnodizedInk } from '@/components/ui/anodized-ink';
+import { OstrumSignatureSculpture } from '@/components/ui/OstrumSignatureSculpture';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -21,6 +22,7 @@ export function OstrumWorksWheelSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const worksWheelRef = useRef<WorksWheelHandle>(null);
+  const overviewSculptureRef = useRef<HTMLDivElement>(null);
 
   const [activeProject, setActiveProject] = useState(0);
   const [isDrumActive, setIsDrumActive] = useState(false);
@@ -125,8 +127,18 @@ export function OstrumWorksWheelSection() {
         );
       };
 
+      const setOverviewSculptureOpacity = (opacity: number) => {
+        const sculpture = overviewSculptureRef.current;
+        if (!sculpture) return;
+        sculpture.style.opacity = opacity.toFixed(3);
+        sculpture.style.visibility = opacity > 0.01 ? 'visible' : 'hidden';
+        const art = sculpture.firstElementChild as SVGElement | null;
+        if (art) art.style.animationPlayState = opacity > 0.99 ? 'running' : 'paused';
+      };
+
       if (prefersReducedMotion) {
         worksWheelRef.current?.setTurn(1);
+        setOverviewSculptureOpacity(0);
         return;
       }
 
@@ -139,21 +151,36 @@ export function OstrumWorksWheelSection() {
           pinSpacing: true,
           anticipatePin: 1,
           id: 'works-wheel-pin',
-          onToggle: (self) => emitVisualCoverage(self.isActive),
+          onEnter: () => setOverviewSculptureOpacity(1),
+          onToggle: (self) => {
+            emitVisualCoverage(self.isActive);
+            setOverviewSculptureOpacity(
+              self.isActive && self.progress <= p1 ? 1 : 0,
+            );
+          },
           onUpdate: (self) => {
             const p = self.progress;
             let targetTurn = 0;
             let capabilitiesProgress: number | null = null;
 
+            if (p < 1 && pinContainerRef.current && pinContainerRef.current.style.visibility === 'hidden') {
+              pinContainerRef.current.style.opacity = '1';
+              pinContainerRef.current.style.visibility = 'visible';
+            }
+
             if (p <= p1) {
               // Phase 1: Oval at rest with minimal center label
               targetTurn = 0;
+              setOverviewSculptureOpacity(1);
               worksWheelRef.current?.setLeftPanelOpacity?.(0);
               notifyCapabilities({ active: false });
             } else if (p <= p2) {
               // Phase 2: Smooth, continuous scroll-scrubbed oval-to-drum expansion
               const tMorph = (p - p1) / (p2 - p1);
               targetTurn = tMorph * 1.0;
+              setOverviewSculptureOpacity(
+                Math.max(0, 1 - Math.min(1, tMorph / 0.68)),
+              );
               worksWheelRef.current?.setLeftPanelOpacity?.(0);
               notifyCapabilities({ active: false });
             } else if (p <= p3) {
@@ -161,6 +188,7 @@ export function OstrumWorksWheelSection() {
               // Project 0 (TMR) -> Project 1 (Saraswati) -> Project 2 (MNESA) -> Project 3 (Our Capabilities)
               const tProj = (p - p2) / (p3 - p2);
               targetTurn = 1.0 + tProj * last;
+              setOverviewSculptureOpacity(0);
               const capabilitiesActive = targetTurn >= 3.5;
               worksWheelRef.current?.setLeftPanelOpacity?.(
                 capabilitiesActive ? 0 : 1,
@@ -177,6 +205,7 @@ export function OstrumWorksWheelSection() {
               // Phase 4: Full-Bleed Capabilities Expansion into Section 05
               // Entry 4 is fully settled on the drum (turn = 4.0).
               targetTurn = 1.0 + last; // 4.0
+              setOverviewSculptureOpacity(0);
               const tExp = Math.min(1, Math.max(0, (p - p3) / (1.0 - p3)));
               const fadeOut = Math.max(0, 1 - tExp * 20);
               worksWheelRef.current?.setLeftPanelOpacity?.(0);
@@ -194,13 +223,32 @@ export function OstrumWorksWheelSection() {
             }
           },
           onLeave: () => {
+            // Hide works wheel pinned container completely when handed off to Capabilities
+            if (pinContainerRef.current) {
+              pinContainerRef.current.style.opacity = '0';
+              pinContainerRef.current.style.visibility = 'hidden';
+            }
+            worksWheelRef.current?.setWheelOpacity?.(0);
+            worksWheelRef.current?.setLeftPanelOpacity?.(0);
             // Keep Capabilities active and full-screen during handoff into capabilities-pin
             notifyCapabilities({
               active: true,
               progress: 1.0,
             });
           },
+          onEnterBack: () => {
+            // Restore works wheel pinned container visibility when scrolling back up
+            if (pinContainerRef.current) {
+              pinContainerRef.current.style.opacity = '1';
+              pinContainerRef.current.style.visibility = 'visible';
+            }
+          },
           onLeaveBack: () => {
+            if (pinContainerRef.current) {
+              pinContainerRef.current.style.opacity = '1';
+              pinContainerRef.current.style.visibility = 'visible';
+            }
+            setOverviewSculptureOpacity(0);
             worksWheelRef.current?.setLeftPanelOpacity?.(0);
             worksWheelRef.current?.setWheelOpacity?.(1);
             notifyCapabilities({ active: false });
@@ -283,6 +331,19 @@ export function OstrumWorksWheelSection() {
             maxDpr={1.25}
             height="100%"
           />
+        </div>
+
+        {/* The still overview has a companion sculpture in its open left field.
+            It fades away with the existing oval-to-drum scrub before project
+            thumbnails move through this area. */}
+        <div
+          ref={overviewSculptureRef}
+          data-testid="selected-work-overview-sculpture"
+          className="selected-work-overview-sculpture pointer-events-none absolute z-10"
+          aria-hidden="true"
+          style={{ opacity: 0, visibility: 'hidden' }}
+        >
+          <OstrumSignatureSculpture placement="selected-work" />
         </div>
 
         {/* Works Wheel Stage (Controlled by ScrollTrigger) */}
