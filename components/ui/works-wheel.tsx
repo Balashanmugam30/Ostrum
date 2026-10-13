@@ -234,57 +234,9 @@ function InteractiveCardArtwork({
         ref={containerRef}
         data-testid="capabilities-transition-anchor"
         data-transition-anchor="capabilities"
-        className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(11,11,16,0.18)] border border-black/[0.08] bg-white transition-all duration-300 pointer-events-none select-none"
-      >
-        {/* Subtle top wash matching Capabilities section */}
-        <span
-          className="pointer-events-none absolute inset-0 block"
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(191,235,247,0.48) 0%, rgba(255,255,255,0.94) 22%, #FFFFFF 45%)',
-          }}
-          aria-hidden="true"
-        />
-        {/* Preview representation of Capabilities matching actual service catalogue */}
-        <span className="relative z-10 flex flex-col justify-between size-full p-5 sm:p-6 select-none pointer-events-none">
-          <span className="block">
-            <span className="block font-sans font-bold tracking-tight text-base sm:text-lg text-[#0B0B10]">
-              Our Capabilities
-            </span>
-            <span className="block font-sans text-xs sm:text-sm text-[#0B0B10]/70 line-clamp-2 mt-1">
-              We design and engineer the systems that move businesses forward.
-            </span>
-          </span>
-          {/* Miniature service tokens representing the catalogue */}
-          <span className="grid grid-cols-3 gap-2 sm:gap-2.5 overflow-hidden py-1">
-            <span
-              className="rounded-xl p-2 sm:p-2.5 flex flex-col justify-between shadow-sm border border-black/5 h-20 sm:h-24"
-              style={{ background: 'linear-gradient(112deg, #D7B5FA 0%, #F2D4FF 48%, #CDE6FC 100%)' }}
-            >
-              <span className="font-mono text-[9px] font-bold text-black/55">01</span>
-              <span className="font-sans font-bold text-[9px] sm:text-[11px] text-black/85 leading-tight">DIGITAL</span>
-            </span>
-            <span
-              className="rounded-xl p-2 sm:p-2.5 flex flex-col justify-between shadow-sm border border-black/5 h-20 sm:h-24"
-              style={{ background: 'linear-gradient(112deg, #86FFF8 0%, #D2F6F0 52%, #F4C5CF 100%)' }}
-            >
-              <span className="font-mono text-[9px] font-bold text-black/55">02</span>
-              <span className="font-sans font-bold text-[9px] sm:text-[11px] text-black/85 leading-tight">AI</span>
-            </span>
-            <span
-              className="rounded-xl p-2 sm:p-2.5 flex flex-col justify-between shadow-sm border border-black/5 h-20 sm:h-24"
-              style={{ background: 'linear-gradient(112deg, #FAC274 0%, #F2A460 100%)' }}
-            >
-              <span className="font-mono text-[9px] font-bold text-black/55">03</span>
-              <span className="font-sans font-bold text-[9px] sm:text-[11px] text-black/85 leading-tight">PLATFORMS</span>
-            </span>
-          </span>
-          <span className="flex items-center justify-between text-[10px] sm:text-xs font-mono text-[#0B0B10]/50 pt-1.5 border-t border-black/5">
-            <span>01 / 06 — 06 / 06</span>
-            <span>EXPAND TO EXPLORE →</span>
-          </span>
-        </span>
-      </span>
+        className="block size-full rounded-2xl pointer-events-none select-none"
+        aria-hidden="true"
+      />
     );
   }
 

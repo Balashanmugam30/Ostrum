@@ -1,376 +1,415 @@
 const { chromium } = require('playwright');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 
-const ARTIFACTS_DIR = 'C:\\Users\\balashanmugam\\.gemini\\antigravity\\brain\\e61a5bf4-ec20-4604-866c-28b2350ab0c5';
+const BASE_URL = process.env.OSTRUM_BASE_URL || 'http://localhost:3000';
+const ARTIFACTS_DIR = path.join(__dirname, '..', 'rebuild-capture', 'audit', 'capabilities-journey');
+fs.mkdirSync(ARTIFACTS_DIR, { recursive: true });
 
-async function runEndToEndVerification() {
-  console.log('======================================================================');
-  console.log('   OSTRUM END-TO-END SCROLL JOURNEY & REVERSIBILITY VERIFICATION      ');
-  console.log('======================================================================\n');
+const VIEWPORT = { width: 1440, height: 900 };
+const DESCRIPTION =
+  'From digital experiences and intelligent AI systems to business platforms, product engineering and connected hardware, we build the technology that moves businesses forward.';
 
-  const report = {
-    timestamp: new Date().toISOString(),
-    testsPassed: 0,
-    testsFailed: 0,
-    assertions: [],
-    consoleErrors: [],
-    pageErrors: [],
-  };
-
-  const assert = (description, condition, details = {}) => {
-    if (condition) {
-      console.log(`✓ PASS: ${description}`);
-      report.testsPassed++;
-      report.assertions.push({ status: 'PASS', description, details });
-    } else {
-      console.error(`✗ FAIL: ${description}`, details);
-      report.testsFailed++;
-      report.assertions.push({ status: 'FAIL', description, details });
-    }
-  };
-
+async function run() {
   const browser = await chromium.launch({
     headless: true,
     args: ['--enable-gpu-benchmarking', '--enable-threaded-compositing'],
   });
+  const page = await browser.newPage({ viewport: VIEWPORT });
+  const errors = [];
+  const networkErrors = [];
+  const assertions = [];
 
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-
-  page.on('console', (msg) => {
-    if (msg.type() === 'error') {
-      report.consoleErrors.push(msg.text());
-      console.error('Console error:', msg.text());
+  page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+  });
+  page.on('requestfailed', (request) => {
+    networkErrors.push(`${request.url()}: ${request.failure()?.errorText ?? 'request failed'}`);
+  });
+  page.on('response', (response) => {
+    if (response.status() >= 400) networkErrors.push(`${response.status()} ${response.url()}`);
+  });
+  await page.addInitScript(() => {
+    const health = { frameIntervals: [], layoutShifts: [], longAnimationFrames: [] };
+    (window).__ostrumBrowserHealth = health;
+    let previousFrame = null;
+    const sampleFrame = (time) => {
+      if (previousFrame !== null) health.frameIntervals.push(time - previousFrame);
+      previousFrame = time;
+      requestAnimationFrame(sampleFrame);
+    };
+    requestAnimationFrame(sampleFrame);
+    if ('PerformanceObserver' in window) {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (!entry.hadRecentInput) {
+            health.layoutShifts.push({
+              value: entry.value,
+              startTime: entry.startTime,
+              sources: (entry.sources ?? []).map((source) => {
+                const node = source.node;
+                return {
+                  testId: node?.closest?.('[data-testid]')?.getAttribute('data-testid') ?? null,
+                  id: node?.id ?? null,
+                  className: typeof node?.className === 'string' ? node.className : null,
+                  previousRect: source.previousRect?.toJSON?.() ?? null,
+                  currentRect: source.currentRect?.toJSON?.() ?? null,
+                };
+              }),
+            });
+          }
+        }
+      });
+      observer.observe({ type: 'layout-shift', buffered: true });
+    }
+    if (PerformanceObserver.supportedEntryTypes?.includes('long-animation-frame')) {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          health.longAnimationFrames.push({
+            duration: entry.duration,
+            blockingDuration: entry.blockingDuration,
+            scripts: (entry.scripts ?? []).map((script) => ({
+              sourceURL: script.sourceURL,
+              functionName: script.sourceFunctionName,
+              duration: script.duration,
+            })),
+          });
+        }
+      });
+      observer.observe({ type: 'long-animation-frame', buffered: true });
     }
   });
 
-  page.on('pageerror', (err) => {
-    report.pageErrors.push(err.message);
-    console.error('Page error:', err.message);
-  });
+  const assert = (name, condition, details = {}) => {
+    assertions.push({ name, passed: Boolean(condition), details });
+    console.log(`${condition ? 'PASS' : 'FAIL'} ${name}`, details);
+  };
 
-  await page.goto('http://localhost:3000', { waitUntil: 'networkidle' });
-  await page.waitForFunction(() => !!window.ScrollTrigger?.getById('works-wheel-pin'));
-  await page.waitForTimeout(500);
+  const snapshot = () =>
+    page.evaluate(() => {
+      const get = (selector) => document.querySelector(selector);
+      const rect = (element) => {
+        if (!element) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          left: value.left,
+          top: value.top,
+          right: value.right,
+          bottom: value.bottom,
+          width: value.width,
+          height: value.height,
+        };
+      };
+      const surface = get('[data-testid="capabilities-pin-container"]');
+      const wheel = document.getElementById('works-wheel-3');
+      const mnesa = document.getElementById('works-wheel-2');
+      const anchor = get('[data-testid="capabilities-transition-anchor"]');
+      const track = get('[data-testid="capabilities-track"]');
+      const capTrigger = window.ScrollTrigger?.getById('capabilities-pin');
+      const wheelTrigger = window.ScrollTrigger?.getById('works-wheel-pin');
 
-  const wheelSt = await page.evaluate(() => {
-    const st = window.ScrollTrigger.getById('works-wheel-pin');
-    return { start: st.start, end: st.end, totalDist: st.end - st.start };
-  });
-
-  const capSt = await page.evaluate(() => {
-    const st = window.ScrollTrigger.getById('capabilities-pin');
-    return { start: st.start, end: st.end, totalDist: st.end - st.start };
-  });
-
-  // -------------------------------------------------------------------------
-  // STAGE 1: MNESA NORMAL PRESENTATION (turn ~ 3.0)
-  // -------------------------------------------------------------------------
-  console.log('\n--- STAGE 1: MNESA (Project 3) Presentation ---');
-  // At tProj = 0.667: turn = 1.0 + 0.667 * 3.0 = 3.0 (MNESA)
-  // p = p2 + 0.667 * (p3 - p2) ~ 0.2269 + 0.667 * (0.7227 - 0.2269) ~ 0.5576
-  const scrollMnesa = wheelSt.start + wheelSt.totalDist * 0.56;
-  await page.evaluate((pos) => window.scrollTo(0, pos), scrollMnesa);
-  await page.waitForTimeout(400);
-
-  const mnesaState = await page.evaluate(() => {
-    const lpTitle = document.querySelector('[data-testid="works-wheel-project-title"]')?.textContent?.trim();
-    const lpDesc = document.querySelector('[data-testid="works-wheel-project-description"]')?.textContent?.trim();
-    const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
-    const anchor = document.querySelector('[data-testid="capabilities-transition-anchor"]');
-    const isOverlayFixed = pinContainer ? pinContainer.style.position === 'fixed' : false;
-
-    return {
-      title: lpTitle,
-      description: lpDesc,
-      isOverlayFixed,
-      anchorOpacity: anchor ? window.getComputedStyle(anchor).opacity : null,
-    };
-  });
-
-  assert('MNESA is active project on Works Wheel', mnesaState.title === 'MNESA', mnesaState);
-  assert('MNESA description is displayed', mnesaState.description?.includes('neural memory retrieval'), mnesaState);
-  assert('Capabilities fixed overlay is INACTIVE over MNESA (not fixed)', !mnesaState.isOverlayFixed, mnesaState);
-
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, 'journey-01-mnesa-settled.png'),
-    fullPage: false,
-  });
-
-  // -------------------------------------------------------------------------
-  // STAGE 2: 3D DRUM CIRCULAR ROTATION FROM MNESA TO OUR CAPABILITIES
-  // -------------------------------------------------------------------------
-  console.log('\n--- STAGE 2: Circular Transition from MNESA to Our Capabilities ---');
-  // Intermediate scroll point during drum rotation (tProj ~ 0.85, turn ~ 3.55, p ~ 0.65)
-  const scrollRotation = wheelSt.start + wheelSt.totalDist * 0.65;
-  await page.evaluate((pos) => window.scrollTo(0, pos), scrollRotation);
-  await page.waitForTimeout(400);
-
-  const rotState = await page.evaluate(() => {
-    const card4 = document.getElementById('works-wheel-3');
-    const card4Anchor = document.querySelector('[data-testid="capabilities-transition-anchor"]');
-    const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
-    const card4Opacity = card4 ? parseFloat(window.getComputedStyle(card4).opacity) : 0;
-    const isOverlayActive = pinContainer ? parseFloat(window.getComputedStyle(pinContainer).opacity) > 0.05 : false;
-
-    return {
-      card4Exists: !!card4,
-      card4Opacity,
-      hasCardPreview: !!card4Anchor,
-      isOverlayActive,
-    };
-  });
-
-  assert('Card 4 (Our Capabilities) exists on the Works Wheel drum', rotState.card4Exists, rotState);
-  assert('Card 4 preview is visible on rotating drum face', rotState.card4Opacity > 0.1 && rotState.hasCardPreview, rotState);
-  assert('Capabilities external overlay is completely INACTIVE during drum rotation', !rotState.isOverlayActive, rotState);
-
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, 'journey-02-drum-rotation-midpoint.png'),
-    fullPage: false,
-  });
-
-  // -------------------------------------------------------------------------
-  // STAGE 3: OUR CAPABILITIES SETTLED ON WHEEL DRUM (turn = 4.0, p ~ 0.725)
-  // -------------------------------------------------------------------------
-  console.log('\n--- STAGE 3: Our Capabilities Settled Front & Center ---');
-  const scrollSettled = wheelSt.start + wheelSt.totalDist * 0.725;
-  await page.evaluate((pos) => window.scrollTo(0, pos), scrollSettled);
-  await page.waitForTimeout(400);
-
-  const settledState = await page.evaluate(() => {
-    const lpTitle = document.querySelector('[data-testid="works-wheel-project-title"]')?.textContent?.trim();
-    const lpDesc = document.querySelector('[data-testid="works-wheel-project-description"]')?.textContent?.trim();
-    const card4 = document.getElementById('works-wheel-3');
-    const c4Rect = card4 ? card4.getBoundingClientRect() : null;
-    const c4Opacity = card4 ? parseFloat(window.getComputedStyle(card4).opacity) : 0;
-    const mnesaCard = document.getElementById('works-wheel-2');
-    const mnesaOpacity = mnesaCard ? parseFloat(window.getComputedStyle(mnesaCard).opacity) : 0;
-    const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
-    const isOverlayActive = pinContainer ? parseFloat(window.getComputedStyle(pinContainer).opacity) > 0.05 : false;
-
-    return {
-      title: lpTitle,
-      description: lpDesc,
-      card4Width: c4Rect ? Math.round(c4Rect.width) : 0,
-      card4Opacity: c4Opacity,
-      mnesaOpacity,
-      isOverlayActive,
-    };
-  });
-
-  assert('Our Capabilities is active entry title', settledState.title === 'Our Capabilities', settledState);
-  assert('Our Capabilities description is present', settledState.description?.includes('digital experiences and intelligent AI systems'), settledState);
-  assert('Card 4 on Works Wheel drum is front and center (opacity = 1)', settledState.card4Opacity > 0.95, settledState);
-  assert('MNESA card on drum is faded out (opacity 0)', settledState.mnesaOpacity < 0.05, settledState);
-  assert('Capabilities full-bleed overlay is not yet triggered before expansion', !settledState.isOverlayActive, settledState);
-
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, 'journey-03-capabilities-settled.png'),
-    fullPage: false,
-  });
-
-  // -------------------------------------------------------------------------
-  // STAGE 4: FULL-BLEED CAPABILITIES EXPANSION (EDGE-TO-EDGE VIEWPORT)
-  // -------------------------------------------------------------------------
-  console.log('\n--- STAGE 4: Full-Bleed Capabilities Expansion ---');
-  // Sample midway expansion (p ~ 0.86) to verify edge-to-edge coverage and zero margins
-  const scrollMidExp = wheelSt.start + wheelSt.totalDist * 0.86;
-  await page.evaluate((pos) => window.scrollTo(0, pos), scrollMidExp);
-  await page.waitForTimeout(400);
-
-  const midState = await page.evaluate(() => {
-    const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
-    const r = pinContainer ? pinContainer.getBoundingClientRect() : null;
-    const style = pinContainer ? window.getComputedStyle(pinContainer) : null;
-    return {
-      left: r ? Math.round(r.left) : -1,
-      right: r ? Math.round(r.right) : -1,
-      top: r ? Math.round(r.top) : -1,
-      bottom: r ? Math.round(r.bottom) : -1,
-      width: r ? Math.round(r.width) : 0,
-      height: r ? Math.round(r.height) : 0,
-      borderRadius: style ? style.borderRadius : null,
-      boxShadow: style ? style.boxShadow : null,
-    };
-  });
-
-  assert('Expanding surface is full-bleed from left=0 to right=1440', midState.left === 0 && midState.right === 1440, midState);
-  assert('Expanding surface is full-bleed from top=0 to bottom=900', midState.top === 0 && midState.bottom === 900, midState);
-  assert('Expanding surface has zero border radius (no rounded card container)', midState.borderRadius === '0px', midState);
-  assert('Expanding surface has no card drop shadow (not a floating card)', midState.boxShadow === 'none', midState);
-
-  // Endpoint expansion (p ~ 0.995)
-  const scrollExpanded = wheelSt.start + wheelSt.totalDist * 0.995;
-  await page.evaluate((pos) => window.scrollTo(0, pos), scrollExpanded);
-  await page.waitForTimeout(400);
-
-  const expState = await page.evaluate(() => {
-    const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
-    const pRect = pinContainer ? pinContainer.getBoundingClientRect() : null;
-    const lp = document.querySelector('[data-testid="works-wheel-left-panel"]');
-    const lpOp = lp ? parseFloat(window.getComputedStyle(lp).opacity) : 1;
-    const heading = document.querySelector('[data-testid="capabilities-heading"]')?.textContent?.trim();
-    return {
-      width: pRect ? Math.round(pRect.width) : 0,
-      height: pRect ? Math.round(pRect.height) : 0,
-      leftPanelOpacity: lpOp,
-      heading,
-    };
-  });
-
-  assert('Expanded container covers full viewport width (1440)', expState.width >= 1438, expState);
-  assert('Expanded container covers full viewport height (900)', expState.height >= 898, expState);
-  assert('Left panel metadata completely faded to 0', expState.leftPanelOpacity < 0.05, expState);
-  assert('Full-size Capabilities heading is displayed', expState.heading === 'Our Capabilities', expState);
-
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, 'journey-04-expansion-full.png'),
-    fullPage: false,
-  });
-
-  // -------------------------------------------------------------------------
-  // STAGE 4B: CONTINUOUS HANDOFF VERIFICATION (ZERO BLANK GAP)
-  // -------------------------------------------------------------------------
-  console.log('\n--- STAGE 4B: Zero Blank Gap Continuous Check ---');
-  let blankGapFrames = 0;
-  for (let step = 0; step <= 8; step++) {
-    const testPos = wheelSt.end - 50 + step * 25; // Spanning through the exact handoff
-    await page.evaluate((pos) => window.scrollTo(0, pos), testPos);
-    await page.waitForTimeout(100);
-
-    const check = await page.evaluate(() => {
-      const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
-      if (!pinContainer) return { visible: false };
-      const r = pinContainer.getBoundingClientRect();
-      const style = window.getComputedStyle(pinContainer);
-      const isVisible = r.width >= 1400 && r.height >= 850 && parseFloat(style.opacity) >= 0.95 && r.top <= 10;
-      return { visible: isVisible, width: r.width, height: r.height, opacity: style.opacity, top: r.top };
+      return {
+        scrollY: window.scrollY,
+        title: get('[data-testid="works-wheel-project-title"]')?.textContent?.trim(),
+        description: get('[data-testid="works-wheel-project-description"]')?.textContent?.trim(),
+        leftPanelOpacity: Number(getComputedStyle(get('[data-testid="works-wheel-left-panel"]')).opacity),
+        wheelTurn: get('[role="listbox"]')?._worksWheel?.turn?.current ?? null,
+        capabilitiesCardOpacity: wheel ? Number(getComputedStyle(wheel).opacity) : 0,
+        mnesaCardOpacity: mnesa ? Number(getComputedStyle(mnesa).opacity) : 0,
+        anchorRect: rect(anchor),
+        anchorChildCount: anchor?.children.length ?? -1,
+        surfaceRect: rect(surface),
+        surfacePosition: surface ? surface.style.position : null,
+        surfaceOpacity: surface ? getComputedStyle(surface).opacity : null,
+        surfaceTransform: surface ? surface.style.transform : null,
+        surfaceClip: surface ? surface.style.clipPath : null,
+        transitionProgress: surface?.dataset.transitionProgress ?? null,
+        transitionScale: surface?.dataset.transitionScale ?? null,
+        transitionSource: surface?.dataset.transitionSource ?? null,
+        transitionVisibleBounds: surface?.dataset.transitionVisibleBounds ?? null,
+        headingCount: document.querySelectorAll('[data-testid="capabilities-heading"]').length,
+        sectionCount: document.querySelectorAll('[data-testid="capabilities-section"]').length,
+        sectionBackground: getComputedStyle(get('[data-testid="capabilities-section"]')).backgroundColor,
+        statementCount: document.querySelectorAll('[data-testid="capabilities-supporting-statement"]').length,
+        trackCount: document.querySelectorAll('[data-testid="capabilities-track"]').length,
+        serviceCardCount: document.querySelectorAll('#capabilities article').length,
+        trackTransform: track ? getComputedStyle(track).transform : null,
+        wheelStart: wheelTrigger?.start ?? null,
+        wheelEnd: wheelTrigger?.end ?? null,
+        capabilitiesStart: capTrigger?.start ?? null,
+        capabilitiesEnd: capTrigger?.end ?? null,
+      };
     });
 
-    if (!check.visible) {
-      blankGapFrames++;
-      console.error(`Blank frame detected at scroll ${testPos}:`, check);
+  const moveWithLenis = async (scrollY) => {
+    await page.evaluate((position) => window.lenis.scrollTo(position, { immediate: true }), scrollY);
+    await page.waitForTimeout(180);
+  };
+
+  const capture = async (name) => {
+    const file = path.join(ARTIFACTS_DIR, `${name}.png`);
+    await page.screenshot({ path: file });
+    console.log(`SCREENSHOT ${file}`);
+    return file;
+  };
+
+  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+  await page.waitForFunction(
+    () => window.lenis && window.ScrollTrigger?.getById('works-wheel-pin'),
+    null,
+    { timeout: 30000 },
+  );
+  await page.waitForTimeout(350);
+
+  const geometry = await page.evaluate(() => {
+    const wheel = window.ScrollTrigger.getById('works-wheel-pin');
+    const mobile = window.innerWidth < 768;
+    const hold = mobile ? 250 : 350;
+    const morph = mobile ? 700 : 1000;
+    const projects = mobile ? 2100 : 2950;
+    const total = hold + morph + projects + (mobile ? 1000 : 1650);
+    const p2 = (hold + morph) / total;
+    const p3 = (hold + morph + projects) / total;
+    return {
+      start: wheel.start,
+      end: wheel.end,
+      p2,
+      p3,
+    };
+  });
+  geometry.forTurn = (turn) => geometry.start + (geometry.end - geometry.start) *
+    (geometry.p2 + ((turn - 1) / 3) * (geometry.p3 - geometry.p2));
+  geometry.forExpansion = (progress) => geometry.start + (geometry.end - geometry.start) *
+    (geometry.p3 + progress * (1 - geometry.p3));
+
+  // 1. MNESA is active, with no Capabilities preview visible over it.
+  await moveWithLenis(geometry.forTurn(3));
+  let state = await snapshot();
+  assert('MNESA is the active third wheel entry', state.title === 'MNESA', state);
+  assert('Capabilities item has no separately rendered thumbnail content', state.anchorChildCount === 0, state);
+  assert('Capabilities section is hidden while MNESA is active', state.surfaceOpacity === '0', state);
+  await capture('01-mnesa-active');
+
+  // 2. Sample the real drum halfway from MNESA to the fourth entry.
+  await moveWithLenis(geometry.forTurn(3.6));
+  state = await snapshot();
+  assert('Fourth item enters through the existing drum rotation', state.title === 'Our Capabilities' && state.wheelTurn >= 3.45, state);
+  assert('The transition uses the real section at the fourth item bounds', state.surfacePosition === 'fixed' && state.anchorChildCount === 0, state);
+  assert('Wheel metadata clears when the canonical Capabilities content enters', state.leftPanelOpacity < 0.02, { leftPanelOpacity: state.leftPanelOpacity });
+  await capture('02-mnesa-to-capabilities-drum-rotation');
+
+  // 3. The fourth item settles; the measured thumbnail and live section share bounds.
+  await moveWithLenis(geometry.forExpansion(0));
+  state = await snapshot();
+  const source = JSON.parse(state.transitionSource || 'null');
+  const visibleBounds = JSON.parse(state.transitionVisibleBounds || 'null');
+  const sourceMatchesAnchor = source && state.anchorRect &&
+    Math.abs(source.left - state.anchorRect.left) < 2 &&
+    Math.abs(source.top - state.anchorRect.top) < 2 &&
+    Math.abs(source.width - state.anchorRect.width) < 2 &&
+    Math.abs(source.height - state.anchorRect.height) < 2;
+  const visibleMatchesAnchor = visibleBounds && state.anchorRect &&
+    Math.abs(visibleBounds.left - state.anchorRect.left) < 2 &&
+    Math.abs(visibleBounds.top - state.anchorRect.top) < 2 &&
+    Math.abs(visibleBounds.width - state.anchorRect.width) < 2 &&
+    Math.abs(visibleBounds.height - state.anchorRect.height) < 2;
+  assert('Our Capabilities settles as wheel item four', state.title === 'Our Capabilities' && state.capabilitiesCardOpacity > 0.95, state);
+  assert('Only the canonical section heading remains visible at the settled entry', state.leftPanelOpacity < 0.02 && state.headingCount === 1, { leftPanelOpacity: state.leftPanelOpacity, headingCount: state.headingCount });
+  assert('MNESA is no longer visible at the settled fourth position', state.mnesaCardOpacity < 0.05, state);
+  assert('The single live section begins at the measured fourth-item media bounds', sourceMatchesAnchor && visibleMatchesAnchor, { source, anchor: state.anchorRect, visibleBounds });
+  assert('The wheel entry copy matches the required description', state.description ===
+    'From digital experiences and intelligent AI systems to business platforms, product engineering and connected hardware, we build the technology that moves businesses forward.', state.description);
+  await capture('03-capabilities-settled-in-wheel');
+
+  // 4–9. Scrub the same outer section from its thumbnail bounds to full viewport.
+  const progressFrames = [
+    ['04-expansion-start', 0.005],
+    ['05-expansion-25-percent', 0.25],
+    ['06-expansion-50-percent', 0.5],
+    ['07-expansion-75-percent', 0.75],
+    ['08-expansion-full-arrival', 1],
+  ];
+  let firstScale = 0;
+  for (const [name, progress] of progressFrames) {
+    const target = progress === 1 ? geometry.end + 1 : geometry.forExpansion(progress);
+    await moveWithLenis(target);
+    state = await snapshot();
+    const scale = Number(state.transitionScale);
+    if (progress === 0.005) firstScale = scale;
+    assert(`${Math.round(progress * 100)}% expansion stays one opaque section`,
+      state.sectionCount === 1 && state.headingCount === 1 && state.serviceCardCount === 6 &&
+      state.surfaceOpacity === '1' && state.leftPanelOpacity < 0.02, state);
+    if (progress >= 0.25 && progress < 1) {
+      assert(`${Math.round(progress * 100)}% expansion grows uniformly from the source bounds`,
+        scale > firstScale && scale < 1 && state.surfaceTransform.includes('scale('),
+        { scale, firstScale, transform: state.surfaceTransform, clip: state.surfaceClip });
     }
+    if (progress === 0.005) {
+      const origin = JSON.parse(state.transitionSource || 'null');
+      const visible = JSON.parse(state.transitionVisibleBounds || 'null');
+      assert('Initial expansion frame still matches the settled media bounds',
+        origin && visible && Math.abs(origin.left - state.anchorRect.left) < 2 &&
+        Math.abs(origin.top - state.anchorRect.top) < 2 &&
+        Math.abs(visible.width - state.anchorRect.width) < 2 &&
+        Math.abs(visible.height - state.anchorRect.height) < 2,
+        { origin, anchor: state.anchorRect, visible });
+    }
+    if (progress === 1) {
+      const neutralTransform = !state.surfaceTransform || state.surfaceTransform === 'none' ||
+        state.surfaceTransform === 'translate(0px, 0px)' || state.surfaceTransform === 'translate(0px,0px)';
+      assert('Full arrival fills the viewport and keeps the real section interactive',
+        state.surfacePosition === 'fixed' && neutralTransform &&
+        state.surfaceRect.width >= VIEWPORT.width - 2 && state.surfaceRect.height >= VIEWPORT.height - 2,
+        { ...state, neutralTransform });
+    }
+    await capture(name);
   }
 
-  assert('ZERO blank frames during works-wheel to capabilities handoff', blankGapFrames === 0, { blankGapFrames });
-
-  // -------------------------------------------------------------------------
-  // STAGE 5: HORIZONTAL SERVICE CATALOGUE (Cards 01 to 06)
-  // -------------------------------------------------------------------------
-  console.log('\n--- STAGE 5: Horizontal Service Catalogue Scrub ---');
-  // Scrub to Card 06 (end of capabilities-pin)
-  const scrollEndCard = capSt.start + capSt.totalDist * 0.95;
-  await page.evaluate((pos) => window.scrollTo(0, pos), scrollEndCard);
-  await page.waitForTimeout(400);
-
-  const trackState = await page.evaluate(() => {
+  // 10–12. The live six-card track has measured travel and a deliberate vertical range.
+  const capMetrics = await page.evaluate(() => {
     const track = document.querySelector('[data-testid="capabilities-track"]');
-    const card6 = document.querySelector('[data-testid="capability-card-6"]');
-    const c6Rect = card6 ? card6.getBoundingClientRect() : null;
+    const surface = document.querySelector('[data-testid="capabilities-pin-container"]');
+    const trigger = window.ScrollTrigger.getById('capabilities-pin');
+    const first = track.querySelector('article');
     return {
-      trackTransform: track ? window.getComputedStyle(track).transform : '',
-      card6Visible: c6Rect ? c6Rect.left < window.innerWidth && c6Rect.right > 0 : false,
-      card6Left: c6Rect ? Math.round(c6Rect.left) : null,
+      horizontalTravel: Math.max(0, track.scrollWidth - surface.clientWidth),
+      verticalDistance: trigger.end - trigger.start,
+      viewportHeight: window.innerHeight,
+      cardHeight: first.getBoundingClientRect().height,
+      steps: track.children.length - 1,
     };
   });
+  assert('Capabilities vertical range is paced from actual horizontal travel and card geometry',
+    capMetrics.verticalDistance > capMetrics.horizontalTravel &&
+    capMetrics.verticalDistance / capMetrics.steps >= Math.max(capMetrics.viewportHeight * 0.58, capMetrics.cardHeight * 1.2) - 2,
+    capMetrics);
 
-  assert('Track translated horizontally across cards', trackState.trackTransform.includes('-'), trackState);
-  assert('Card 06 (CUSTOM ENGINEERING) is in view at end of catalogue', trackState.card6Visible, trackState);
+  const capStart = state.capabilitiesStart;
+  const capEnd = state.capabilitiesEnd;
+  const capDistance = capEnd - capStart;
+  await moveWithLenis(capStart + capDistance * 0.12);
+  state = await snapshot();
+  await capture('09-first-service-card-reveal');
+  const firstCard = await page.locator('[data-testid="capability-card-1"]').boundingBox();
+  assert('First service card is visible as the horizontal track begins moving',
+    firstCard && firstCard.x < VIEWPORT.width && firstCard.x + firstCard.width > 0, firstCard);
 
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, 'journey-05-card-06-settled.png'),
-    fullPage: false,
+  await moveWithLenis(capStart + capDistance * 0.5);
+  const middleTrack = await page.locator('[data-testid="capabilities-track"]').evaluate((element) => getComputedStyle(element).transform);
+  await capture('10-service-catalogue-midpoint');
+  assert('The catalogue advances continuously at its midpoint', middleTrack !== 'none' && middleTrack !== 'matrix(1, 0, 0, 1, 0, 0)', middleTrack);
+
+  await moveWithLenis(capEnd - 1);
+  state = await snapshot();
+  const finalCard = await page.locator('[data-testid="capability-card-6"]').boundingBox();
+  await capture('11-sixth-card-fully-accessible');
+  assert('The sixth card is fully in view at the measured track endpoint',
+    finalCard && finalCard.x >= -1 && finalCard.x + finalCard.width <= VIEWPORT.width + 1,
+    { finalCard, viewport: VIEWPORT, horizontalTravel: capMetrics.horizontalTravel });
+
+  // 13. The section releases into the existing contact CTA without a fixed stale surface.
+  await moveWithLenis(capEnd + 1);
+  state = await snapshot();
+  const footer = await page.locator('#studio-footer').boundingBox();
+  await capture('12-natural-release-into-contact-cta');
+  assert('The contact CTA enters naturally after the sixth card',
+    footer && Math.abs(footer.y) < 5 && footer.y + footer.height > 0,
+    { footer, transitionPosition: state.surfacePosition, transitionTransform: state.surfaceTransform });
+  assert('The released section leaves no white tail behind the contact CTA',
+    state.sectionBackground === 'rgba(0, 0, 0, 0)', { sectionBackground: state.sectionBackground });
+  assert('The shared section releases its fixed transform before the CTA',
+    state.surfacePosition !== 'fixed' && !state.surfaceTransform,
+    { position: state.surfacePosition, transform: state.surfaceTransform });
+
+  // 14. Reverse-scroll through the same section and wheel, checking clean restoration.
+  await moveWithLenis(capStart + capDistance * 0.5);
+  await capture('13-reverse-through-service-catalogue');
+  await moveWithLenis(geometry.forExpansion(0));
+  state = await snapshot();
+  assert('Reverse scroll restores the settled fourth wheel entry',
+    state.title === 'Our Capabilities' && state.capabilitiesCardOpacity > 0.95 && state.surfacePosition === 'fixed', state);
+  await capture('14-reverse-to-capabilities-wheel-entry');
+  await moveWithLenis(geometry.forTurn(3));
+  state = await snapshot();
+  assert('Reverse scroll restores MNESA and removes the shared-element styles',
+    state.title === 'MNESA' && state.surfacePosition !== 'fixed' && state.surfaceOpacity === '0', state);
+  await capture('15-reverse-to-mnesa');
+
+  // Exercise the same journey with real mouse-wheel events through Lenis.
+  const wheelTo = async (target) => {
+    await page.mouse.move(VIEWPORT.width * 0.75, VIEWPORT.height * 0.5);
+    let current = await page.evaluate(() => window.scrollY);
+    while (Math.abs(target - current) > 30) {
+      const requested = Math.sign(target - current) * Math.min(480, Math.abs(target - current) / 0.95);
+      await page.mouse.wheel(0, requested);
+      const expected = current + requested * 0.95;
+      await page.waitForFunction((goal) => Math.abs(window.scrollY - goal) < 30, expected, { timeout: 5000 });
+      current = await page.evaluate(() => window.scrollY);
+    }
+    await page.waitForTimeout(120);
+  };
+  await moveWithLenis(0);
+  await wheelTo(geometry.forTurn(3));
+  const mouseWheelMnesa = await snapshot();
+  assert('Real mouse-wheel input reaches MNESA through Lenis and ScrollTrigger', mouseWheelMnesa.title === 'MNESA', mouseWheelMnesa);
+  await page.evaluate(() => {
+    window.__ostrumBrowserHealth.frameIntervals.length = 0;
+    window.__ostrumBrowserHealth.layoutShifts.length = 0;
+    window.__ostrumBrowserHealth.longAnimationFrames.length = 0;
   });
-
-  // -------------------------------------------------------------------------
-  // STAGE 6: NATURAL RELEASE INTO FOOTER (Zero Duplicate Section / Zero Blank Pause)
-  // -------------------------------------------------------------------------
-  console.log('\n--- STAGE 6: Natural Release into Studio Footer ---');
-  // Scroll into Studio Footer
-  const scrollFooter = capSt.end + 500;
-  await page.evaluate((pos) => window.scrollTo(0, pos), scrollFooter);
-  await page.waitForTimeout(400);
-
-  const footerState = await page.evaluate(() => {
-    const footer = document.getElementById('studio-footer');
-    const fRect = footer ? footer.getBoundingClientRect() : null;
-    const secCount = document.querySelectorAll('[data-testid="capabilities-section"]').length;
-    const headingCount = document.querySelectorAll('[data-testid="capabilities-heading"]').length;
-    const cardsCount = document.querySelectorAll('#capabilities article').length;
+  await wheelTo(geometry.forTurn(3.75));
+  const mouseWheelCapabilities = await snapshot();
+  assert('Real mouse-wheel input advances through the circular drum to Capabilities',
+    mouseWheelCapabilities.title === 'Our Capabilities' && mouseWheelCapabilities.wheelTurn > 3.5,
+    mouseWheelCapabilities);
+  const browserHealth = await page.evaluate(() => {
+    const intervals = window.__ostrumBrowserHealth.frameIntervals.slice().sort((a, b) => a - b);
+    const percentile = (fraction) => intervals.length
+      ? intervals[Math.min(intervals.length - 1, Math.floor(intervals.length * fraction))]
+      : 0;
     return {
-      footerVisible: fRect ? fRect.top < window.innerHeight && fRect.bottom > 0 : false,
-      footerTop: fRect ? Math.round(fRect.top) : null,
-      sectionCount: secCount,
-      headingCount: headingCount,
-      cardsCount: cardsCount,
+      sampledFrames: intervals.length,
+      frameIntervalP95Ms: percentile(0.95),
+      maxFrameIntervalMs: intervals.at(-1) ?? 0,
+      intervalsOver50Ms: intervals.filter((interval) => interval > 50).length,
+      cumulativeLayoutShift: window.__ostrumBrowserHealth.layoutShifts.reduce((sum, entry) => sum + entry.value, 0),
+      layoutShifts: window.__ostrumBrowserHealth.layoutShifts,
+      longAnimationFrames: window.__ostrumBrowserHealth.longAnimationFrames,
+      maxLongAnimationFrameMs: Math.max(0, ...window.__ostrumBrowserHealth.longAnimationFrames.map((entry) => entry.duration)),
     };
   });
+  console.log('Browser health during real wheel interaction', JSON.stringify(browserHealth, null, 2));
+  assert('No significant layout shift during the real wheel interaction', browserHealth.cumulativeLayoutShift < 0.1, browserHealth);
+  assert('No long animation frames during the real wheel interaction', browserHealth.maxLongAnimationFrameMs <= 50, browserHealth);
+  await capture('16-real-wheel-input-capabilities');
+  await wheelTo(geometry.forTurn(3));
+  const mouseWheelReverse = await snapshot();
+  assert('Real reverse mouse-wheel input returns to MNESA', mouseWheelReverse.title === 'MNESA', mouseWheelReverse);
 
-  assert('Studio Footer is visible and entered viewport naturally', footerState.footerVisible, footerState);
-  assert('Exactly 1 Capabilities section exists in DOM', footerState.sectionCount === 1, footerState);
-  assert('Exactly 1 Capabilities heading exists in DOM (NO duplicate section)', footerState.headingCount === 1, footerState);
-  assert('Exactly 6 service cards exist in DOM (NO duplicate catalogue)', footerState.cardsCount === 6, footerState);
+  assert('All page assets load successfully', networkErrors.length === 0, networkErrors);
 
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, 'journey-06-studio-footer-entered.png'),
-    fullPage: false,
-  });
-
-  // -------------------------------------------------------------------------
-  // STAGE 7: REVERSE SCROLL CLEAN REVERSIBILITY
-  // -------------------------------------------------------------------------
-  console.log('\n--- STAGE 7: Reverse Scroll to MNESA ---');
-  // Reverse scroll all the way back to MNESA
-  await page.evaluate((pos) => window.scrollTo(0, pos), scrollMnesa);
-  await page.waitForTimeout(500);
-
-  const revMnesa = await page.evaluate(() => {
-    const lpTitle = document.querySelector('[data-testid="works-wheel-project-title"]')?.textContent?.trim();
-    const pinContainer = document.querySelector('[data-testid="capabilities-pin-container"]');
-    return {
-      title: lpTitle,
-      isOverlayFixed: pinContainer ? pinContainer.style.position === 'fixed' : false,
-    };
-  });
-
-  assert('Reverse scroll successfully restored MNESA', revMnesa.title === 'MNESA', revMnesa);
-  assert('Capabilities overlay inactive on reverse scroll to MNESA', !revMnesa.isOverlayFixed, revMnesa);
-
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, 'journey-07-reversed-to-mnesa.png'),
-    fullPage: false,
-  });
-
-  // -------------------------------------------------------------------------
-  // RUNTIME CLEANLINESS
-  // -------------------------------------------------------------------------
-  console.log('\n--- STAGE 8: Runtime Health ---');
-  assert('Zero console errors throughout journey', report.consoleErrors.length === 0, report.consoleErrors);
-  assert('Zero page errors throughout journey', report.pageErrors.length === 0, report.pageErrors);
-
+  assert('No browser console or runtime errors during the journey', errors.length === 0, errors);
+  const report = {
+    baseUrl: BASE_URL,
+    viewport: VIEWPORT,
+    geometry,
+    capabilitiesMetrics: capMetrics,
+    browserHealth,
+    assertions,
+    errors,
+    networkErrors,
+    screenshots: fs.readdirSync(ARTIFACTS_DIR).filter((file) => file.endsWith('.png')),
+  };
+  fs.writeFileSync(path.join(ARTIFACTS_DIR, 'end_to_end_journey_audit_report.json'), JSON.stringify(report, null, 2));
   await browser.close();
 
-  // Report Summary
-  console.log('\n======================================================================');
-  console.log(`JOURNEY VERIFICATION PASSED: ${report.testsPassed}`);
-  console.log(`JOURNEY VERIFICATION FAILED: ${report.testsFailed}`);
-  console.log('======================================================================\n');
-
-  fs.writeFileSync(
-    path.join(ARTIFACTS_DIR, 'end_to_end_journey_audit_report.json'),
-    JSON.stringify(report, null, 2)
-  );
-
-  if (report.testsFailed > 0 || report.consoleErrors.length > 0 || report.pageErrors.length > 0) {
-    process.exit(1);
-  } else {
-    process.exit(0);
-  }
+  const failures = assertions.filter((item) => !item.passed);
+  console.log(`\n${assertions.length - failures.length}/${assertions.length} assertions passed; ${failures.length} failed.`);
+  if (failures.length) process.exitCode = 1;
 }
 
-runEndToEndVerification().catch((err) => {
-  console.error('Fatal journey failure:', err);
-  process.exit(1);
+run().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
 });

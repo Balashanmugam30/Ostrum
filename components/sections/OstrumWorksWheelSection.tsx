@@ -9,7 +9,6 @@ import {
   WorksWheelHandle,
   LIGHT_OVAL_THEME,
   PROJECT_THEMES,
-  CARD_RATIO,
 } from '@/components/ui/works-wheel';
 import { AnodizedInk } from '@/components/ui/anodized-ink';
 
@@ -26,15 +25,6 @@ export function OstrumWorksWheelSection() {
   const [activeProject, setActiveProject] = useState(0);
   const [isDrumActive, setIsDrumActive] = useState(false);
 
-  const [metrics, setMetrics] = useState({
-    w: 1440,
-    h: 900,
-    cardW: 560,
-    cardH: 350,
-    initLeft: 700,
-    initTop: 275,
-  });
-
   // Derive authoritative theme: light white/lavender in oval state, rich project theme in drum mode
   const currentTheme = isDrumActive
     ? (PROJECT_THEMES[activeProject] ?? LIGHT_OVAL_THEME)
@@ -42,43 +32,11 @@ export function OstrumWorksWheelSection() {
 
   const handleTurnChange = useCallback((turn: number) => {
     setIsDrumActive(turn >= 0.45);
-  }, []);
-
-  // Calculate card layout metrics for shared-element expansion
-  useEffect(() => {
-    const calcMetrics = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const isDesktop = w >= 1024;
-      const isTablet = w >= 768 && w < 1024;
-      const isMobile = w < 768;
-
-      const cardW = isDesktop
-        ? Math.min(w * 0.44, h * 0.54 * CARD_RATIO)
-        : isTablet
-        ? Math.min(w * 0.52, h * 0.46 * CARD_RATIO)
-        : Math.min(w * 0.84, 340);
-
-      const cardH = cardW / CARD_RATIO;
-      const drumShiftX = isDesktop ? w * 0.22 : isTablet ? w * 0.20 : 0;
-      const drumShiftY = isMobile ? -h * 0.12 : 0;
-
-      const cx = w * 0.5 + drumShiftX;
-      const cy = h * 0.5 + drumShiftY;
-
-      setMetrics({
-        w,
-        h,
-        cardW,
-        cardH,
-        initLeft: cx - cardW * 0.5,
-        initTop: cy - cardH * 0.5,
-      });
-    };
-
-    calcMetrics();
-    window.addEventListener('resize', calcMetrics);
-    return () => window.removeEventListener('resize', calcMetrics);
+    window.dispatchEvent(
+      new CustomEvent('ostrum:works-wheel-turn', {
+        detail: { turn, capabilitiesActive: turn >= 3.5 },
+      }),
+    );
   }, []);
 
   // Smooth programmatic project selection (via card click or keyboard)
@@ -123,8 +81,6 @@ export function OstrumWorksWheelSection() {
     const notifyCapabilities = (detail: {
       active: boolean;
       progress?: number;
-      opacity?: number;
-      metrics?: typeof metrics;
     }) => {
       const fn = (window as any).__ostrumUpdateCapabilitiesTransition;
       if (typeof fn === 'function') {
@@ -154,7 +110,6 @@ export function OstrumWorksWheelSection() {
 
       const count = OSTRUM_WORKS.length;
       const last = Math.max(count - 1, 0);
-
       const p1 = holdDist / totalPinDistance;
       const p2 = (holdDist + morphDist) / totalPinDistance;
       const p3 = (holdDist + morphDist + projectsDist) / totalPinDistance;
@@ -177,6 +132,7 @@ export function OstrumWorksWheelSection() {
           onUpdate: (self) => {
             const p = self.progress;
             let targetTurn = 0;
+            let capabilitiesProgress: number | null = null;
 
             if (p <= p1) {
               // Phase 1: Oval at rest with minimal center label
@@ -194,39 +150,40 @@ export function OstrumWorksWheelSection() {
               // Project 0 (TMR) -> Project 1 (Saraswati) -> Project 2 (MNESA) -> Project 3 (Our Capabilities)
               const tProj = (p - p2) / (p3 - p2);
               targetTurn = 1.0 + tProj * last;
-              worksWheelRef.current?.setLeftPanelOpacity?.(1);
+              const capabilitiesActive = targetTurn >= 3.5;
+              worksWheelRef.current?.setLeftPanelOpacity?.(
+                capabilitiesActive ? 0 : 1,
+              );
               worksWheelRef.current?.setWheelOpacity?.(1);
-
-              // Capabilities overlay remains completely inactive during project browsing & drum rotation.
-              // Our Capabilities participates genuinely as the 4th item in the Works Wheel drum.
-              notifyCapabilities({ active: false });
+              if (capabilitiesActive) capabilitiesProgress = 0;
+              // The live Capabilities section follows item four's measured media bounds
+              // through the same wheel rotation, via handleTurnChange above.
             } else {
               // Phase 4: Full-Bleed Capabilities Expansion into Section 05
               // Entry 4 is fully settled on the drum (turn = 4.0).
               targetTurn = 1.0 + last; // 4.0
               const tExp = Math.min(1, Math.max(0, (p - p3) / (1.0 - p3)));
-              const fadeOut = Math.max(0, 1 - tExp * 2.5);
-              worksWheelRef.current?.setLeftPanelOpacity?.(fadeOut);
+              const fadeOut = Math.max(0, 1 - tExp * 20);
+              worksWheelRef.current?.setLeftPanelOpacity?.(0);
               worksWheelRef.current?.setWheelOpacity?.(fadeOut);
 
-              notifyCapabilities({
-                active: true,
-                progress: tExp,
-                opacity: 1,
-                metrics,
-              });
+              capabilitiesProgress = tExp;
             }
 
             worksWheelRef.current?.setTurn(targetTurn);
             setIsDrumActive(targetTurn >= 0.45);
+            if (capabilitiesProgress !== null) {
+              notifyCapabilities({
+                active: true,
+                progress: capabilitiesProgress,
+              });
+            }
           },
           onLeave: () => {
             // Keep Capabilities active and full-screen during handoff into capabilities-pin
             notifyCapabilities({
               active: true,
               progress: 1.0,
-              opacity: 1,
-              metrics,
             });
           },
           onLeaveBack: () => {
@@ -266,7 +223,7 @@ export function OstrumWorksWheelSection() {
       window.removeEventListener('ostrum:narrative-ready', onNarrativeReady);
       if (cleanupCtx) cleanupCtx();
     };
-  }, [metrics]);
+  }, []);
 
   return (
     <section

@@ -285,7 +285,7 @@ export function OstrumEngineSection() {
 
             {/* 2. Main Heading */}
             <h3 className="font-serif italic text-2xl sm:text-[27px] text-white font-normal leading-[1.18] tracking-[-0.02em] drop-shadow-sm">
-              "{engine.forBusiness.statement}"
+              &quot;{engine.forBusiness.statement}&quot;
             </h3>
 
             {/* 3. Supporting Text */}
@@ -358,7 +358,7 @@ export function OstrumEngineSection() {
 
             {/* 2. Main Heading */}
             <h3 className="font-serif italic text-2xl sm:text-[27px] text-white font-normal leading-[1.18] tracking-[-0.02em] drop-shadow-sm">
-              "{engine.forNext.statement}"
+              &quot;{engine.forNext.statement}&quot;
             </h3>
 
             {/* 3. Supporting Text */}

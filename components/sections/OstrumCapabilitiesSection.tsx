@@ -86,8 +86,34 @@ export function OstrumCapabilitiesSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const transitionOriginRef = useRef<DOMRect | null>(null);
 
-  // Synchronised Shared-Element Transition Controller
+  const clearTransitionStyles = (hide: boolean) => {
+    const pinContainer = pinContainerRef.current;
+    if (!pinContainer) return;
+
+    pinContainer.style.position = '';
+    pinContainer.style.top = '';
+    pinContainer.style.left = '';
+    pinContainer.style.width = '';
+    pinContainer.style.height = '';
+    pinContainer.style.zIndex = '';
+    pinContainer.style.pointerEvents = '';
+    pinContainer.style.transform = '';
+    pinContainer.style.transformOrigin = '';
+    pinContainer.style.clipPath = '';
+    pinContainer.style.borderRadius = '';
+    pinContainer.style.boxShadow = '';
+    pinContainer.style.opacity = hide ? '0' : '';
+    pinContainer.dataset.transitionProgress = '';
+    pinContainer.dataset.transitionSource = '';
+    pinContainer.dataset.transitionScale = '';
+    pinContainer.dataset.transitionVisibleBounds = '';
+    transitionOriginRef.current = null;
+  };
+
+  // The canonical section is the shared element: it moves over the fourth wheel
+  // item's measured media bounds, then expands to its full viewport layout.
   useEffect(() => {
     const pinContainer = pinContainerRef.current;
     if (!pinContainer) return;
@@ -95,90 +121,158 @@ export function OstrumCapabilitiesSection() {
     const updateTransition = ({
       active,
       progress = 0,
-      opacity = 1,
-      metrics,
     }: {
       active: boolean;
       progress?: number;
-      opacity?: number;
-      metrics?: {
-        w: number;
-        h: number;
-        cardW: number;
-        cardH: number;
-        initLeft: number;
-        initTop: number;
-      };
     }) => {
       if (!pinContainer) return;
 
       if (!active) {
-        pinContainer.style.position = '';
-        pinContainer.style.top = '';
-        pinContainer.style.left = '';
-        pinContainer.style.width = '';
-        pinContainer.style.height = '';
-        pinContainer.style.zIndex = '';
-        pinContainer.style.pointerEvents = '';
-        pinContainer.style.transform = '';
-        pinContainer.style.transformOrigin = '';
-        pinContainer.style.borderRadius = '';
-        pinContainer.style.boxShadow = '';
-        pinContainer.style.border = '';
-        pinContainer.style.opacity = '0';
+        clearTransitionStyles(true);
         return;
       }
 
       const normProgress = Math.min(1, Math.max(0, progress));
-      const ease =
-        normProgress < 0.5
-          ? 2 * normProgress * normProgress
-          : 1 - Math.pow(-2 * normProgress + 2, 2) / 2;
+      if (normProgress >= 1) {
+        pinContainer.style.position = 'fixed';
+        pinContainer.style.top = '0px';
+        pinContainer.style.left = '0px';
+        pinContainer.style.width = `${document.documentElement.clientWidth}px`;
+        pinContainer.style.height = `${document.documentElement.clientHeight}px`;
+        pinContainer.style.zIndex = '35';
+        pinContainer.style.pointerEvents = 'auto';
+        pinContainer.style.opacity = '1';
+        pinContainer.style.transform = 'none';
+        pinContainer.style.transformOrigin = '0 0';
+        pinContainer.style.clipPath = 'none';
+        pinContainer.style.borderRadius = '0px';
+        pinContainer.style.boxShadow = 'none';
+        pinContainer.dataset.transitionProgress = '1.000';
+        pinContainer.dataset.transitionScale = '1.00000';
+        pinContainer.dataset.transitionVisibleBounds = JSON.stringify({
+          left: 0,
+          top: 0,
+          width: document.documentElement.clientWidth,
+          height: document.documentElement.clientHeight,
+        });
+        return;
+      }
 
-      // Full-bleed edge-to-edge transition surface covering 100% of the viewport
-      // Left: 0, Right: 100vw, Top: 0, Bottom: 100vh (zero margins, zero underlying page exposed)
+      const ease = normProgress * normProgress * (3 - 2 * normProgress);
+      const anchor = document.querySelector<HTMLElement>(
+        '[data-transition-anchor="capabilities"]',
+      );
+      const anchorRect = anchor?.getBoundingClientRect();
+
+      if (
+        anchorRect &&
+        anchorRect.width > 0 &&
+        anchorRect.height > 0 &&
+        (normProgress === 0 || !transitionOriginRef.current)
+      ) {
+        transitionOriginRef.current = new DOMRect(
+          anchorRect.left,
+          anchorRect.top,
+          anchorRect.width,
+          anchorRect.height,
+        );
+        pinContainer.dataset.transitionSource = JSON.stringify({
+          left: anchorRect.left,
+          top: anchorRect.top,
+          width: anchorRect.width,
+          height: anchorRect.height,
+        });
+      }
+
+      const origin = transitionOriginRef.current;
+      if (!origin) {
+        clearTransitionStyles(true);
+        return;
+      }
+
+      const viewportWidth = document.documentElement.clientWidth;
+      const viewportHeight = document.documentElement.clientHeight;
+      const startScale = Math.max(
+        origin.width / viewportWidth,
+        origin.height / viewportHeight,
+      );
+      const scale = startScale + (1 - startScale) * ease;
+      const startClipLeft = Math.max(
+        0,
+        (viewportWidth * startScale - origin.width) / (2 * startScale),
+      );
+      // Portrait mobile pages use the top of the live section as the thumbnail
+      // crop so its real heading and supporting statement remain visible.
+      const isPortraitViewport = viewportHeight > viewportWidth * 1.2;
+      const verticalOverflow = Math.max(
+        0,
+        (viewportHeight * startScale - origin.height) / startScale,
+      );
+      const startClipTop = isPortraitViewport ? 0 : verticalOverflow / 2;
+      const startClipBottom = verticalOverflow - startClipTop;
+      const clipLeft = startClipLeft * (1 - ease);
+      const clipRight = startClipLeft * (1 - ease);
+      const clipTop = startClipTop * (1 - ease);
+      const clipBottom = startClipBottom * (1 - ease);
+      const visibleLeft = origin.left * (1 - ease);
+      const visibleTop = origin.top * (1 - ease);
+      const x = visibleLeft - clipLeft * scale;
+      const y = visibleTop - clipTop * scale;
+
       pinContainer.style.position = 'fixed';
       pinContainer.style.top = '0px';
       pinContainer.style.left = '0px';
-      pinContainer.style.width = '100vw';
-      pinContainer.style.height = '100vh';
+      pinContainer.style.width = `${viewportWidth}px`;
+      pinContainer.style.height = `${viewportHeight}px`;
       pinContainer.style.zIndex = '35';
-      pinContainer.style.pointerEvents = normProgress >= 0.95 ? 'auto' : 'none';
-      pinContainer.style.opacity = String(ease);
-      pinContainer.style.transform = 'none';
+      pinContainer.style.pointerEvents = normProgress >= 0.99 ? 'auto' : 'none';
+      pinContainer.style.opacity = '1';
+      pinContainer.style.transformOrigin = '0 0';
+      pinContainer.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(5)})`;
+      pinContainer.style.clipPath = `inset(${clipTop.toFixed(2)}px ${clipRight.toFixed(2)}px ${clipBottom.toFixed(2)}px ${clipLeft.toFixed(2)}px round ${(18 * (1 - ease) / scale).toFixed(2)}px)`;
       pinContainer.style.borderRadius = '0px';
       pinContainer.style.boxShadow = 'none';
-      pinContainer.style.border = 'none';
-
-      // Subtle, coordinated entrance for content within the full-bleed canvas
-      const header = pinContainer.querySelector('header') as HTMLElement | null;
-      if (header) {
-        header.style.opacity = String(Math.min(1, ease * 1.5));
-        header.style.transform =
-          normProgress >= 0.95
-            ? 'none'
-            : `translate3d(0, ${((1 - ease) * 20).toFixed(1)}px, 0)`;
-      }
-
-      if (trackRef.current && !ScrollTrigger.getById('capabilities-pin')?.isActive) {
-        trackRef.current.style.opacity = String(Math.min(1, ease * 1.5));
-        trackRef.current.style.transform =
-          normProgress >= 0.95
-            ? 'none'
-            : `translate3d(0, ${((1 - ease) * 30).toFixed(1)}px, 0) scale(${(0.96 + 0.04 * ease).toFixed(3)})`;
-      }
+      pinContainer.dataset.transitionProgress = normProgress.toFixed(3);
+      pinContainer.dataset.transitionScale = scale.toFixed(5);
+      pinContainer.dataset.transitionVisibleBounds = JSON.stringify({
+        left: visibleLeft,
+        top: visibleTop,
+        width: (viewportWidth - clipLeft - clipRight) * scale,
+        height: (viewportHeight - clipTop - clipBottom) * scale,
+      });
     };
 
     (window as any).__ostrumUpdateCapabilitiesTransition = updateTransition;
 
-    const onCustomEvent = (e: any) => {
-      if (e.detail) updateTransition(e.detail);
+    const onCustomEvent = (event: Event) => {
+      const detail = (event as CustomEvent).detail;
+      if (detail) updateTransition(detail);
+    };
+    const onWheelTurn = (event: Event) => {
+      const { turn, capabilitiesActive } = (event as CustomEvent).detail ?? {};
+      const currentProgress = Number(pinContainer.dataset.transitionProgress) || 0;
+      updateTransition({
+        active: Boolean(capabilitiesActive),
+        progress: turn >= 4 ? currentProgress : 0,
+      });
     };
     window.addEventListener('ostrum:capabilities-transition', onCustomEvent);
+    window.addEventListener('ostrum:works-wheel-turn', onWheelTurn);
+
+    const onResize = () => {
+      const progress = Number(pinContainer.dataset.transitionProgress);
+      if (Number.isFinite(progress) && pinContainer.style.position === 'fixed') {
+        if (progress < 1) transitionOriginRef.current = null;
+        updateTransition({ active: true, progress });
+      }
+    };
+    window.addEventListener('resize', onResize);
 
     return () => {
       delete (window as any).__ostrumUpdateCapabilitiesTransition;
       window.removeEventListener('ostrum:capabilities-transition', onCustomEvent);
+      window.removeEventListener('ostrum:works-wheel-turn', onWheelTurn);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
@@ -193,45 +287,77 @@ export function OstrumCapabilitiesSection() {
       '(prefers-reduced-motion: reduce)'
     ).matches;
 
-    const isMobile = window.innerWidth < 768;
+    // Measure the full track travel and reserve deliberate reading distance for
+    // each card-to-card movement. The major Energy Narrative uses about 1,000px
+    // per beat (5,000px across five beats); these shorter catalogue reads use a
+    // responsive 58–70% of the viewport height, with the real card geometry as
+    // a lower bound.
+    const getScrollMetrics = () => {
+      const horizontalTravel = Math.max(
+        0,
+        track.scrollWidth - pinContainer.clientWidth,
+      );
+      const cardCount = track.children.length;
+      const steps = Math.max(1, cardCount - 1);
+      const isMobile = window.innerWidth < 768;
+      const firstCard = track.querySelector<HTMLElement>('[data-testid^="capability-card-"]');
+      const cardHeight = firstCard?.getBoundingClientRect().height ?? 0;
+      const horizontalStep = horizontalTravel / steps;
+      const readingDistancePerStep = Math.max(
+        window.innerHeight * (isMobile ? 0.58 : 0.7),
+        cardHeight * 1.2,
+        horizontalStep * 1.5,
+      );
 
-    // Calculate maximum horizontal scroll distance
-    const getScrollDistance = () => {
-      const trackWidth = track.scrollWidth;
-      const viewportWidth = window.innerWidth;
-      const padding = isMobile ? 32 : 96;
-      return Math.max(0, trackWidth - viewportWidth + padding);
+      return {
+        horizontalTravel,
+        verticalDistance: Math.max(
+          horizontalTravel,
+          readingDistancePerStep * steps,
+        ),
+      };
     };
 
     if (prefersReducedMotion) {
       // Natural horizontal scrolling allowed without scroll-scrub pin
+      section.style.marginBottom = '0px';
       track.style.overflowX = 'auto';
-      return;
+      return () => {
+        section.style.marginBottom = '';
+        track.style.overflowX = '';
+      };
     }
-
-    const scrollDistance = getScrollDistance();
-    const pinDistance = isMobile ? scrollDistance * 1.1 : scrollDistance * 1.35;
 
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: section,
         start: 'top top',
-        end: `+=${pinDistance}`,
+        end: () => `+=${getScrollMetrics().verticalDistance}`,
         pin: pinContainer,
         pinSpacing: true,
-        scrub: 1,
+        scrub: 0.6,
         anticipatePin: 1,
         id: 'capabilities-pin',
         invalidateOnRefresh: true,
         onUpdate: (self) => {
-          const dist = getScrollDistance();
-          gsap.set(track, { x: -self.progress * dist });
+          const { horizontalTravel } = getScrollMetrics();
+          gsap.set(track, { x: -self.progress * horizontalTravel });
         },
         onLeave: () => {
-          const dist = getScrollDistance();
-          gsap.set(track, { x: -dist });
+          const { horizontalTravel } = getScrollMetrics();
+          gsap.set(track, { x: -horizontalTravel });
+          clearTransitionStyles(false);
+          section.style.backgroundColor = 'transparent';
+        },
+        onEnterBack: () => {
+          section.style.backgroundColor = '#FFFFFF';
+          (window as any).__ostrumUpdateCapabilitiesTransition?.({
+            active: true,
+            progress: 1,
+          });
         },
         onLeaveBack: () => {
+          section.style.backgroundColor = '#FFFFFF';
           gsap.set(track, { x: 0 });
           const wheelTrigger = ScrollTrigger.getById('works-wheel-pin');
           if (wheelTrigger) {
@@ -261,24 +387,17 @@ export function OstrumCapabilitiesSection() {
       id="capabilities"
       ref={sectionRef}
       data-testid="capabilities-section"
-      className="relative z-[24] w-full min-h-screen bg-white select-none"
+      className="relative z-[24] w-full min-h-screen bg-white select-none mb-[-100svh]"
       style={{
         backgroundColor: '#FFFFFF',
       }}
       aria-label="Our Capabilities"
     >
-      {/* Zero-size placeholder preserved for DOM queries */}
-      <div
-        data-testid="capabilities-flow-placeholder"
-        className="hidden w-0 h-0 pointer-events-none"
-        aria-hidden="true"
-      />
-
       {/* Canonical Stage Container with subtle top wash */}
       <div
         ref={pinContainerRef}
         data-testid="capabilities-pin-container"
-        className="w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-16 pb-6 sm:py-10 md:py-12 bg-white"
+        className="w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-20 pb-6 sm:pt-20 sm:pb-10 md:pt-24 md:pb-12 bg-white"
         style={{
           background:
             'linear-gradient(180deg, rgba(191,235,247,0.48) 0%, rgba(255,255,255,0.94) 13%, #FFFFFF 26%)',
