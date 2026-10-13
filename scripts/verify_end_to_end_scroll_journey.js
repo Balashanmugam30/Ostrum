@@ -13,7 +13,7 @@ const DESCRIPTION =
 async function run() {
   const browser = await chromium.launch({
     headless: true,
-    args: ['--enable-gpu-benchmarking', '--enable-threaded-compositing'],
+    args: ['--enable-gpu', '--enable-gpu-benchmarking', '--enable-threaded-compositing'],
   });
   const page = await browser.newPage({ viewport: VIEWPORT });
   const errors = [];
@@ -339,14 +339,17 @@ async function run() {
   // Exercise the same journey with real mouse-wheel events through Lenis.
   const wheelTo = async (target) => {
     await page.mouse.move(VIEWPORT.width * 0.75, VIEWPORT.height * 0.5);
-    let current = await page.evaluate(() => window.scrollY);
-    while (Math.abs(target - current) > 30) {
-      const requested = Math.sign(target - current) * Math.min(480, Math.abs(target - current) / 0.95);
+    let wheelTarget = await page.evaluate(() => window.lenis.targetScroll);
+    let wheelEvents = 0;
+    while (Math.abs(target - wheelTarget) > 30 && wheelEvents < 80) {
+      const direction = Math.sign(target - wheelTarget);
+      const requested = direction * Math.min(480, Math.abs(target - wheelTarget));
       await page.mouse.wheel(0, requested);
-      const expected = current + requested * 0.95;
-      await page.waitForFunction((goal) => Math.abs(window.scrollY - goal) < 30, expected, { timeout: 5000 });
-      current = await page.evaluate(() => window.scrollY);
+      wheelEvents += 1;
+      await page.waitForTimeout(50);
+      wheelTarget = await page.evaluate(() => window.lenis.targetScroll);
     }
+    await page.waitForFunction((goal) => Math.abs(window.scrollY - goal) < 30, target, { timeout: 12000 });
     await page.waitForTimeout(120);
   };
   await moveWithLenis(0);
@@ -369,6 +372,12 @@ async function run() {
       ? intervals[Math.min(intervals.length - 1, Math.floor(intervals.length * fraction))]
       : 0;
     return {
+      webglRenderer: (() => {
+        const canvas = document.querySelector('canvas');
+        const context = canvas?.getContext('webgl2') ?? canvas?.getContext('webgl');
+        const debugInfo = context?.getExtension('WEBGL_debug_renderer_info');
+        return debugInfo ? context.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : null;
+      })(),
       sampledFrames: intervals.length,
       frameIntervalP95Ms: percentile(0.95),
       maxFrameIntervalMs: intervals.at(-1) ?? 0,

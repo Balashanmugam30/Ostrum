@@ -15,7 +15,7 @@ fs.mkdirSync(ARTIFACTS_DIR, { recursive: true });
 async function run() {
   const browser = await chromium.launch({
     headless: true,
-    args: ['--enable-gpu-benchmarking', '--enable-threaded-compositing'],
+    args: ['--enable-gpu', '--enable-gpu-benchmarking', '--enable-threaded-compositing'],
   });
   const assertions = [];
   const errors = [];
