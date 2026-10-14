@@ -98,14 +98,7 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
     <section
       id="faq"
       data-testid="faq-section"
-      className="relative z-20 w-full overflow-hidden select-text text-black"
-      style={{
-        background: `
-          radial-gradient(ellipse 65% 50% at 20% 30%, rgba(255, 255, 255, 0.65) 0%, transparent 70%),
-          radial-gradient(ellipse 60% 50% at 80% 80%, rgba(215, 195, 236, 0.35) 0%, transparent 70%),
-          linear-gradient(180deg, #FFFCFA 0%, #EEE3F7 50%, #C7A6E3 100%)
-        `,
-      }}
+      className="relative z-20 w-full overflow-hidden select-text text-black bg-transparent"
       aria-label="Frequently Asked Questions"
     >
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 py-24 sm:py-32 lg:py-40">

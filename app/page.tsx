@@ -33,11 +33,34 @@ export default function HomePage() {
       {/* SECTION 06: Testimonials (Ignite-inspired Stacked Editorial Cards) */}
       <OstrumTestimonialsSection />
 
-      {/* SECTION 07: Frequently Asked Questions (FAQ) */}
-      <OstrumFaqSection />
+      {/* SECTIONS 07 & 08: Unified FAQ & Contact Purple Color Field (Continuous Purple-Dominant Gradient) */}
+      <div
+        id="faq-contact-field"
+        className="relative z-20 w-full overflow-hidden select-text"
+        style={{
+          background: `linear-gradient(
+            180deg,
+            #FFFEFF 0%,
+            #FFFEFF 4%,
+            #F3EAF9 10%,
+            #DFC4EE 22%,
+            #C6A0E0 38%,
+            #A779CE 55%,
+            #8354B4 72%,
+            #604080 85%,
+            #392344 92%,
+            #160D20 96%,
+            #050505 98%,
+            #050505 100%
+          )`,
+        }}
+      >
+        {/* SECTION 07: Frequently Asked Questions (FAQ) */}
+        <OstrumFaqSection />
 
-      {/* SECTION 08: Contact / Project Enquiry Form (Final Page Section) */}
-      <OstrumContactSection />
+        {/* SECTION 08: Contact / Project Enquiry Form (Final Page Section) */}
+        <OstrumContactSection />
+      </div>
     </div>
   );
 }

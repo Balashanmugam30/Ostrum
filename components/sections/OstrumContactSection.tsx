@@ -99,14 +99,7 @@ export function OstrumContactSection() {
     <section
       id="contact"
       data-testid="contact-section"
-      className="relative z-20 w-full overflow-hidden select-text text-black -mt-[1px]"
-      style={{
-        background: `
-          radial-gradient(ellipse 70% 50% at 85% 20%, rgba(255, 255, 255, 0.40) 0%, transparent 60%),
-          radial-gradient(ellipse 60% 45% at 15% 45%, rgba(220, 231, 247, 0.30) 0%, transparent 60%),
-          linear-gradient(180deg, #C7A6E3 0%, #D7C3EC 18%, #EBDCEB 36%, #DCE7F7 52%, #AEB3BE 70%, #53545B 86%, #050505 100%)
-        `,
-      }}
+      className="relative z-20 w-full overflow-hidden select-text text-black bg-transparent"
       aria-label="Contact and Project Enquiry"
     >
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 pt-24 sm:pt-32 lg:pt-36 pb-32 sm:pb-44 lg:pb-52">
