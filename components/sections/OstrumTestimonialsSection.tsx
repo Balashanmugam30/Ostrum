@@ -306,16 +306,16 @@ export function OstrumTestimonialsSection({
       >
         {/* Enormous Condensed Monumental Heading (Background layer: z-10) */}
         <div
-          className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none px-4 sm:px-8 md:px-12 overflow-hidden"
+          className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none px-2 sm:px-4 md:px-6 overflow-hidden"
           aria-hidden="true"
         >
           <h2
             ref={headingRef}
             data-testid="testimonials-heading"
-            className="font-condensed font-bold uppercase text-black text-center select-none w-full whitespace-nowrap tracking-[-0.015em]"
+            className="font-condensed font-bold uppercase text-black text-center select-none w-full whitespace-nowrap tracking-[-0.025em]"
             style={{
-              fontSize: 'clamp(3.2rem, 16.2vw, 312px)',
-              lineHeight: '0.84',
+              fontSize: 'clamp(3.2rem, 17.8vw, 340px)',
+              lineHeight: '0.86',
               color: '#000000',
             }}
           >
@@ -326,7 +326,7 @@ export function OstrumTestimonialsSection({
         {/* Foreground Testimonial Card Stack (Layer: z-20 to z-30) */}
         <div
           data-testid="testimonials-card-stack"
-          className="relative z-20 w-full max-w-[530px] md:max-w-[560px] flex items-center justify-center h-[645px] sm:h-[690px] md:h-[728px] max-h-[85vh]"
+          className="relative z-20 w-full max-w-[530px] md:max-w-[560px] flex items-center justify-center h-[430px] sm:h-[460px] md:h-[485px]"
         >
           {items.map((testimonial, index) => (
             <div
