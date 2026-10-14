@@ -170,8 +170,8 @@ export default function OstrumLiquidGlass({
             width="${innerWidth}"
             height="${innerHeight}"
             rx="${innerRadius}"
-            fill="hsl(0 0% 56% / 0.9)"
-            style="filter:blur(0.5px)"
+            fill="hsl(0 0% 55% / 0.93)"
+            style="filter:blur(6px)"
           />
         </svg>
       `;
@@ -190,17 +190,17 @@ export default function OstrumLiquidGlass({
       // These are softer than the source's default settings.
       redChannelRef.current?.setAttribute(
         "scale",
-        "-74"
+        "-55"
       );
 
       greenChannelRef.current?.setAttribute(
         "scale",
-        "-71"
+        "-52"
       );
 
       blueChannelRef.current?.setAttribute(
         "scale",
-        "-68"
+        "-49"
       );
 
       [redChannelRef, greenChannelRef, blueChannelRef]
@@ -249,7 +249,7 @@ export default function OstrumLiquidGlass({
     blueGradientId,
   ]);
 
-  const fallbackBlur = "blur(20px) saturate(1.18)";
+  const glassBlur = "blur(28px) saturate(1.4) brightness(1.03)";
 
   const surfaceStyle: CSSProperties = {
     ...style,
@@ -260,23 +260,22 @@ export default function OstrumLiquidGlass({
 
     borderRadius: `${radius}px`,
 
-    background: "rgba(255, 255, 255, 0.30)",
+    background: "linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.04) 100%)",
 
-    border: "1px solid rgba(255, 255, 255, 0.76)",
+    border: "1px solid rgba(255, 255, 255, 0.65)",
 
     backdropFilter: chromiumRefraction
-      ? `url(#${filterId}) saturate(1.12)`
-      : fallbackBlur,
+      ? `url(#${filterId}) ${glassBlur}`
+      : glassBlur,
 
-    WebkitBackdropFilter: chromiumRefraction
-      ? undefined
-      : fallbackBlur,
+    WebkitBackdropFilter: glassBlur,
 
     boxShadow: [
-      "0 22px 60px rgba(72, 53, 97, 0.10)",
-      "0 4px 16px rgba(72, 53, 97, 0.05)",
-      "inset 0 1px 0 rgba(255, 255, 255, 0.92)",
-      "inset 0 -1px 0 rgba(255, 255, 255, 0.38)",
+      "0 0 0 1px rgba(255, 255, 255, 0.5) inset",
+      "0 1.5px 3px 0 rgba(255, 255, 255, 0.85) inset",
+      "0 -1.5px 3px 0 rgba(0, 0, 0, 0.06) inset",
+      "0 24px 60px -12px rgba(80, 50, 120, 0.18)",
+      "0 8px 24px -4px rgba(80, 50, 120, 0.10)",
     ].join(", "),
   };
 
@@ -398,6 +397,23 @@ export default function OstrumLiquidGlass({
           </filter>
         </defs>
       </svg>
+
+      {/* Subtle Apple-style specular gloss reflection along the top */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "40%",
+          background:
+            "linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 60%, transparent 100%)",
+          borderRadius: `${radius}px ${radius}px 0 0`,
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
 
       <div
         style={{

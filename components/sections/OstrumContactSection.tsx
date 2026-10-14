@@ -95,33 +95,21 @@ export function OstrumContactSection() {
     }
   };
 
-  const scrollToForm = () => {
-    const target = document.getElementById('contact-form') || document.getElementById('contact');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-      const nameInput = document.getElementById('contact-name');
-      if (nameInput) {
-        setTimeout(() => nameInput.focus(), 500);
-      }
-    }
-  };
-
   return (
     <section
       id="contact"
       data-testid="contact-section"
-      className="relative z-20 w-full overflow-hidden select-text text-black"
+      className="relative z-20 w-full overflow-hidden select-text text-black -mt-[1px]"
       style={{
         background: `
-          radial-gradient(ellipse 70% 50% at 80% 25%, rgba(255, 255, 255, 0.45) 0%, transparent 70%),
-          radial-gradient(ellipse 60% 45% at 20% 60%, rgba(220, 231, 247, 0.5) 0%, transparent 70%),
-          linear-gradient(180deg, #C7A6E3 0%, #D7C3EC 24%, #EBDCEB 46%, #DCE7F7 66%, #20242C 82%, #050505 92%, #050505 100%)
+          radial-gradient(ellipse 70% 50% at 85% 20%, rgba(255, 255, 255, 0.40) 0%, transparent 60%),
+          radial-gradient(ellipse 60% 45% at 15% 45%, rgba(220, 231, 247, 0.30) 0%, transparent 60%),
+          linear-gradient(180deg, #C7A6E3 0%, #D7C3EC 18%, #EBDCEB 36%, #DCE7F7 52%, #AEB3BE 70%, #53545B 86%, #050505 100%)
         `,
       }}
       aria-label="Contact and Project Enquiry"
     >
-      {/* Upper Main Contact Region (Pastel Gradient Field) */}
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 pt-24 sm:pt-32 lg:pt-36 pb-20 sm:pb-28">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 pt-24 sm:pt-32 lg:pt-36 pb-32 sm:pb-44 lg:pb-52">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Left Column: Heading & Concise Technical Scope */}
           <div className="lg:col-span-5 flex flex-col items-start lg:sticky lg:top-28">
@@ -140,41 +128,24 @@ export function OstrumContactSection() {
             </h2>
 
             <p className="font-sans text-base sm:text-lg text-[#2E3542] leading-relaxed max-w-md mt-6 sm:mt-8 font-normal">
-              Have an ambitious product, intelligent AI system, or custom engineering challenge in mind? Tell us what you&apos;re building and we&apos;ll schedule a confidential technical consultation.
+              Tell us about the product, system, or digital experience you&apos;re building. We&apos;ll review your requirements and discuss the next steps.
             </p>
-
-            {/* Direct Studio Channels */}
-            <div className="mt-8 pt-8 border-t border-black/15 w-full max-w-md flex flex-col gap-3 font-mono text-xs text-[#3E4552]">
-              <div className="flex items-center justify-between">
-                <span className="uppercase tracking-wider">Direct Studio Line:</span>
-                <a
-                  href="mailto:hello@ostrum.co"
-                  className="font-semibold text-black hover:text-[#5B21B6] transition-colors"
-                >
-                  hello@ostrum.co
-                </a>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="uppercase tracking-wider">Response Window:</span>
-                <span className="font-semibold text-black">Within 24 Hours</span>
-              </div>
-            </div>
           </div>
 
-          {/* Right Column: Liquid-Glass Form Panel */}
+          {/* Right Column: Tall Portrait Liquid-Glass Form Panel */}
           <div className="lg:col-span-7 w-full flex justify-center lg:justify-end">
             <OstrumLiquidGlass
               radius={28}
-              className="w-full max-w-[660px]"
+              className="w-full max-w-[580px]"
             >
               <div
                 id="contact-form"
-                className="p-7 sm:p-9 md:p-10 text-black select-text"
+                className="p-8 sm:p-10 text-black select-text"
               >
                 {submitSuccess ? (
                   <div
                     data-testid="contact-success-state"
-                    className="py-12 flex flex-col items-center text-center select-none"
+                    className="py-16 flex flex-col items-center text-center select-none"
                   >
                     <div className="w-16 h-16 rounded-full bg-[#7A52A8]/15 border border-[#7A52A8]/30 flex items-center justify-center text-[#5A2C8F] text-2xl mb-6">
                       ✓
@@ -198,7 +169,7 @@ export function OstrumContactSection() {
                     onSubmit={handleSubmit}
                     noValidate
                     data-testid="contact-enquiry-form"
-                    className="flex flex-col gap-4 sm:gap-5"
+                    className="flex flex-col gap-4 sm:gap-4.5"
                   >
                     {/* Panel Header */}
                     <div className="flex items-center justify-between pb-3 border-b border-black/10">
@@ -206,7 +177,7 @@ export function OstrumContactSection() {
                         Project Enquiry
                       </span>
                       <span className="font-mono text-[11px] text-[#6B7280]">
-                        * Required fields
+                        * Required
                       </span>
                     </div>
 
@@ -220,101 +191,99 @@ export function OstrumContactSection() {
                       </div>
                     )}
 
-                    {/* Row 1: Name & Work Email */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <label
-                          htmlFor="contact-name"
-                          className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
-                        >
-                          Name <span className="text-[#8B5CF6]">*</span>
-                        </label>
-                        <input
-                          id="contact-name"
-                          name="name"
-                          type="text"
-                          required
-                          autoComplete="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          placeholder="e.g. Elena Vance"
-                          className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label
-                          htmlFor="contact-email"
-                          className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
-                        >
-                          Work Email <span className="text-[#8B5CF6]">*</span>
-                        </label>
-                        <input
-                          id="contact-email"
-                          name="email"
-                          type="email"
-                          required
-                          autoComplete="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          placeholder="elena@company.com"
-                          className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm"
-                        />
-                      </div>
+                    {/* 1. Name — required */}
+                    <div className="flex flex-col gap-1.5 w-full">
+                      <label
+                        htmlFor="contact-name"
+                        className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
+                      >
+                        Name <span className="text-[#8B5CF6]">*</span>
+                      </label>
+                      <input
+                        id="contact-name"
+                        name="name"
+                        type="text"
+                        required
+                        autoComplete="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="e.g. Elena Vance"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm"
+                      />
                     </div>
 
-                    {/* Row 2: Company & Project Type */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <label
-                          htmlFor="contact-company"
-                          className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
-                        >
-                          Company <span className="text-[#6B7280] font-normal text-[11px]">(Optional)</span>
-                        </label>
-                        <input
-                          id="contact-company"
-                          name="company"
-                          type="text"
-                          autoComplete="organization"
-                          value={formData.company}
-                          onChange={handleChange}
-                          placeholder="e.g. Vance Dynamics"
-                          className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label
-                          htmlFor="contact-project-type"
-                          className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
-                        >
-                          Project Type <span className="text-[#6B7280] font-normal text-[11px]">(Optional)</span>
-                        </label>
-                        <select
-                          id="contact-project-type"
-                          name="projectType"
-                          value={formData.projectType}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm cursor-pointer"
-                        >
-                          <option value="">Select project type...</option>
-                          {PROJECT_TYPE_OPTIONS.map((opt) => (
-                            <option key={opt} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                    {/* 2. Work Email — required */}
+                    <div className="flex flex-col gap-1.5 w-full">
+                      <label
+                        htmlFor="contact-email"
+                        className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
+                      >
+                        Work Email <span className="text-[#8B5CF6]">*</span>
+                      </label>
+                      <input
+                        id="contact-email"
+                        name="email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="elena@company.com"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm"
+                      />
                     </div>
 
-                    {/* Row 3: Phone (Optional) */}
-                    <div className="flex flex-col gap-1.5">
+                    {/* 3. Company — optional */}
+                    <div className="flex flex-col gap-1.5 w-full">
+                      <label
+                        htmlFor="contact-company"
+                        className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
+                      >
+                        Company <span className="text-[#6B7280] font-normal text-[11px]">(Optional)</span>
+                      </label>
+                      <input
+                        id="contact-company"
+                        name="company"
+                        type="text"
+                        autoComplete="organization"
+                        value={formData.company}
+                        onChange={handleChange}
+                        placeholder="e.g. Vance Dynamics"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm"
+                      />
+                    </div>
+
+                    {/* 4. Project Type — optional select */}
+                    <div className="flex flex-col gap-1.5 w-full">
+                      <label
+                        htmlFor="contact-project-type"
+                        className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
+                      >
+                        Project Type <span className="text-[#6B7280] font-normal text-[11px]">(Optional)</span>
+                      </label>
+                      <select
+                        id="contact-project-type"
+                        name="projectType"
+                        value={formData.projectType}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm cursor-pointer"
+                      >
+                        <option value="">Select project type...</option>
+                        {PROJECT_TYPE_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* 5. Phone Number — optional */}
+                    <div className="flex flex-col gap-1.5 w-full">
                       <label
                         htmlFor="contact-phone"
                         className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
                       >
-                        Phone number <span className="text-[#6B7280] font-normal text-[11px]">(Optional)</span>
+                        Phone Number <span className="text-[#6B7280] font-normal text-[11px]">(Optional)</span>
                       </label>
                       <input
                         id="contact-phone"
@@ -324,12 +293,12 @@ export function OstrumContactSection() {
                         value={formData.phone}
                         onChange={handleChange}
                         placeholder="e.g. +61 400 000 000"
-                        className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm"
                       />
                     </div>
 
-                    {/* Row 4: Message (Required) */}
-                    <div className="flex flex-col gap-1.5">
+                    {/* 6. Message — required */}
+                    <div className="flex flex-col gap-1.5 w-full">
                       <label
                         htmlFor="contact-message"
                         className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
@@ -344,11 +313,11 @@ export function OstrumContactSection() {
                         value={formData.message}
                         onChange={handleChange}
                         placeholder="Describe your project goals, scope, and technical timeline..."
-                        className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm min-h-[110px] resize-y"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm min-h-[120px] resize-y"
                       />
                     </div>
 
-                    {/* Submit Button */}
+                    {/* 7. Send Enquiry Button */}
                     <div className="pt-2">
                       <button
                         type="submit"
@@ -376,59 +345,10 @@ export function OstrumContactSection() {
                         )}
                       </button>
                     </div>
-
-                    {/* Confidentiality Assurance */}
-                    <p className="font-mono text-[11px] text-center text-[#525B6C] uppercase tracking-wider pt-1">
-                      Strict Non-Disclosure Guaranteed · Direct Principal Response
-                    </p>
                   </form>
                 )}
               </div>
             </OstrumLiquidGlass>
-          </div>
-        </div>
-      </div>
-
-      {/* Lower Closing Sub-Region: Smooth Fade into Black CTA */}
-      <div
-        id="closing-cta"
-        data-testid="closing-cta"
-        className="w-full pt-16 sm:pt-24 pb-24 sm:pb-32 px-6 sm:px-10 md:px-16 lg:px-20 text-white select-text"
-      >
-        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-8 pt-12 border-t border-white/10">
-          <div className="max-w-2xl">
-            <h2
-              className="font-condensed font-bold uppercase text-white tracking-[-0.01em] select-none"
-              style={{
-                fontSize: 'clamp(2.6rem, 5.5vw, 68px)',
-                lineHeight: '0.92',
-                color: '#FFFFFF',
-              }}
-            >
-              Ready To Build?
-            </h2>
-            <p className="font-sans text-base sm:text-lg text-white/70 leading-relaxed max-w-lg mt-4 font-normal">
-              Partner with Ostrum to engineer transformative software, intelligent systems, and scalable digital ventures.
-            </p>
-          </div>
-
-          <div className="flex flex-col items-start md:items-end shrink-0">
-            <button
-              type="button"
-              onClick={scrollToForm}
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-[#0B0C0E] font-sans text-base sm:text-lg font-semibold transition-all duration-300 hover:bg-[#EBDCEB] hover:shadow-[0_10px_30px_rgba(255,255,255,0.18)] cursor-pointer group"
-            >
-              <span>Start a Conversation</span>
-              <span
-                className="transition-transform group-hover:translate-x-1"
-                aria-hidden="true"
-              >
-                →
-              </span>
-            </button>
-            <p className="font-mono text-xs text-white/45 mt-3">
-              Direct Principal Line · hello@ostrum.co
-            </p>
           </div>
         </div>
       </div>
