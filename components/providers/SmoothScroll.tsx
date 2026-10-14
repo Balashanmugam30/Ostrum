@@ -44,6 +44,13 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     gsap.ticker.add(updateTicker);
     gsap.ticker.lagSmoothing(0);
 
+    // Refresh ScrollTrigger once fonts and assets are ready
+    if (typeof document !== 'undefined' && document.fonts) {
+      document.fonts.ready.then(() => {
+        ScrollTrigger.refresh();
+      });
+    }
+
     return () => {
       delete (window as any).lenis;
       gsap.ticker.remove(updateTicker);

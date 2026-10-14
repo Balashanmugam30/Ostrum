@@ -49,6 +49,12 @@ export function LineByLine({
       return;
     }
 
+    // Immediately trigger if already visible in initial viewport
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      setIsVisible(true);
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
