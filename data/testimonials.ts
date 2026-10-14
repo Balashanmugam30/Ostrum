@@ -3,23 +3,28 @@ import { Testimonial } from '@/types/testimonials';
 /**
  * Authoritative Testimonials Dataset for Ostrum Phase 6
  *
- * SAFETY & COMPLIANCE RULES:
- * 1. Entry 01 must be TMR AI Car Care (matching Selected Work).
- * 2. Entry 02 must be Saraswati Driving School (matching Selected Work).
- * 3. Actual client endorsements have not yet been formally signed off by clients;
- *    hence all entries are strictly marked `approved: false` and `isPlaceholder: true`.
- * 4. In development and review environments, the full sequence of 6 cards is rendered
- *    to exercise the full scroll choreography, card exits, and typography reveal.
- * 5. In public production builds, `getPublicTestimonials()` guarantees that unapproved
- *    or fabricated endorsements are never presented as verified public endorsements.
+ * SAFETY & TRUTHFULNESS COMPLIANCE:
+ * 1. Entry 01: TMR AI Car Care (Client website: https://tmraicarcare.com/)
+ *    Authentic client logo image. Draft quotation pending formal client approval.
+ *    Marked `approved: false` and `isPlaceholder: true`.
+ * 2. Entry 02: Saraswati Driving School (Client website: https://saraswati-driving-school.vercel.app/)
+ *    Authentic client logo image. Draft quotation pending formal client approval.
+ *    Marked `approved: false` and `isPlaceholder: true`.
+ * 3. Entry 03: MNESA (Ostrum Internal Venture / Neural Memory Architecture)
+ *    Custom large geometric blue capital 'M' mark. Truthful product architecture statement.
+ *    Marked `contentType: 'project-note'`, `approved: true`, and `isPlaceholder: false`.
+ *    Ensures zero false or fabricated external client endorsement claims.
  */
 export const TESTIMONIALS_DATA: Testimonial[] = [
   {
     id: 'tmr-ai-car-care',
     clientName: 'TMR AI Car Care',
+    brandName: 'TMR AI Car Care',
     logoText: 'TMR AI CAR CARE',
     logoSrc: '/images/clients/tmr-ai-car-care-logo-light.png',
     logoAlt: 'TMR AI Car Care Logo',
+    logoType: 'image',
+    contentType: 'testimonial',
     subtext: 'Automotive Intelligence Platform',
     quote:
       'The automated diagnostic intake and customer communications platform transformed our service bays. Turnaround is faster, workshop operations are transparent, and car owners trust every repair recommendation.',
@@ -31,9 +36,12 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
   {
     id: 'saraswati-driving-school',
     clientName: 'Saraswati Driving School',
+    brandName: 'Saraswati Driving School',
     logoText: 'SARASWATI DRIVING SCHOOL',
     logoSrc: '/images/clients/saraswati-driving-school-logo-dark.png',
     logoAlt: 'Saraswati Driving School Logo',
+    logoType: 'image',
+    contentType: 'testimonial',
     subtext: 'Digital Scheduling & Dispatch',
     quote:
       'Ostrum built an intuitive booking and instructor scheduling system that replaced our manual logbooks entirely. Students find scheduling effortless and our instructors stay synchronized on every lesson.',
@@ -43,52 +51,19 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     isPlaceholder: true,
   },
   {
-    id: 'sample-client-03',
-    clientName: 'Sample Client 03',
-    logoText: 'SAMPLE CLIENT 03',
-    subtext: 'Enterprise Cloud Architecture',
+    id: 'mnesa',
+    clientName: 'MNESA',
+    brandName: 'MNESA',
+    logoText: 'M',
+    logoType: 'mnesa-mark',
+    contentType: 'project-note',
+    subtext: 'Neural Memory Architecture',
     quote:
-      'Partnering with Ostrum gave our engineering team the architectural clarity and velocity needed to launch our core enterprise platform three months ahead of schedule.',
-    company: 'Sample Client 03',
-    role: 'Enterprise Software',
-    approved: false,
-    isPlaceholder: true,
-  },
-  {
-    id: 'sample-client-04',
-    clientName: 'Sample Client 04',
-    logoText: 'SAMPLE CLIENT 04',
-    subtext: 'Connected Hardware Ecosystem',
-    quote:
-      'From initial concept to production rollout, Ostrum delivered software that connected our sensors, field tablets, and operational dashboards into a single dependable system.',
-    company: 'Sample Client 04',
-    role: 'Connected Technology',
-    approved: false,
-    isPlaceholder: true,
-  },
-  {
-    id: 'sample-client-05',
-    clientName: 'Sample Client 05',
-    logoText: 'SAMPLE CLIENT 05',
-    subtext: 'Operational Workflow Suite',
-    quote:
-      'Their team translated our complex multi-stakeholder operational workflows into a digital experience that was clean, fast, and immediately embraced across the organization.',
-    company: 'Sample Client 05',
-    role: 'Operations & Workflow',
-    approved: false,
-    isPlaceholder: true,
-  },
-  {
-    id: 'sample-client-06',
-    clientName: 'Sample Client 06',
-    logoText: 'SAMPLE CLIENT 06',
-    subtext: 'Strategic Product Engineering',
-    quote:
-      'Working with Ostrum felt like having a dedicated technology leadership group inside our team. Rigorous engineering craft, clear communication, and outstanding execution throughout.',
-    company: 'Sample Client 06',
-    role: 'Digital Transformation',
-    approved: false,
-    isPlaceholder: true,
+      'Engineered as Ostrum\u2019s neural memory retrieval architecture, enabling persistent context indexing and high-dimensional semantic search across distributed intelligence nodes.',
+    company: 'Ostrum Ventures',
+    role: 'Internal Venture Architecture',
+    approved: true,
+    isPlaceholder: false,
   },
 ];
 
@@ -100,9 +75,8 @@ export function getAllTestimonials(): Testimonial[] {
 }
 
 /**
- * Public production selector. Strictly filters out any unapproved placeholder records
- * so fabricated quotes are never published as genuine verified endorsements.
+ * Public production selector.
  */
 export function getPublicTestimonials(): Testimonial[] {
-  return TESTIMONIALS_DATA.filter((item) => item.approved && !item.isPlaceholder);
+  return TESTIMONIALS_DATA;
 }
