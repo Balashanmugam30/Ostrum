@@ -210,10 +210,10 @@ export function OstrumTestimonialsSection({
         <div className="max-w-5xl mx-auto flex flex-col items-center">
           <h2
             data-testid="testimonials-heading"
-            className="font-condensed font-bold uppercase text-black text-center mb-16 tracking-[-0.015em]"
+            className="font-condensed font-bold uppercase text-black text-center mb-16 tracking-[-0.01em]"
             style={{
               fontSize: 'clamp(2.5rem, 8vw, 96px)',
-              lineHeight: '0.9',
+              lineHeight: '0.85',
             }}
           >
             TESTIMONIALS
@@ -228,9 +228,13 @@ export function OstrumTestimonialsSection({
                 data-client={testimonial.clientName}
                 data-placeholder={testimonial.isPlaceholder}
                 data-approved={testimonial.approved}
-                className="w-full rounded-[6px] p-8 sm:p-10 text-black bg-[#F7F7F7]"
+                className="w-full rounded-[6px] p-8 sm:p-10 text-black"
                 style={{
-                  boxShadow: '0 10px 24px -4px rgba(0, 0, 0, 0.06), 0 4px 8px -2px rgba(0, 0, 0, 0.03)',
+                  backgroundColor: index % 2 === 1 ? '#EEEEEE' : '#FFFFFF',
+                  boxShadow:
+                    index === 0
+                      ? '0 16px 36px -6px rgba(0, 0, 0, 0.08), 0 6px 14px -3px rgba(0, 0, 0, 0.04)'
+                      : '0 10px 24px -4px rgba(0, 0, 0, 0.06), 0 4px 8px -2px rgba(0, 0, 0, 0.03)',
                 }}
               >
                 {/* Logo Area */}
@@ -306,16 +310,16 @@ export function OstrumTestimonialsSection({
       >
         {/* Enormous Condensed Monumental Heading (Background layer: z-10) */}
         <div
-          className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none px-2 sm:px-4 md:px-6 overflow-hidden"
+          className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none px-6 sm:px-10 md:px-16 lg:px-[5vw] overflow-hidden"
           aria-hidden="true"
         >
           <h2
             ref={headingRef}
             data-testid="testimonials-heading"
-            className="font-condensed font-bold uppercase text-black text-center select-none w-full whitespace-nowrap tracking-[-0.025em]"
+            className="font-condensed font-bold uppercase text-black text-center select-none w-full whitespace-nowrap tracking-[-0.01em]"
             style={{
-              fontSize: 'clamp(3.2rem, 17.8vw, 340px)',
-              lineHeight: '0.86',
+              fontSize: 'clamp(3.2rem, 26vw, 395px)',
+              lineHeight: '0.85',
               color: '#000000',
             }}
           >
@@ -341,7 +345,7 @@ export function OstrumTestimonialsSection({
               data-approved={testimonial.approved}
               className="absolute inset-0 flex flex-col justify-between rounded-[6px] p-6 sm:p-8 md:p-10 text-black select-text cursor-default will-change-transform"
               style={{
-                backgroundColor: '#F7F7F7',
+                backgroundColor: index % 2 === 1 ? '#EEEEEE' : '#FFFFFF',
                 boxShadow:
                   index === 0
                     ? '0 16px 36px -6px rgba(0, 0, 0, 0.08), 0 6px 14px -3px rgba(0, 0, 0, 0.04)'

@@ -28,6 +28,14 @@
 
 @font-face {
   font-display: swap;
+  font-family: 'Soehne Schmal Halbfett';
+  font-style: normal;
+  font-weight: 600 700;
+  src: url('/fonts/soehne-schmal-halbfett.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
   font-family: 'Oswald';
   font-style: normal;
   font-weight: 700;
@@ -87,7 +95,7 @@ body {
 }
 
 .font-condensed {
-  font-family: 'Oswald', 'Barlow Condensed', Impact, sans-serif;
+  font-family: 'Soehne Schmal Halbfett', 'Oswald', 'Barlow Condensed', Impact, sans-serif;
 }
 
 .h1 {
