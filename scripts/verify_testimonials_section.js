@@ -28,9 +28,9 @@ async function run() {
     console.log(`${condition ? 'PASS' : 'FAIL'} ${name}`, details);
   };
 
-  // Test Primary Viewport (1440x900) for complete scroll choreography
-  console.log('\n--- 1. Testing Full Scroll Choreography on Desktop (1440x900) ---');
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  // 1. Primary Viewport Calibration (1920x1080) matching Ignite Reference
+  console.log('\n--- 1. Testing Ignite Visual Calibration on Desktop (1920x1080) ---');
+  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 
   page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
   page.on('console', (msg) => {
@@ -41,9 +41,10 @@ async function run() {
   });
 
   await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+  await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(1000);
 
-  // Assertion 1: Placement & Hierarchy
+  // Assertion 1: Hierarchy and Placement
   const sectionInfo = await page.evaluate(() => {
     const caps = document.querySelector('#capabilities');
     const test = document.querySelector('#testimonials');
@@ -63,7 +64,7 @@ async function run() {
   );
   assert('Exactly one Testimonials section instance exists', sectionInfo?.instances === 1, sectionInfo);
 
-  // Assertion 2: Heading Typography & Bounding Box
+  // Assertion 2: Heading Typography, Font, and Proportions
   const headingInfo = await page.evaluate(() => {
     const heading = document.querySelector('[data-testid="testimonials-heading"]');
     if (!heading) return null;
@@ -72,8 +73,11 @@ async function run() {
     return {
       text: heading.textContent.trim(),
       width: rect.width,
+      height: rect.height,
       viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
       fontSize: style.fontSize,
+      fontFamily: style.fontFamily,
       fontWeight: style.fontWeight,
       color: style.color,
       ratio: rect.width / window.innerWidth,
@@ -81,44 +85,107 @@ async function run() {
   });
 
   assert(
-    'Monumental TESTIMONIALS heading has correct text and spans canvas width',
+    'Monumental TESTIMONIALS heading uses condensed font family',
     headingInfo &&
-      headingInfo.text === 'TESTIMONIALS' &&
-      headingInfo.ratio >= 0.75,
+      (headingInfo.fontFamily.toLowerCase().includes('oswald') ||
+        headingInfo.fontFamily.toLowerCase().includes('barlow') ||
+        headingInfo.fontFamily.toLowerCase().includes('impact')),
+    headingInfo,
+  );
+  assert(
+    'TESTIMONIALS heading text is exact and spans prominent viewport width ratio (>= 0.80 at 1920px)',
+    headingInfo && headingInfo.text === 'TESTIMONIALS' && headingInfo.ratio >= 0.8,
     headingInfo,
   );
 
-  // Assertion 3: Card Stack Setup & Data Integrity
-  const cardsData = await page.evaluate(() => {
-    const cards = Array.from(document.querySelectorAll('[data-card-index]'));
-    return cards.map((c) => ({
-      index: Number(c.getAttribute('data-card-index')),
-      client: c.getAttribute('data-client'),
-      placeholder: c.getAttribute('data-placeholder'),
-      approved: c.getAttribute('data-approved'),
-      opacity: Number(getComputedStyle(c).opacity),
-      transform: getComputedStyle(c).transform,
-      rect: c.getBoundingClientRect(),
-    }));
+  // Assertion 3: Card Surface, Color, and Corner Radius
+  const cardSurfaceInfo = await page.evaluate(() => {
+    const card = document.querySelector('[data-testid="testimonial-card-0"]');
+    if (!card) return null;
+    const style = getComputedStyle(card);
+    const rect = card.getBoundingClientRect();
+    return {
+      backgroundColor: style.backgroundColor,
+      borderRadius: style.borderRadius,
+      boxShadow: style.boxShadow,
+      width: rect.width,
+      height: rect.height,
+    };
   });
 
-  assert('Exactly 6 testimonial cards are present in stack', cardsData.length === 6, {
-    count: cardsData.length,
+  // rgb(247, 247, 247) corresponds to #F7F7F7
+  assert(
+    'Card surface is light-grey #F7F7F7 (rgb(247, 247, 247))',
+    cardSurfaceInfo && cardSurfaceInfo.backgroundColor === 'rgb(247, 247, 247)',
+    cardSurfaceInfo,
+  );
+  assert(
+    'Card corner radius is subtle (<= 8px)',
+    cardSurfaceInfo && parseFloat(cardSurfaceInfo.borderRadius) <= 8,
+    cardSurfaceInfo,
+  );
+
+  // Assertion 4: Card Content Minimalist Structure (Only Logo + Quote)
+  const cardContentInfo = await page.evaluate(() => {
+    const cards = Array.from(document.querySelectorAll('[data-card-index]'));
+    return cards.map((c, idx) => {
+      const text = c.textContent || '';
+      const img = c.querySelector('img');
+      const hasCounter = /\d+\s*\/\s*\d+/.test(text);
+      const hasSubtitle = text.includes('Automotive Intelligence Platform') || text.includes('Digital Scheduling');
+      const hasDivider = c.querySelector('.border-t, hr') !== null;
+      return {
+        idx,
+        client: c.getAttribute('data-client'),
+        hasImg: Boolean(img),
+        imgSrc: img ? img.getAttribute('src') : null,
+        imgAlt: img ? img.getAttribute('alt') : null,
+        hasCounter,
+        hasSubtitle,
+        hasDivider,
+        textSnippet: text.slice(0, 60),
+      };
+    });
   });
+
   assert(
-    'First card is TMR AI Car Care',
-    cardsData[0]?.client === 'TMR AI Car Care',
-    cardsData[0],
+    'TMR AI Car Care card has authentic client logo image',
+    cardContentInfo[0] &&
+      cardContentInfo[0].hasImg &&
+      decodeURIComponent(cardContentInfo[0].imgSrc || '').includes('tmr-ai-car-care-logo-light'),
+    cardContentInfo[0],
   );
   assert(
-    'Second card is Saraswati Driving School',
-    cardsData[1]?.client === 'Saraswati Driving School',
-    cardsData[1],
+    'Saraswati Driving School card has authentic client logo image',
+    cardContentInfo[1] &&
+      cardContentInfo[1].hasImg &&
+      decodeURIComponent(cardContentInfo[1].imgSrc || '').includes('saraswati-driving-school-logo-dark'),
+    cardContentInfo[1],
   );
   assert(
-    'All sample cards are flagged with isPlaceholder=true and approved=false',
-    cardsData.every((c) => c.placeholder === 'true' && c.approved === 'false'),
-    cardsData.map((c) => ({ client: c.client, placeholder: c.placeholder, approved: c.approved })),
+    'All cards have redundant subtitles, footers, counters, and dividers completely removed',
+    cardContentInfo.every((c) => !c.hasCounter && !c.hasSubtitle && !c.hasDivider),
+    cardContentInfo,
+  );
+
+  // Assertion 5: Button is Completely Removed
+  const buttonCheck = await page.evaluate(() => {
+    const btn = document.querySelector('[data-testid="testimonials-cta-button"]');
+    const startConvo = Array.from(document.querySelectorAll('a, button')).find((el) =>
+      el.textContent.includes('Start a Conversation'),
+    );
+    return {
+      btnExists: Boolean(btn),
+      startConvoExistsInTestimonials: Boolean(
+        startConvo && document.querySelector('#testimonials')?.contains(startConvo),
+      ),
+    };
+  });
+
+  assert(
+    'Start a Conversation button is completely removed from Testimonials section',
+    !buttonCheck.btnExists && !buttonCheck.startConvoExistsInTestimonials,
+    buttonCheck,
   );
 
   // Measure Scroll Ranges
@@ -129,7 +196,7 @@ async function run() {
     const distance = section.offsetHeight - window.innerHeight;
     return { start, distance, height: section.offsetHeight, innerHeight: window.innerHeight };
   });
-  console.log('Testimonials scroll metrics:', scrollMetrics);
+  console.log('Testimonials scroll metrics at 1920x1080:', scrollMetrics);
 
   const scrollToProgress = async (progress) => {
     const targetY = scrollMetrics.start + scrollMetrics.distance * progress;
@@ -143,7 +210,17 @@ async function run() {
     await page.waitForTimeout(400);
   };
 
-  // State 1: Progress 0.0 — Initial State, Card 0 (TMR) foreground
+  const takeScreenshot = async (p, filePath) => {
+    await p.evaluate(() => document.fonts.ready);
+    await p.screenshot({
+      path: filePath,
+      fullPage: false,
+      animations: 'disabled',
+      timeout: 15000,
+    });
+  };
+
+  // State 1: Progress 0.01 — Initial State, Card 0 (TMR) foreground
   await scrollToProgress(0.01);
   const state0 = await page.evaluate(() => {
     const c0 = document.querySelector('[data-testid="testimonial-card-0"]');
@@ -155,10 +232,7 @@ async function run() {
       c1Transform: getComputedStyle(c1).transform,
     };
   });
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, '01-testimonials-initial-card-0-tmr.png'),
-    fullPage: false,
-  });
+  await takeScreenshot(page, path.join(ARTIFACTS_DIR, '01-testimonials-initial-card-0-tmr.png'));
   assert('State 0: TMR AI Car Care card is active in foreground', state0.c0Opacity >= 0.95, state0);
 
   // State 2: Progress 0.16 — Card 0 exited, Card 1 (Saraswati) settled in foreground
@@ -175,10 +249,7 @@ async function run() {
       c1Opacity: Number(getComputedStyle(c1).opacity),
     };
   });
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, '02-testimonials-card-1-saraswati.png'),
-    fullPage: false,
-  });
+  await takeScreenshot(page, path.join(ARTIFACTS_DIR, '02-testimonials-card-1-saraswati.png'));
   assert(
     'State 1: Card 0 has moved upward and Card 1 is settling in foreground',
     state1.c0Y < state1.c1Y && state1.c1Opacity >= 0.95,
@@ -195,10 +266,7 @@ async function run() {
     }));
     return cards;
   });
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, '03-testimonials-card-transition-midpoint.png'),
-    fullPage: false,
-  });
+  await takeScreenshot(page, path.join(ARTIFACTS_DIR, '03-testimonials-card-transition-midpoint.png'));
   assert(
     'State 2: Middle cards cycle smoothly through stack at midpoint',
     stateMid[0].opacity === 0 && stateMid[1].opacity === 0,
@@ -207,12 +275,9 @@ async function run() {
 
   // State 4: Progress 0.86 — Last card exiting stack
   await scrollToProgress(0.86);
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, '04-testimonials-last-card-exit.png'),
-    fullPage: false,
-  });
+  await takeScreenshot(page, path.join(ARTIFACTS_DIR, '04-testimonials-last-card-exit.png'));
 
-  // State 5: Progress 0.98 — Resolved state: All cards exited, TESTIMONIALS unobstructed, button prominent
+  // State 5: Progress 0.98 — Resolved state: All cards exited, TESTIMONIALS unobstructed, NO button
   await scrollToProgress(0.98);
   const resolvedState = await page.evaluate(() => {
     const cards = Array.from(document.querySelectorAll('[data-card-index]'));
@@ -223,28 +288,16 @@ async function run() {
     });
     const heading = document.querySelector('[data-testid="testimonials-heading"]');
     const button = document.querySelector('[data-testid="testimonials-cta-button"]');
-    const buttonRect = button ? button.getBoundingClientRect() : null;
     return {
       allExited,
       headingVisible: heading && getComputedStyle(heading).visibility !== 'hidden',
-      buttonVisible: button && getComputedStyle(button).opacity >= 0.8,
-      buttonHref: button?.getAttribute('href'),
-      buttonText: button?.textContent?.trim(),
-      buttonRect,
+      buttonAbsent: button === null,
     };
   });
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, '05-testimonials-resolved-unobstructed-heading.png'),
-    fullPage: false,
-  });
+  await takeScreenshot(page, path.join(ARTIFACTS_DIR, '05-testimonials-resolved-unobstructed-heading.png'));
   assert(
-    'State 3: All cards exit cleanly leaving TESTIMONIALS heading completely unobstructed',
-    resolvedState.allExited,
-    resolvedState,
-  );
-  assert(
-    'State 4: Outlined pill button is visible and links to #contact',
-    resolvedState.buttonVisible && resolvedState.buttonHref === '#contact',
+    'State 3: All cards exit cleanly leaving TESTIMONIALS heading completely unobstructed with NO button',
+    resolvedState.allExited && resolvedState.headingVisible && resolvedState.buttonAbsent,
     resolvedState,
   );
 
@@ -257,12 +310,9 @@ async function run() {
       c0Rect: c0.getBoundingClientRect(),
     };
   });
-  await page.screenshot({
-    path: path.join(ARTIFACTS_DIR, '06-testimonials-reverse-restoration.png'),
-    fullPage: false,
-  });
+  await takeScreenshot(page, path.join(ARTIFACTS_DIR, '06-testimonials-reverse-restoration.png'));
   assert(
-    'State 5: Reverse scrolling flawlessly restores Card 0 to active foreground position',
+    'State 4: Reverse scrolling flawlessly restores Card 0 to active foreground position',
     restoredState.c0Opacity >= 0.95,
     restoredState,
   );
@@ -274,7 +324,6 @@ async function run() {
   for (const vp of VIEWPORTS) {
     const vpPage = await browser.newPage({ viewport: { width: vp.width, height: vp.height } });
     await vpPage.goto(BASE_URL, { waitUntil: 'networkidle' });
-    // Ensure ScrollTrigger layout is fully initialized, then scroll to testimonials
     await vpPage.evaluate(() => {
       if (window.ScrollTrigger) window.ScrollTrigger.refresh();
     });
@@ -298,12 +347,10 @@ async function run() {
       const section = document.querySelector('#testimonials');
       const heading = document.querySelector('[data-testid="testimonials-heading"]');
       const card = document.querySelector('[data-testid="testimonial-card-0"]');
-      const button = document.querySelector('[data-testid="testimonials-cta-button"]');
       if (!section || !heading || !card) return null;
 
       const hRect = heading.getBoundingClientRect();
       const cRect = card.getBoundingClientRect();
-      const bRect = button?.getBoundingClientRect();
 
       return {
         sectionHeight: section.offsetHeight,
@@ -313,14 +360,17 @@ async function run() {
         cardHeight: cRect.height,
         viewportWidth: window.innerWidth,
         viewportHeight: window.innerHeight,
-        overflowsX: hRect.width > window.innerWidth + 10,
+        overflowsX: document.documentElement.scrollWidth > window.innerWidth + 2,
         cardFits: cRect.width <= window.innerWidth,
       };
     });
 
+    await vpPage.evaluate(() => document.fonts.ready);
     await vpPage.screenshot({
       path: path.join(ARTIFACTS_DIR, `viewport-${vp.name}-${vp.width}x${vp.height}.png`),
       fullPage: false,
+      animations: 'disabled',
+      timeout: 15000,
     });
 
     assert(
@@ -359,9 +409,12 @@ async function run() {
       allAccessible: cards.every((c) => c.textContent.length > 20),
     };
   });
+  await rmPage.evaluate(() => document.fonts.ready);
   await rmPage.screenshot({
     path: path.join(ARTIFACTS_DIR, 'reduced-motion-layout.png'),
     fullPage: false,
+    animations: 'disabled',
+    timeout: 15000,
   });
   assert('Reduced-motion mode renders all testimonials accessibly', rmState.allAccessible, rmState);
   await rmPage.close();

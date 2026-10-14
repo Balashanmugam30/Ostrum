@@ -26,6 +26,22 @@
   src: url('/fonts/Romie-Regular.woff2') format('woff2');
 }
 
+@font-face {
+  font-display: swap;
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/Oswald-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/BarlowCondensed-Bold.woff2') format('woff2');
+}
+
 :root {
   --black: #000000;
   --black-rgb: 0, 0, 0;
@@ -68,6 +84,10 @@ body {
 
 .font-serif {
   font-family: 'Romie', Georgia, serif;
+}
+
+.font-condensed {
+  font-family: 'Oswald', 'Barlow Condensed', Impact, sans-serif;
 }
 
 .h1 {

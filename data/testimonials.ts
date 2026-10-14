@@ -18,6 +18,8 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     id: 'tmr-ai-car-care',
     clientName: 'TMR AI Car Care',
     logoText: 'TMR AI CAR CARE',
+    logoSrc: '/images/clients/tmr-ai-car-care-logo-light.png',
+    logoAlt: 'TMR AI Car Care Logo',
     subtext: 'Automotive Intelligence Platform',
     quote:
       'The automated diagnostic intake and customer communications platform transformed our service bays. Turnaround is faster, workshop operations are transparent, and car owners trust every repair recommendation.',
@@ -30,6 +32,8 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     id: 'saraswati-driving-school',
     clientName: 'Saraswati Driving School',
     logoText: 'SARASWATI DRIVING SCHOOL',
+    logoSrc: '/images/clients/saraswati-driving-school-logo-dark.png',
+    logoAlt: 'Saraswati Driving School Logo',
     subtext: 'Digital Scheduling & Dispatch',
     quote:
       'Ostrum built an intuitive booking and instructor scheduling system that replaced our manual logbooks entirely. Students find scheduling effortless and our instructors stay synchronized on every lesson.',

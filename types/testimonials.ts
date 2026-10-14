@@ -6,6 +6,8 @@ export interface Testimonial {
   company?: string;
   logoText: string;
   subtext?: string;
+  logoSrc?: string;
+  logoAlt?: string;
   approved: boolean;
   isPlaceholder: boolean;
 }
