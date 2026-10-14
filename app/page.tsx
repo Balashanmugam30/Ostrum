@@ -8,7 +8,7 @@ import { OstrumCapabilitiesSection } from '@/components/sections/OstrumCapabilit
 import { OstrumTestimonialsSection } from '@/components/sections/OstrumTestimonialsSection';
 import { OstrumFaqSection } from '@/components/sections/OstrumFaqSection';
 import { OstrumContactSection } from '@/components/sections/OstrumContactSection';
-import { OstrumLiquidSandCTA } from '@/components/sections/OstrumLiquidSandCTA';
+import { OstrumFooterReveal } from '@/components/sections/OstrumFooterReveal';
 
 export default function HomePage() {
   return (
@@ -63,8 +63,8 @@ export default function HomePage() {
         <OstrumContactSection />
       </div>
 
-      {/* SECTION 09: Final Closing CTA with Edge-to-Edge Liquid Sand Sculpture */}
-      <OstrumLiquidSandCTA />
+      {/* SECTIONS 09 & 10: Final Closing CTA with Reveal Transition into Studio Footer */}
+      <OstrumFooterReveal />
     </div>
   );
 }
