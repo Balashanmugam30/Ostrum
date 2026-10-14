@@ -8,6 +8,7 @@ import { OstrumCapabilitiesSection } from '@/components/sections/OstrumCapabilit
 import { OstrumTestimonialsSection } from '@/components/sections/OstrumTestimonialsSection';
 import { OstrumFaqSection } from '@/components/sections/OstrumFaqSection';
 import { OstrumContactSection } from '@/components/sections/OstrumContactSection';
+import { OstrumLiquidSandCTA } from '@/components/sections/OstrumLiquidSandCTA';
 
 export default function HomePage() {
   return (
@@ -58,9 +59,12 @@ export default function HomePage() {
         {/* SECTION 07: Frequently Asked Questions (FAQ) */}
         <OstrumFaqSection />
 
-        {/* SECTION 08: Contact / Project Enquiry Form (Final Page Section) */}
+        {/* SECTION 08: Contact / Project Enquiry Form */}
         <OstrumContactSection />
       </div>
+
+      {/* SECTION 09: Final Closing CTA with Edge-to-Edge Liquid Sand Sculpture */}
+      <OstrumLiquidSandCTA />
     </div>
   );
 }
