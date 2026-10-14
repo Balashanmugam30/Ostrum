@@ -1,26 +1,34 @@
 'use client';
 
 import React, { useState } from 'react';
+import OstrumLiquidGlass from '@/components/ui/OstrumLiquidGlass';
 
 interface FormData {
   name: string;
   email: string;
-  city: string;
-  phone: string;
   company: string;
-  position: string;
+  projectType: string;
+  phone: string;
   message: string;
 }
 
 const INITIAL_FORM_DATA: FormData = {
   name: '',
   email: '',
-  city: '',
-  phone: '',
   company: '',
-  position: '',
+  projectType: '',
+  phone: '',
   message: '',
 };
+
+const PROJECT_TYPE_OPTIONS = [
+  'Digital Experiences (Web, Platforms, Portals)',
+  'AI Systems & Agents (Autonomous Automation)',
+  'Business Platforms (CRM, ERP, Operations)',
+  'Software & Product Engineering (SaaS, APIs)',
+  'Hardware & Connected Tech (IoT, Embedded)',
+  'Custom Engineering & Architecture',
+];
 
 export function OstrumContactSection() {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
@@ -29,7 +37,7 @@ export function OstrumContactSection() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -47,7 +55,7 @@ export function OstrumContactSection() {
     }
 
     if (!formData.email.trim()) {
-      setErrorMessage('Please enter your email address.');
+      setErrorMessage('Please enter your work email.');
       return;
     }
 
@@ -87,6 +95,17 @@ export function OstrumContactSection() {
     }
   };
 
+  const scrollToForm = () => {
+    const target = document.getElementById('contact-form') || document.getElementById('contact');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+      const nameInput = document.getElementById('contact-name');
+      if (nameInput) {
+        setTimeout(() => nameInput.focus(), 500);
+      }
+    }
+  };
+
   return (
     <section
       id="contact"
@@ -94,25 +113,23 @@ export function OstrumContactSection() {
       className="relative z-20 w-full overflow-hidden select-text text-black"
       style={{
         background: `
-          radial-gradient(ellipse 70% 60% at 85% 25%, rgba(134, 255, 248, 0.08) 0%, transparent 70%),
-          radial-gradient(ellipse 60% 50% at 15% 75%, rgba(24, 43, 73, 0.06) 0%, transparent 70%),
-          linear-gradient(180deg, #E3EAF2 0%, #DCE4EE 35%, #D4DEEA 70%, #CBD6E3 100%)
+          radial-gradient(ellipse 70% 50% at 80% 25%, rgba(255, 255, 255, 0.45) 0%, transparent 70%),
+          radial-gradient(ellipse 60% 45% at 20% 60%, rgba(220, 231, 247, 0.5) 0%, transparent 70%),
+          linear-gradient(180deg, #C7A6E3 0%, #D7C3EC 24%, #EBDCEB 46%, #DCE7F7 66%, #20242C 82%, #050505 92%, #050505 100%)
         `,
       }}
       aria-label="Contact and Project Enquiry"
     >
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 py-24 sm:py-32 lg:py-40">
+      {/* Upper Main Contact Region (Pastel Gradient Field) */}
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 pt-24 sm:pt-32 lg:pt-36 pb-20 sm:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left Column: Heading & Technical Invitation */}
+          {/* Left Column: Heading & Concise Technical Scope */}
           <div className="lg:col-span-5 flex flex-col items-start lg:sticky lg:top-28">
-            <span className="font-mono text-xs sm:text-sm uppercase tracking-[0.24em] font-semibold text-[#D24B2C] mb-4">
-              READY TO BUILD?
-            </span>
             <h2
               data-testid="contact-heading"
               className="font-condensed font-bold uppercase text-black tracking-[-0.01em] select-none"
               style={{
-                fontSize: 'clamp(3.5rem, 8vw, 105px)',
+                fontSize: 'clamp(3.2rem, 7.5vw, 96px)',
                 lineHeight: '0.92',
                 color: '#000000',
               }}
@@ -122,17 +139,17 @@ export function OstrumContactSection() {
               To Us
             </h2>
 
-            <p className="font-sans text-base sm:text-lg text-[#3A4353] leading-relaxed max-w-md mt-6 sm:mt-8 font-normal">
+            <p className="font-sans text-base sm:text-lg text-[#2E3542] leading-relaxed max-w-md mt-6 sm:mt-8 font-normal">
               Have an ambitious product, intelligent AI system, or custom engineering challenge in mind? Tell us what you&apos;re building and we&apos;ll schedule a confidential technical consultation.
             </p>
 
-            {/* Direct Channel Badges */}
-            <div className="mt-8 pt-8 border-t border-black/10 w-full max-w-md flex flex-col gap-3 font-mono text-xs text-[#50545C]">
+            {/* Direct Studio Channels */}
+            <div className="mt-8 pt-8 border-t border-black/15 w-full max-w-md flex flex-col gap-3 font-mono text-xs text-[#3E4552]">
               <div className="flex items-center justify-between">
                 <span className="uppercase tracking-wider">Direct Studio Line:</span>
                 <a
                   href="mailto:hello@ostrum.co"
-                  className="font-semibold text-black hover:text-[#D24B2C] transition-colors"
+                  className="font-semibold text-black hover:text-[#5B21B6] transition-colors"
                 >
                   hello@ostrum.co
                 </a>
@@ -144,139 +161,160 @@ export function OstrumContactSection() {
             </div>
           </div>
 
-          {/* Right Column: Prominent Rounded Form Panel */}
-          <div className="lg:col-span-7 w-full">
-            <div
-              className="w-full rounded-[24px] sm:rounded-[28px] p-7 sm:p-9 md:p-11 text-white border border-white/10 shadow-[0_24px_64px_-12px_rgba(10,15,26,0.35)] relative overflow-hidden"
-              style={{
-                background: 'linear-gradient(145deg, #162030 0%, #0F1624 55%, #0A0F1A 100%)',
-              }}
+          {/* Right Column: Liquid-Glass Form Panel */}
+          <div className="lg:col-span-7 w-full flex justify-center lg:justify-end">
+            <OstrumLiquidGlass
+              radius={28}
+              className="w-full max-w-[660px]"
             >
-              {/* Subtle Atmospheric Internal Glow */}
               <div
-                className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full blur-[90px] opacity-25 bg-[#86FFF8]"
-                aria-hidden="true"
-              />
-
-              {submitSuccess ? (
-                <div
-                  data-testid="contact-success-state"
-                  className="py-12 flex flex-col items-center text-center select-none"
-                >
-                  <div className="w-16 h-16 rounded-full bg-[#86FFF8]/15 border border-[#86FFF8]/40 flex items-center justify-center text-[#86FFF8] text-2xl mb-6">
-                    ✓
-                  </div>
-                  <h3 className="font-sans text-2xl sm:text-3xl font-bold text-white mb-3">
-                    Enquiry Received
-                  </h3>
-                  <p className="font-sans text-sm sm:text-base text-white/70 max-w-md leading-relaxed mb-8">
-                    Thank you for reaching out. We have received your project details and a studio principal will review your requirements and respond within 24 hours.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setSubmitSuccess(false)}
-                    className="px-8 py-3.5 rounded-full bg-white text-[#0A0F1A] font-sans font-semibold text-sm hover:bg-[#86FFF8] transition-colors"
+                id="contact-form"
+                className="p-7 sm:p-9 md:p-10 text-black select-text"
+              >
+                {submitSuccess ? (
+                  <div
+                    data-testid="contact-success-state"
+                    className="py-12 flex flex-col items-center text-center select-none"
                   >
-                    Submit Another Enquiry
-                  </button>
-                </div>
-              ) : (
-                <form
-                  onSubmit={handleSubmit}
-                  noValidate
-                  data-testid="contact-enquiry-form"
-                  className="flex flex-col gap-5 sm:gap-6 relative z-10"
-                >
-                  {/* Micro-header over form */}
-                  <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                    <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#86FFF8] font-semibold">
-                      PROJECT ENQUIRY
-                    </span>
-                    <span className="font-mono text-[11px] text-white/40 uppercase tracking-widest">
-                      * Required fields
-                    </span>
-                  </div>
-
-                  {errorMessage && (
-                    <div
-                      role="alert"
-                      className="p-4 rounded-xl bg-red-500/15 border border-red-500/30 text-red-200 text-xs sm:text-sm font-sans flex items-center gap-3"
+                    <div className="w-16 h-16 rounded-full bg-[#7A52A8]/15 border border-[#7A52A8]/30 flex items-center justify-center text-[#5A2C8F] text-2xl mb-6">
+                      ✓
+                    </div>
+                    <h3 className="font-sans text-2xl sm:text-3xl font-bold text-black mb-3">
+                      Enquiry Received
+                    </h3>
+                    <p className="font-sans text-sm sm:text-base text-[#3A4353] max-w-md leading-relaxed mb-8">
+                      Thank you for reaching out. We have received your project details and a studio principal will review your requirements and respond within 24 hours.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSubmitSuccess(false)}
+                      className="px-8 py-3.5 rounded-full bg-[#111827] text-white font-sans font-semibold text-sm hover:bg-black transition-colors cursor-pointer"
                     >
-                      <span className="text-red-400 font-bold shrink-0">!</span>
-                      <span>{errorMessage}</span>
-                    </div>
-                  )}
-
-                  {/* Row 1: Name & Email */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                    <div className="flex flex-col gap-1.5">
-                      <label
-                        htmlFor="contact-name"
-                        className="font-sans text-xs uppercase tracking-wider text-white/80 font-medium"
-                      >
-                        Name <span className="text-[#86FFF8]">*</span>
-                      </label>
-                      <input
-                        id="contact-name"
-                        name="name"
-                        type="text"
-                        required
-                        autoComplete="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="e.g. Elena Vance"
-                        className="w-full px-5 py-3.5 rounded-full bg-white/[0.07] hover:bg-white/[0.1] focus:bg-white/[0.12] text-white placeholder:text-white/30 border border-white/10 focus:border-[#86FFF8]/60 focus:ring-2 focus:ring-[#86FFF8]/25 outline-none transition-all font-sans text-sm"
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label
-                        htmlFor="contact-email"
-                        className="font-sans text-xs uppercase tracking-wider text-white/80 font-medium"
-                      >
-                        Email address <span className="text-[#86FFF8]">*</span>
-                      </label>
-                      <input
-                        id="contact-email"
-                        name="email"
-                        type="email"
-                        required
-                        autoComplete="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="elena@company.com"
-                        className="w-full px-5 py-3.5 rounded-full bg-white/[0.07] hover:bg-white/[0.1] focus:bg-white/[0.12] text-white placeholder:text-white/30 border border-white/10 focus:border-[#86FFF8]/60 focus:ring-2 focus:ring-[#86FFF8]/25 outline-none transition-all font-sans text-sm"
-                      />
-                    </div>
+                      Submit Another Enquiry
+                    </button>
                   </div>
-
-                  {/* Row 2: City & Phone */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                    <div className="flex flex-col gap-1.5">
-                      <label
-                        htmlFor="contact-city"
-                        className="font-sans text-xs uppercase tracking-wider text-white/80 font-medium"
-                      >
-                        City
-                      </label>
-                      <input
-                        id="contact-city"
-                        name="city"
-                        type="text"
-                        autoComplete="address-level2"
-                        value={formData.city}
-                        onChange={handleChange}
-                        placeholder="e.g. Melbourne / Remote"
-                        className="w-full px-5 py-3.5 rounded-full bg-white/[0.07] hover:bg-white/[0.1] focus:bg-white/[0.12] text-white placeholder:text-white/30 border border-white/10 focus:border-[#86FFF8]/60 focus:ring-2 focus:ring-[#86FFF8]/25 outline-none transition-all font-sans text-sm"
-                      />
+                ) : (
+                  <form
+                    onSubmit={handleSubmit}
+                    noValidate
+                    data-testid="contact-enquiry-form"
+                    className="flex flex-col gap-4 sm:gap-5"
+                  >
+                    {/* Panel Header */}
+                    <div className="flex items-center justify-between pb-3 border-b border-black/10">
+                      <span className="font-sans text-xs uppercase tracking-wider text-[#4A3B69] font-bold">
+                        Project Enquiry
+                      </span>
+                      <span className="font-mono text-[11px] text-[#6B7280]">
+                        * Required fields
+                      </span>
                     </div>
 
+                    {errorMessage && (
+                      <div
+                        role="alert"
+                        className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/25 text-red-800 text-xs sm:text-sm font-sans flex items-center gap-3"
+                      >
+                        <span className="text-red-600 font-bold shrink-0">!</span>
+                        <span>{errorMessage}</span>
+                      </div>
+                    )}
+
+                    {/* Row 1: Name & Work Email */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <label
+                          htmlFor="contact-name"
+                          className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
+                        >
+                          Name <span className="text-[#8B5CF6]">*</span>
+                        </label>
+                        <input
+                          id="contact-name"
+                          name="name"
+                          type="text"
+                          required
+                          autoComplete="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          placeholder="e.g. Elena Vance"
+                          className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label
+                          htmlFor="contact-email"
+                          className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
+                        >
+                          Work Email <span className="text-[#8B5CF6]">*</span>
+                        </label>
+                        <input
+                          id="contact-email"
+                          name="email"
+                          type="email"
+                          required
+                          autoComplete="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          placeholder="elena@company.com"
+                          className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Row 2: Company & Project Type */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <label
+                          htmlFor="contact-company"
+                          className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
+                        >
+                          Company <span className="text-[#6B7280] font-normal text-[11px]">(Optional)</span>
+                        </label>
+                        <input
+                          id="contact-company"
+                          name="company"
+                          type="text"
+                          autoComplete="organization"
+                          value={formData.company}
+                          onChange={handleChange}
+                          placeholder="e.g. Vance Dynamics"
+                          className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label
+                          htmlFor="contact-project-type"
+                          className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
+                        >
+                          Project Type <span className="text-[#6B7280] font-normal text-[11px]">(Optional)</span>
+                        </label>
+                        <select
+                          id="contact-project-type"
+                          name="projectType"
+                          value={formData.projectType}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm cursor-pointer"
+                        >
+                          <option value="">Select project type...</option>
+                          {PROJECT_TYPE_OPTIONS.map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Row 3: Phone (Optional) */}
                     <div className="flex flex-col gap-1.5">
                       <label
                         htmlFor="contact-phone"
-                        className="font-sans text-xs uppercase tracking-wider text-white/80 font-medium"
+                        className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
                       >
-                        Phone number
+                        Phone number <span className="text-[#6B7280] font-normal text-[11px]">(Optional)</span>
                       </label>
                       <input
                         id="contact-phone"
@@ -286,108 +324,111 @@ export function OstrumContactSection() {
                         value={formData.phone}
                         onChange={handleChange}
                         placeholder="e.g. +61 400 000 000"
-                        className="w-full px-5 py-3.5 rounded-full bg-white/[0.07] hover:bg-white/[0.1] focus:bg-white/[0.12] text-white placeholder:text-white/30 border border-white/10 focus:border-[#86FFF8]/60 focus:ring-2 focus:ring-[#86FFF8]/25 outline-none transition-all font-sans text-sm"
+                        className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm"
                       />
                     </div>
-                  </div>
 
-                  {/* Row 3: Company & Position */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                    {/* Row 4: Message (Required) */}
                     <div className="flex flex-col gap-1.5">
                       <label
-                        htmlFor="contact-company"
-                        className="font-sans text-xs uppercase tracking-wider text-white/80 font-medium"
+                        htmlFor="contact-message"
+                        className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
                       >
-                        Company
+                        Message <span className="text-[#8B5CF6]">*</span>
                       </label>
-                      <input
-                        id="contact-company"
-                        name="company"
-                        type="text"
-                        autoComplete="organization"
-                        value={formData.company}
+                      <textarea
+                        id="contact-message"
+                        name="message"
+                        required
+                        rows={4}
+                        value={formData.message}
                         onChange={handleChange}
-                        placeholder="e.g. Vance Dynamics"
-                        className="w-full px-5 py-3.5 rounded-full bg-white/[0.07] hover:bg-white/[0.1] focus:bg-white/[0.12] text-white placeholder:text-white/30 border border-white/10 focus:border-[#86FFF8]/60 focus:ring-2 focus:ring-[#86FFF8]/25 outline-none transition-all font-sans text-sm"
+                        placeholder="Describe your project goals, scope, and technical timeline..."
+                        className="w-full px-4 py-3 rounded-xl bg-white/65 hover:bg-white/85 focus:bg-white text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/50 outline-none transition-all font-sans text-sm min-h-[110px] resize-y"
                       />
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
-                      <label
-                        htmlFor="contact-position"
-                        className="font-sans text-xs uppercase tracking-wider text-white/80 font-medium"
+                    {/* Submit Button */}
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-4 px-8 rounded-full bg-[#111827] hover:bg-black text-white font-sans font-semibold text-base transition-all duration-300 shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.22)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 cursor-pointer group"
                       >
-                        Position / Role
-                      </label>
-                      <input
-                        id="contact-position"
-                        name="position"
-                        type="text"
-                        autoComplete="organization-title"
-                        value={formData.position}
-                        onChange={handleChange}
-                        placeholder="e.g. VP of Product / Founder"
-                        className="w-full px-5 py-3.5 rounded-full bg-white/[0.07] hover:bg-white/[0.1] focus:bg-white/[0.12] text-white placeholder:text-white/30 border border-white/10 focus:border-[#86FFF8]/60 focus:ring-2 focus:ring-[#86FFF8]/25 outline-none transition-all font-sans text-sm"
-                      />
+                        {isSubmitting ? (
+                          <>
+                            <span
+                              className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+                              aria-hidden="true"
+                            />
+                            <span>Submitting...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Send Enquiry</span>
+                            <span
+                              className="transition-transform group-hover:translate-x-1"
+                              aria-hidden="true"
+                            >
+                              →
+                            </span>
+                          </>
+                        )}
+                      </button>
                     </div>
-                  </div>
 
-                  {/* Full-Width Row: Message */}
-                  <div className="flex flex-col gap-1.5">
-                    <label
-                      htmlFor="contact-message"
-                      className="font-sans text-xs uppercase tracking-wider text-white/80 font-medium"
-                    >
-                      Message <span className="text-[#86FFF8]">*</span>
-                    </label>
-                    <textarea
-                      id="contact-message"
-                      name="message"
-                      required
-                      rows={4}
-                      value={formData.message}
-                      onChange={handleChange}
-                      placeholder="Describe your project goals, scope, and technical timeline..."
-                      className="w-full px-5 py-4 rounded-2xl bg-white/[0.07] hover:bg-white/[0.1] focus:bg-white/[0.12] text-white placeholder:text-white/30 border border-white/10 focus:border-[#86FFF8]/60 focus:ring-2 focus:ring-[#86FFF8]/25 outline-none transition-all font-sans text-sm min-h-[120px] resize-y"
-                    />
-                  </div>
+                    {/* Confidentiality Assurance */}
+                    <p className="font-mono text-[11px] text-center text-[#525B6C] uppercase tracking-wider pt-1">
+                      Strict Non-Disclosure Guaranteed · Direct Principal Response
+                    </p>
+                  </form>
+                )}
+              </div>
+            </OstrumLiquidGlass>
+          </div>
+        </div>
+      </div>
 
-                  {/* Submit Button */}
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full py-4 px-8 rounded-full bg-white hover:bg-[#86FFF8] text-[#0A0F1A] font-sans font-bold text-base sm:text-lg transition-all duration-300 shadow-[0_8px_20px_rgba(255,255,255,0.12)] hover:shadow-[0_12px_28px_rgba(134,255,248,0.25)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <span
-                            className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"
-                            aria-hidden="true"
-                          />
-                          <span>Submitting...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Send Enquiry</span>
-                          <span
-                            className="transition-transform group-hover:translate-x-1"
-                            aria-hidden="true"
-                          >
-                            →
-                          </span>
-                        </>
-                      )}
-                    </button>
-                  </div>
+      {/* Lower Closing Sub-Region: Smooth Fade into Black CTA */}
+      <div
+        id="closing-cta"
+        data-testid="closing-cta"
+        className="w-full pt-16 sm:pt-24 pb-24 sm:pb-32 px-6 sm:px-10 md:px-16 lg:px-20 text-white select-text"
+      >
+        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-8 pt-12 border-t border-white/10">
+          <div className="max-w-2xl">
+            <h2
+              className="font-condensed font-bold uppercase text-white tracking-[-0.01em] select-none"
+              style={{
+                fontSize: 'clamp(2.6rem, 5.5vw, 68px)',
+                lineHeight: '0.92',
+                color: '#FFFFFF',
+              }}
+            >
+              Ready To Build?
+            </h2>
+            <p className="font-sans text-base sm:text-lg text-white/70 leading-relaxed max-w-lg mt-4 font-normal">
+              Partner with Ostrum to engineer transformative software, intelligent systems, and scalable digital ventures.
+            </p>
+          </div>
 
-                  {/* Confidentiality Assurance */}
-                  <p className="font-mono text-[11px] text-center text-white/45 uppercase tracking-wider pt-1">
-                    Strict Non-Disclosure Guaranteed · Direct Partner Response
-                  </p>
-                </form>
-              )}
-            </div>
+          <div className="flex flex-col items-start md:items-end shrink-0">
+            <button
+              type="button"
+              onClick={scrollToForm}
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-[#0B0C0E] font-sans text-base sm:text-lg font-semibold transition-all duration-300 hover:bg-[#EBDCEB] hover:shadow-[0_10px_30px_rgba(255,255,255,0.18)] cursor-pointer group"
+            >
+              <span>Start a Conversation</span>
+              <span
+                className="transition-transform group-hover:translate-x-1"
+                aria-hidden="true"
+              >
+                →
+              </span>
+            </button>
+            <p className="font-mono text-xs text-white/45 mt-3">
+              Direct Principal Line · hello@ostrum.co
+            </p>
           </div>
         </div>
       </div>

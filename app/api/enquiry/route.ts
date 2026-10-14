@@ -7,6 +7,7 @@ export interface EnquiryPayload {
   phone?: string;
   company?: string;
   position?: string;
+  projectType?: string;
   message: string;
 }
 
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
   try {
     const body: EnquiryPayload = await request.json();
 
-    const { name, email, city, phone, company, position, message } = body;
+    const { name, email, city, phone, company, position, projectType, message } = body;
 
     // Validate required fields
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -52,9 +53,10 @@ export async function POST(request: Request) {
       timestamp: new Date().toISOString(),
       name: name.trim(),
       email: email.trim(),
-      city: city?.trim() || 'N/A',
-      phone: phone?.trim() || 'N/A',
       company: company?.trim() || 'N/A',
+      projectType: projectType?.trim() || 'N/A',
+      phone: phone?.trim() || 'N/A',
+      city: city?.trim() || 'N/A',
       position: position?.trim() || 'N/A',
       messageLength: message.trim().length,
     });

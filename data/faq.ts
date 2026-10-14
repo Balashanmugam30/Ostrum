@@ -6,51 +6,63 @@ export interface FaqItem {
 
 export const OSTRUM_FAQ_DATA: FaqItem[] = [
   {
-    id: 'what-is-ostrum',
-    question: 'What is Ostrum?',
+    id: 'what-does-ostrum-do',
+    question: 'What does Ostrum do?',
     answer:
       'Ostrum is a digital transformation studio and venture foundry. We design, engineer, and deploy high-performance software systems, intelligent AI agents, modern digital experiences, and connected hardware infrastructure that empower ambitious organizations to scale efficiently.',
   },
   {
-    id: 'services-provided',
-    question: 'What services does Ostrum provide?',
+    id: 'services-supported',
+    question: 'What services can Ostrum help with?',
     answer:
-      'We deliver end-to-end solutions across six core capabilities: Digital Experiences (websites, e-commerce, customer portals), AI Systems & Agents (autonomous agents, receptionists, automated operations), Business Platforms (CRM, ERP, real-time command dashboards), Software & Product Engineering (web/mobile applications, SaaS platforms, custom APIs), Hardware & Connected Technology (IoT, embedded systems, smart devices), and Custom Engineering.',
+      'We deliver end-to-end solutions across our six core capabilities: Digital Experiences, AI Systems & Agents, Business Platforms, Software & Product Engineering, Hardware & Connected Technology, and Custom Engineering. Each engagement is tailored to address specific operational and technical goals.',
   },
   {
-    id: 'getting-started',
-    question: 'How do we get started with a project?',
+    id: 'how-to-start',
+    question: 'How do we start a project with Ostrum?',
     answer:
-      'Engagements begin with a technical discovery discussion to understand your business objectives, technical constraints, and workflow bottlenecks. From there, we formulate a comprehensive architectural roadmap, deliverable milestones, and resource plan before moving directly into rapid design and engineering.',
-  },
-  {
-    id: 'startups-and-enterprises',
-    question: 'Can Ostrum work with startups and established businesses?',
-    answer:
-      'Yes. We partner with high-growth venture startups building modern MVPs and scalable platforms, as well as established market leaders modernizing legacy infrastructure, automating complex internal workflows, and deploying next-generation connected systems.',
-  },
-  {
-    id: 'project-timeline',
-    question: 'How long does a project take?',
-    answer:
-      'Project duration is determined by scope, technical complexity, and required integrations. Focused digital platforms or production-ready MVP prototypes typically ship in 4 to 8 weeks, while comprehensive enterprise architectures, multi-agent AI ecosystems, or custom hardware solutions are deployed in disciplined, phased milestones.',
+      'Engagements begin when you submit an enquiry outlining your objectives. We then conduct an initial technical discovery to understand your workflow, constraints, and deliverables before establishing an agreed project scope and milestone roadmap.',
   },
   {
     id: 'project-cost',
     question: 'How much does a project cost?',
     answer:
-      'Because every engagement is custom-engineered to solve specific operational challenges, pricing varies based on technical architecture and milestone scope. Following our initial discovery consultation, we provide a transparent, fixed-scope proposal with clearly defined deliverables.',
+      'Project estimates depend directly on technical complexity, deliverable scope, third-party integrations, and timeline requirements. We invite you to submit an enquiry so we can prepare a tailored proposal aligned with your exact needs.',
   },
   {
-    id: 'existing-products',
-    question: 'Can Ostrum help with an existing product or website?',
+    id: 'project-timeline',
+    question: 'How long will a project take?',
     answer:
-      'Yes. Through our software engineering and business platforms practices, we regularly audit existing codebases, architect custom API integrations, modernize legacy workflows, eliminate technical debt, and optimize performance across active digital products.',
+      'Duration varies based on system complexity, architecture requirements, feedback turnaround, and milestone milestones. Prototyping and focused digital products often move quickly, while enterprise platforms and multi-agent systems are delivered in disciplined, phased deployments.',
   },
   {
-    id: 'discuss-a-project',
-    question: 'How can I discuss a project with Ostrum?',
+    id: 'existing-product-work',
+    question: 'Can Ostrum work on an existing website or product?',
     answer:
-      'You can submit your project requirements using the enquiry form immediately below, or reach out directly to our principals at hello@ostrum.co to schedule an introductory technical review.',
+      'Yes. We regularly assess existing systems to audit architecture, modernize technical infrastructure, eliminate performance bottlenecks, and integrate custom APIs or AI workflows alongside active engineering teams.',
+  },
+  {
+    id: 'mobile-responsiveness',
+    question: 'Will my website work on mobile devices?',
+    answer:
+      'Yes. Every digital interface we engineer follows a responsive, multi-device design approach. We optimize layouts, touch interactions, typography, and asset loading across smartphone, tablet, and desktop viewports.',
+  },
+  {
+    id: 'project-revisions',
+    question: 'Can I request revisions during a project?',
+    answer:
+      'Revision rounds and design iterations are structured directly into the agreed project proposal and milestone phases. This collaborative review process ensures deliverables remain closely aligned with your strategic expectations before production deployment.',
+  },
+  {
+    id: 'asset-ownership',
+    question: 'Who owns the finished website and project assets?',
+    answer:
+      'Asset ownership, source code licensing, and handover details are clearly defined in the client engagement agreement. Upon milestone completion and settlement, agreed custom code and deliverables transfer directly to your organization.',
+  },
+  {
+    id: 'post-launch-support',
+    question: 'What support is available after launch?',
+    answer:
+      'Continuing maintenance, infrastructure monitoring, software updates, and extended engineering support can be structured to fit your ongoing operational needs. We discuss post-launch arrangements during the scoping phase.',
   },
 ];

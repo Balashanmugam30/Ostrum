@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { OSTRUM_FAQ_DATA, FaqItem } from '@/data/faq';
 
 export interface OstrumFaqSectionProps {
@@ -8,12 +8,91 @@ export interface OstrumFaqSectionProps {
 }
 
 export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionProps) {
-  // First question open by default, matching reference
+  // First question open by default
   const [openId, setOpenId] = useState<string | null>(items[0]?.id || null);
+  const [typedLength, setTypedLength] = useState<number>(() => items[0]?.answer.length || 0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  const toggleItem = (id: string) => {
-    setOpenId((prev) => (prev === id ? null : id));
+  // Check reduced motion preference
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setPrefersReducedMotion(mediaQuery.matches);
+
+      const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+      mediaQuery.addEventListener('change', handler);
+      return () => mediaQuery.removeEventListener('change', handler);
+    }
+  }, []);
+
+  const openIdRef = useRef<string | null>(openId);
+  openIdRef.current = openId;
+
+  const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearTimer = () => {
+    if (typingTimerRef.current) {
+      clearInterval(typingTimerRef.current);
+      typingTimerRef.current = null;
+    }
   };
+
+  const openQuestion = (id: string) => {
+    if (openIdRef.current === id) return;
+    openIdRef.current = id;
+    clearTimer();
+    setOpenId(id);
+
+    const targetItem = items.find((it) => it.id === id);
+    if (!targetItem) return;
+
+    if (prefersReducedMotion) {
+      setTypedLength(targetItem.answer.length);
+      return;
+    }
+
+    setTypedLength(0);
+    const targetLength = targetItem.answer.length;
+    let currentLength = 0;
+    const speedMs = 18; // 18ms per character (within 15-22ms range)
+
+    typingTimerRef.current = setInterval(() => {
+      currentLength += 1;
+      setTypedLength(currentLength);
+      if (currentLength >= targetLength) {
+        clearTimer();
+      }
+    }, speedMs);
+  };
+
+  const toggleQuestion = (id: string) => {
+    if (openIdRef.current === id) {
+      clearTimer();
+      openIdRef.current = null;
+      setOpenId(null);
+      setTypedLength(0);
+    } else {
+      openQuestion(id);
+    }
+  };
+
+  // If reduced motion is activated while open, immediately show full text
+  useEffect(() => {
+    if (prefersReducedMotion && openId) {
+      clearTimer();
+      const currentItem = items.find((it) => it.id === openId);
+      if (currentItem) {
+        setTypedLength(currentItem.answer.length);
+      }
+    }
+  }, [prefersReducedMotion, openId, items]);
+
+  // Clean up any ongoing typing operations on unmount
+  useEffect(() => {
+    return () => {
+      clearTimer();
+    };
+  }, []);
 
   return (
     <section
@@ -22,57 +101,65 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
       className="relative z-20 w-full overflow-hidden select-text text-black"
       style={{
         background: `
-          radial-gradient(ellipse 65% 50% at 20% 35%, rgba(215, 230, 248, 0.5) 0%, transparent 70%),
-          radial-gradient(ellipse 55% 55% at 85% 65%, rgba(225, 236, 250, 0.45) 0%, transparent 70%),
-          linear-gradient(180deg, #FFFFFF 0%, #F4F7FB 40%, #E8EEF5 75%, #E3EAF2 100%)
+          radial-gradient(ellipse 65% 50% at 20% 30%, rgba(255, 255, 255, 0.65) 0%, transparent 70%),
+          radial-gradient(ellipse 60% 50% at 80% 80%, rgba(215, 195, 236, 0.35) 0%, transparent 70%),
+          linear-gradient(180deg, #FFFCFA 0%, #EEE3F7 50%, #C7A6E3 100%)
         `,
       }}
       aria-label="Frequently Asked Questions"
     >
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 py-24 sm:py-32 lg:py-40">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left Column: Monumental FAQ Heading & Introduction */}
+          {/* Left Column: Monumental Heading & Clean Supporting Copy */}
           <div className="lg:col-span-5 flex flex-col items-start lg:sticky lg:top-28">
-            <span className="font-mono text-xs sm:text-sm uppercase tracking-[0.24em] font-semibold text-[#D24B2C] mb-4">
-              QUESTIONS &amp; ANSWERS
-            </span>
             <h2
               data-testid="faq-heading"
               className="font-condensed font-bold uppercase text-black tracking-[-0.01em] select-none"
               style={{
-                fontSize: 'clamp(3.8rem, 9.5vw, 120px)',
-                lineHeight: '0.88',
+                fontSize: 'clamp(2.8rem, 6vw, 76px)',
+                lineHeight: '0.92',
                 color: '#000000',
               }}
             >
-              FAQ
+              Frequently Asked Questions
             </h2>
-            <p className="font-sans text-base sm:text-lg text-[#4A5568] leading-relaxed max-w-sm mt-6 font-normal">
-              Everything you need to know about partnering with Ostrum, our engineering practices, and delivering digital transformation.
+            <p className="font-sans text-base sm:text-lg text-[#333842] leading-relaxed max-w-sm mt-6 font-normal">
+              Clear insights into our engineering scope, collaborative process, and technical delivery.
             </p>
           </div>
 
-          {/* Right Column: Clean Expandable Accordion List */}
-          <div className="lg:col-span-7 flex flex-col w-full border-t border-black/10">
+          {/* Right Column: Clean Expandable Accordion List with Hover Typewriter */}
+          <div className="lg:col-span-7 flex flex-col w-full border-t border-black/15">
             {items.map((item, index) => {
               const isOpen = openId === item.id;
               return (
                 <div
                   key={item.id}
                   data-testid={`faq-item-${index}`}
-                  className="border-b border-black/10 transition-colors"
+                  onMouseEnter={() => openQuestion(item.id)}
+                  onPointerEnter={() => openQuestion(item.id)}
+                  className="border-b border-black/15 transition-colors"
                 >
                   <button
                     type="button"
-                    onClick={() => toggleItem(item.id)}
+                    onClick={() => toggleQuestion(item.id)}
+                    onMouseEnter={() => openQuestion(item.id)}
+                    onPointerEnter={() => openQuestion(item.id)}
+                    onFocus={(e) => {
+                      if (typeof e.target.matches === 'function' && e.target.matches(':focus-visible')) {
+                        openQuestion(item.id);
+                      }
+                    }}
                     aria-expanded={isOpen}
                     aria-controls={`faq-answer-${item.id}`}
                     id={`faq-question-${item.id}`}
-                    className="w-full flex items-center justify-between text-left py-6 sm:py-7 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#182B49] rounded-sm transition-colors"
+                    className="w-full flex items-center justify-between text-left py-6 sm:py-7 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C1844] rounded-sm transition-colors cursor-pointer"
                   >
                     <span
-                      className={`font-sans text-base sm:text-lg md:text-xl font-medium tracking-tight pr-6 transition-colors duration-200 ${
-                        isOpen ? 'text-[#182B49] font-semibold' : 'text-[#161514] group-hover:text-[#182B49]'
+                      className={`font-sans text-base sm:text-lg md:text-xl tracking-tight pr-6 transition-colors duration-200 ${
+                        isOpen
+                          ? 'text-[#1F162A] font-semibold'
+                          : 'text-[#161514] font-medium group-hover:text-[#2C1844]'
                       }`}
                     >
                       {item.question}
@@ -82,7 +169,7 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
                     <span
                       className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
                         isOpen
-                          ? 'bg-[#182B49] text-white rotate-180 shadow-sm'
+                          ? 'bg-[#20182C] text-white rotate-180 shadow-sm'
                           : 'border border-black/20 text-black/75 group-hover:border-black/50 group-hover:text-black'
                       }`}
                       aria-hidden="true"
@@ -114,18 +201,33 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
                     </span>
                   </button>
 
-                  {/* Smooth Restrained Expand / Collapse Container */}
+                  {/* Smooth Restrained Expand / Collapse Container with Typewriter Display */}
                   <div
                     id={`faq-answer-${item.id}`}
                     role="region"
                     aria-labelledby={`faq-question-${item.id}`}
                     className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
-                      isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+                      isOpen
+                        ? 'grid-rows-[1fr] opacity-100'
+                        : 'grid-rows-[0fr] opacity-0 pointer-events-none'
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="font-sans text-sm sm:text-base md:text-[16.5px] leading-relaxed text-[#4A5568] pb-7 pt-1 max-w-2xl font-normal">
-                        {item.answer}
+                      {/* Accessible Full Answer for Screen Readers */}
+                      <p className="sr-only">{item.answer}</p>
+
+                      {/* Visual Letter-by-Letter Animated Text */}
+                      <p
+                        aria-hidden="true"
+                        className="font-sans text-sm sm:text-base md:text-[16px] leading-relaxed text-[#2D333E] pb-7 pt-1 max-w-2xl font-normal"
+                      >
+                        {isOpen ? item.answer.slice(0, typedLength) : ''}
+                        {isOpen && typedLength < item.answer.length && (
+                          <span
+                            className="inline-block w-[2px] h-[1.1em] bg-[#2C1844] ml-0.5 align-middle animate-pulse"
+                            aria-hidden="true"
+                          />
+                        )}
                       </p>
                     </div>
                   </div>
