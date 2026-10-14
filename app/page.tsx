@@ -6,6 +6,9 @@ import { OstrumEnergyNarrativeSection } from '@/components/sections/OstrumEnergy
 import { OstrumWorksWheelSection } from '@/components/sections/OstrumWorksWheelSection';
 import { OstrumCapabilitiesSection } from '@/components/sections/OstrumCapabilitiesSection';
 import { OstrumTestimonialsSection } from '@/components/sections/OstrumTestimonialsSection';
+import { OstrumFaqSection } from '@/components/sections/OstrumFaqSection';
+import { OstrumContactSection } from '@/components/sections/OstrumContactSection';
+import { OstrumStudioFooter } from '@/components/sections/OstrumStudioFooter';
 
 export default function HomePage() {
   return (
@@ -30,6 +33,15 @@ export default function HomePage() {
 
       {/* SECTION 06: Testimonials (Ignite-inspired Stacked Editorial Cards) */}
       <OstrumTestimonialsSection />
+
+      {/* SECTION 07: Frequently Asked Questions (FAQ) */}
+      <OstrumFaqSection />
+
+      {/* SECTION 08: Contact / Project Enquiry Form */}
+      <OstrumContactSection />
+
+      {/* STUDIO FOOTER */}
+      <OstrumStudioFooter />
     </div>
   );
 }

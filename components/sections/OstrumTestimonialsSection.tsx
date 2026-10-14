@@ -298,9 +298,6 @@ export function OstrumTestimonialsSection({
       style={{ backgroundColor: '#FFFFFF' }}
       aria-label="Testimonials"
     >
-      {/* Target anchor for smooth navigation */}
-      <div id="contact" className="absolute -top-10 left-0 w-full h-1 pointer-events-none" />
-
       {/* Pinned / Sticky Stage Container */}
       <div
         ref={stageRef}
