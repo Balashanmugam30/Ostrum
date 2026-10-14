@@ -269,8 +269,11 @@ export function OstrumTestimonialsSection({
                 </div>
 
                 {/* Quotation Area */}
-                <div className="py-2 text-center px-1 sm:px-3">
-                  <p className="font-sans text-[17px] sm:text-[19px] font-normal leading-[1.48] text-[#141414] tracking-[-0.01em]">
+                <div className="py-3 text-center px-1 sm:px-3">
+                  <p
+                    data-testid="testimonial-quote-text"
+                    className="font-sans text-[18px] sm:text-[21px] md:text-[24px] lg:text-[25px] font-normal leading-[1.44] text-[#111111] tracking-[-0.015em]"
+                  >
                     &ldquo;{testimonial.quote}&rdquo;
                   </p>
                 </div>
@@ -323,7 +326,7 @@ export function OstrumTestimonialsSection({
         {/* Foreground Testimonial Card Stack (Layer: z-20 to z-30) */}
         <div
           data-testid="testimonials-card-stack"
-          className="relative z-20 w-full max-w-[510px] flex items-center justify-center h-[410px] sm:h-[430px] md:h-[440px]"
+          className="relative z-20 w-full max-w-[530px] md:max-w-[560px] flex items-center justify-center h-[430px] sm:h-[460px] md:h-[485px]"
         >
           {items.map((testimonial, index) => (
             <div
@@ -336,7 +339,7 @@ export function OstrumTestimonialsSection({
               data-client={testimonial.clientName}
               data-placeholder={testimonial.isPlaceholder}
               data-approved={testimonial.approved}
-              className="absolute inset-0 flex flex-col justify-between rounded-[6px] p-8 sm:p-10 md:p-12 text-black select-text cursor-default will-change-transform"
+              className="absolute inset-0 flex flex-col justify-between rounded-[6px] p-6 sm:p-8 md:p-10 text-black select-text cursor-default will-change-transform"
               style={{
                 backgroundColor: '#F7F7F7',
                 boxShadow:
@@ -383,14 +386,17 @@ export function OstrumTestimonialsSection({
               </div>
 
               {/* Element 2 (Main Area): Testimonial Quotation */}
-              <div className="my-auto flex items-center justify-center py-2 text-center px-1 sm:px-3">
-                <p className="font-sans text-[17px] sm:text-[19px] md:text-[21px] font-normal leading-[1.48] text-[#141414] tracking-[-0.01em]">
+              <div className="my-auto flex items-center justify-center py-2 sm:py-3 text-center px-1 sm:px-3">
+                <p
+                  data-testid="testimonial-quote-text"
+                  className="font-sans text-[18px] sm:text-[21px] md:text-[24px] lg:text-[25px] font-normal leading-[1.44] text-[#111111] tracking-[-0.015em]"
+                >
                   &ldquo;{testimonial.quote}&rdquo;
                 </p>
               </div>
 
               {/* Structural balance spacer: ensures quote remains beautifully centered vertically */}
-              <div className="h-4 shrink-0 pointer-events-none" aria-hidden="true" />
+              <div className="h-2 sm:h-4 shrink-0 pointer-events-none" aria-hidden="true" />
             </div>
           ))}
         </div>

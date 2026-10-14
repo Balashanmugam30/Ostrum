@@ -259,11 +259,6 @@ export function BackgroundCaustics() {
         vec3 halo = mouseHalo(uv, uMouse);
         color += halo;
 
-        float grain1 = filmGrain(uv, time);
-        float grain2 = filmGrain(uv * 1.5 + 0.5, time * 0.8);
-        float grain3 = filmGrain(uv * 3.0, time * 1.5);
-        float grain = grain1 * 0.5 + grain2 * 0.3 + grain3 * 0.2;
-
         // Concentrated atmosphere darkening for Energy Narrative
         if (uDarken > 0.001) {
           // Pure obsidian dark base (#030204) matching Ignite reference
@@ -279,7 +274,6 @@ export function BackgroundCaustics() {
           color = mix(color, cinematicField, uDarken);
         }
 
-        color = color + (grain - 0.5) * uGrainIntensity;
         color = clamp(color, 0.0, 1.0);
 
         gl_FragColor = vec4(color, 1.0);
@@ -300,8 +294,8 @@ export function BackgroundCaustics() {
         uDistortionStrength: { value: isMobile ? 0.018 : 0.025 },
         uMouseRadius: { value: 0.3 },
         uMouseStrength: { value: isMobile ? 0 : 0.035 },
-        uGrainIntensity: { value: isMobile ? 0.25 : 0.4 },
-        uGrainSpeed: { value: isMobile ? 8 : 12 },
+        uGrainIntensity: { value: 0.0 },
+        uGrainSpeed: { value: 0.0 },
         uScrollY: { value: 0 },
         uHaloIntensity: { value: isMobile ? 0 : 0.75 },
         uHaloSize: { value: 0.5 },

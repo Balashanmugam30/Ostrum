@@ -322,7 +322,7 @@ export function OstrumWorksWheelSection() {
             turbulence={0.68}
             scale={1.05}
             sheen={0.65}
-            grain={0.14}
+            grain={0}
             glow={0.28}
             swirl={0.52}
             vignette={0.15}
