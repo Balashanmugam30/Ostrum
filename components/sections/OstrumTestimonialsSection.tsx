@@ -326,7 +326,7 @@ export function OstrumTestimonialsSection({
         {/* Foreground Testimonial Card Stack (Layer: z-20 to z-30) */}
         <div
           data-testid="testimonials-card-stack"
-          className="relative z-20 w-full max-w-[530px] md:max-w-[560px] flex items-center justify-center h-[430px] sm:h-[460px] md:h-[485px]"
+          className="relative z-20 w-full max-w-[530px] md:max-w-[560px] flex items-center justify-center h-[645px] sm:h-[690px] md:h-[728px] max-h-[85vh]"
         >
           {items.map((testimonial, index) => (
             <div
