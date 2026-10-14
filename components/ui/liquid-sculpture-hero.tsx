@@ -227,6 +227,17 @@ out vec3 vCol;
 out float vA;
 ${NOISE}
 ${ENERGY}
+
+vec3 toSilver(vec3 c){
+  float lum = dot(c, vec3(0.299, 0.587, 0.114));
+  vec3 shadow = vec3(0.08, 0.08, 0.10);
+  vec3 mid    = vec3(0.80, 0.81, 0.86);
+  vec3 high   = vec3(0.98, 0.98, 1.00);
+  vec3 silver = mix(mix(shadow, mid, clamp(lum * 1.5, 0.0, 1.0)), high, smoothstep(0.45, 0.92, lum));
+  float lav = smoothstep(0.35, 0.75, lum) * (1.0 - smoothstep(0.75, 0.98, lum));
+  return silver + vec3(0.012, 0.006, 0.025) * lav;
+}
+
 void main(){
   int id = gl_InstanceID;
   ivec2 ij = ivec2(id % uTexW, id / uTexW);
@@ -258,16 +269,8 @@ void main(){
   vHalfLen = len*0.5;
   vR = r;
 
-  // Luminance-preserving monochrome pearl-silver conversion for Ostrum
-  vec3 rawCl = cl.rgb / 255.0;
-  float lum = dot(rawCl, vec3(0.299, 0.587, 0.114));
-  vec3 shadow = vec3(0.08, 0.08, 0.09);
-  vec3 mid = vec3(0.81, 0.80, 0.85);
-  vec3 high = vec3(0.99, 0.985, 1.0);
-  vec3 silverCol = mix(mix(shadow, mid, clamp(lum * 1.6, 0.0, 1.0)), high, smoothstep(0.50, 0.95, lum));
-  float lav = smoothstep(0.3, 0.7, lum) * (1.0 - smoothstep(0.7, 0.95, lum));
-  silverCol += vec3(0.012, 0.005, 0.03) * lav;
-  vec3 col = silverCol;
+  // Convert material to pearl-white / silver (cl.rgb is normalized [0.0, 1.0])
+  vec3 col = toSilver(cl.rgb);
 
   // fast material catches the light, like liquid metal
   float glint = smoothstep(2.0, 16.0, sp);
@@ -322,6 +325,17 @@ uniform float uRest;
 uniform float uAlphaMode;
 ${NOISE}
 ${ENERGY}
+
+vec3 toSilver(vec3 c){
+  float lum = dot(c, vec3(0.299, 0.587, 0.114));
+  vec3 shadow = vec3(0.08, 0.08, 0.10);
+  vec3 mid    = vec3(0.80, 0.81, 0.86);
+  vec3 high   = vec3(0.98, 0.98, 1.00);
+  vec3 silver = mix(mix(shadow, mid, clamp(lum * 1.5, 0.0, 1.0)), high, smoothstep(0.45, 0.92, lum));
+  float lav = smoothstep(0.35, 0.75, lum) * (1.0 - smoothstep(0.75, 0.98, lum));
+  return silver + vec3(0.012, 0.006, 0.025) * lav;
+}
+
 void main(){
   vec2 px = vec2(gl_FragCoord.x, uRes.y*uDpr - gl_FragCoord.y)/uDpr;
   vec2 size = uRect.zw;
@@ -344,16 +358,7 @@ void main(){
   float E = energyAt(rp, uMouse, uRadius, uPresence, fl.b);
   float show = (1.0 - max(E, uRest))*uIntroVis;
 
-  // Luminance-preserving monochrome pearl-silver conversion for Ostrum
-  float lum = dot(rawCol, vec3(0.299, 0.587, 0.114));
-  vec3 shadow = vec3(0.08, 0.08, 0.09);
-  vec3 mid = vec3(0.81, 0.80, 0.85);
-  vec3 high = vec3(0.99, 0.985, 1.0);
-  vec3 silverCol = mix(mix(shadow, mid, clamp(lum * 1.6, 0.0, 1.0)), high, smoothstep(0.50, 0.95, lum));
-  float lav = smoothstep(0.3, 0.7, lum) * (1.0 - smoothstep(0.7, 0.95, lum));
-  silverCol += vec3(0.012, 0.005, 0.03) * lav;
-
-  vec3 mat = silverCol;
+  vec3 mat = toSilver(rawCol);
   // premultiplied: empty areas stay transparent so the page shows through
   float A = k*show;
   o = vec4(mat*A, A);
@@ -815,10 +820,6 @@ export class LiquidEngine {
       this.presenceTarget = 0
       this.touchRelease = 0
     }
-    // Return to crisp resting detail when pointer stops moving for > 750ms
-    if (this.presenceTarget > 0 && now - this.lastInput > 750) {
-      this.presenceTarget = 0
-    }
     const ease = 1 - Math.pow(1 - 0.22, dt)
     this.mouse.x += (this.target.x - this.mouse.x) * ease
     this.mouse.y += (this.target.y - this.mouse.y) * ease
@@ -1018,8 +1019,7 @@ export class LiquidEngine {
     gl.uniform1f(P.u.uIntroVis, introVis)
     gl.uniform1f(P.u.uRest, rest)
     gl.uniform1f(P.u.uDpr, dpr)
-    if (this.alphaMode) gl.uniform3f(P.u.uTint, 1, 1, 1)
-    else gl.uniform3f(P.u.uTint, br / Math.max(ir, 0.001), bg / Math.max(ig, 0.001), bb / Math.max(ib, 0.001))
+    gl.uniform3f(P.u.uTint, 1, 1, 1)
     gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.n)
     gl.disable(gl.BLEND)
   }
@@ -1522,18 +1522,6 @@ export default function SculptureHero(props: SculptureHeroProps) {
       {/* Foreground Content (Positioned in front of the sculpture, which flows edge-to-edge behind it) */}
       <div className="sh-content">
         {children}
-      </div>
-
-      {/* Discreet 21st.dev Attribution Notice */}
-      <div className="absolute bottom-3 sm:bottom-4 left-0 right-0 z-20 text-center pointer-events-auto">
-        <a
-          href="https://21st.dev/@gughigug/components/liquid-sculpture-hero"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-sans text-[11px] text-[#6E6979] hover:text-[#C9C7D2] transition-colors underline underline-offset-2 decoration-[#6E6979]/40"
-        >
-          Liquid Sculpture Hero
-        </a>
       </div>
 
       {showCredit && (

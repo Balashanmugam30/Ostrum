@@ -27,10 +27,23 @@ export function OstrumLiquidSandCTA() {
         hint=""
         hintTouch=""
         showCredit={false}
-        restStyle="image" // Preserve the original detailed woven filaments and metallic highlights at rest
-        particleDensity={1}
-        dotSize={1}
+        restStyle="image"
+        sculptureScale={0.90}
+        mobileSculptureScale={0.82}
         interactive={true}
+        strength={1}
+        radius={220}
+        particleDensity={1}
+        particleSpread={1}
+        dotSize={1}
+        turbulence={1}
+        liquid={1}
+        streaks={true}
+        returnSpeed={1}
+        ambient={false}
+        ambientIntensity={1}
+        speed={1}
+        intro={false}
         height="clamp(680px, 86svh, 920px)"
         darkSrc="https://cdn.21st.dev/assets/mirror/a1/a1fa387b6e417b26a25f317559c87cce4d241c1052c52a2b3bc2966b2aaf9b65.webp"
         mobileDarkSrc="https://cdn.21st.dev/assets/mirror/9a/9a82cb59be1bfde59855b79d7a565e487155a89f4d52eac74dcc10e267b2b6d1.webp"
@@ -44,7 +57,7 @@ export function OstrumLiquidSandCTA() {
               fontSize: 'clamp(3.2rem, 8.5vw, 118px)',
               lineHeight: '0.90',
               maxWidth: '1050px',
-              textShadow: '0 2px 24px rgba(0,0,0,0.85), 0 0 40px rgba(5,5,5,0.7)',
+              textShadow: '0 2px 5px rgba(0,0,0,0.92), 0 4px 14px rgba(0,0,0,0.72), 0 0 24px rgba(0,0,0,0.38)',
             }}
           >
             HAVE AN IDEA?
@@ -56,7 +69,7 @@ export function OstrumLiquidSandCTA() {
           <p
             className="font-sans text-base sm:text-lg md:text-xl text-[#FAF9FF] font-medium leading-relaxed max-w-xl mt-5 sm:mt-6 text-pretty select-none"
             style={{
-              textShadow: '0 2px 14px rgba(0,0,0,0.95), 0 0 30px rgba(0,0,0,0.85)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.95), 0 2px 9px rgba(0,0,0,0.62)',
             }}
           >
             Digital products, intelligent systems, and experiences built around what you need.
