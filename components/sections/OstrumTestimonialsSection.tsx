@@ -219,7 +219,7 @@ export function OstrumTestimonialsSection({
             TESTIMONIALS
           </h2>
 
-          <div className="w-full max-w-[540px] flex flex-col gap-8">
+          <div className="w-full max-w-[480px] flex flex-col gap-8">
             {items.map((testimonial, index) => (
               <div
                 key={testimonial.id}
@@ -228,7 +228,7 @@ export function OstrumTestimonialsSection({
                 data-client={testimonial.clientName}
                 data-placeholder={testimonial.isPlaceholder}
                 data-approved={testimonial.approved}
-                className="w-full rounded-[6px] p-8 sm:p-10 text-black"
+                className="w-full rounded-[4px] p-6 sm:p-8 text-black"
                 style={{
                   backgroundColor: index % 2 === 1 ? '#EEEEEE' : '#FFFFFF',
                   boxShadow:
@@ -238,17 +238,17 @@ export function OstrumTestimonialsSection({
                 }}
               >
                 {/* Logo Area */}
-                <div className="h-14 sm:h-16 flex items-center justify-center text-center select-none mb-6">
+                <div className="h-10 sm:h-12 flex items-center justify-center text-center select-none mb-5">
                   {testimonial.logoType === 'mnesa-mark' ? (
                     <div
                       data-testid="mnesa-blue-m-mark"
-                      className="flex items-center justify-center h-12 w-12"
+                      className="flex items-center justify-center h-10 w-10"
                       aria-label="MNESA Mark"
                     >
                       <span
                         className="font-bold text-[#1E5BF0] select-none leading-none tracking-tight"
                         style={{
-                          fontSize: '44px',
+                          fontSize: '38px',
                           fontFamily: 'var(--font-oswald), "Barlow Condensed", sans-serif',
                           fontWeight: 900,
                           color: '#1E5BF0',
@@ -261,9 +261,9 @@ export function OstrumTestimonialsSection({
                     <Image
                       src={testimonial.logoSrc}
                       alt={testimonial.logoAlt || testimonial.clientName}
-                      width={220}
-                      height={56}
-                      className="max-h-11 sm:max-h-12 w-auto object-contain"
+                      width={200}
+                      height={48}
+                      className="max-h-9 sm:max-h-10 w-auto object-contain"
                     />
                   ) : (
                     <span className="font-mono text-xs sm:text-[13px] uppercase tracking-[0.2em] font-semibold text-black/75">
@@ -273,10 +273,10 @@ export function OstrumTestimonialsSection({
                 </div>
 
                 {/* Quotation Area */}
-                <div className="py-3 text-center px-1 sm:px-3">
+                <div className="py-2 text-center px-1 sm:px-2">
                   <p
                     data-testid="testimonial-quote-text"
-                    className="font-sans text-[18px] sm:text-[21px] md:text-[24px] lg:text-[25px] font-normal leading-[1.44] text-[#111111] tracking-[-0.015em]"
+                    className="font-sans text-[16px] sm:text-[18px] md:text-[19.5px] lg:text-[20px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
                   >
                     &ldquo;{testimonial.quote}&rdquo;
                   </p>
@@ -330,7 +330,7 @@ export function OstrumTestimonialsSection({
         {/* Foreground Testimonial Card Stack (Layer: z-20 to z-30) */}
         <div
           data-testid="testimonials-card-stack"
-          className="relative z-20 w-full max-w-[530px] md:max-w-[560px] flex items-center justify-center h-[430px] sm:h-[460px] md:h-[485px]"
+          className="relative z-20 w-full max-w-[440px] sm:max-w-[465px] md:max-w-[480px] flex items-center justify-center h-[310px] sm:h-[330px] md:h-[345px]"
         >
           {items.map((testimonial, index) => (
             <div
@@ -343,7 +343,7 @@ export function OstrumTestimonialsSection({
               data-client={testimonial.clientName}
               data-placeholder={testimonial.isPlaceholder}
               data-approved={testimonial.approved}
-              className="absolute inset-0 flex flex-col justify-between rounded-[6px] p-6 sm:p-8 md:p-10 text-black select-text cursor-default will-change-transform"
+              className="absolute inset-0 flex flex-col justify-between rounded-[4px] p-6 sm:p-7 md:p-8 text-black select-text cursor-default will-change-transform"
               style={{
                 backgroundColor: index % 2 === 1 ? '#EEEEEE' : '#FFFFFF',
                 boxShadow:
@@ -354,17 +354,17 @@ export function OstrumTestimonialsSection({
               }}
             >
               {/* Element 1 (Top Area): Authentic Client Logo or MNESA Mark */}
-              <div className="h-14 sm:h-16 flex items-center justify-center text-center select-none shrink-0">
+              <div className="h-10 sm:h-12 flex items-center justify-center text-center select-none shrink-0">
                 {testimonial.logoType === 'mnesa-mark' ? (
                   <div
                     data-testid="mnesa-blue-m-mark"
-                    className="flex items-center justify-center h-12 w-12"
+                    className="flex items-center justify-center h-10 w-10"
                     aria-label="MNESA Mark"
                   >
                     <span
                       className="font-bold text-[#1E5BF0] select-none leading-none tracking-tight"
                       style={{
-                        fontSize: '44px',
+                        fontSize: '38px',
                         fontFamily: 'var(--font-oswald), "Barlow Condensed", sans-serif',
                         fontWeight: 900,
                         color: '#1E5BF0',
@@ -377,10 +377,10 @@ export function OstrumTestimonialsSection({
                   <Image
                     src={testimonial.logoSrc}
                     alt={testimonial.logoAlt || testimonial.clientName}
-                    width={220}
-                    height={56}
+                    width={200}
+                    height={48}
                     priority={index === 0}
-                    className="max-h-11 sm:max-h-12 w-auto object-contain"
+                    className="max-h-9 sm:max-h-10 w-auto object-contain"
                   />
                 ) : (
                   <span className="font-mono text-xs sm:text-[13px] uppercase tracking-[0.2em] font-semibold text-black/75">
@@ -390,17 +390,17 @@ export function OstrumTestimonialsSection({
               </div>
 
               {/* Element 2 (Main Area): Testimonial Quotation */}
-              <div className="my-auto flex items-center justify-center py-2 sm:py-3 text-center px-1 sm:px-3">
+              <div className="my-auto flex items-center justify-center py-1 sm:py-2 text-center px-1 sm:px-2">
                 <p
                   data-testid="testimonial-quote-text"
-                  className="font-sans text-[18px] sm:text-[21px] md:text-[24px] lg:text-[25px] font-normal leading-[1.44] text-[#111111] tracking-[-0.015em]"
+                  className="font-sans text-[16px] sm:text-[18px] md:text-[19.5px] lg:text-[20px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
                 >
                   &ldquo;{testimonial.quote}&rdquo;
                 </p>
               </div>
 
               {/* Structural balance spacer: ensures quote remains beautifully centered vertically */}
-              <div className="h-2 sm:h-4 shrink-0 pointer-events-none" aria-hidden="true" />
+              <div className="h-1 sm:h-2 shrink-0 pointer-events-none" aria-hidden="true" />
             </div>
           ))}
         </div>
