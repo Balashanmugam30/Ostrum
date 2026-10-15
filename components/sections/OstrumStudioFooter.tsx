@@ -16,7 +16,7 @@ export function OstrumStudioFooter() {
       background="#050505"
       ink="#F4F4F5"
       muted="#8E8E93"
-      accent="#F04438"
+      accent="var(--ostrum-footer-accent, #FF4D30)"
       wordTop="#240B0F"
       wordFoot="#050505"
       wordWeight={700}
@@ -31,7 +31,7 @@ export function OstrumStudioFooter() {
           <a
             href="mailto:hello@ostrum.co"
             data-testid="footer-tile-email"
-            className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-white text-[#050505] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,255,255,0.14)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F04438]"
+            className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-white text-[#050505] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,255,255,0.14)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ostrum-footer-accent,#FF4D30)]"
           >
             <div>
               <span className="font-mono text-xs sm:text-[13px] uppercase tracking-[0.2em] font-semibold text-[#71717A] block">
@@ -43,10 +43,10 @@ export function OstrumStudioFooter() {
             </div>
 
             <div className="flex items-center justify-between pt-6 border-t border-black/10">
-              <span className="font-sans text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-[#050505] group-hover:text-[#F04438] transition-colors">
+              <span className="font-sans text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-[#050505] group-hover:text-[var(--ostrum-footer-accent,#FF4D30)] transition-colors">
                 hello@ostrum.co
               </span>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-black/15 flex items-center justify-center transition-all duration-300 group-hover:border-[#F04438] group-hover:bg-[#F04438] group-hover:text-white">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-black/15 flex items-center justify-center transition-all duration-300 group-hover:border-[var(--ostrum-footer-accent,#FF4D30)] group-hover:bg-[var(--ostrum-footer-accent,#FF4D30)] group-hover:text-white">
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   viewBox="0 0 16 16"
@@ -67,7 +67,7 @@ export function OstrumStudioFooter() {
           <a
             href="#contact"
             data-testid="footer-tile-project"
-            className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-[#F04438] text-white transition-all duration-300 hover:shadow-[0_20px_50px_rgba(240,68,56,0.32)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-[var(--ostrum-footer-accent,#FF4D30)] text-white transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,77,48,0.32)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <div>
               <span className="font-mono text-xs sm:text-[13px] uppercase tracking-[0.2em] font-semibold text-white/80 block">
@@ -82,7 +82,7 @@ export function OstrumStudioFooter() {
               <span className="font-sans text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white group-hover:translate-x-1 transition-transform">
                 Start a project
               </span>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/30 flex items-center justify-center transition-all duration-300 group-hover:border-white group-hover:bg-white group-hover:text-[#F04438]">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/30 flex items-center justify-center transition-all duration-300 group-hover:border-white group-hover:bg-white group-hover:text-[var(--ostrum-footer-accent,#FF4D30)]">
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   viewBox="0 0 16 16"
@@ -104,7 +104,7 @@ export function OstrumStudioFooter() {
         <div className="mt-28 sm:mt-36 md:mt-44 pt-12 sm:pt-16 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-10 sm:gap-12 lg:gap-16">
           {/* Column 1: EXPLORE */}
           <div>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[#F04438] block mb-5">
+            <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-accent,#FF4D30)] block mb-5">
               EXPLORE
             </span>
             <ul className="space-y-3 font-sans text-sm sm:text-base text-[#D4D4D8]">
@@ -145,7 +145,7 @@ export function OstrumStudioFooter() {
 
           {/* Column 2: CONNECT */}
           <div>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[#F04438] block mb-5">
+            <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-accent,#FF4D30)] block mb-5">
               CONNECT
             </span>
             <ul className="space-y-3 font-sans text-sm sm:text-base text-[#D4D4D8]">
@@ -165,7 +165,7 @@ export function OstrumStudioFooter() {
 
           {/* Column 3: LEGAL */}
           <div>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[#F04438] block mb-5">
+            <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-accent,#FF4D30)] block mb-5">
               LEGAL
             </span>
             <ul className="space-y-3 font-sans text-sm sm:text-base text-[#D4D4D8]">

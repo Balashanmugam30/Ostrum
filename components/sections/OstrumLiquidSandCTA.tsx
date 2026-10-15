@@ -8,7 +8,7 @@ export function OstrumLiquidSandCTA() {
     <section
       id="cta"
       data-testid="liquid-sand-cta-section"
-      className="relative z-20 w-full overflow-hidden select-text"
+      className="relative z-20 w-full min-h-[100svh] flex flex-col justify-center overflow-hidden select-text"
       style={{
         backgroundColor: '#050505',
         backgroundImage: 'linear-gradient(180deg, #0e0915 0%, #050505 14%, #050505 100%)',
@@ -44,7 +44,7 @@ export function OstrumLiquidSandCTA() {
         ambientIntensity={1}
         speed={1}
         intro={false}
-        height="clamp(680px, 86svh, 920px)"
+        height="100svh"
         darkSrc="https://cdn.21st.dev/assets/mirror/a1/a1fa387b6e417b26a25f317559c87cce4d241c1052c52a2b3bc2966b2aaf9b65.webp"
         mobileDarkSrc="https://cdn.21st.dev/assets/mirror/9a/9a82cb59be1bfde59855b79d7a565e487155a89f4d52eac74dcc10e267b2b6d1.webp"
       >

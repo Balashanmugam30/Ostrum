@@ -55,6 +55,17 @@
   --black-rgb: 0, 0, 0;
   --white: #ffffff;
   --white-rgb: 255, 255, 255;
+
+  /* ==========================================================================
+     OSTRUM FOOTER ACCENT TOKEN & ROLLBACK
+     - Canonical Hero Red: #FF4D30 (matching hero 3D rim light & LivingThread core)
+     - Previous Working Footer Red: #F04438 (documented rollback)
+     To roll back, simply set --ostrum-footer-accent: var(--ostrum-footer-accent-previous);
+     ========================================================================== */
+  --ostrum-footer-accent-previous: #F04438;
+  --ostrum-footer-accent-previous-rgb: 240, 68, 56;
+  --ostrum-footer-accent: #FF4D30;
+  --ostrum-footer-accent-rgb: 255, 77, 48;
 }
 
 html {

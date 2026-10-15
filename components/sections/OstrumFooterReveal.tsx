@@ -12,8 +12,8 @@ if (typeof window !== 'undefined') {
 
 export function OstrumFooterReveal() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const ctaWrapRef = useRef<HTMLDivElement>(null);
-  const footerWrapRef = useRef<HTMLDivElement>(null);
+  const curtainRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -23,53 +23,84 @@ export function OstrumFooterReveal() {
     if (prefersReducedMotion) return;
 
     const container = containerRef.current;
-    const cta = ctaWrapRef.current;
-    const footer = footerWrapRef.current;
-    if (!container || !cta || !footer) return;
+    const curtain = curtainRef.current;
+    const stage = stageRef.current;
+    if (!container || !curtain || !stage) return;
 
-    // Only apply the dynamic reveal on desktop/tablet where viewport height allows cinematic reveal
+    // Use gsap.matchMedia for clean, responsive desktop/tablet theatre curtain reveal
     const mm = gsap.matchMedia();
 
     mm.add('(min-width: 768px)', () => {
-      // Calculate scroll travel distance for the reveal
-      const ctaHeight = cta.offsetHeight;
+      const ctaHeight = curtain.offsetHeight;
+      const liftDistance = Math.min(ctaHeight, window.innerHeight);
+
+      // Stacking structure:
+      // Curtain sits as absolute foreground cover (z-20) over stage (z-10)
+      gsap.set(curtain, {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        minHeight: '100svh',
+        zIndex: 20,
+        y: 0,
+        autoAlpha: 1,
+        pointerEvents: 'auto',
+      });
+
+      gsap.set(stage, {
+        position: 'relative',
+        zIndex: 10,
+        width: '100%',
+      });
+
+      // Pinned theatre-curtain lift timeline directly driven by scroll progress
+      const tl = gsap.timeline({
+        paused: true,
+      });
+
+      tl.to(curtain, {
+        y: -liftDistance,
+        ease: 'power2.inOut',
+      });
 
       const trigger = ScrollTrigger.create({
         trigger: container,
         start: 'top top',
-        end: () => `+=${ctaHeight}`,
-        pin: cta,
-        pinSpacing: false,
+        end: `+=${liftDistance * 1.15}`,
+        pin: container,
+        pinSpacing: true,
+        scrub: 0.8,
         anticipatePin: 1,
-        id: 'ostrum-cta-footer-reveal',
+        id: 'theatre-curtain-reveal',
         invalidateOnRefresh: true,
-        scrub: true,
+        animation: tl,
         onUpdate: (self) => {
-          // Progressively lift the CTA panel upwards out of the viewport
-          gsap.set(cta, {
-            y: -self.progress * ctaHeight,
-            autoAlpha: self.progress > 0.98 ? 0 : 1,
-            pointerEvents: self.progress > 0.9 ? 'none' : 'auto',
-          });
+          if (curtain) {
+            // Fade out the very last bit to avoid any edge bleeding
+            curtain.style.opacity = self.progress > 0.98 ? '0' : '1';
+            // Disable curtain pointer events as it exits so underlying stage links are immediately accessible
+            curtain.style.pointerEvents = self.progress > 0.85 ? 'none' : 'auto';
+          }
         },
         onLeave: () => {
-          gsap.set(cta, {
-            y: -ctaHeight,
-            autoAlpha: 0,
-            pointerEvents: 'none',
-          });
+          if (curtain) {
+            curtain.style.pointerEvents = 'none';
+            curtain.style.opacity = '0';
+          }
         },
         onEnterBack: () => {
-          gsap.set(cta, {
-            autoAlpha: 1,
-            pointerEvents: 'auto',
-          });
+          if (curtain) {
+            curtain.style.pointerEvents = 'auto';
+            curtain.style.opacity = '1';
+          }
         },
       });
 
       return () => {
         trigger.kill();
-        gsap.set(cta, { clearProps: 'all' });
+        tl.kill();
+        gsap.set([curtain, stage], { clearProps: 'all' });
       };
     });
 
@@ -81,21 +112,24 @@ export function OstrumFooterReveal() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full overflow-hidden"
-      style={{ backgroundColor: '#050505' }}
+      id="theatre-stage-wrapper"
+      data-testid="theatre-curtain-reveal-container"
+      className="relative w-full overflow-hidden bg-[#050505]"
     >
-      {/* SECTION 09: Final Closing CTA (Foreground Closing Layer) */}
+      {/* THEATRE CURTAIN: Foreground Closing Panel (z-20) */}
       <div
-        ref={ctaWrapRef}
-        className="relative z-20 w-full bg-[#050505] shadow-[0_30px_70px_rgba(0,0,0,0.95)]"
+        ref={curtainRef}
+        data-testid="theatre-curtain-panel"
+        className="theatre-curtain relative z-20 w-full min-h-[100svh] bg-[#050505] shadow-[0_30px_70px_rgba(0,0,0,0.95)]"
       >
         <OstrumLiquidSandCTA />
       </div>
 
-      {/* SECTION 10: Ostrum Studio Footer (Underlying Layer Revealed as CTA Lifts Away) */}
+      {/* THEATRE STAGE: Underlying Studio Footer Layer (z-10) */}
       <div
-        ref={footerWrapRef}
-        className="relative z-10 w-full bg-[#050505]"
+        ref={stageRef}
+        data-testid="theatre-stage-panel"
+        className="theatre-stage relative z-10 w-full bg-[#050505]"
       >
         <OstrumStudioFooter />
       </div>
