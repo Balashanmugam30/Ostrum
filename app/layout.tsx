@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
-import { PreloaderProvider } from '@/context/PreloaderContext';
-import { OstrumPreloader } from '@/components/ui/OstrumPreloader';
-import { OstrumContinuousJourney } from '@/components/visuals/OstrumContinuousJourney';
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
 import { CustomCursor } from '@/components/ui/CustomCursor';
@@ -49,27 +46,19 @@ export default function RootLayout({
     <html lang="en" className="dark bg-black">
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black">
         <LanguageProvider>
-          <PreloaderProvider>
-            <SmoothScroll>
-              {/* Fixed Luminous Caustics WebGL Background */}
-              <BackgroundCaustics />
+          <SmoothScroll>
+            {/* Fixed Luminous Caustics WebGL Background */}
+            <BackgroundCaustics />
 
-              {/* Luxury Cinematic Multi-color Preloader Atmosphere (z-[25]) */}
-              <OstrumPreloader />
+            {/* Custom Precision Desktop Circular Cursor */}
+            <CustomCursor />
 
-              {/* Continuous 3D Journey Canvas (z-[35] during loader, z-[12] after complete) */}
-              <OstrumContinuousJourney />
+            {/* Minimalist Floating Global Header */}
+            <Header />
 
-              {/* Custom Precision Desktop Circular Cursor */}
-              <CustomCursor />
-
-              {/* Minimalist Floating Global Header */}
-              <Header />
-
-              {/* Page Main Content */}
-              <main className="relative z-10">{children}</main>
-            </SmoothScroll>
-          </PreloaderProvider>
+            {/* Page Main Content */}
+            <main className="relative z-10">{children}</main>
+          </SmoothScroll>
         </LanguageProvider>
       </body>
     </html>

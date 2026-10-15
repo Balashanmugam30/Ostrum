@@ -308,21 +308,14 @@ export function BackgroundCaustics() {
     scene.add(mesh);
 
     const textureLoader = new THREE.TextureLoader();
-    textureLoader.load(
-      '/images/bg.webp',
-      (tex) => {
-        tex.minFilter = THREE.LinearFilter;
-        tex.magFilter = THREE.LinearFilter;
-        material.uniforms.uTexture.value = tex;
-        if (tex.image) {
-          material.uniforms.uTextureResolution.value.set(tex.image.width, tex.image.height);
-        }
-      },
-      undefined,
-      (err) => {
-        console.warn('Background caustics texture failed to load', err);
+    textureLoader.load('/images/bg.webp', (tex) => {
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      material.uniforms.uTexture.value = tex;
+      if (tex.image) {
+        material.uniforms.uTextureResolution.value.set(tex.image.width, tex.image.height);
       }
-    );
+    });
 
     const mousePos = { x: 0.5, y: 0.5 };
     const targetPos = { x: 0.5, y: 0.5 };

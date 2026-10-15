@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { usePreloader } from '@/context/PreloaderContext';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -17,24 +15,10 @@ if (typeof window !== 'undefined') {
 let cachedModelScene: THREE.Group | null = null;
 
 export function OstrumContinuousJourney() {
-  const pathname = usePathname();
-  const isHomepage = pathname === '/' || pathname === '' || pathname === '/fr';
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const {
-    phase,
-    reportModelReady,
-    reportFirstFrame,
-    reportHeroTargetReady,
-    reportError,
-  } = usePreloader();
-
-  const phaseRef = useRef(phase);
-  phaseRef.current = phase;
-  const isModelReadyRef = useRef(false);
 
   useEffect(() => {
-    if (!isHomepage) return;
     const container = containerRef.current;
     if (!container) return;
 
@@ -61,9 +45,7 @@ export function OstrumContinuousJourney() {
         alpha: true,
         powerPreference: 'high-performance',
       });
-    } catch (err: any) {
-      console.warn('[3D Journey] WebGL init fallback:', err);
-      reportError(err?.message || 'WebGL not supported');
+    } catch {
       return;
     }
 
@@ -262,28 +244,18 @@ export function OstrumContinuousJourney() {
       pivotGroup.scale.set(baseScale, baseScale, baseScale);
       pivotGroup.add(rawGroup);
 
-      isModelReadyRef.current = true;
       setIsLoaded(true);
-      reportModelReady();
     };
 
     if (cachedModelScene) {
       setupModelMesh(cachedModelScene.clone(true));
     } else {
       const loader = new GLTFLoader();
-      loader.load(
-        '/models/monyedre-360.glb',
-        (gltf) => {
-          if (isDisposed) return;
-          cachedModelScene = gltf.scene;
-          setupModelMesh(gltf.scene.clone(true));
-        },
-        undefined,
-        (err: unknown) => {
-          console.warn('[3D Journey] Model load error, triggering fallback:', err);
-          reportError((err as any)?.message || 'GLTF model load failed');
-        }
-      );
+      loader.load('/models/monyedre-360.glb', (gltf) => {
+        if (isDisposed) return;
+        cachedModelScene = gltf.scene;
+        setupModelMesh(gltf.scene.clone(true));
+      });
     }
 
     // 7. Mathematical Screen-to-World Projection
@@ -341,7 +313,6 @@ export function OstrumContinuousJourney() {
         hDocX = svgRect.left + 104 * svgScale;
         hDocY = svgRect.top + 171 * svgScale + window.scrollY;
         hWidth = 185 * svgScale;
-        reportHeroTargetReady();
       }
 
       const heroPixelTarget = Math.max(32, hWidth * 0.72);
@@ -430,15 +401,6 @@ export function OstrumContinuousJourney() {
     let currentEnergy = 0;
     let isInitialized = false;
     let hasPlayedArrival = false;
-    let startRotY = 0;
-    let hasCapturedStartRot = false;
-    let hasReportedFirstFrame = false;
-    let handoffProgress = phaseRef.current === 'complete' ? 1 : 0;
-
-    const onHandoff = (e: Event) => {
-      handoffProgress = (e as CustomEvent<number>).detail ?? 0;
-    };
-    window.addEventListener('ostrum:handoff-progress', onHandoff);
 
     const animate = (time: number) => {
       animId = 0;
@@ -471,47 +433,14 @@ export function OstrumContinuousJourney() {
         }
       }
 
-      const isMob = window.innerWidth < 768;
-      const loaderScreenX = window.innerWidth * 0.50;
-      const loaderScreenY = window.innerHeight * 0.48;
-      const loaderScale = isMob ? 0.35 : 0.46;
-      const currentPhase = phaseRef.current;
-
       let targetScreenX: number;
       let targetScreenY: number;
       let targetScale: number;
       let targetRotY: number;
       let targetEnergyLevel = 0;
 
-      // Preloader Phase 1: Resting & Rotating in Center of Loader
-      if (currentPhase === 'loading') {
-        hasCapturedStartRot = false;
-        targetScreenX = loaderScreenX;
-        targetScreenY = loaderScreenY;
-        targetScale = loaderScale;
-        targetRotY = (time * 0.00065) % (Math.PI * 2);
-        targetEnergyLevel = 0;
-
-        // Dynamic sculptural studio lighting highlighting porcelain surface
-        keyLight.position.x = -2.5 + Math.sin(time * 0.0008) * 0.5;
-        keyLight.position.y = 3.6 + Math.cos(time * 0.0008) * 0.3;
-        rimLight.intensity = 2.2;
-      }
-      // Preloader Phase 2: Cinematic Travel from Loader Center into Hero 'O'
-      else if (currentPhase === 'handoff') {
-        if (!hasCapturedStartRot) {
-          startRotY = currentRotationY;
-          hasCapturedStartRot = true;
-        }
-        const hp = handoffProgress;
-        targetScreenX = loaderScreenX + (anchors.heroDocX - loaderScreenX) * hp;
-        targetScreenY = loaderScreenY + (anchors.heroDocY - loaderScreenY) * hp;
-        targetScale = loaderScale + (anchors.heroScale - loaderScale) * hp;
-        targetRotY = (1 - hp) * startRotY;
-        targetEnergyLevel = 0;
-      }
       // Stage 1: Journey (Hero 'O' -> Section 02)
-      else if (scrollY < dockStart) {
+      if (scrollY < dockStart) {
         const t = Math.min(1, Math.max(0, scrollY / (dockStart || 1)));
         const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
@@ -598,12 +527,6 @@ export function OstrumContinuousJourney() {
         currentRotationY = targetRotY;
         currentEnergy = targetEnergyLevel;
         isInitialized = true;
-      } else if (currentPhase === 'handoff') {
-        currentX = targetWorld.x;
-        currentY = targetWorld.y;
-        currentScale = targetScale;
-        currentRotationY = targetRotY;
-        currentEnergy = targetEnergyLevel;
       } else {
         const isPinnedState = scrollY >= dockStart && scrollY <= energyEnd;
         const posLerp = isPinnedState ? 0.35 : 0.18;
@@ -614,8 +537,8 @@ export function OstrumContinuousJourney() {
         currentEnergy += (targetEnergyLevel - currentEnergy) * 0.10;
       }
 
-      // Zero-G float: active during journey and loader
-      const isTraveling = currentPhase === 'loading' || currentPhase === 'handoff' || scrollY < dockStart;
+      // Zero-G float: active during journey only
+      const isTraveling = scrollY < dockStart;
       const floatOffset = isTraveling ? Math.sin(time * 0.0016) * 0.04 * currentScale : 0;
 
       modelRoot.position.set(currentX, currentY + floatOffset, 0);
@@ -671,10 +594,6 @@ export function OstrumContinuousJourney() {
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
-      if (!hasReportedFirstFrame && isModelReadyRef.current) {
-        hasReportedFirstFrame = true;
-        reportFirstFrame();
-      }
       animId = requestAnimationFrame(animate);
     };
 
@@ -723,7 +642,6 @@ export function OstrumContinuousJourney() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('ostrum:focus-bias', handleFocusBias);
       window.removeEventListener('ostrum:narrative-ready', onNarrativeReady);
-      window.removeEventListener('ostrum:handoff-progress', onHandoff);
       ScrollTrigger.removeEventListener('refresh', updateAnchors);
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
       renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
@@ -740,18 +658,12 @@ export function OstrumContinuousJourney() {
       filamentMat2.dispose();
       filamentMat3.dispose();
     };
-  }, [isHomepage, reportError, reportFirstFrame, reportHeroTargetReady, reportModelReady]);
-
-  if (!isHomepage) {
-    return null;
-  }
+  }, []);
 
   return (
     <div
       ref={containerRef}
-      className={`ostrum-continuous-journey fixed inset-0 pointer-events-none overflow-visible ${
-        phase !== 'complete' ? 'z-[35]' : 'z-[12]'
-      }`}
+      className="ostrum-continuous-journey fixed inset-0 pointer-events-none z-[12] overflow-visible"
       style={{
         opacity: 1,
         transition: 'opacity 0.4s ease',

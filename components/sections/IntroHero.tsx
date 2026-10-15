@@ -2,17 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { usePreloader } from '@/context/PreloaderContext';
 import { OstrumLogo } from '@/components/ui/OstrumLogo';
 import { LineByLine } from '@/components/ui/LineByLine';
 import { LivingThread } from '@/components/ui/LivingThread';
 
 export function IntroHero() {
   const { t } = useLanguage();
-  const { phase } = usePreloader();
   const [scrolled, setScrolled] = useState(false);
-
-  const isRevealed = phase === 'handoff' || phase === 'complete';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,20 +22,10 @@ export function IntroHero() {
   return (
     <section className="intro relative w-full h-[100svh] min-h-[640px] flex flex-col items-center justify-center overflow-hidden px-4">
       {/* Living Connected Strand - Signature organic art element */}
-      <div
-        className={`transition-opacity duration-700 ease-out ${
-          isRevealed ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-      >
-        <LivingThread />
-      </div>
+      <LivingThread />
 
       {/* Monumental Upward Parallax Wordmark */}
-      <div
-        className={`w-[85vw] max-w-[1250px] -mt-[4vw] z-10 transition-all duration-700 ease-out ${
-          isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'
-        }`}
-      >
+      <div className="w-[85vw] max-w-[1250px] -mt-[4vw] z-10 transition-transform duration-300">
         <OstrumLogo
           hasParallax
           isScrolled={scrolled}
@@ -48,11 +34,7 @@ export function IntroHero() {
       </div>
 
       {/* Main Statement & Dual Positioning */}
-      <div
-        className={`mt-8 md:mt-12 text-center max-w-[760px] px-6 z-10 flex flex-col items-center transition-all duration-700 ease-out ${
-          isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
-        }`}
-      >
+      <div className="mt-8 md:mt-12 text-center max-w-[760px] px-6 z-10 flex flex-col items-center">
         {/* Primary Statement: Business Building & Product Creation */}
         <LineByLine
           tag="h1"
@@ -60,7 +42,6 @@ export function IntroHero() {
           text={t.hero.headline}
           delay={0.1}
           auto={true}
-          trigger={isRevealed}
         />
 
         {/* Supporting Philosophy */}
@@ -73,14 +54,13 @@ export function IntroHero() {
           ]}
           delay={0.25}
           auto={true}
-          trigger={isRevealed}
         />
       </div>
 
       {/* Subtle Restrained Scroll Cue */}
       <div
         className={`scroll-cue absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] tracking-[0.24em] text-white/45 uppercase font-sans select-none pointer-events-none transition-opacity duration-500 z-10 ${
-          scrolled || !isRevealed ? 'opacity-0' : 'opacity-100'
+          scrolled ? 'opacity-0' : 'opacity-100'
         }`}
         aria-hidden="true"
       >
