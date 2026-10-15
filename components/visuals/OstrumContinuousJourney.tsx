@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { usePreloader } from '@/context/PreloaderContext';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -17,6 +18,23 @@ let cachedModelScene: THREE.Group | null = null;
 export function OstrumContinuousJourney() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const {
+    phase,
+    energyProgress,
+    handoffProgress,
+    reportModelReady,
+    reportFirstFrame,
+    reportHeroTargetReady,
+    reportError,
+  } = usePreloader();
+
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
+  const energyRef = useRef(energyProgress);
+  energyRef.current = energyProgress;
+  const handoffRef = useRef(handoffProgress);
+  handoffRef.current = handoffProgress;
+  const isModelReadyRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -45,7 +63,9 @@ export function OstrumContinuousJourney() {
         alpha: true,
         powerPreference: 'high-performance',
       });
-    } catch {
+    } catch (err: any) {
+      console.warn('[3D Journey] WebGL init fallback:', err);
+      reportError(err?.message || 'WebGL not supported');
       return;
     }
 
@@ -244,18 +264,28 @@ export function OstrumContinuousJourney() {
       pivotGroup.scale.set(baseScale, baseScale, baseScale);
       pivotGroup.add(rawGroup);
 
+      isModelReadyRef.current = true;
       setIsLoaded(true);
+      reportModelReady();
     };
 
     if (cachedModelScene) {
       setupModelMesh(cachedModelScene.clone(true));
     } else {
       const loader = new GLTFLoader();
-      loader.load('/models/monyedre-360.glb', (gltf) => {
-        if (isDisposed) return;
-        cachedModelScene = gltf.scene;
-        setupModelMesh(gltf.scene.clone(true));
-      });
+      loader.load(
+        '/models/monyedre-360.glb',
+        (gltf) => {
+          if (isDisposed) return;
+          cachedModelScene = gltf.scene;
+          setupModelMesh(gltf.scene.clone(true));
+        },
+        undefined,
+        (err: unknown) => {
+          console.warn('[3D Journey] Model load error, triggering fallback:', err);
+          reportError((err as any)?.message || 'GLTF model load failed');
+        }
+      );
     }
 
     // 7. Mathematical Screen-to-World Projection
@@ -313,6 +343,7 @@ export function OstrumContinuousJourney() {
         hDocX = svgRect.left + 104 * svgScale;
         hDocY = svgRect.top + 171 * svgScale + window.scrollY;
         hWidth = 185 * svgScale;
+        reportHeroTargetReady();
       }
 
       const heroPixelTarget = Math.max(32, hWidth * 0.72);
@@ -401,6 +432,9 @@ export function OstrumContinuousJourney() {
     let currentEnergy = 0;
     let isInitialized = false;
     let hasPlayedArrival = false;
+    let startRotY = 0;
+    let hasCapturedStartRot = false;
+    let hasReportedFirstFrame = false;
 
     const animate = (time: number) => {
       animId = 0;
@@ -433,14 +467,96 @@ export function OstrumContinuousJourney() {
         }
       }
 
+      const currentPhase = phaseRef.current;
+      const isMob = window.innerWidth < 768;
+      const loaderScreenX = window.innerWidth * 0.50;
+      const loaderScreenY = window.innerHeight * 0.48;
+      const loaderScale = isMob ? 0.36 : 0.48;
+
       let targetScreenX: number;
       let targetScreenY: number;
       let targetScale: number;
       let targetRotY: number;
       let targetEnergyLevel = 0;
 
-      // Stage 1: Journey (Hero 'O' -> Section 02)
-      if (scrollY < dockStart) {
+      // =========================================================================
+      // PRELOADER STAGE A: PEARL EMERGENCE
+      // Centered, deliberate pearl porcelain rotation, studio lighting
+      // =========================================================================
+      if (currentPhase === 'stageA') {
+        hasCapturedStartRot = false;
+        targetScreenX = loaderScreenX;
+        targetScreenY = loaderScreenY;
+        targetScale = loaderScale;
+        targetRotY = (time * 0.00065) % (Math.PI * 2);
+        targetEnergyLevel = 0;
+
+        // Dynamic sculptural studio lighting highlighting pearl porcelain surface
+        keyLight.color.set('#fff7ee');
+        keyLight.intensity = 2.4;
+        keyLight.position.x = -2.5 + Math.sin(time * 0.0008) * 0.4;
+        keyLight.position.y = 3.6 + Math.cos(time * 0.0008) * 0.3;
+        hemiLight.intensity = 1.15;
+        rimLight.color.set('#ff8570');
+        rimLight.intensity = 1.3;
+        energyRubyLight.intensity = 0;
+        energyAmberLight.intensity = 0;
+        material.sheen = 0.42;
+        material.sheenColor.set('#fcecd4');
+      }
+      // =========================================================================
+      // PRELOADER STAGE B: CRIMSON ENERGY TRANSITION
+      // Centerpiece energy surge across sculpture
+      // =========================================================================
+      else if (currentPhase === 'stageB') {
+        hasCapturedStartRot = false;
+        const ep = energyRef.current;
+        targetScreenX = loaderScreenX;
+        targetScreenY = loaderScreenY;
+        // Subtle sculptural breathing pulse during crimson energy burst
+        targetScale = loaderScale + Math.sin(ep * Math.PI) * 0.05;
+        targetRotY = (time * 0.00085) % (Math.PI * 2);
+        targetEnergyLevel = ep;
+
+        // Dramatic crimson energy response on 3D sculpture
+        keyLight.color.set('#ffebe5');
+        keyLight.intensity = 2.4 + ep * 0.9;
+        rimLight.color.set('#ff1e2e');
+        rimLight.intensity = 1.6 + ep * 3.2;
+        energyRubyLight.intensity = ep * 4.2;
+        energyAmberLight.intensity = ep * 2.6;
+        material.sheen = 0.42 + ep * 0.45;
+        material.sheenColor.set('#ff2a3e');
+      }
+      // =========================================================================
+      // PRELOADER STAGE C: HERO 'O' HANDOFF
+      // Seamless cinematic travel from center into the Hero 'O' motif
+      // =========================================================================
+      else if (currentPhase === 'stageC') {
+        if (!hasCapturedStartRot) {
+          startRotY = currentRotationY;
+          hasCapturedStartRot = true;
+        }
+        const hp = handoffRef.current;
+        targetScreenX = loaderScreenX + (anchors.heroDocX - loaderScreenX) * hp;
+        targetScreenY = loaderScreenY + (anchors.heroDocY - loaderScreenY) * hp;
+        targetScale = loaderScale + (anchors.heroScale - loaderScale) * hp;
+        targetRotY = (1 - hp) * startRotY;
+        targetEnergyLevel = (1 - hp) * 0.35;
+
+        // Smoothly settle lights back to hero baseline
+        keyLight.color.set('#fff7ee');
+        keyLight.intensity = 2.4 - hp * 0.2;
+        rimLight.color.set('#ff4d30');
+        rimLight.intensity = 3.5 - hp * 1.7;
+        energyRubyLight.intensity = (1 - hp) * 1.5;
+        energyAmberLight.intensity = (1 - hp) * 1.0;
+        material.sheen = 0.65 - hp * 0.25;
+      }
+      // =========================================================================
+      // STAGE 1: Journey (Hero 'O' -> Section 02)
+      // =========================================================================
+      else if (scrollY < dockStart) {
         const t = Math.min(1, Math.max(0, scrollY / (dockStart || 1)));
         const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
@@ -527,6 +643,12 @@ export function OstrumContinuousJourney() {
         currentRotationY = targetRotY;
         currentEnergy = targetEnergyLevel;
         isInitialized = true;
+      } else if (currentPhase === 'stageC') {
+        currentX = targetWorld.x;
+        currentY = targetWorld.y;
+        currentScale = targetScale;
+        currentRotationY = targetRotY;
+        currentEnergy = targetEnergyLevel;
       } else {
         const isPinnedState = scrollY >= dockStart && scrollY <= energyEnd;
         const posLerp = isPinnedState ? 0.35 : 0.18;
@@ -537,8 +659,8 @@ export function OstrumContinuousJourney() {
         currentEnergy += (targetEnergyLevel - currentEnergy) * 0.10;
       }
 
-      // Zero-G float: active during journey only
-      const isTraveling = scrollY < dockStart;
+      // Zero-G float: active during journey and loader
+      const isTraveling = currentPhase === 'stageA' || currentPhase === 'stageB' || currentPhase === 'stageC' || scrollY < dockStart;
       const floatOffset = isTraveling ? Math.sin(time * 0.0016) * 0.04 * currentScale : 0;
 
       modelRoot.position.set(currentX, currentY + floatOffset, 0);
@@ -594,6 +716,10 @@ export function OstrumContinuousJourney() {
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
+      if (!hasReportedFirstFrame && isModelReadyRef.current) {
+        hasReportedFirstFrame = true;
+        reportFirstFrame();
+      }
       animId = requestAnimationFrame(animate);
     };
 
@@ -658,12 +784,14 @@ export function OstrumContinuousJourney() {
       filamentMat2.dispose();
       filamentMat3.dispose();
     };
-  }, []);
+  }, [reportError, reportFirstFrame, reportHeroTargetReady, reportModelReady]);
 
   return (
     <div
       ref={containerRef}
-      className="ostrum-continuous-journey fixed inset-0 pointer-events-none z-[12] overflow-visible"
+      className={`ostrum-continuous-journey fixed inset-0 pointer-events-none overflow-visible ${
+        phase !== 'complete' ? 'z-[35]' : 'z-[12]'
+      }`}
       style={{
         opacity: 1,
         transition: 'opacity 0.4s ease',

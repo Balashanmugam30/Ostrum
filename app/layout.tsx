@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
+import { PreloaderProvider } from '@/context/PreloaderContext';
+import { OstrumPreloader } from '@/components/ui/OstrumPreloader';
+import { OstrumContinuousJourney } from '@/components/visuals/OstrumContinuousJourney';
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
 import { CustomCursor } from '@/components/ui/CustomCursor';
@@ -46,19 +49,29 @@ export default function RootLayout({
     <html lang="en" className="dark bg-black">
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black">
         <LanguageProvider>
-          <SmoothScroll>
-            {/* Fixed Luminous Caustics WebGL Background */}
-            <BackgroundCaustics />
+          <PreloaderProvider>
+            <SmoothScroll>
+              {/* Fixed Luminous Caustics WebGL Background */}
+              <BackgroundCaustics />
 
-            {/* Custom Precision Desktop Circular Cursor */}
-            <CustomCursor />
+              {/* Luxury Cinematic 3D Preloader (Stage A Pearl -> Stage B Crimson -> Stage C Handoff) */}
+              <OstrumPreloader />
 
-            {/* Minimalist Floating Global Header */}
-            <Header />
+              {/* Master Continuous 3D Möbius Journey (z-[35] during preloader, z-[12] after complete) */}
+              <OstrumContinuousJourney />
 
-            {/* Page Main Content */}
-            <main className="relative z-10">{children}</main>
-          </SmoothScroll>
+              {/* Custom Precision Desktop Circular Cursor */}
+              <CustomCursor />
+
+              {/* Minimalist Floating Global Header */}
+              <Header />
+
+              {/* Page Main Content */}
+              <main id="main-content" className="relative z-10 w-full min-h-screen">
+                {children}
+              </main>
+            </SmoothScroll>
+          </PreloaderProvider>
         </LanguageProvider>
       </body>
     </html>

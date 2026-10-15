@@ -10,6 +10,7 @@ interface LineByLineProps {
   className?: string;
   auto?: boolean;
   repeat?: boolean;
+  trigger?: boolean;
   children?: React.ReactNode;
 }
 
@@ -35,12 +36,20 @@ export function LineByLine({
   className = '',
   auto = true,
   repeat = false,
+  trigger,
   children,
 }: LineByLineProps) {
   const elRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    if (trigger !== undefined) {
+      if (trigger) {
+        setIsVisible(true);
+      }
+      return;
+    }
+
     const el = elRef.current;
     if (!el) return;
 
@@ -74,7 +83,7 @@ export function LineByLine({
     return () => {
       observer.disconnect();
     };
-  }, [auto, repeat]);
+  }, [auto, repeat, trigger]);
 
   const rawLines: string[] = lines || (text ? text.split('\n') : []);
   const Tag = tag as any;
