@@ -47,7 +47,8 @@ export const fitSize = (
   cap: number
 ): number => {
   if (!(measuredAt100 > 0) || !(target > 0)) return 0;
-  const size = (100 * target) / measuredAt100;
+  const targetWidth = target * 0.955;
+  const size = (100 * targetWidth) / measuredAt100;
   return cap > 0 ? Math.min(size, cap) : size;
 };
 
@@ -179,6 +180,7 @@ const CSS = `
   width: 100%;
 }
 .bwf-word-box {
+  width: 100%;
   padding: 0 clamp(16px, 3.5cqw, 48px);
   max-width: 100%;
   margin: 0 auto;
@@ -192,7 +194,7 @@ const CSS = `
   white-space: nowrap;
   font-weight: var(--bwf-ww);
   line-height: 0.88;
-  letter-spacing: -0.04em;
+  letter-spacing: normal;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -201,15 +203,21 @@ const CSS = `
   translate: 0 0;
   transition: translate 1.25s cubic-bezier(.16, .84, .2, 1) var(--bwf-d, 0ms);
 }
+.bwf-lw:not(:last-child) {
+  margin-right: -0.025em;
+}
 .bwf[data-in='false'] .bwf-lw {
   translate: 0 85%;
 }
 
-/* Letters with traveling beam, pointer glow, and periodic subtle shine */
+/* Letters with traveling beam and pointer glow */
 .bwf-l {
   display: inline-block;
   cursor: pointer;
   color: transparent;
+  letter-spacing: normal;
+  padding-right: 0.04em;
+  margin-right: -0.04em;
   -webkit-background-clip: text;
   background-clip: text;
   background-repeat: no-repeat;
@@ -218,16 +226,7 @@ const CSS = `
   background-image:
     /* Layer 1: Mouse pointer glow */
     radial-gradient(circle 24cqw at var(--bwf-px) var(--bwf-py), rgba(var(--bwf-lit), calc(var(--bwf-g) * 0.95)), transparent 70%),
-    /* Layer 2: Periodic automatic subtle shine sweep across O->M */
-    linear-gradient(
-      var(--bwf-shine-ang, 115deg),
-      transparent calc(var(--bwf-sb, -30%) - 6%),
-      rgba(var(--bwf-acc), calc(var(--bwf-so, 0) * 0.40)) calc(var(--bwf-sb, -30%) - 3%),
-      rgba(255, 252, 250, calc(var(--bwf-so, 0) * 0.95)) var(--bwf-sb, -30%),
-      rgba(var(--bwf-acc), calc(var(--bwf-so, 0) * 0.40)) calc(var(--bwf-sb, -30%) + 3%),
-      transparent calc(var(--bwf-sb, -30%) + 6%)
-    ),
-    /* Layer 3: Ambient/interactive beam */
+    /* Layer 2: Ambient/interactive beam */
     linear-gradient(
       var(--bwf-ang),
       transparent calc(var(--bwf-b) - 10%),
@@ -238,7 +237,7 @@ const CSS = `
       rgba(var(--bwf-acc), 0.3) calc(var(--bwf-b) + 5%),
       transparent calc(var(--bwf-b) + 10%)
     ),
-    /* Layer 4: Base vertical wordmark gradient */
+    /* Layer 3: Base vertical wordmark gradient */
     linear-gradient(180deg, var(--bwf-wt) var(--bwf-top), var(--bwf-wf) var(--bwf-bot));
   transition: transform .5s cubic-bezier(.2, .9, .25, 1.2), filter .4s;
   transform-origin: 50% 100%;
@@ -326,12 +325,12 @@ export default function BeamWordmarkFooter({
       const padRight = parseFloat(getComputedStyle(wb).paddingRight) || 0;
       const target = wb.clientWidth - (padLeft + padRight);
       inner.style.fontSize = '100px';
-      const measured = inner.offsetWidth;
+      const measured = inner.getBoundingClientRect().width || inner.offsetWidth;
       setBase(
         measureBaseline(getComputedStyle(inner).fontFamily, wordWeight, word)
       );
-      // Fit to fill 96-98% width of the container
-      const next = fitSize(measured, target, target * 0.55);
+      // Fit to fill ~95.5% width of the container
+      const next = fitSize(measured, target, target * 0.45);
       inner.style.fontSize = next + 'px';
       setSize(next);
       place();
@@ -372,11 +371,14 @@ export default function BeamWordmarkFooter({
     const ro = new ResizeObserver(schedule);
     ro.observe(root);
     let alive = true;
-    document.fonts?.ready.then(() => alive && schedule());
+    const onFontLoad = () => alive && schedule();
+    document.fonts?.ready.then(onFontLoad);
+    document.fonts?.addEventListener?.('loadingdone', onFontLoad);
     return () => {
       alive = false;
       cancelAnimationFrame(frame);
       ro.disconnect();
+      document.fonts?.removeEventListener?.('loadingdone', onFontLoad);
     };
   }, [word, fontSans, wordWeight]);
 
@@ -453,82 +455,6 @@ export default function BeamWordmarkFooter({
     return () => cancelAnimationFrame(raf);
   }, [reduced, animate, visible]);
 
-  // Periodic subtle shine sweep (O to M) across the giant OSTRUM wordmark (~every 22s for ~2.2s)
-  React.useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
-    if (reduced || !animate || !visible) {
-      root.style.setProperty('--bwf-so', '0');
-      root.style.setProperty('--bwf-sb', '-30%');
-      return;
-    }
-
-    let timerId: ReturnType<typeof setTimeout> | null = null;
-    let animId = 0;
-    let isCancelled = false;
-
-    const runShineSweep = () => {
-      if (isCancelled || !visible) return;
-
-      const duration = 2200; // ~2.2 second pass
-      const startPos = -15; // starts slightly to the left of 'O'
-      const endPos = 115; // finishes slightly to the right of 'M'
-      const startTime = performance.now();
-
-      const sweepFrame = (now: number) => {
-        if (isCancelled) return;
-        const elapsed = now - startTime;
-        const rawProgress = Math.min(1, Math.max(0, elapsed / duration));
-
-        // Smooth cubic ease-in-out for natural, dignified sweep motion
-        const easedProgress =
-          rawProgress < 0.5
-            ? 4 * rawProgress * rawProgress * rawProgress
-            : 1 - Math.pow(-2 * rawProgress + 2, 3) / 2;
-
-        const currentPos = startPos + (endPos - startPos) * easedProgress;
-
-        // Smooth fade-in across first 12% and fade-out across last 12%
-        let opacity = 1;
-        if (rawProgress < 0.12) {
-          opacity = rawProgress / 0.12;
-        } else if (rawProgress > 0.88) {
-          opacity = (1 - rawProgress) / 0.12;
-        }
-
-        root.style.setProperty('--bwf-sb', `${currentPos.toFixed(2)}%`);
-        root.style.setProperty('--bwf-so', opacity.toFixed(3));
-
-        if (rawProgress < 1) {
-          animId = requestAnimationFrame(sweepFrame);
-        } else {
-          // Reset shine state and schedule the next periodic sweep in ~22 seconds
-          root.style.setProperty('--bwf-so', '0');
-          root.style.setProperty('--bwf-sb', '-30%');
-          if (!isCancelled) {
-            timerId = setTimeout(runShineSweep, 22000);
-          }
-        }
-      };
-
-      animId = requestAnimationFrame(sweepFrame);
-    };
-
-    // First subtle sweep runs 3.5s after entering viewport, then repeats every 22s
-    timerId = setTimeout(runShineSweep, 3500);
-
-    return () => {
-      isCancelled = true;
-      if (timerId) clearTimeout(timerId);
-      cancelAnimationFrame(animId);
-      if (root) {
-        root.style.setProperty('--bwf-so', '0');
-        root.style.setProperty('--bwf-sb', '-30%');
-      }
-    };
-  }, [reduced, animate, visible]);
-
   const onPointer = (e: React.PointerEvent<HTMLElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
     const p = ptr.current;
@@ -563,9 +489,6 @@ export default function BeamWordmarkFooter({
     '--bwf-px': '50%',
     '--bwf-py': '50%',
     '--bwf-g': '0',
-    '--bwf-sb': '-30%',
-    '--bwf-so': '0',
-    '--bwf-shine-ang': '115deg',
     '--bwf-top': '0px',
     '--bwf-bot': '100%',
   } as React.CSSProperties;
