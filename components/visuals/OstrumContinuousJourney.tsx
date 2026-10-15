@@ -468,10 +468,21 @@ export function OstrumContinuousJourney() {
       }
 
       const currentPhase = phaseRef.current;
-      const isMob = window.innerWidth < 768;
-      const loaderScreenX = window.innerWidth * 0.50;
-      const loaderScreenY = window.innerHeight * 0.48;
-      const loaderScale = isMob ? 0.36 : 0.48;
+
+      // =========================================================================
+      // LOADER STAGES A & B: 3D SCULPTURE STRICTLY HIDDEN
+      // No 3D model, no WebGL canvas during the 2D intro animation
+      // =========================================================================
+      if (currentPhase === 'stageA' || currentPhase === 'stageB') {
+        modelRoot.visible = false;
+        if (container.style.opacity !== '0') {
+          container.style.opacity = '0';
+        }
+        animId = requestAnimationFrame(animate);
+        return;
+      }
+
+      modelRoot.visible = true;
 
       let targetScreenX: number;
       let targetScreenY: number;
@@ -480,78 +491,26 @@ export function OstrumContinuousJourney() {
       let targetEnergyLevel = 0;
 
       // =========================================================================
-      // PRELOADER STAGE A: PEARL EMERGENCE
-      // Centered, deliberate pearl porcelain rotation, studio lighting
+      // STAGE C: REVEAL IN HERO 'O'
+      // Model is cleanly docked inside Hero 'O', fading in with handoff progress
       // =========================================================================
-      if (currentPhase === 'stageA') {
-        hasCapturedStartRot = false;
-        targetScreenX = loaderScreenX;
-        targetScreenY = loaderScreenY;
-        targetScale = loaderScale;
-        targetRotY = (time * 0.00065) % (Math.PI * 2);
+      if (currentPhase === 'stageC') {
+        const hp = handoffRef.current;
+        targetScreenX = anchors.heroDocX;
+        targetScreenY = anchors.heroDocY;
+        targetScale = anchors.heroScale;
+        targetRotY = 0;
         targetEnergyLevel = 0;
 
-        // Dynamic sculptural studio lighting highlighting pearl porcelain surface
+        container.style.opacity = String(Math.min(1, hp * 1.2));
+
         keyLight.color.set('#fff7ee');
-        keyLight.intensity = 2.4;
-        keyLight.position.x = -2.5 + Math.sin(time * 0.0008) * 0.4;
-        keyLight.position.y = 3.6 + Math.cos(time * 0.0008) * 0.3;
-        hemiLight.intensity = 1.15;
-        rimLight.color.set('#ff8570');
-        rimLight.intensity = 1.3;
+        keyLight.intensity = 2.2;
+        rimLight.color.set('#ff4d30');
+        rimLight.intensity = 1.8;
         energyRubyLight.intensity = 0;
         energyAmberLight.intensity = 0;
-        material.sheen = 0.42;
-        material.sheenColor.set('#fcecd4');
-      }
-      // =========================================================================
-      // PRELOADER STAGE B: CRIMSON ENERGY TRANSITION
-      // Centerpiece energy surge across sculpture
-      // =========================================================================
-      else if (currentPhase === 'stageB') {
-        hasCapturedStartRot = false;
-        const ep = energyRef.current;
-        targetScreenX = loaderScreenX;
-        targetScreenY = loaderScreenY;
-        // Subtle sculptural breathing pulse during crimson energy burst
-        targetScale = loaderScale + Math.sin(ep * Math.PI) * 0.05;
-        targetRotY = (time * 0.00085) % (Math.PI * 2);
-        targetEnergyLevel = ep;
-
-        // Dramatic crimson energy response on 3D sculpture
-        keyLight.color.set('#ffebe5');
-        keyLight.intensity = 2.4 + ep * 0.9;
-        rimLight.color.set('#ff1e2e');
-        rimLight.intensity = 1.6 + ep * 3.2;
-        energyRubyLight.intensity = ep * 4.2;
-        energyAmberLight.intensity = ep * 2.6;
-        material.sheen = 0.42 + ep * 0.45;
-        material.sheenColor.set('#ff2a3e');
-      }
-      // =========================================================================
-      // PRELOADER STAGE C: HERO 'O' HANDOFF
-      // Seamless cinematic travel from center into the Hero 'O' motif
-      // =========================================================================
-      else if (currentPhase === 'stageC') {
-        if (!hasCapturedStartRot) {
-          startRotY = currentRotationY;
-          hasCapturedStartRot = true;
-        }
-        const hp = handoffRef.current;
-        targetScreenX = loaderScreenX + (anchors.heroDocX - loaderScreenX) * hp;
-        targetScreenY = loaderScreenY + (anchors.heroDocY - loaderScreenY) * hp;
-        targetScale = loaderScale + (anchors.heroScale - loaderScale) * hp;
-        targetRotY = (1 - hp) * startRotY;
-        targetEnergyLevel = (1 - hp) * 0.35;
-
-        // Smoothly settle lights back to hero baseline
-        keyLight.color.set('#fff7ee');
-        keyLight.intensity = 2.4 - hp * 0.2;
-        rimLight.color.set('#ff4d30');
-        rimLight.intensity = 3.5 - hp * 1.7;
-        energyRubyLight.intensity = (1 - hp) * 1.5;
-        energyAmberLight.intensity = (1 - hp) * 1.0;
-        material.sheen = 0.65 - hp * 0.25;
+        material.sheen = 0.40;
       }
       // =========================================================================
       // STAGE 1: Journey (Hero 'O' -> Section 02)
@@ -659,8 +618,8 @@ export function OstrumContinuousJourney() {
         currentEnergy += (targetEnergyLevel - currentEnergy) * 0.10;
       }
 
-      // Zero-G float: active during journey and loader
-      const isTraveling = currentPhase === 'stageA' || currentPhase === 'stageB' || currentPhase === 'stageC' || scrollY < dockStart;
+      // Zero-G float: active during journey only
+      const isTraveling = scrollY < dockStart;
       const floatOffset = isTraveling ? Math.sin(time * 0.0016) * 0.04 * currentScale : 0;
 
       modelRoot.position.set(currentX, currentY + floatOffset, 0);
@@ -789,11 +748,9 @@ export function OstrumContinuousJourney() {
   return (
     <div
       ref={containerRef}
-      className={`ostrum-continuous-journey fixed inset-0 pointer-events-none overflow-visible ${
-        phase !== 'complete' ? 'z-[35]' : 'z-[12]'
-      }`}
+      className="ostrum-continuous-journey fixed inset-0 pointer-events-none z-[12] overflow-visible"
       style={{
-        opacity: 1,
+        opacity: 0,
         transition: 'opacity 0.4s ease',
       }}
       aria-hidden="true"

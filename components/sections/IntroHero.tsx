@@ -9,10 +9,10 @@ import { LivingThread } from '@/components/ui/LivingThread';
 
 export function IntroHero() {
   const { t } = useLanguage();
-  const { phase, handoffProgress } = usePreloader();
+  const { phase } = usePreloader();
   const [scrolled, setScrolled] = useState(false);
 
-  const isRevealed = (phase === 'stageC' && handoffProgress >= 0.45) || phase === 'complete';
+  const isRevealed = phase === 'stageC' || phase === 'complete';
 
   useEffect(() => {
     const handleScroll = () => {
