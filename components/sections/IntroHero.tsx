@@ -2,13 +2,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { usePreloader } from '@/context/PreloaderContext';
 import { OstrumLogo } from '@/components/ui/OstrumLogo';
 import { LineByLine } from '@/components/ui/LineByLine';
 import { LivingThread } from '@/components/ui/LivingThread';
 
 export function IntroHero() {
   const { t } = useLanguage();
+  const { phase } = usePreloader();
   const [scrolled, setScrolled] = useState(false);
+
+  const isRevealed = phase === 'handoff' || phase === 'complete';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,6 +46,7 @@ export function IntroHero() {
           text={t.hero.headline}
           delay={0.1}
           auto={true}
+          trigger={isRevealed}
         />
 
         {/* Supporting Philosophy */}
@@ -54,13 +59,14 @@ export function IntroHero() {
           ]}
           delay={0.25}
           auto={true}
+          trigger={isRevealed}
         />
       </div>
 
       {/* Subtle Restrained Scroll Cue */}
       <div
         className={`scroll-cue absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] tracking-[0.24em] text-white/45 uppercase font-sans select-none pointer-events-none transition-opacity duration-500 z-10 ${
-          scrolled ? 'opacity-0' : 'opacity-100'
+          scrolled || !isRevealed ? 'opacity-0' : 'opacity-100'
         }`}
         aria-hidden="true"
       >

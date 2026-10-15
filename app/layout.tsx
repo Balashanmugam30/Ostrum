@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
+import { PreloaderProvider } from '@/context/PreloaderContext';
+import { OstrumPreloader } from '@/components/ui/OstrumPreloader';
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
 import { CustomCursor } from '@/components/ui/CustomCursor';
@@ -46,19 +48,24 @@ export default function RootLayout({
     <html lang="en" className="dark bg-black">
       <body className="bg-black text-white antialiased selection:bg-white selection:text-black">
         <LanguageProvider>
-          <SmoothScroll>
-            {/* Fixed Luminous Caustics WebGL Background */}
-            <BackgroundCaustics />
+          <PreloaderProvider>
+            <SmoothScroll>
+              {/* Luxury Cinematic 3D Preloader Overlay */}
+              <OstrumPreloader />
 
-            {/* Custom Precision Desktop Circular Cursor */}
-            <CustomCursor />
+              {/* Fixed Luminous Caustics WebGL Background */}
+              <BackgroundCaustics />
 
-            {/* Minimalist Floating Global Header */}
-            <Header />
+              {/* Custom Precision Desktop Circular Cursor */}
+              <CustomCursor />
 
-            {/* Page Main Content */}
-            <main className="relative z-10">{children}</main>
-          </SmoothScroll>
+              {/* Minimalist Floating Global Header */}
+              <Header />
+
+              {/* Page Main Content */}
+              <main className="relative z-10">{children}</main>
+            </SmoothScroll>
+          </PreloaderProvider>
         </LanguageProvider>
       </body>
     </html>
