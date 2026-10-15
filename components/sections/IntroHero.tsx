@@ -26,10 +26,20 @@ export function IntroHero() {
   return (
     <section className="intro relative w-full h-[100svh] min-h-[640px] flex flex-col items-center justify-center overflow-hidden px-4">
       {/* Living Connected Strand - Signature organic art element */}
-      <LivingThread />
+      <div
+        className={`transition-opacity duration-700 ease-out ${
+          isRevealed ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <LivingThread />
+      </div>
 
       {/* Monumental Upward Parallax Wordmark */}
-      <div className="w-[85vw] max-w-[1250px] -mt-[4vw] z-10 transition-transform duration-300">
+      <div
+        className={`w-[85vw] max-w-[1250px] -mt-[4vw] z-10 transition-all duration-700 ease-out ${
+          isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'
+        }`}
+      >
         <OstrumLogo
           hasParallax
           isScrolled={scrolled}
@@ -38,7 +48,11 @@ export function IntroHero() {
       </div>
 
       {/* Main Statement & Dual Positioning */}
-      <div className="mt-8 md:mt-12 text-center max-w-[760px] px-6 z-10 flex flex-col items-center">
+      <div
+        className={`mt-8 md:mt-12 text-center max-w-[760px] px-6 z-10 flex flex-col items-center transition-all duration-700 ease-out ${
+          isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+        }`}
+      >
         {/* Primary Statement: Business Building & Product Creation */}
         <LineByLine
           tag="h1"

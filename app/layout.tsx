@@ -3,6 +3,7 @@ import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { PreloaderProvider } from '@/context/PreloaderContext';
 import { OstrumPreloader } from '@/components/ui/OstrumPreloader';
+import { OstrumContinuousJourney } from '@/components/visuals/OstrumContinuousJourney';
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
 import { CustomCursor } from '@/components/ui/CustomCursor';
@@ -50,11 +51,14 @@ export default function RootLayout({
         <LanguageProvider>
           <PreloaderProvider>
             <SmoothScroll>
-              {/* Luxury Cinematic 3D Preloader Overlay */}
-              <OstrumPreloader />
-
               {/* Fixed Luminous Caustics WebGL Background */}
               <BackgroundCaustics />
+
+              {/* Luxury Cinematic Multi-color Preloader Atmosphere (z-[25]) */}
+              <OstrumPreloader />
+
+              {/* Continuous 3D Journey Canvas (z-[35] during loader, z-[12] after complete) */}
+              <OstrumContinuousJourney />
 
               {/* Custom Precision Desktop Circular Cursor */}
               <CustomCursor />

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { gsap } from 'gsap';
@@ -16,6 +17,8 @@ if (typeof window !== 'undefined') {
 let cachedModelScene: THREE.Group | null = null;
 
 export function OstrumContinuousJourney() {
+  const pathname = usePathname();
+  const isHomepage = pathname === '/' || pathname === '' || pathname === '/fr';
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const {
@@ -31,6 +34,7 @@ export function OstrumContinuousJourney() {
   const isModelReadyRef = useRef(false);
 
   useEffect(() => {
+    if (!isHomepage) return;
     const container = containerRef.current;
     if (!container) return;
 
@@ -470,7 +474,7 @@ export function OstrumContinuousJourney() {
       const isMob = window.innerWidth < 768;
       const loaderScreenX = window.innerWidth * 0.50;
       const loaderScreenY = window.innerHeight * 0.48;
-      const loaderScale = isMob ? 0.30 : 0.42;
+      const loaderScale = isMob ? 0.35 : 0.46;
       const currentPhase = phaseRef.current;
 
       let targetScreenX: number;
@@ -487,6 +491,11 @@ export function OstrumContinuousJourney() {
         targetScale = loaderScale;
         targetRotY = (time * 0.00065) % (Math.PI * 2);
         targetEnergyLevel = 0;
+
+        // Dynamic sculptural studio lighting highlighting porcelain surface
+        keyLight.position.x = -2.5 + Math.sin(time * 0.0008) * 0.5;
+        keyLight.position.y = 3.6 + Math.cos(time * 0.0008) * 0.3;
+        rimLight.intensity = 2.2;
       }
       // Preloader Phase 2: Cinematic Travel from Loader Center into Hero 'O'
       else if (currentPhase === 'handoff') {
@@ -731,13 +740,17 @@ export function OstrumContinuousJourney() {
       filamentMat2.dispose();
       filamentMat3.dispose();
     };
-  }, [reportError, reportFirstFrame, reportHeroTargetReady, reportModelReady]);
+  }, [isHomepage, reportError, reportFirstFrame, reportHeroTargetReady, reportModelReady]);
+
+  if (!isHomepage) {
+    return null;
+  }
 
   return (
     <div
       ref={containerRef}
       className={`ostrum-continuous-journey fixed inset-0 pointer-events-none overflow-visible ${
-        phase !== 'complete' ? 'z-50' : 'z-[12]'
+        phase !== 'complete' ? 'z-[35]' : 'z-[12]'
       }`}
       style={{
         opacity: 1,

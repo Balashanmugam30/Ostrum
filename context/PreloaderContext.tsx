@@ -69,10 +69,15 @@ export function PreloaderProvider({ children }: { children: React.ReactNode }) {
   // Deliberate minimum hold to prevent jarring micro-flash on warm cache
   useEffect(() => {
     if (!isHomepage || phase === 'complete') return;
+    const isHold =
+      typeof window !== 'undefined' &&
+      window.location.search.includes('holdPreloader');
+    if (isHold) return;
+
     const timer = setTimeout(() => {
       minTimePassedRef.current = true;
       checkAllGates();
-    }, 750);
+    }, 850);
     return () => clearTimeout(timer);
   }, [isHomepage, phase]);
 
@@ -103,7 +108,7 @@ export function PreloaderProvider({ children }: { children: React.ReactNode }) {
     const proxy = { p: 0 };
     gsap.to(proxy, {
       p: 1,
-      duration: 1.15,
+      duration: 1.25,
       ease: 'power3.inOut',
       onUpdate: () => {
         setHandoffProgress(proxy.p);
@@ -194,6 +199,10 @@ export function PreloaderProvider({ children }: { children: React.ReactNode }) {
   // Readiness Gate Safety Timeout (max 5s)
   useEffect(() => {
     if (!isHomepage || phase === 'complete') return;
+    const isHold =
+      typeof window !== 'undefined' &&
+      window.location.search.includes('holdPreloader');
+    if (isHold) return;
 
     const safetyTimer = setTimeout(() => {
       if (!isTriggeredRef.current) {
