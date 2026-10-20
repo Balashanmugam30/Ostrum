@@ -98,7 +98,7 @@ export function OstrumCapabilitiesSection() {
   const clearTransitionStyles = (hide: boolean) => {
     const pinContainer = pinContainerRef.current;
     if (sectionRef.current) {
-      sectionRef.current.style.backgroundColor = '#FFFFFF';
+      sectionRef.current.style.backgroundColor = hide ? 'transparent' : '#FFFFFF';
     }
     if (!pinContainer) return;
 
@@ -114,6 +114,7 @@ export function OstrumCapabilitiesSection() {
     pinContainer.style.clipPath = '';
     pinContainer.style.borderRadius = '';
     pinContainer.style.boxShadow = '';
+    pinContainer.style.filter = '';
     pinContainer.style.opacity = hide ? '0' : '';
     pinContainer.dataset.transitionProgress = '';
     pinContainer.dataset.transitionSource = '';
@@ -131,9 +132,11 @@ export function OstrumCapabilitiesSection() {
     const updateTransition = ({
       active,
       progress = 0,
+      opacity = 1,
     }: {
       active: boolean;
       progress?: number;
+      opacity?: number;
     }) => {
       if (!pinContainer) return;
 
@@ -144,6 +147,15 @@ export function OstrumCapabilitiesSection() {
 
       const normProgress = Math.min(1, Math.max(0, progress));
       if (normProgress >= 1) {
+        if (sectionRef.current) {
+          const rect = sectionRef.current.getBoundingClientRect();
+          if (rect.bottom <= 0) {
+            // Already scrolled past capabilities into lower sections; do not apply fixed overlay
+            clearTransitionStyles(false);
+            return;
+          }
+          sectionRef.current.style.backgroundColor = '#FFFFFF';
+        }
         pinContainer.style.position = 'fixed';
         pinContainer.style.top = '0px';
         pinContainer.style.left = '0px';
@@ -157,6 +169,7 @@ export function OstrumCapabilitiesSection() {
         pinContainer.style.clipPath = 'none';
         pinContainer.style.borderRadius = '0px';
         pinContainer.style.boxShadow = 'none';
+        pinContainer.style.filter = 'none';
         pinContainer.dataset.transitionProgress = '1.000';
         pinContainer.dataset.transitionScale = '1.00000';
         pinContainer.dataset.transitionVisibleBounds = JSON.stringify({
@@ -166,6 +179,10 @@ export function OstrumCapabilitiesSection() {
           height: document.documentElement.clientHeight,
         });
         return;
+      }
+
+      if (sectionRef.current) {
+        sectionRef.current.style.backgroundColor = 'transparent';
       }
 
       const ease = normProgress * normProgress * (3 - 2 * normProgress);
@@ -237,12 +254,16 @@ export function OstrumCapabilitiesSection() {
       pinContainer.style.height = `${viewportHeight}px`;
       pinContainer.style.zIndex = '35';
       pinContainer.style.pointerEvents = normProgress >= 0.99 ? 'auto' : 'none';
-      pinContainer.style.opacity = '1';
+      pinContainer.style.opacity = String(opacity);
       pinContainer.style.transformOrigin = '0 0';
       pinContainer.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(5)})`;
       pinContainer.style.clipPath = `inset(${clipTop.toFixed(2)}px ${clipRight.toFixed(2)}px ${clipBottom.toFixed(2)}px ${clipLeft.toFixed(2)}px round ${(18 * (1 - ease) / scale).toFixed(2)}px)`;
       pinContainer.style.borderRadius = '0px';
       pinContainer.style.boxShadow = 'none';
+      pinContainer.style.filter =
+        ease >= 0.98
+          ? 'none'
+          : `drop-shadow(0px ${(20 * (1 - ease)).toFixed(1)}px ${(40 * (1 - ease)).toFixed(1)}px rgba(0,0,0,${(0.35 * (1 - ease) * opacity).toFixed(3)}))`;
       pinContainer.dataset.transitionProgress = normProgress.toFixed(3);
       pinContainer.dataset.transitionScale = scale.toFixed(5);
       pinContainer.dataset.transitionVisibleBounds = JSON.stringify({
@@ -252,6 +273,8 @@ export function OstrumCapabilitiesSection() {
         height: (viewportHeight - clipTop - clipBottom) * scale,
       });
     };
+
+    (window as any).__ostrumUpdateCapabilitiesTransition = updateTransition;
 
     const onCustomEvent = (event: Event) => {
       const detail = (event as CustomEvent).detail;
@@ -269,6 +292,7 @@ export function OstrumCapabilitiesSection() {
     window.addEventListener('resize', onResize);
 
     return () => {
+      delete (window as any).__ostrumUpdateCapabilitiesTransition;
       window.removeEventListener('ostrum:capabilities-transition', onCustomEvent);
       window.removeEventListener('resize', onResize);
     };
@@ -319,6 +343,7 @@ export function OstrumCapabilitiesSection() {
     if (prefersReducedMotion) {
       // Natural horizontal scrolling allowed without scroll-scrub pin
       section.style.marginBottom = '0px';
+      section.style.backgroundColor = '#FFFFFF';
       track.style.overflowX = 'auto';
       return () => {
         section.style.marginBottom = '';
@@ -359,23 +384,23 @@ export function OstrumCapabilitiesSection() {
         onToggle: (self) => {
           emitVisualCoverage(self.isActive);
         },
+        onEnter: () => {
+          clearTransitionStyles(false);
+          if (section) section.style.backgroundColor = '#FFFFFF';
+        },
         onLeave: () => {
           gsap.set(track, { x: -scrollMetrics.horizontalTravel });
           clearTransitionStyles(false);
           if (section) section.style.backgroundColor = '#FFFFFF';
         },
         onEnterBack: () => {
+          clearTransitionStyles(false);
           if (section) section.style.backgroundColor = '#FFFFFF';
-          window.dispatchEvent(
-            new CustomEvent('ostrum:capabilities-transition', {
-              detail: { active: true, progress: 1 },
-            }),
-          );
         },
         onLeaveBack: () => {
-          if (section) section.style.backgroundColor = '#FFFFFF';
+          if (section) section.style.backgroundColor = 'transparent';
           gsap.set(track, { x: 0 });
-          clearTransitionStyles(false);
+          clearTransitionStyles(true);
           const wheelTrigger = ScrollTrigger.getById('works-wheel-pin');
           if (wheelTrigger) {
             wheelTrigger.update();
@@ -407,21 +432,19 @@ export function OstrumCapabilitiesSection() {
       id="capabilities"
       ref={sectionRef}
       data-testid="capabilities-section"
-      className="relative z-[24] w-full min-h-screen bg-white select-none"
+      className="relative z-[35] w-full min-h-screen select-none"
       style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'transparent',
       }}
       aria-label="Our Capabilities"
     >
-      {/* Canonical Stage Container with subtle top wash */}
+      {/* Canonical Stage Container with pure white surface */}
       <div
         ref={pinContainerRef}
         data-testid="capabilities-pin-container"
-        className="capabilities-stage sticky top-0 w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-20 pb-6 sm:pt-20 sm:pb-10 md:pt-24 md:pb-12 bg-white"
+        className="capabilities-stage sticky top-0 w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-12 sm:pt-14 md:pt-16 pb-3 sm:pb-5 bg-[#FFFFFF]"
         style={{
           backgroundColor: '#FFFFFF',
-          background:
-            'linear-gradient(180deg, #D4EFF8 0%, #FAFDFF 13%, #FFFFFF 26%)',
         }}
       >
         {/* Soft edge fades on both left and right edges */}
@@ -446,28 +469,26 @@ export function OstrumCapabilitiesSection() {
 
         {/* Editorial Section Header (Canonical instance, zero CTA inside Capabilities) */}
         <header className="w-full px-6 sm:px-12 md:px-16 lg:px-20 z-20 shrink-0">
-          <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8">
+          <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-start justify-between gap-6 md:gap-10">
             <div>
               <h2
                 data-testid="capabilities-heading"
-                className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#0B0B10]"
+                className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#0B0B10] leading-none"
               >
                 Our Capabilities
               </h2>
             </div>
             <p
               data-testid="capabilities-supporting-statement"
-              className="font-sans text-sm sm:text-base md:text-lg text-[#0B0B10]/70 max-w-[48ch] sm:max-w-[54ch] leading-relaxed"
+              className="font-sans text-sm sm:text-base md:text-base lg:text-lg text-[#0B0B10]/75 max-w-[46ch] sm:max-w-[50ch] md:max-w-[52ch] leading-relaxed"
             >
-              We design and engineer the systems that move businesses forward—from
-              digital experiences and intelligent software to connected hardware
-              built around real-world needs.
+              OSTRUM designs and develops digital experiences, AI systems, custom software, business platforms, and connected hardware that help businesses improve customer experiences, streamline operations, and grow.
             </p>
           </div>
         </header>
 
         {/* Horizontal Scroll Catalogue Track (Canonical 6 service cards) */}
-        <div className="relative w-full z-10 flex items-center overflow-visible my-auto py-2">
+        <div className="relative w-full z-10 flex items-center overflow-visible my-auto py-1">
           <div
             ref={trackRef}
             data-testid="capabilities-track"
@@ -478,13 +499,13 @@ export function OstrumCapabilitiesSection() {
                 key={card.index}
                 data-testid={`capability-card-${card.variant}`}
                 tabIndex={0}
-                className="capability-card group relative shrink-0 w-[300px] sm:w-[340px] md:w-[360px] h-[450px] sm:h-[480px] md:h-[510px] rounded-[24px] p-6 sm:p-7 flex flex-col justify-between shadow-[0_20px_50px_-15px_rgba(11,11,16,0.08)] border border-black/[0.06] transition-[transform,box-shadow] duration-200 ease-out outline-none"
+                className="capability-card group relative shrink-0 w-[310px] sm:w-[340px] md:w-[365px] lg:w-[388px] h-[450px] sm:h-[475px] md:h-[490px] rounded-[24px] p-5 sm:p-6 md:p-6 flex flex-col justify-between shadow-[0_16px_36px_-12px_rgba(11,11,16,0.08)] border border-black/[0.06] transition-[transform,box-shadow] duration-200 ease-out outline-none"
                 style={{
                   background: card.gradient,
                 }}
               >
                 {/* Card Header: Index & Category Marker */}
-                <div className="flex items-center justify-between w-full shrink-0">
+                <div className="flex items-center justify-between w-full shrink-0 h-5 sm:h-6">
                   <span className="font-mono text-xs sm:text-sm font-bold tracking-wider text-black/55">
                     {card.index}
                   </span>
@@ -494,28 +515,30 @@ export function OstrumCapabilitiesSection() {
                   />
                 </div>
 
-                {/* 3D Dimensional Accent Viewport */}
-                <div className="capability-art-frame relative w-full h-[180px] sm:h-[200px] md:h-[210px] my-auto flex items-center justify-center">
+                {/* 3D Dimensional Accent Viewport (Consistent Upper-Middle Frame) */}
+                <div className="capability-art-frame relative w-full h-[160px] sm:h-[172px] md:h-[180px] shrink-0 my-1 flex items-center justify-center overflow-hidden">
                   <Card3DAccent
                     variant={card.variant}
                     data-testid={`capability-artwork-${card.variant}`}
-                    className="capability-artwork"
+                    className="capability-artwork size-full"
                   />
                 </div>
 
-                {/* Card Content: Title, Description, Tags (Strictly NO CTA) */}
-                <div className="flex flex-col shrink-0 mt-auto">
-                  <h3 className="font-sans text-lg sm:text-xl font-bold tracking-tight text-[#0B0B10] leading-tight mb-2">
-                    {card.title}
-                  </h3>
-                  <p className="font-sans text-xs sm:text-sm text-black/75 leading-relaxed mb-4 line-clamp-3">
-                    {card.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                {/* Card Content: Title, Description, Tags (Consistent Anchor) */}
+                <div className="flex-1 flex flex-col justify-between min-h-0 pt-1">
+                  <div>
+                    <h3 className="font-sans text-lg sm:text-xl font-bold tracking-tight text-[#0B0B10] leading-tight min-h-[42px] sm:min-h-[46px] flex items-start">
+                      {card.title}
+                    </h3>
+                    <p className="font-sans text-xs sm:text-sm text-black/75 leading-relaxed mt-1 line-clamp-3">
+                      {card.description}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-2 mt-auto">
                     {card.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="inline-block px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium text-black/80 bg-white/60 backdrop-blur-sm border border-black/[0.06]"
+                        className="inline-block px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-medium text-black/80 bg-white/60 backdrop-blur-sm border border-black/[0.06]"
                       >
                         {tag}
                       </span>
@@ -527,11 +550,16 @@ export function OstrumCapabilitiesSection() {
           </div>
         </div>
 
-        {/* Minimal Bottom Baseline / Status bar */}
-        <div className="w-full px-6 sm:px-12 md:px-16 lg:px-20 z-20 shrink-0">
-          <div className="max-w-[1440px] mx-auto flex items-center justify-between text-xs font-mono text-black/40">
-            <span>01 / 06 — 06 / 06</span>
-            <span className="tracking-widest uppercase">
+        {/* Dedicated Reserved Footer Strip / Status bar (Always clear and visible, never overlapped) */}
+        <div
+          data-testid="capabilities-footer-strip"
+          className="w-full px-6 sm:px-12 md:px-16 lg:px-20 z-20 shrink-0 pb-2 pt-2"
+        >
+          <div className="max-w-[1440px] mx-auto flex items-center justify-end text-xs font-mono font-medium text-[#36312F]">
+            <span
+              data-testid="capabilities-scroll-cue"
+              className="tracking-widest uppercase font-semibold text-[#36312F]"
+            >
               SCROLL TO EXPLORE →
             </span>
           </div>

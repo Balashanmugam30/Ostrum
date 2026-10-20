@@ -107,16 +107,16 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
           <div className="lg:col-span-5 flex flex-col items-start lg:sticky lg:top-28">
             <h2
               data-testid="faq-heading"
-              className="font-condensed font-bold uppercase text-black tracking-[-0.01em] select-none"
+              className="font-condensed font-bold uppercase text-[#161514] tracking-[-0.01em] select-none"
               style={{
                 fontSize: 'clamp(2.8rem, 6vw, 76px)',
                 lineHeight: '0.92',
-                color: '#000000',
+                color: '#161514',
               }}
             >
               Frequently Asked Questions
             </h2>
-            <p className="font-sans text-base sm:text-lg text-[#333842] leading-relaxed max-w-sm mt-6 font-normal">
+            <p className="font-sans text-base sm:text-lg text-[#242424] leading-relaxed max-w-sm mt-6 font-normal">
               Clear insights into our engineering scope, collaborative process, and technical delivery.
             </p>
           </div>
@@ -146,13 +146,13 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
                     aria-expanded={isOpen}
                     aria-controls={`faq-answer-${item.id}`}
                     id={`faq-question-${item.id}`}
-                    className="w-full flex items-center justify-between text-left py-6 sm:py-7 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2C1844] rounded-sm transition-colors cursor-pointer"
+                    className="w-full flex items-center justify-between text-left py-6 sm:py-7 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D24B2C] rounded-sm transition-colors cursor-pointer"
                   >
                     <span
-                      className={`font-sans text-base sm:text-lg md:text-xl tracking-tight pr-6 transition-colors duration-200 ${
+                      className={`font-sans text-base sm:text-lg md:text-xl tracking-tight pr-6 transition-colors duration-200 text-[#161514] ${
                         isOpen
-                          ? 'text-[#1F162A] font-semibold'
-                          : 'text-[#161514] font-medium group-hover:text-[#2C1844]'
+                          ? 'font-semibold'
+                          : 'font-medium group-hover:text-black'
                       }`}
                     >
                       {item.question}
@@ -162,7 +162,7 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
                     <span
                       className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
                         isOpen
-                          ? 'bg-[#20182C] text-white rotate-180 shadow-sm'
+                          ? 'bg-[#42100F] text-[#FFF8F3] rotate-180 shadow-sm'
                           : 'border border-black/20 text-black/75 group-hover:border-black/50 group-hover:text-black'
                       }`}
                       aria-hidden="true"
@@ -212,12 +212,12 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
                       {/* Visual Letter-by-Letter Animated Text */}
                       <p
                         aria-hidden="true"
-                        className="font-sans text-sm sm:text-base md:text-[16px] leading-relaxed text-[#2D333E] pb-7 pt-1 max-w-2xl font-normal"
+                        className="font-sans text-sm sm:text-base md:text-[16px] leading-relaxed text-[#242424] pb-7 pt-1 max-w-2xl font-normal"
                       >
                         {isOpen ? item.answer.slice(0, typedLength) : ''}
                         {isOpen && typedLength < item.answer.length && (
                           <span
-                            className="inline-block w-[2px] h-[1.1em] bg-[#2C1844] ml-0.5 align-middle animate-pulse"
+                            className="inline-block w-[2px] h-[1.1em] bg-[#D24B2C] ml-0.5 align-middle animate-pulse"
                             aria-hidden="true"
                           />
                         )}

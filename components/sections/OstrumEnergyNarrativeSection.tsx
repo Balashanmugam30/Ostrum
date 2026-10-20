@@ -235,11 +235,24 @@ export function OstrumEnergyNarrativeSection() {
 
     const ctx = gsap.context(() => {
       const isMobile = window.innerWidth < 768;
-      const scrollDistance = isMobile ? 3600 : 5000;
+      const initialHold = isMobile ? 450 : 600; // Pause 1: ~1s visual pause on completed dark stage before text
+      const narrativeSpan = isMobile ? 3600 : 5000; // Preserved narrative travel span for the 5 beats
+      const closingHold = isMobile ? 450 : 600; // Pause 2: ~1s visual pause on closing composition before Selected Work
+      const scrollDistance = initialHold + narrativeSpan + closingHold;
       const handoffDistance = window.innerHeight;
       const totalPinDistance = scrollDistance + handoffDistance;
 
-      // 1. Master Pinned Trigger for the Energy Narrative
+      // 1. Initialize beat cards and line fills
+      const beatCards = gsap.utils.toArray<HTMLElement>('.narrative-beat-card');
+      beatCards.forEach((card) => {
+        gsap.set(card, { opacity: 0, y: 24 });
+        const lineFills = card.querySelectorAll<HTMLElement>('.narrative-line-fill');
+        lineFills.forEach((fill) => {
+          gsap.set(fill, { clipPath: 'inset(-35% 100% -45% 0px)' });
+        });
+      });
+
+      // 2. Master Pinned Trigger for the Energy Narrative
       ScrollTrigger.create({
         trigger: section,
         start: 'top top',
@@ -250,23 +263,23 @@ export function OstrumEnergyNarrativeSection() {
         id: 'energy-narrative-pin',
         anticipatePin: 1,
         onUpdate: (self) => {
-          // Progress through narrative reveals is mapped across [0, scrollDistance]:
-          const rawProgress = (self.scroll() - self.start) / scrollDistance;
-          const narrativeProgress = Math.max(0, Math.min(1, rawProgress));
+          const currentScroll = self.scroll() - self.start;
+          const rawNarrativeProgress = (currentScroll - initialHold) / (narrativeSpan || 1);
+          const narrativeProgress = Math.max(0, Math.min(1, rawNarrativeProgress));
 
-          // Beat intervals:
-          // Stage 0: [0.00, 0.12)
-          // Beat 01: [0.12, 0.28)
-          // Beat 02: [0.29, 0.44)
-          // Beat 03: [0.45, 0.62)
-          // Beat 04: [0.63, 0.80)
-          // Beat 05: [0.81, 1.00]
+          // Beat intervals: mapped strictly across the 5 beats of narrativeSpan
           let currentBeat = -1;
-          if (narrativeProgress >= 0.81) currentBeat = 4;
-          else if (narrativeProgress >= 0.63) currentBeat = 3;
-          else if (narrativeProgress >= 0.45) currentBeat = 2;
-          else if (narrativeProgress >= 0.29) currentBeat = 1;
-          else if (narrativeProgress >= 0.12) currentBeat = 0;
+          if (currentScroll < initialHold) {
+            // Pause 1: Dark stage hold (zero text)
+            currentBeat = -1;
+          } else if (rawNarrativeProgress > 1.00) {
+            // Pause 2 & handoff: Beat 05 active and persistent
+            currentBeat = 4;
+          } else if (narrativeProgress >= 0.80) currentBeat = 4;
+          else if (narrativeProgress >= 0.60) currentBeat = 3;
+          else if (narrativeProgress >= 0.40) currentBeat = 2;
+          else if (narrativeProgress >= 0.20) currentBeat = 1;
+          else if (narrativeProgress >= 0.00) currentBeat = 0;
 
           setActiveBeat(currentBeat);
 
@@ -282,19 +295,21 @@ export function OstrumEnergyNarrativeSection() {
             })
           );
         },
+        onLeave: () => {
+          // Conceal beat cards when Selected Work has 100% covered the viewport
+          beatCards.forEach((c) => {
+            gsap.set(c, { opacity: 0 });
+          });
+        },
+        onEnterBack: () => {
+          // Restore Beat 05 card immediately when scrolling back into the handoff
+          if (beatCards[4]) {
+            gsap.set(beatCards[4], { opacity: 1, y: 0 });
+          }
+        },
       });
 
-      // 2. Master Scrubbed Timeline for Sequential Line Reveals
-      const beatCards = gsap.utils.toArray<HTMLElement>('.narrative-beat-card');
-
-      // Initialize all beat cards and lines:
-      beatCards.forEach((card) => {
-        gsap.set(card, { opacity: 0, y: 24 });
-        const lineFills = card.querySelectorAll<HTMLElement>('.narrative-line-fill');
-        lineFills.forEach((fill) => {
-          gsap.set(fill, { clipPath: 'inset(-35% 100% -45% 0px)' });
-        });
-      });
+      // 3. Master Scrubbed Timeline for Sequential Line Reveals
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -305,16 +320,27 @@ export function OstrumEnergyNarrativeSection() {
         },
       });
 
-      // Stage 0: 0.00 -> 0.12 (Object-only black stage, 0 text)
+      const hold1Frac = initialHold / scrollDistance;
+      const narrativeFrac = narrativeSpan / scrollDistance;
 
-      // Choreograph sequential line reveals for each of the 5 beats
-      const beatTimings = [
-        { enter: 0.12, revealStart: 0.14, revealEnd: 0.23, holdEnd: 0.26, exitEnd: 0.28 },
-        { enter: 0.29, revealStart: 0.31, revealEnd: 0.38, holdEnd: 0.42, exitEnd: 0.44 },
-        { enter: 0.45, revealStart: 0.47, revealEnd: 0.57, holdEnd: 0.60, exitEnd: 0.62 },
-        { enter: 0.63, revealStart: 0.65, revealEnd: 0.74, holdEnd: 0.78, exitEnd: 0.80 },
-        { enter: 0.81, revealStart: 0.83, revealEnd: 0.93, holdEnd: 1.00, exitEnd: 1.00 },
+      // Base relative timings across the 5 narrative beats [0.00, 1.00]
+      // Shifted by hold1Frac so Beat 01 reveal starts only after Pause 1 completes
+      // Beat 05 reading hold persists through holdEnd, remaining visible through Pause 2 and handoff
+      const baseBeatTimings = [
+        { enter: 0.00, revealStart: 0.02, revealEnd: 0.12, holdEnd: 0.16, exitEnd: 0.19 },
+        { enter: 0.20, revealStart: 0.22, revealEnd: 0.32, holdEnd: 0.36, exitEnd: 0.39 },
+        { enter: 0.40, revealStart: 0.42, revealEnd: 0.52, holdEnd: 0.56, exitEnd: 0.59 },
+        { enter: 0.60, revealStart: 0.62, revealEnd: 0.72, holdEnd: 0.76, exitEnd: 0.79 },
+        { enter: 0.80, revealStart: 0.82, revealEnd: 0.92, holdEnd: 1.00, exitEnd: 1.00 },
       ];
+
+      const beatTimings = baseBeatTimings.map((b) => ({
+        enter: hold1Frac + b.enter * narrativeFrac,
+        revealStart: hold1Frac + b.revealStart * narrativeFrac,
+        revealEnd: hold1Frac + b.revealEnd * narrativeFrac,
+        holdEnd: hold1Frac + b.holdEnd * narrativeFrac,
+        exitEnd: hold1Frac + b.exitEnd * narrativeFrac,
+      }));
 
       beatCards.forEach((card, beatIdx) => {
         if (beatIdx >= beatTimings.length) return;
@@ -354,7 +380,7 @@ export function OstrumEnergyNarrativeSection() {
           tl.to(card, { opacity: 1, duration: timing.holdEnd - timing.revealEnd }, timing.revealEnd);
         }
 
-        // D. Exit Dissolve (only for beats 0 to 3; beat 4 holds through 1.00)
+        // D. Exit Dissolve (beats 0 to 3 dissolve so next beat can enter; Beat 05 remains static and 100% visible through handoff)
         if (beatIdx < 4 && timing.exitEnd > timing.holdEnd) {
           tl.to(card, { opacity: 0, y: -20, duration: timing.exitEnd - timing.holdEnd, ease: 'power2.in' }, timing.holdEnd);
         }
@@ -448,7 +474,7 @@ export function OstrumEnergyNarrativeSection() {
                     key={cIdx}
                     className={`narrative-char-filled inline-block ${
                       isBrandSignoff || ch.isHighlight
-                        ? 'text-[#C01832]'
+                        ? 'text-[#C9362B]'
                         : 'text-white'
                     }`}
                     data-char={ch.char}
@@ -473,7 +499,7 @@ export function OstrumEnergyNarrativeSection() {
     <section
       ref={sectionRef}
       id="energy-narrative"
-      className="relative w-full overflow-visible z-[15] select-none"
+      className="relative w-full overflow-visible z-[25] select-none"
       aria-label="Ostrum Energy Narrative"
     >
       {/* Offscreen Measurement DOM: Accurately computes visual line wrapping with final font */}
@@ -543,7 +569,7 @@ export function OstrumEnergyNarrativeSection() {
         <div
           id="section03-sculpture-slot"
           data-testid="ostrum-energy-3d-slot"
-          className="absolute inset-0 m-auto w-full aspect-square max-w-[340px] sm:max-w-[440px] md:max-w-[540px] lg:max-w-[620px] pointer-events-none z-10 flex items-center justify-center"
+          className="absolute inset-0 m-auto w-full aspect-square max-w-[260px] sm:max-w-[330px] md:max-w-[400px] lg:max-w-[460px] pointer-events-none z-10 flex items-center justify-center"
         />
 
         {/* Centered Narrative Statements Container (Expanded to 88vw max 1540px) */}

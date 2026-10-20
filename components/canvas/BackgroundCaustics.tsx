@@ -1,12 +1,20 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import * as THREE from 'three';
 
 export function BackgroundCaustics() {
+  const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const isLegalPage =
+    pathname?.startsWith('/terms-and-conditions') ||
+    pathname?.startsWith('/privacy-policy');
+
   useEffect(() => {
+    if (isLegalPage) return;
+
     const container = containerRef.current;
     if (!container) return;
 
@@ -255,8 +263,8 @@ export function BackgroundCaustics() {
           color = texture2D(uTexture, texUV).rgb * bottomFade;
         }
 
-        // Radiant cursor halo
-        vec3 halo = mouseHalo(uv, uMouse);
+        // Radiant cursor halo (fades out as atmosphere darkens into narrative)
+        vec3 halo = mouseHalo(uv, uMouse) * max(0.0, 1.0 - uDarken * 1.5);
         color += halo;
 
         // Concentrated atmosphere darkening for Energy Narrative
@@ -359,7 +367,10 @@ export function BackgroundCaustics() {
         } else if (scrollYPos < energyStart) {
           // Exact handoff journey between Section 02 release and Section 03 entrance:
           // Smooth, continuous, mono-directional transition from 0.0 to 1.0
-          targetDarken = Math.max(0, Math.min(1, (scrollYPos - dockEnd) / handoffSpan));
+          // Uses identical cubic ease curve matching the 3D sculpture's half-turn and zoom
+          const t = Math.max(0, Math.min(1, (scrollYPos - dockEnd) / handoffSpan));
+          const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+          targetDarken = ease;
         } else {
           // Inside Section 03 pinned narrative & subsequent spacer: deep black with subtle ruby core
           targetDarken = 1.0;
@@ -421,7 +432,7 @@ export function BackgroundCaustics() {
       uniforms.uMouse.value.set(mousePos.x, mousePos.y);
       // Continuous scroll progression mapping through 2532px vertical artwork
       uniforms.uScrollY.value = scrollY * 0.84;
-      currentDarken += (targetDarken - currentDarken) * 0.22;
+      currentDarken += (targetDarken - currentDarken) * 0.28;
       uniforms.uDarken.value = currentDarken;
 
       renderer.render(scene, camera);
@@ -493,7 +504,11 @@ export function BackgroundCaustics() {
       mesh.geometry.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [isLegalPage]);
+
+  if (isLegalPage) {
+    return null;
+  }
 
   return (
     <div

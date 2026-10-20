@@ -6,31 +6,56 @@ import { OstrumPreloader } from '@/components/ui/OstrumPreloader';
 import { OstrumContinuousJourney } from '@/components/visuals/OstrumContinuousJourney';
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
-import { CustomCursor } from '@/components/ui/CustomCursor';
 import { SmoothScroll } from '@/components/providers/SmoothScroll';
+import { SITE_CONFIG } from '@/lib/site-config';
 
 export const metadata: Metadata = {
-  title: 'OSTRUM — Digital Transformation Studio',
+  metadataBase: new URL(SITE_CONFIG.baseUrl),
+  title: {
+    default: 'OSTRUM — Digital Transformation & Engineering Studio',
+    template: '%s — OSTRUM',
+  },
   description:
-    'We build the technology that helps ambitious businesses grow. Custom software development, integrations, and digital infrastructure.',
+    'Independent digital engineering, technology architecture, and product design studio. We build intelligent systems, business platforms, and immersive web experiences.',
   keywords: [
     'Ostrum',
     'Digital Transformation',
     'Technology Studio',
     'Software Architecture',
+    'AI Systems',
     'Integrations',
-    'Three.js',
+    'Next.js',
     'WebGL',
+    'Product Engineering',
   ],
-  metadataBase: new URL('https://ostrum.com'),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'OSTRUM — Digital Transformation Studio',
+    title: 'OSTRUM — Digital Transformation & Engineering Studio',
     description:
-      'We build the technology that helps ambitious businesses grow.',
-    url: 'https://ostrum.com',
+      'Independent digital engineering, technology architecture, and product design studio.',
+    url: SITE_CONFIG.baseUrl,
     siteName: 'OSTRUM',
     locale: 'en_US',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'OSTRUM — Digital Transformation & Engineering Studio',
+    description:
+      'Independent digital engineering, technology architecture, and product design studio.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
@@ -40,6 +65,35 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_CONFIG.baseUrl}/#organization`,
+      name: 'OSTRUM',
+      legalName: 'Ostrum',
+      url: SITE_CONFIG.baseUrl,
+      logo: `${SITE_CONFIG.baseUrl}/images/ostrum-logo.png`,
+      email: SITE_CONFIG.contactEmail,
+      description:
+        'Independent digital product engineering, technology architecture, and venture design studio.',
+      sameAs: [
+        'https://github.com/Balashanmugam30/Ostrum',
+      ],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_CONFIG.baseUrl}/#website`,
+      url: SITE_CONFIG.baseUrl,
+      name: 'OSTRUM',
+      publisher: {
+        '@id': `${SITE_CONFIG.baseUrl}/#organization`,
+      },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,7 +101,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark bg-black">
-      <body className="bg-black text-white antialiased selection:bg-white selection:text-black">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+      <body className="bg-black text-white antialiased">
         <LanguageProvider>
           <PreloaderProvider>
             <SmoothScroll>
@@ -60,14 +120,11 @@ export default function RootLayout({
               {/* Master Continuous 3D Möbius Journey (z-[35] during preloader, z-[12] after complete) */}
               <OstrumContinuousJourney />
 
-              {/* Custom Precision Desktop Circular Cursor */}
-              <CustomCursor />
-
               {/* Minimalist Floating Global Header */}
               <Header />
 
               {/* Page Main Content */}
-              <main id="main-content" className="relative z-10 w-full min-h-screen">
+              <main id="main-content" className="relative w-full min-h-screen">
                 {children}
               </main>
             </SmoothScroll>

@@ -1,298 +1,302 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { SITE_CONFIG } from '@/lib/site-config';
+import {
+  LegalDocumentLayout,
+  type LegalSectionItem,
+} from '@/components/legal/LegalDocumentLayout';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Ostrum',
+  title: 'Privacy Policy — OSTRUM',
   description:
-    'Privacy Policy outlining the collection, use, and protection of personal data in compliance with India DPDP Act and applicable principles.',
+    'Privacy Policy outlining the collection, use, security, and protection of personal data in compliance with the DPDP Act and international privacy principles.',
 };
 
+const SECTIONS: LegalSectionItem[] = [
+  { id: 'commitment', num: '01', title: 'Commitment to Privacy & Scope' },
+  { id: 'controller', num: '02', title: 'Studio Identity & Data Controller' },
+  { id: 'data-collected', num: '03', title: 'Personal Information We Collect' },
+  { id: 'legal-bases', num: '04', title: 'Legal Bases for Processing' },
+  { id: 'purposes', num: '05', title: 'Purposes of Processing' },
+  { id: 'retention', num: '06', title: 'Retention of Enquiry Data' },
+  { id: 'service-providers', num: '07', title: 'Third-Party Service Providers' },
+  { id: 'international-transfers', num: '08', title: 'International Data Transfers' },
+  { id: 'cookies', num: '09', title: 'Cookies & Local Storage' },
+  { id: 'security', num: '10', title: 'Data Security Measures' },
+  { id: 'your-rights', num: '11', title: 'Your Data Protection Rights' },
+  { id: 'children', num: '12', title: "Children's Privacy" },
+  { id: 'do-not-track', num: '13', title: 'Do Not Track & Browser Privacy Controls' },
+  { id: 'changes', num: '14', title: 'Changes to This Privacy Policy' },
+  { id: 'contact', num: '15', title: 'Contact Us & Grievance Redressal' },
+];
+
 export default function PrivacyPolicyPage() {
-  const lastUpdated = '15 October 2026';
+  const lastUpdated = '19 October 2026';
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#E4E4E7] antialiased selection:bg-white selection:text-black">
-      {/* Top Header / Back Navigation */}
-      <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#050505]/85 backdrop-blur-md">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="font-condensed text-xl font-bold uppercase tracking-wider text-white hover:text-[#F04438] transition-colors"
-          >
-            OSTRUM
-          </Link>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[#A1A1AA] hover:text-white transition-colors"
-          >
-            <span aria-hidden="true">←</span> Back to Ostrum
-          </Link>
-        </div>
-      </header>
+    <LegalDocumentLayout
+      title="Privacy Policy"
+      badge="DATA PRIVACY · TRANSPARENCY"
+      effectiveDate={lastUpdated}
+      activeTab="privacy"
+      sections={SECTIONS}
+    >
+      {/* Section 1 */}
+      <section id="commitment" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">01</span>
+          Commitment to Privacy &amp; Scope
+        </h2>
+        <p>
+          OSTRUM (&ldquo;Ostrum&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) is committed to transparent, lawful, and ethical data governance. This Privacy Policy outlines our practices regarding the collection, processing, storage, and protection of personal information obtained through our public website, project intake forms, and electronic communications.
+        </p>
+        <p className="mt-3">
+          Our practices are architected in alignment with the Digital Personal Data Protection Act, 2023 (DPDP Act) and the Digital Personal Data Protection Rules, 2025 of India, alongside recognized international privacy principles, including the General Data Protection Regulation (GDPR) to the extent applicable to international visitors.
+        </p>
+      </section>
 
-      {/* Main Document Body */}
-      <main className="max-w-4xl mx-auto px-6 py-16 sm:py-24">
-        {/* Document Header */}
-        <div className="border-b border-white/10 pb-10 mb-12">
-          <p className="font-mono text-xs uppercase tracking-[0.24em] font-semibold text-[#F04438] mb-3">
-            DATA PRIVACY &amp; PROTECTION
+      {/* Section 2 */}
+      <section id="controller" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">02</span>
+          Studio Identity &amp; Data Controller
+        </h2>
+        <p>
+          The data controller responsible for personal information processed through this website is OSTRUM. Studio operations and inquiries are centrally administered through our designated contact mailbox at <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#D24B2C] hover:underline font-medium">{SITE_CONFIG.contactEmail}</a>.
+        </p>
+        <p className="mt-3">
+          Our planned primary domain is <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#161514] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>. All electronic correspondence submitted through form handlers or direct email arrives directly in our studio triage queue.
+        </p>
+      </section>
+
+      {/* Section 3 */}
+      <section id="data-collected" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">03</span>
+          Personal Information We Collect
+        </h2>
+        <p>
+          We practice strict data minimization. We only collect information that is voluntarily provided by you or technically necessary to operate and secure our website:
+        </p>
+        <div className="mt-4 space-y-4">
+          <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7]">
+            <h3 className="font-bold text-[#161514] text-sm">A. Information You Voluntarily Provide</h3>
+            <p className="mt-1 text-xs sm:text-sm text-[#50545C]">
+              When you submit a project enquiry through our contact form, we collect:
+            </p>
+            <ul className="list-disc pl-5 mt-2 space-y-1.5 text-xs sm:text-sm text-[#50545C]">
+              <li><strong>Full Name:</strong> To address you professionally in communications;</li>
+              <li><strong>Work Email Address:</strong> To respond to your inquiry and discuss project scope;</li>
+              <li><strong>Company / Organization Name:</strong> To contextualize business requirements;</li>
+              <li><strong>Project Classification:</strong> Selected service track (e.g., AI Systems, Digital Experiences, Custom Engineering);</li>
+              <li><strong>Telephone Number (Optional):</strong> If provided, for direct scheduling coordination;</li>
+              <li><strong>Project Description / Message:</strong> Information you choose to share regarding your technical goals and requirements.</li>
+            </ul>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7]">
+            <h3 className="font-bold text-[#161514] text-sm">B. Technical &amp; Diagnostic Telemetry</h3>
+            <p className="mt-1 text-xs sm:text-sm text-[#50545C]">
+              When you browse our website, our hosting infrastructure automatically logs standard technical metadata, including your IP address (anonymized where feasible), browser type and version, operating system, referring URL, timestamp of access, and general hardware capabilities (e.g. WebGL support for 3D visual rendering).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 4 */}
+      <section id="legal-bases" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">04</span>
+          Legal Bases for Processing
+        </h2>
+        <p>
+          Under applicable data protection laws, we process your personal data based upon the following lawful grounds:
+        </p>
+        <ul className="list-disc pl-5 mt-3 space-y-2 text-[#50545C]">
+          <li><strong>Legitimate Interests:</strong> Operating, securing, diagnosing, and enhancing our public studio platform, and responding accurately to commercial inquiries initiated by prospective clients;</li>
+          <li><strong>Pre-Contractual Measures:</strong> Evaluating technical project parameters, preparing engineering estimates, and drafting proposals at your express request prior to entering into a formal agreement;</li>
+          <li><strong>Statutory Compliance:</strong> Fulfilling accounting, recordkeeping, and regulatory obligations mandated by applicable Indian law;</li>
+          <li><strong>Consent:</strong> Where explicitly requested for specific communications or voluntary feedback.</li>
+        </ul>
+      </section>
+
+      {/* Section 5 */}
+      <section id="purposes" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">05</span>
+          Purposes of Processing
+        </h2>
+        <p>
+          We utilize collected information exclusively for the following defined purposes:
+        </p>
+        <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#50545C]">
+          <li>Reviewing and responding to project enquiries, architecture consultations, and studio inquiries;</li>
+          <li>Conducting preliminary technical scoping, resource allocation, and feasibility assessments;</li>
+          <li>Drafting Statements of Work (SOW) and commercial proposals;</li>
+          <li>Preventing fraudulent form submissions, brute-force attacks, and abusive bot interactions;</li>
+          <li>Ensuring cross-browser compatibility and hardware-accelerated 3D rendering stability.</li>
+        </ul>
+        <p className="mt-3 font-medium text-[#161514]">
+          We never sell, rent, monetize, or trade your personal or corporate information to third-party data brokers or marketing aggregators under any circumstances.
+        </p>
+      </section>
+
+      {/* Section 6 */}
+      <section id="retention" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">06</span>
+          Retention of Enquiry Data
+        </h2>
+        <p>
+          We retain personal information submitted via project enquiries only for as long as necessary to fulfill the prospective business evaluation or satisfy statutory retention requirements.
+        </p>
+        <p className="mt-3">
+          Enquiry submissions that do not result in an active commercial engagement are securely deleted or anonymized within 24 months of our last communication. Where an enquiry progresses to a formal client engagement, records are maintained in accordance with the governing master agreement and applicable commercial accounting laws.
+        </p>
+      </section>
+
+      {/* Section 7 */}
+      <section id="service-providers" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">07</span>
+          Third-Party Service Providers
+        </h2>
+        <p>
+          To deliver a modern, resilient, high-speed web experience, we partner with specialized cloud infrastructure and hosting providers. These service providers act as data processors under binding obligations of confidentiality and security:
+        </p>
+        <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#50545C]">
+          <li><strong>Edge Hosting &amp; Serverless Infrastructure:</strong> High-performance content delivery networks (CDNs) for static asset distribution and serverless API execution;</li>
+          <li><strong>Email Infrastructure:</strong> Encrypted mail routing services utilized solely to deliver submitted enquiries to studio personnel;</li>
+          <li><strong>Security &amp; DDoS Shielding:</strong> Edge firewalls that monitor inbound request patterns to prevent distributed denial-of-service attacks.</li>
+        </ul>
+      </section>
+
+      {/* Section 8 */}
+      <section id="international-transfers" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">08</span>
+          International Data Transfers
+        </h2>
+        <p>
+          As an engineering studio collaborating with clients and technical partners globally, information collected by our cloud infrastructure may be processed on secure servers located outside your jurisdiction.
+        </p>
+        <p className="mt-3">
+          Whenever personal data is transferred across borders, we ensure that appropriate safeguards are established in accordance with applicable laws, including Standard Contractual Clauses (SCCs), robust technical encryption protocols, and verified compliance certifications.
+        </p>
+      </section>
+
+      {/* Section 9 */}
+      <section id="cookies" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">09</span>
+          Cookies &amp; Local Storage
+        </h2>
+        <p>
+          Our public website does not employ third-party advertising cookies, cross-site behavioral tracking scripts, or commercial marketing pixels.
+        </p>
+        <p className="mt-3">
+          We utilize only minimal, essential browser storage mechanisms necessary for the core operation of the site, including ephemeral session flags (such as recording completion of the initial visual cinematic sequence during a single browsing session) and user interface accessibility preferences (such as respecting <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#161514] font-mono text-xs">prefers-reduced-motion</code>).
+        </p>
+      </section>
+
+      {/* Section 10 */}
+      <section id="security" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">10</span>
+          Data Security Measures
+        </h2>
+        <p>
+          We implement robust technical and organizational security controls designed to protect personal information from unauthorized access, alteration, disclosure, or accidental destruction.
+        </p>
+        <p className="mt-3">
+          These controls include modern Transport Layer Security (TLS 1.3) encryption for all data in transit, strict least-privilege administrative access controls, containerized deployment pipelines, and automated security dependency auditing.
+        </p>
+      </section>
+
+      {/* Section 11 */}
+      <section id="your-rights" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">11</span>
+          Your Data Protection Rights
+        </h2>
+        <p>
+          Under the DPDP Act 2023, the GDPR, and applicable privacy frameworks, you hold specific statutory rights regarding your personal data:
+        </p>
+        <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#50545C]">
+          <li><strong>Right to Access:</strong> Request confirmation of whether we process your personal data and obtain a summary of such information;</li>
+          <li><strong>Right to Correction &amp; Erasure:</strong> Request the correction of inaccurate data or the deletion of personal information no longer required for its original purpose;</li>
+          <li><strong>Right to Restrict Processing:</strong> Request the restriction of processing under specified statutory circumstances;</li>
+          <li><strong>Right to Data Portability:</strong> Obtain a structured, commonly used copy of data you provided to us;</li>
+          <li><strong>Right to Withdraw Consent:</strong> Where processing relies on consent, withdraw that consent at any time without affecting past lawful processing.</li>
+        </ul>
+        <p className="mt-3">
+          To exercise any of these rights, contact us at <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#D24B2C] hover:underline font-medium">{SITE_CONFIG.contactEmail}</a>. We verify identity and respond within statutory timeframes.
+        </p>
+      </section>
+
+      {/* Section 12 */}
+      <section id="children" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">12</span>
+          Children&apos;s Privacy
+        </h2>
+        <p>
+          Our website and digital engineering services are directed exclusively at business enterprises, technology founders, and adult professionals aged 18 and older.
+        </p>
+        <p className="mt-3">
+          We do not knowingly collect, solicit, or maintain personal information from individuals under the age of 18. If we become aware that an individual under 18 has submitted personal information through our contact channels, we will take immediate steps to permanently expunge such records from our systems.
+        </p>
+      </section>
+
+      {/* Section 13 */}
+      <section id="do-not-track" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">13</span>
+          Do Not Track &amp; Browser Privacy Controls
+        </h2>
+        <p>
+          Because our website operates without third-party tracking cookies or behavioral profile collectors, our baseline architecture is inherently privacy-preserving and complies by default with browser-level &ldquo;Do Not Track&rdquo; (DNT) and Global Privacy Control (GPC) signals.
+        </p>
+      </section>
+
+      {/* Section 14 */}
+      <section id="changes" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">14</span>
+          Changes to This Privacy Policy
+        </h2>
+        <p>
+          We may periodically revise this Privacy Policy to reflect advancements in our technology stack, changes in studio structure, or updates to domestic and international privacy legislation.
+        </p>
+        <p className="mt-3">
+          Any updates will be published directly to this page with an updated effective date. We encourage visitors to review this document periodically to stay informed about our data protection commitments.
+        </p>
+      </section>
+
+      {/* Section 15 */}
+      <section id="contact" className="scroll-mt-24 pt-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#D24B2C] font-semibold">15</span>
+          Contact Us &amp; Grievance Redressal
+        </h2>
+        <p>
+          If you have questions, inquiries, requests, or grievances concerning this Privacy Policy or our data handling practices, please contact our designated privacy triage officer:
+        </p>
+        <div className="mt-4 p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7] font-mono text-xs sm:text-sm text-[#161514]">
+          <p>
+            <span className="text-[#70757E]">Privacy &amp; Data Inquiries:</span>{' '}
+            <a
+              href={`mailto:${SITE_CONFIG.contactEmail}?subject=Privacy%20Inquiry`}
+              className="text-[#D24B2C] font-semibold hover:underline"
+            >
+              {SITE_CONFIG.contactEmail}
+            </a>
           </p>
-          <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
-            Privacy Policy
-          </h1>
-          <p className="font-mono text-xs text-[#71717A]">
-            Last Updated: {lastUpdated}
+          <p className="mt-1 text-[#70757E]">
+            Studio Designation: OSTRUM Digital Engineering &amp; Technology Studio
           </p>
         </div>
-
-        {/* 13 Required Sections in Exact Order */}
-        <div className="space-y-12 font-sans text-base sm:text-lg leading-relaxed text-[#D4D4D8]">
-          {/* Section 1 */}
-          <section id="scope-and-contact" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">01</span>
-              Scope and Contact
-            </h2>
-            <p>
-              This Privacy Policy explains how Ostrum (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) handles personal information collected through our public website (ostrum.co) and our project enquiry channels. This policy is formulated in alignment with the Digital Personal Data Protection Act, 2023 (DPDP Act) and the Digital Personal Data Protection Rules, 2025 of India, to the extent applicable.
-            </p>
-            <p className="mt-3">
-              If you have any questions, rights requests, or feedback regarding your personal data, you may reach us directly at{' '}
-              <a
-                href="mailto:hello@ostrum.co"
-                className="text-[#F04438] hover:underline"
-              >
-                hello@ostrum.co
-              </a>
-              .
-            </p>
-          </section>
-
-          {/* Section 2 */}
-          <section id="information-collected" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">02</span>
-              Information Collected
-            </h2>
-            <p>
-              We collect information that you voluntarily provide to us when submitting an enquiry or contacting our studio. Specifically, our live contact form provides for the following fields:
-            </p>
-            <ul className="list-disc pl-6 mt-3 space-y-2 text-[#A1A1AA]">
-              <li><strong className="text-white">Full Name:</strong> To address you and identify your enquiry;</li>
-              <li><strong className="text-white">Work Email:</strong> To communicate regarding project scope and follow-ups;</li>
-              <li><strong className="text-white">Company / Organization:</strong> To understand your business context and operational scope;</li>
-              <li><strong className="text-white">Project Type / Category:</strong> To evaluate fit with our engineering, AI, platform, or experience design capabilities;</li>
-              <li><strong className="text-white">Phone Number (Optional):</strong> To facilitate direct coordination if provided;</li>
-              <li><strong className="text-white">Project Description / Message:</strong> Detailed notes and technical requirements you provide.</li>
-            </ul>
-            <p className="mt-4">
-              <strong className="text-white">Technical Logs:</strong> When accessing the website, standard web server runtime and hosting infrastructure may record standard operational connection logs, including IP address, user-agent, request timestamp, and HTTP response code. These logs are used strictly for service delivery, infrastructure health, and cybersecurity monitoring.
-            </p>
-          </section>
-
-          {/* Section 3 */}
-          <section id="why-information-used" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">03</span>
-              Why Information is Used
-            </h2>
-            <p>
-              We process personal information exclusively for specified, legitimate business purposes:
-            </p>
-            <ul className="list-disc pl-6 mt-3 space-y-2 text-[#A1A1AA]">
-              <li>Responding to incoming project enquiries and requests for proposals;</li>
-              <li>Evaluating technical compatibility, project timelines, and studio bandwidth;</li>
-              <li>Communicating with you regarding requested services and potential collaborations;</li>
-              <li>Operating, securing, and defending our website infrastructure against malicious activity;</li>
-              <li>Maintaining necessary internal business records and fulfilling statutory compliance obligations.</li>
-            </ul>
-            <p className="mt-3">
-              We do not use submitted enquiry details for unsolicited promotional email blasts or newsletters, nor do we run marketing mailing lists on this website.
-            </p>
-          </section>
-
-          {/* Section 4 */}
-          <section id="legal-basis" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">04</span>
-              Legal Basis and Permission
-            </h2>
-            <p>
-              Under applicable data protection principles, including the DPDP Act 2023, our processing of your personal information is based on your voluntary submission and consent when sending an enquiry, as well as our legitimate business interest in responding to commercial enquiries initiated by you.
-            </p>
-            <p className="mt-3">
-              Where data processing is necessary to take preliminary steps prior to entering into a formal client contract, processing is carried out for that specific purpose. You may withdraw consent for further communication at any time by notifying us at{' '}
-              <a
-                href="mailto:hello@ostrum.co"
-                className="text-[#F04438] hover:underline"
-              >
-                hello@ostrum.co
-              </a>
-              .
-            </p>
-          </section>
-
-          {/* Section 5 */}
-          <section id="data-sharing" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">05</span>
-              Data Sharing and Processors
-            </h2>
-            <p>
-              Ostrum does not sell, rent, or trade your personal information. We do not provide your data to third-party data brokers or marketing networks.
-            </p>
-            <p className="mt-3">
-              Your information may only be processed by operational infrastructure vendors who provide cloud hosting, application runtime, domain hosting, or secure email dispatch services essential to delivering our website and communicating with you. These vendors act strictly under contractual obligations to process data securely and solely for the operational purposes we instruct.
-            </p>
-          </section>
-
-          {/* Section 6 */}
-          <section id="international-transfers" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">06</span>
-              Cross-Border Data Transfers
-            </h2>
-            <p>
-              Depending on the geographic deployment of cloud hosting infrastructure (such as Vercel, cloud server clusters, or global edge content delivery networks), data submitted through the website may transit through servers located outside of India. All such transfers are conducted in accordance with applicable statutory regulations and established cybersecurity safeguards.
-            </p>
-          </section>
-
-          {/* Section 7 */}
-          <section id="data-retention" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">07</span>
-              Data Retention
-            </h2>
-            <p>
-              We retain project enquiry details only for as long as reasonably required to evaluate and respond to your request, conduct preliminary discussions, preserve legitimate business records of commercial enquiries, or satisfy legal and dispute resolution requirements.
-            </p>
-            <p className="mt-3">
-              When an enquiry does not lead to a commercial engagement and is no longer needed for auditing or communications, the associated personal information is securely removed or anonymized.
-            </p>
-          </section>
-
-          {/* Section 8 */}
-          <section id="security" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">08</span>
-              Security Safeguards
-            </h2>
-            <p>
-              We employ reasonable technical and organizational safeguards to protect submitted personal data against unauthorized access, loss, misuse, or alteration. All web communications are transmitted over modern encrypted protocols (HTTPS/TLS).
-            </p>
-            <p className="mt-3">
-              However, no electronic transmission over the Internet can be guaranteed as 100% invulnerable. We encourage you to exercise prudence and avoid submitting sensitive personal credentials or financial account numbers through general contact forms.
-            </p>
-          </section>
-
-          {/* Section 9 */}
-          <section id="rights-and-choices" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">09</span>
-              Your Rights and Choices
-            </h2>
-            <p>
-              Subject to applicable laws, including the DPDP Act 2023, you have rights regarding the personal information you share with us:
-            </p>
-            <ul className="list-disc pl-6 mt-3 space-y-2 text-[#A1A1AA]">
-              <li><strong className="text-white">Right to Access:</strong> You may request a summary of the personal data we hold about your enquiry;</li>
-              <li><strong className="text-white">Right to Correction:</strong> You may request correction of inaccurate, incomplete, or outdated data;</li>
-              <li><strong className="text-white">Right to Erasure:</strong> You may request the deletion of your personal data where it is no longer required for the purpose for which it was collected;</li>
-              <li><strong className="text-white">Right to Withdraw Consent:</strong> You may revoke consent for ongoing communications at any time.</li>
-            </ul>
-            <p className="mt-3">
-              To exercise any of these rights, please email{' '}
-              <a
-                href="mailto:hello@ostrum.co"
-                className="text-[#F04438] hover:underline"
-              >
-                hello@ostrum.co
-              </a>
-              . We will review and respond to verified requests within statutory timeframes.
-            </p>
-          </section>
-
-          {/* Section 10 */}
-          <section id="cookies-and-analytics" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">10</span>
-              Cookies and Analytics
-            </h2>
-            <p>
-              Our website is designed with a privacy-respecting posture. We do not deploy third-party advertising tracking cookies, behavioral remarketing pixels, or invasive surveillance scripts on this website.
-            </p>
-            <p className="mt-3">
-              Essential technical session mechanisms may be used strictly to ensure correct page delivery, smooth scrolling performance, and theme consistency. If optional performance analytics are integrated in the future, this policy will be updated with relevant transparency details.
-            </p>
-          </section>
-
-          {/* Section 11 */}
-          <section id="childrens-privacy" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">11</span>
-              Children&apos;s Privacy
-            </h2>
-            <p>
-              Our website and services are intended exclusively for commercial, business, and professional audiences. We do not knowingly solicit or collect personal information from children under the age of 18. If a parent or legal guardian discovers that a child has submitted personal details through our form, please alert us at{' '}
-              <a
-                href="mailto:hello@ostrum.co"
-                className="text-[#F04438] hover:underline"
-              >
-                hello@ostrum.co
-              </a>
-              , and we will promptly delete the data.
-            </p>
-          </section>
-
-          {/* Section 12 */}
-          <section id="external-links" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">12</span>
-              External Links
-            </h2>
-            <p>
-              This website may reference external third-party links or industry references for convenience. We have no authority over, and assume no responsibility for, the content or privacy standards of external websites. We encourage you to review the privacy policies of any third-party destinations you visit.
-            </p>
-          </section>
-
-          {/* Section 13 */}
-          <section id="policy-changes-and-contact" className="scroll-mt-24 pt-6 border-t border-white/10">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-sm text-[#F04438]">13</span>
-              Policy Changes and Contact
-            </h2>
-            <p>
-              We reserve the right to revise this Privacy Policy to reflect evolving regulatory frameworks or adjustments to our technical architecture. Updated versions will be published on this page with the modified &quot;Last Updated&quot; date indicated at the top.
-            </p>
-            <div className="mt-4 p-4 rounded-xl border border-white/10 bg-white/[0.02]">
-              <p className="font-mono text-xs uppercase tracking-wider text-[#A1A1AA] mb-1">
-                Data Controller &amp; Inquiries
-              </p>
-              <p className="font-sans font-semibold text-white">
-                Ostrum Studio
-              </p>
-              <p className="font-mono text-sm text-[#D4D4D8] mt-1">
-                Contact:{' '}
-                <a
-                  href="mailto:hello@ostrum.co"
-                  className="text-[#F04438] hover:underline"
-                >
-                  hello@ostrum.co
-                </a>
-              </p>
-            </div>
-            <p className="mt-4 text-xs text-[#71717A] italic">
-              [Note for Legal Review: Final registered corporate entity details, grievance officer designations, and physical registered office addresses subject to legal owner verification before production deployment.]
-            </p>
-          </section>
-        </div>
-      </main>
-
-      {/* Minimal Footer */}
-      <footer className="w-full border-t border-white/10 py-8 px-6 text-center font-mono text-xs text-[#71717A]">
-        © {new Date().getFullYear()} Ostrum. All rights reserved.
-      </footer>
-    </div>
+      </section>
+    </LegalDocumentLayout>
   );
 }

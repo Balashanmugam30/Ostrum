@@ -30,24 +30,23 @@ export default function HomePage() {
       {/* SECTION 06: Testimonials (Ignite-inspired Stacked Editorial Cards) */}
       <OstrumTestimonialsSection />
 
-      {/* SECTIONS 07 & 08: Unified FAQ & Contact Purple Color Field (Continuous Purple-Dominant Gradient) */}
+      {/* SECTIONS 07 & 08: Unified FAQ & Contact Red Color Field */}
       <div
         id="faq-contact-field"
         className="relative z-20 w-full overflow-hidden select-text"
         style={{
           background: `linear-gradient(
             180deg,
-            #FFFEFF 0%,
-            #FFFEFF 4%,
-            #F3EAF9 10%,
-            #DFC4EE 22%,
-            #C6A0E0 38%,
-            #A779CE 55%,
-            #8354B4 72%,
-            #604080 85%,
-            #392344 92%,
-            #160D20 96%,
-            #050505 98%,
+            #FFFEFA 0%,
+            #FAF1EC 12%,
+            #F4DAD1 26%,
+            #E7B6A8 40%,
+            #D96B54 48%,
+            #D24B2C 54%,
+            #C9362B 62%,
+            #8D2620 74%,
+            #42100F 85%,
+            #1E0908 94%,
             #050505 100%
           )`,
         }}

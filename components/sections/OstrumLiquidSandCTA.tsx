@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import SculptureHero from '@/components/ui/liquid-sculpture-hero';
 
 export function OstrumLiquidSandCTA() {
@@ -75,10 +76,10 @@ export function OstrumLiquidSandCTA() {
             Digital products, intelligent systems, and experiences built around what you need.
           </p>
 
-          {/* Primary CTA Button pointing to #contact */}
+          {/* Primary CTA Button pointing to /#contact */}
           <div className="mt-8 sm:mt-9">
-            <a
-              href="#contact"
+            <Link
+              href="/#contact"
               data-testid="cta-primary-button"
               className="inline-flex items-center gap-2.5 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-white hover:bg-[#FAF9FF] text-[#050505] font-sans text-base sm:text-lg font-bold shadow-[0_4px_24px_rgba(255,255,255,0.12)] hover:shadow-[0_8px_32px_rgba(255,255,255,0.24)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
@@ -95,7 +96,7 @@ export function OstrumLiquidSandCTA() {
               >
                 <path d="M4 12L12 4M12 4H6M12 4V10" />
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </SculptureHero>

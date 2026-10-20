@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { gsap } from 'gsap';
@@ -16,12 +17,18 @@ if (typeof window !== 'undefined') {
 let cachedModelScene: THREE.Group | null = null;
 
 export function OstrumContinuousJourney() {
+  const pathname = usePathname();
+  const isLegalPage =
+    pathname?.startsWith('/terms-and-conditions') ||
+    pathname?.startsWith('/privacy-policy');
+
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const {
     phase,
-    energyProgress,
-    handoffProgress,
+    introProgress,
+    transformProgress,
+    dockProgress,
     reportModelReady,
     reportFirstFrame,
     reportHeroTargetReady,
@@ -30,15 +37,17 @@ export function OstrumContinuousJourney() {
 
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
-  const energyRef = useRef(energyProgress);
-  energyRef.current = energyProgress;
-  const handoffRef = useRef(handoffProgress);
-  handoffRef.current = handoffProgress;
+  const introProgressRef = useRef(introProgress);
+  introProgressRef.current = introProgress;
+  const transformProgressRef = useRef(transformProgress);
+  transformProgressRef.current = transformProgress;
+  const dockProgressRef = useRef(dockProgress);
+  dockProgressRef.current = dockProgress;
   const isModelReadyRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || isLegalPage) return;
 
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
@@ -148,11 +157,14 @@ export function OstrumContinuousJourney() {
       emissive: emissiveBlack.clone(),
       emissiveIntensity: 0,
       side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 1,
     });
 
     // 5. Model Root & Pivot Group
     const modelRoot = new THREE.Group();
     scene.add(modelRoot);
+    modelRoot.visible = false; // Hidden during intro counting until transformation
 
     const pivotGroup = new THREE.Group();
     modelRoot.add(pivotGroup);
@@ -182,27 +194,28 @@ export function OstrumContinuousJourney() {
       );
     });
 
-    // Filament 2: Warm Amber / Champagne Orbital Arc
+    // Filament 2: Amber Secondary Helix (counter-rotating ribbon)
     const curve2 = createFilamentCurve((t) => {
-      const r = 1.72 - 0.18 * Math.sin(2 * t);
+      const r = 1.84 + 0.18 * Math.sin(3 * t);
       return new THREE.Vector3(
-        r * Math.cos(t + 0.8),
-        1.72 * Math.sin(t + 0.8),
-        -1.08 * Math.sin(2 * t + 0.5)
+        r * Math.cos(-t + 0.5),
+        1.75 * Math.sin(-t + 0.5),
+        0.85 * Math.cos(2 * t)
       );
     });
 
-    // Filament 3: Ivory Lightning Trace
+    // Filament 3: Champagne Tertiary Whisp (outer highlight)
     const curve3 = createFilamentCurve((t) => {
+      const r = 1.48 + 0.28 * Math.cos(t);
       return new THREE.Vector3(
-        1.42 * Math.cos(t - 1.2),
-        2.08 * Math.sin(t - 1.2) * (1 + 0.12 * Math.cos(2 * t)),
-        0.82 * Math.sin(3 * t)
+        r * Math.sin(t * 1.5),
+        1.55 * Math.cos(t),
+        1.10 * Math.sin(t * 2.5)
       );
     });
 
     const filamentMat1 = new THREE.MeshBasicMaterial({
-      color: new THREE.Color('#ff203a'),
+      color: new THREE.Color('#ff2233'),
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -236,6 +249,50 @@ export function OstrumContinuousJourney() {
     filamentsGroup.add(tubeMesh1);
     filamentsGroup.add(tubeMesh2);
     filamentsGroup.add(tubeMesh3);
+
+    // =========================================================================
+    // =========================================================================
+    // 7. 3D PROGRESS RIBBON & UNDERSTATED CHARCOAL TRACK
+    // =========================================================================
+    const ribbonGroup = new THREE.Group();
+    scene.add(ribbonGroup);
+    ribbonGroup.position.set(0, 0, 0);
+
+    const TRACK_WIDTH = isMobile ? 1.60 : 2.20;
+    const startX = -TRACK_WIDTH / 2;
+    const endX = TRACK_WIDTH / 2;
+
+    // Understated Charcoal Progress Track (matches ribbon endpoints with 0px protrusion)
+    const trackGeom = new THREE.PlaneGeometry(TRACK_WIDTH, 0.075);
+    const trackMat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color('#222226'),
+      transparent: true,
+      opacity: 1,
+      side: THREE.DoubleSide,
+    });
+    const trackMesh = new THREE.Mesh(trackGeom, trackMat);
+    trackMesh.position.set(0, 0, 0.01);
+    ribbonGroup.add(trackMesh);
+
+    const RIBBON_SAMPLES = 64;
+    const ribbonPoints: THREE.Vector3[] = [];
+    for (let i = 0; i <= RIBBON_SAMPLES; i++) {
+      ribbonPoints.push(new THREE.Vector3(startX + (TRACK_WIDTH * i) / RIBBON_SAMPLES, 0, 0.05));
+    }
+
+    const ribbonCurve = new THREE.CatmullRomCurve3(ribbonPoints, false, 'centripetal');
+    let ribbonGeometry = new THREE.TubeGeometry(ribbonCurve, isMobile ? 40 : 56, 0.046, 8, false);
+    const ribbonMaterial = material.clone();
+    ribbonMaterial.transparent = true;
+    ribbonMaterial.opacity = 1;
+    const ribbonMesh = new THREE.Mesh(ribbonGeometry, ribbonMaterial);
+    ribbonMesh.scale.set(1.0, 1.0, 0.55); // 1:1 X/Y proportion, sleek sculptural ribbon profile
+    ribbonGroup.add(ribbonMesh);
+
+    // Tip accent highlight
+    const tipGlow = new THREE.PointLight('#fff7ee', 1.6, 3.0, 2.0);
+    tipGlow.position.set(startX, 0, 0.15);
+    ribbonGroup.add(tipGlow);
 
     const setupModelMesh = (rawGroup: THREE.Group) => {
       rawGroup.traverse((child) => {
@@ -288,7 +345,7 @@ export function OstrumContinuousJourney() {
       );
     }
 
-    // 7. Mathematical Screen-to-World Projection
+    // 8. Mathematical Screen-to-World Projection
     const getVisibleWorldDimensions = () => {
       const vHeight = 2 * Math.tan((34 * Math.PI) / 360) * 7.5;
       const vWidth = vHeight * (window.innerWidth / window.innerHeight);
@@ -302,8 +359,11 @@ export function OstrumContinuousJourney() {
       return { x: worldX, y: worldY };
     };
 
-    // 8. Dynamic Anchor Geometry
+    // 9. Dynamic Anchor Geometry
     interface AnchorData {
+      introDocX: number;
+      introDocY: number;
+      introScale: number;
       heroDocX: number;
       heroDocY: number;
       heroScale: number;
@@ -316,13 +376,16 @@ export function OstrumContinuousJourney() {
     }
 
     let anchors: AnchorData = {
+      introDocX: window.innerWidth * 0.50,
+      introDocY: window.innerHeight * 0.50,
+      introScale: isMobile ? 0.40 : 0.48,
       heroDocX: window.innerWidth * 0.16,
       heroDocY: window.innerHeight * 0.35,
       heroScale: 0.25,
       slotDocX: window.innerWidth * 0.50,
       slotDocY: window.innerHeight * 1.8,
       slotScale: 0.55,
-      energyScale: 0.62,
+      energyScale: 0.58,
       dockScrollY: 1000,
       exitScrollY: 3800,
     };
@@ -330,6 +393,15 @@ export function OstrumContinuousJourney() {
     const updateAnchors = () => {
       const isMob = window.innerWidth < 768;
       const vHeight = 2 * Math.tan((34 * Math.PI) / 360) * 7.5;
+
+      // 0. Intro Center Anchor (Visual center of screen)
+      const iDocX = window.innerWidth * 0.50;
+      const iDocY = window.innerHeight * 0.50;
+      const iScale = isMob ? 0.40 : 0.48;
+
+      anchors.introDocX = iDocX;
+      anchors.introDocY = iDocY;
+      anchors.introScale = iScale;
 
       // 1. Measure Hero SVG Wordmark
       const heroSvg = document.querySelector('.intro svg[aria-label="OSTRUM"]');
@@ -346,9 +418,15 @@ export function OstrumContinuousJourney() {
         reportHeroTargetReady();
       }
 
+      // Hero scale: fit comfortably inside 'O' counter footprint with zero collision with 'S'
+      // Scaled strictly proportional to measured 'O' width
       const heroPixelTarget = Math.max(32, hWidth * 0.72);
       const heroWorldUnits = (heroPixelTarget / window.innerHeight) * vHeight;
       const hScale = Math.max(0.05, Math.min(0.24, heroWorldUnits / 3.35));
+
+      anchors.heroDocX = hDocX;
+      anchors.heroDocY = hDocY;
+      anchors.heroScale = hScale;
 
       // 2. Measure Section 02 Slot
       const engineSlot = document.getElementById('section02-sculpture-slot');
@@ -363,29 +441,29 @@ export function OstrumContinuousJourney() {
         sWidth = slotRect.width;
       }
 
+      // Section 02 scale: fit cleanly within the slot with ample breathing room
       const slotPixelTarget = isMob
         ? Math.min(220, window.innerWidth * 0.58)
         : Math.min(330, sWidth * 0.70);
       const slotWorldUnits = (slotPixelTarget / window.innerHeight) * vHeight;
       const sScale = Math.max(0.25, Math.min(0.55, slotWorldUnits / 3.35));
 
-      // 3. Section 03 Scale Target (Majestic focal presence)
-      const energyPixelTarget = isMob
-        ? Math.min(270, window.innerWidth * 0.68)
-        : Math.min(420, window.innerWidth * 0.32);
-      const energyWorldUnits = (energyPixelTarget / window.innerHeight) * vHeight;
-      const eScale = Math.max(0.32, Math.min(0.68, energyWorldUnits / 3.35));
+      // 3. Section 03 Scale Target: Subtle focal zoom (4–5% larger than Section 02 slot size)
+      // Restrained medium focal scale (~94.5% of previous), visually balanced against narrative typography
+      const eScale = sScale * 1.04;
 
       const st = ScrollTrigger.getById('section02-hold');
       const dScrollY = st ? st.start : Math.max(1, sDocY - window.innerHeight * 0.50);
 
       const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
-      // The selected-work stage covers the sculpture as soon as the energy pin releases.
       const exitY = stEnergy
         ? stEnergy.end + 100
         : dScrollY + (isMob ? 5000 : 7500);
 
       anchors = {
+        introDocX: iDocX,
+        introDocY: iDocY,
+        introScale: iScale,
         heroDocX: hDocX,
         heroDocY: hDocY,
         heroScale: hScale,
@@ -424,18 +502,114 @@ export function OstrumContinuousJourney() {
     };
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
-    // 9. Master Continuous Render Loop
+    // Animation loop state
+    let isInitialized = false;
     let currentX = 0;
     let currentY = 0;
     let currentScale = anchors.heroScale;
     let currentRotationY = 0;
     let currentEnergy = 0;
-    let isInitialized = false;
     let hasPlayedArrival = false;
-    let startRotY = 0;
-    let hasCapturedStartRot = false;
     let hasReportedFirstFrame = false;
 
+    // Helper: update 3D Progress Ribbon Geometry during intro
+    const updateRibbonPoints = (
+      pPhase: string,
+      pIntro: number,
+      pTransform: number
+    ) => {
+      if (pPhase === 'preparing') {
+        trackMat.opacity = 1;
+        const minHead = startX + TRACK_WIDTH * 0.005;
+        for (let k = 0; k <= RIBBON_SAMPLES; k++) {
+          const u = k / RIBBON_SAMPLES;
+          const px = startX + (minHead - startX) * u;
+          ribbonPoints[k].set(px, 0, 0.05);
+        }
+        tipGlow.position.set(minHead, 0, 0.15);
+        tipGlow.intensity = 0.8;
+        ribbonGroup.rotation.set(0, 0, 0);
+      } else if (pPhase === 'counting') {
+        trackMat.opacity = 1;
+        const clampedP = Math.max(0.005, Math.min(1.0, pIntro));
+        const currentEnd = startX + TRACK_WIDTH * clampedP;
+
+        for (let k = 0; k <= RIBBON_SAMPLES; k++) {
+          const u = k / RIBBON_SAMPLES;
+          // Progress ribbon advances strictly from startX to currentEnd
+          const px = startX + (currentEnd - startX) * u;
+          const normX = (px - startX) / TRACK_WIDTH;
+          // Subtle elegant elevation wave across the active path
+          const py = Math.sin(normX * Math.PI) * 0.025;
+          const pz = 0.05 + Math.cos(normX * Math.PI * 2) * 0.015;
+          ribbonPoints[k].set(px, py, pz);
+        }
+
+        tipGlow.position.set(currentEnd, 0, 0.15);
+        tipGlow.intensity = 1.4;
+        ribbonGroup.rotation.set(0, 0, 0);
+      } else if (pPhase === 'transforming') {
+        // Morph the completed horizontal ribbon into the broad 3-lobe Ostrum Möbius sculpture
+        const t = Math.max(0, Math.min(1.0, pTransform));
+
+        // Background track fades out smoothly as transformation begins
+        trackMat.opacity = Math.max(0, 1 - t * 3.5);
+
+        for (let k = 0; k <= RIBBON_SAMPLES; k++) {
+          const u = k / RIBBON_SAMPLES;
+          // Base horizontal curve at t=0
+          const x0 = startX + TRACK_WIDTH * u;
+          const y0 = Math.sin(u * Math.PI) * 0.025;
+          const z0 = 0.05 + Math.cos(u * Math.PI * 2) * 0.015;
+
+          // Target 3-lobe Möbius loop geometry matching media_1792170732096_47cecb64.png
+          // Broad, softly rounded triangular loop with circular 1:1 footprint (NOT a narrow raindrop or vertical oval)
+          const angle = u * Math.PI * 2;
+          const R0 = 1.45;
+          const A = 0.22;
+          const B = 0.38;
+          const r = R0 + A * Math.cos(3 * angle);
+          const x1 = r * Math.cos(angle);
+          const y1 = r * Math.sin(angle);
+          const z1 = B * Math.sin(3 * angle);
+
+          // Sequential curling: leading tip curves around first to fold into the loop
+          const curlDelay = (1 - u) * 0.24;
+          const localT = Math.max(0, Math.min(1, (t - curlDelay) / (1 - curlDelay || 1)));
+          const easeT = localT < 0.5 ? 4 * localT * localT * localT : 1 - Math.pow(-2 * localT + 2, 3) / 2;
+
+          const curX = x0 * (1 - easeT) + x1 * easeT;
+          const curY = y0 * (1 - easeT) + y1 * easeT;
+          const curZ = z0 * (1 - easeT) + z1 * easeT;
+          ribbonPoints[k].set(curX, curY, curZ);
+        }
+
+        // Align ribbon group orientation with GLB resting pose (0.20 on X, -0.05 on Z)
+        ribbonGroup.rotation.x = t * 0.20;
+        ribbonGroup.rotation.z = -t * 0.05;
+        ribbonGroup.rotation.y = 0;
+
+        // Dynamic light sweep over curling surfaces
+        const sweep = Math.sin(t * Math.PI);
+        energyRubyLight.intensity = sweep * 2.8;
+        energyAmberLight.intensity = sweep * 1.5;
+        ribbonMaterial.sheenColor.lerpColors(sheenColorNormal, sheenColorScarlet, sweep);
+        tipGlow.intensity = (1 - t) * 1.5;
+      }
+
+      // Rebuild tube mesh along updated curve
+      ribbonCurve.updateArcLengths();
+      ribbonMesh.geometry.dispose();
+      ribbonMesh.geometry = new THREE.TubeGeometry(
+        ribbonCurve,
+        isMobile ? 40 : 56,
+        0.046,
+        8,
+        false
+      );
+    };
+
+    // Main Animation Loop
     const animate = (time: number) => {
       animId = 0;
       if (isDisposed || isContextLost) return;
@@ -451,8 +625,6 @@ export function OstrumContinuousJourney() {
       const energyStart = stEnergy ? stEnergy.start : dockEnd + (isMobile ? 500 : 800);
       const energyEnd = stEnergy ? stEnergy.end : energyStart + (isMobile ? 3600 : 5000) + window.innerHeight;
 
-      // Stop the renderer once the opaque Selected Work stage covers it. A scroll
-      // listener wakes it again when the visitor reverses into the journey.
       const exitBoundary = stEnergy ? stEnergy.end + 100 : anchors.exitScrollY;
       const isPastExit = scrollY > exitBoundary;
 
@@ -467,22 +639,22 @@ export function OstrumContinuousJourney() {
         }
       }
 
-      const currentPhase = phaseRef.current;
-
-      // =========================================================================
-      // LOADER STAGES A & B: 3D SCULPTURE STRICTLY HIDDEN
-      // No 3D model, no WebGL canvas during the 2D intro animation
-      // =========================================================================
-      if (currentPhase === 'stageA' || currentPhase === 'stageB') {
-        modelRoot.visible = false;
-        if (container.style.opacity !== '0') {
-          container.style.opacity = '0';
-        }
-        animId = requestAnimationFrame(animate);
-        return;
-      }
-
-      modelRoot.visible = true;
+      // Real-time synchronization with preloader phases
+      const currentPhase =
+        (typeof window !== 'undefined' && (window as any).__ostrumPhase) ||
+        phaseRef.current;
+      const introP =
+        (typeof window !== 'undefined' && (window as any).__ostrumIntroProgress !== undefined)
+          ? (window as any).__ostrumIntroProgress
+          : introProgressRef.current;
+      const transformP =
+        (typeof window !== 'undefined' && (window as any).__ostrumTransformProgress !== undefined)
+          ? (window as any).__ostrumTransformProgress
+          : transformProgressRef.current;
+      const dockP =
+        (typeof window !== 'undefined' && (window as any).__ostrumDockProgress !== undefined)
+          ? (window as any).__ostrumDockProgress
+          : dockProgressRef.current;
 
       let targetScreenX: number;
       let targetScreenY: number;
@@ -491,31 +663,98 @@ export function OstrumContinuousJourney() {
       let targetEnergyLevel = 0;
 
       // =========================================================================
-      // STAGE C: REVEAL IN HERO 'O'
-      // Model is cleanly docked inside Hero 'O', fading in with handoff progress
+      // INTRO PHASE 1: PREPARING (0.0s - 0.4s)
       // =========================================================================
-      if (currentPhase === 'stageC') {
-        const hp = handoffRef.current;
-        targetScreenX = anchors.heroDocX;
-        targetScreenY = anchors.heroDocY;
-        targetScale = anchors.heroScale;
+      if (currentPhase === 'preparing') {
+        ribbonGroup.visible = true;
+        modelRoot.visible = false;
+        ribbonMaterial.opacity = 1;
+        material.opacity = 0;
+
+        updateRibbonPoints('preparing', 0, 0);
+
+        targetScreenX = anchors.introDocX;
+        targetScreenY = anchors.introDocY;
+        targetScale = anchors.introScale;
         targetRotY = 0;
-        targetEnergyLevel = 0;
-
-        container.style.opacity = String(Math.min(1, hp * 1.2));
-
-        keyLight.color.set('#fff7ee');
-        keyLight.intensity = 2.2;
-        rimLight.color.set('#ff4d30');
-        rimLight.intensity = 1.8;
-        energyRubyLight.intensity = 0;
-        energyAmberLight.intensity = 0;
-        material.sheen = 0.40;
       }
       // =========================================================================
-      // STAGE 1: Journey (Hero 'O' -> Section 02)
+      // INTRO PHASE 2: COUNTING (0.4s - 4.2s)
+      // =========================================================================
+      else if (currentPhase === 'counting') {
+        ribbonGroup.visible = true;
+        modelRoot.visible = false;
+        ribbonMaterial.opacity = 1;
+        material.opacity = 0;
+
+        updateRibbonPoints('counting', introP, 0);
+
+        targetScreenX = anchors.introDocX;
+        targetScreenY = anchors.introDocY;
+        targetScale = anchors.introScale;
+        targetRotY = 0;
+      }
+      // =========================================================================
+      // INTRO PHASE 3: TRANSFORMING (4.2s - 5.4s)
+      // Ribbon coils inward into 3-lobe Möbius loop, with subtle hero zoom moment
+      // =========================================================================
+      else if (currentPhase === 'transforming') {
+        updateRibbonPoints('transforming', 1.0, transformP);
+
+        // Subtle hero presentation zoom & lighting as loop completes (transformP >= 0.82)
+        const heroP = transformP >= 0.82 ? (transformP - 0.82) / 0.18 : 0;
+        const zoomPulse = Math.sin(heroP * Math.PI * 0.5) * 0.15;
+
+        targetScreenX = anchors.introDocX;
+        targetScreenY = anchors.introDocY;
+        targetScale = anchors.introScale * (1.0 + zoomPulse);
+        targetRotY = 0;
+
+        if (transformP < 0.72) {
+          ribbonGroup.visible = true;
+          modelRoot.visible = false;
+          ribbonMaterial.opacity = 1;
+          material.opacity = 0;
+        } else {
+          // Model resolves into view without pop
+          ribbonGroup.visible = transformP < 0.98;
+          modelRoot.visible = true;
+          const fade = (transformP - 0.72) / 0.26;
+          ribbonMaterial.opacity = Math.max(0, 1 - fade);
+          material.opacity = Math.min(1, fade);
+        }
+      }
+      // =========================================================================
+      // INTRO PHASE 4: DOCKING (5.4s - 6.6s)
+      // Live GLB glides from center into measured Hero 'O' anchor
+      // =========================================================================
+      else if (currentPhase === 'docking') {
+        ribbonGroup.visible = false;
+        modelRoot.visible = true;
+        material.opacity = 1;
+
+        // dockP is already smoothly eased by GSAP with power2.inOut
+        const ease = dockP;
+
+        const startScale = anchors.introScale * 1.15;
+        targetScreenX = anchors.introDocX + (anchors.heroDocX - anchors.introDocX) * ease;
+        targetScreenY = anchors.introDocY + (anchors.heroDocY - anchors.introDocY) * ease;
+        targetScale = startScale + (anchors.heroScale - startScale) * ease;
+        targetRotY = 0;
+
+        energyRubyLight.intensity = (1 - ease) * 0.8;
+        energyAmberLight.intensity = 0;
+        keyLight.intensity = 2.2;
+        rimLight.intensity = 1.8;
+      }
+      // =========================================================================
+      // COMPLETE: HERO AT REST & DOWNSTREAM SCROLL JOURNEY
       // =========================================================================
       else if (scrollY < dockStart) {
+        ribbonGroup.visible = false;
+        modelRoot.visible = true;
+        material.opacity = 1;
+
         const t = Math.min(1, Math.max(0, scrollY / (dockStart || 1)));
         const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
@@ -533,6 +772,10 @@ export function OstrumContinuousJourney() {
       }
       // Stage 2: Section 02 Editorial Pinned Hold
       else if (scrollY <= dockEnd) {
+        ribbonGroup.visible = false;
+        modelRoot.visible = true;
+        material.opacity = 1;
+
         targetScreenX = anchors.slotDocX;
         targetScreenY = window.innerHeight * 0.50;
         targetScale = anchors.slotScale;
@@ -553,38 +796,63 @@ export function OstrumContinuousJourney() {
           });
         }
       }
-      // Stage 3: Transition (Section 02 -> Section 03)
+      // Stage 3: Phase B — Connected Darkening, Gentle Zoom & Stationary Orientation Hold
       else if (scrollY < energyStart) {
-        const transSpan = Math.max(1, energyStart - dockEnd);
-        const tTrans = Math.min(1, Math.max(0, (scrollY - dockEnd) / transSpan));
-        const easeTrans = tTrans < 0.5 ? 4 * tTrans * tTrans * tTrans : 1 - Math.pow(-2 * tTrans + 2, 3) / 2;
+        ribbonGroup.visible = false;
+        modelRoot.visible = true;
+        material.opacity = 1;
 
-        targetScreenX = window.innerWidth * 0.50;
+        const t = Math.min(1, Math.max(0, (scrollY - dockEnd) / (energyStart - dockEnd || 1)));
+        const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        // Smooth centered alignment into viewport focal position
+        const targetCenterX = window.innerWidth * 0.50;
+        targetScreenX = anchors.slotDocX + (targetCenterX - anchors.slotDocX) * ease;
         targetScreenY = window.innerHeight * 0.50;
-        targetScale = anchors.slotScale + (anchors.energyScale - anchors.slotScale) * easeTrans;
-        targetRotY = Math.PI * 2;
-        targetEnergyLevel = easeTrans * 0.20;
+
+        // Restrained focal zoom: gentle approach from Section 02 slot scale to Section 03 focal scale
+        targetScale = anchors.slotScale + (anchors.energyScale - anchors.slotScale) * ease;
+
+        // Stationary orientation hold during approach: rotation holds still at 2.0π (orientation held from Section 02)
+        targetRotY = Math.PI * 2 + focusBias * (1 - ease);
+        targetEnergyLevel = ease * 0.35;
       }
-      // Stage 4: Section 03 Pinned Energy Narrative (Beats 01 to 05 + stationary handoff)
+      // Stage 4: Energy Narrative Pinned Experience
       else if (scrollY <= energyEnd) {
-        const narrativeSpan = isMobile ? 3600 : 5000;
-        const pEnergy = Math.min(1, Math.max(0, (scrollY - energyStart) / narrativeSpan));
+        ribbonGroup.visible = false;
+        modelRoot.visible = true;
+        material.opacity = 1;
+
+        const initialHold = isMobile ? 450 : 600; // Pause 1: ~1s visual dwell on dark stage before text
+        const narrativeSpan = isMobile ? 3600 : 5000; // Preserved narrative travel span for the 5 beats
+        const narrativeStart = energyStart + initialHold;
+        const narrativeEnd = narrativeStart + narrativeSpan;
 
         targetScreenX = window.innerWidth * 0.50;
         targetScreenY = window.innerHeight * 0.50;
         targetScale = anchors.energyScale;
 
-        // Controlled rotation across the 5 narrative beats: from 2.0π to 4.0π (settles front pose at beat 05)
-        targetRotY = (2.0 + pEnergy * 2.0) * Math.PI;
-
-        // High-energy illuminated material response
-        targetEnergyLevel = Math.min(1, 0.20 + pEnergy * 0.80);
+        if (scrollY < narrativeStart) {
+          // Pause 1: Completed dark-background composition held stationary for ~1 second (zero rotation, orientation held from Section 02)
+          targetRotY = 2.0 * Math.PI;
+          targetEnergyLevel = 0.35;
+        } else if (scrollY <= narrativeEnd) {
+          // Synchronized rotation initiated as Beat 01 reveals, progressing smoothly across the 5 narrative beats
+          const narrativeProgress = Math.min(1, Math.max(0, (scrollY - narrativeStart) / (narrativeSpan || 1)));
+          targetRotY = 2.0 * Math.PI + narrativeProgress * (2.0 * Math.PI);
+          targetEnergyLevel = 0.35 + narrativeProgress * 0.65;
+        } else {
+          // Pause 2 & handoff: Completed closing composition held stationary for ~1 second in front-facing rest pose (4.0π) before Selected Work
+          targetRotY = 4.0 * Math.PI;
+          targetEnergyLevel = 1.0;
+        }
       }
       // Stage 5: Transition into Selected Work
       else {
-        // Sculpture settles permanently in its final centered resting pose.
-        // As Selected Work rises up from the bottom edge of the viewport (z-[20]),
-        // it physically covers and obscures the sculpture from the bottom up.
+        ribbonGroup.visible = false;
+        modelRoot.visible = true;
+        material.opacity = 1;
+
         targetScreenX = window.innerWidth * 0.50;
         targetScreenY = window.innerHeight * 0.50;
         targetScale = anchors.energyScale;
@@ -602,7 +870,12 @@ export function OstrumContinuousJourney() {
         currentRotationY = targetRotY;
         currentEnergy = targetEnergyLevel;
         isInitialized = true;
-      } else if (currentPhase === 'stageC') {
+      } else if (
+        currentPhase === 'preparing' ||
+        currentPhase === 'counting' ||
+        currentPhase === 'transforming' ||
+        currentPhase === 'docking'
+      ) {
         currentX = targetWorld.x;
         currentY = targetWorld.y;
         currentScale = targetScale;
@@ -611,66 +884,88 @@ export function OstrumContinuousJourney() {
       } else {
         const isPinnedState = scrollY >= dockStart && scrollY <= energyEnd;
         const posLerp = isPinnedState ? 0.35 : 0.18;
+        const rotLerp = isPinnedState ? 0.16 : 0.12;
         currentX += (targetWorld.x - currentX) * posLerp;
         currentY += (targetWorld.y - currentY) * posLerp;
         currentScale += (targetScale - currentScale) * 0.16;
-        currentRotationY += (targetRotY - currentRotationY) * 0.12;
+        currentRotationY += (targetRotY - currentRotationY) * rotLerp;
         currentEnergy += (targetEnergyLevel - currentEnergy) * 0.10;
       }
 
-      // Zero-G float: active during journey only
-      const isTraveling = scrollY < dockStart;
+      // Zero-G subtle organic breathing float: active during journey (Hero & travel)
+      const isTraveling = scrollY < dockStart && currentPhase === 'complete';
       const floatOffset = isTraveling ? Math.sin(time * 0.0016) * 0.04 * currentScale : 0;
 
       modelRoot.position.set(currentX, currentY + floatOffset, 0);
       modelRoot.scale.set(currentScale, currentScale, currentScale);
       modelRoot.rotation.y = currentRotationY;
+      if (typeof window !== 'undefined') {
+        (window as any).__ostrumModelRoot = modelRoot;
+        (window as any).__ostrumCurrentRotationY = currentRotationY;
+        (window as any).__ostrumCamera = camera;
+        (window as any).__ostrumAnchors = anchors;
+      }
 
       // Dynamic Material & Energy Updates (Zero React renders)
       const E = currentEnergy;
 
-      // Base color & specular reflections
-      material.color.lerpColors(porcelainColor, rubyChampagneColor, E * 0.75);
-      material.roughness = 0.26 - E * 0.10; // Becomes ultra-glossy liquid glass
-      material.metalness = 0.06 + E * 0.12;
-      material.clearcoat = 0.58 + E * 0.38;
-      material.clearcoatRoughness = 0.18 - E * 0.06;
-      material.sheen = 0.65 + E * 0.35;
-      material.sheenColor.lerpColors(sheenColorNormal, sheenColorScarlet, E);
-      material.emissive.lerpColors(emissiveBlack, emissiveScarlet, E);
-      material.emissiveIntensity = E * 1.4;
-
-      // Local energy point lights
-      energyRubyLight.intensity = E * 2.2;
-      energyRubyLight.position.set(currentX, currentY, 0.4);
-
-      energyAmberLight.intensity = E * 1.6;
-      energyAmberLight.position.set(currentX + 1.2 * currentScale, currentY + 0.6 * currentScale, -0.8);
-
-      // Energy Filaments Luminous Radiance & Flowing Currents
-      filamentMat1.opacity = E * 0.85;
-      filamentMat2.opacity = E * 0.70;
-      filamentMat3.opacity = E * 0.55;
-
       if (E > 0.01) {
-        filamentsGroup.rotation.y = currentRotationY * 0.2 + (time * 0.0006);
-        filamentsGroup.rotation.z = Math.sin(time * 0.001) * 0.08;
+        material.color.lerpColors(porcelainColor, rubyChampagneColor, E * 0.55);
+        material.roughness = 0.26 - E * 0.10;
+        material.clearcoat = 0.58 + E * 0.40;
+        material.sheen = 0.65 + E * 0.35;
+        material.sheenColor.lerpColors(sheenColorNormal, sheenColorScarlet, E);
+        material.emissive.lerpColors(emissiveBlack, emissiveScarlet, E * 0.60);
+        material.emissiveIntensity = E * 0.95;
+
+        filamentMat1.opacity = Math.min(0.92, E * 1.15);
+        filamentMat2.opacity = Math.min(0.78, E * 0.95);
+        filamentMat3.opacity = Math.min(0.65, E * 0.85);
+
+        energyRubyLight.intensity = E * 3.8;
+        energyAmberLight.intensity = E * 2.2;
+      } else if (currentPhase === 'complete') {
+        material.color.copy(porcelainColor);
+        material.roughness = 0.26;
+        material.clearcoat = 0.58;
+        material.sheen = 0.65;
+        material.sheenColor.copy(sheenColorNormal);
+        material.emissive.copy(emissiveBlack);
+        material.emissiveIntensity = 0;
+
+        filamentMat1.opacity = 0;
+        filamentMat2.opacity = 0;
+        filamentMat3.opacity = 0;
+
+        energyRubyLight.intensity = 0;
+        energyAmberLight.intensity = 0;
       }
 
-      // Spatial Pointer Tilt
-      if (!isMobile && !prefersReducedMotion) {
-        const isPinnedState = scrollY >= dockStart && scrollY <= energyEnd;
-        if (isPinnedState) {
-          modelRoot.rotation.x = pointer.y * 0.08;
-          modelRoot.rotation.z = -pointer.x * 0.06;
-          camera.position.x = pointer.x * 0.08;
-          camera.position.y = 0;
-        } else {
-          modelRoot.rotation.x = pointer.y * 0.16;
-          modelRoot.rotation.z = -pointer.x * 0.12;
-          camera.position.x = pointer.x * 0.18;
-          camera.position.y = pointer.y * 0.14;
+      // Subtle spatial pointer tilt
+      if (currentPhase === 'complete') {
+        pointer.x += (pointer.targetX - pointer.x) * 0.06;
+        pointer.y += (pointer.targetY - pointer.y) * 0.06;
+        focusBias += (targetFocusBias - focusBias) * 0.10;
+
+        if (!isMobile && !prefersReducedMotion) {
+          const isPinnedState = scrollY >= dockStart && scrollY <= energyEnd;
+          if (isPinnedState) {
+            modelRoot.rotation.x = pointer.y * 0.08;
+            modelRoot.rotation.z = -pointer.x * 0.06;
+            camera.position.x = pointer.x * 0.08;
+            camera.position.y = 0;
+          } else {
+            modelRoot.rotation.x = pointer.y * 0.16;
+            modelRoot.rotation.z = -pointer.x * 0.12;
+            camera.position.x = pointer.x * 0.18;
+            camera.position.y = pointer.y * 0.14;
+          }
         }
+      } else {
+        modelRoot.rotation.x = 0;
+        modelRoot.rotation.z = 0;
+        camera.position.x = 0;
+        camera.position.y = 0;
       }
       camera.lookAt(0, 0, 0);
 
@@ -692,7 +987,9 @@ export function OstrumContinuousJourney() {
         return;
       }
 
-      if (container.style.opacity !== '1') container.style.opacity = '1';
+      if (container.style.opacity !== '1') {
+        container.style.opacity = '1';
+      }
       if (!isDisposed && !isContextLost && animId === 0) {
         animId = requestAnimationFrame(animate);
       }
@@ -736,21 +1033,29 @@ export function OstrumContinuousJourney() {
       }
       renderer.dispose();
       material.dispose();
+      ribbonMaterial.dispose();
+      ribbonGeometry.dispose();
       tubeGeom1.dispose();
       tubeGeom2.dispose();
       tubeGeom3.dispose();
-      filamentMat1.dispose();
-      filamentMat2.dispose();
-      filamentMat3.dispose();
+      trackGeom.dispose();
+      trackMat.dispose();
+      if (ribbonMesh.geometry) {
+        ribbonMesh.geometry.dispose();
+      }
     };
-  }, [reportError, reportFirstFrame, reportHeroTargetReady, reportModelReady]);
+  }, [reportError, reportFirstFrame, reportHeroTargetReady, reportModelReady, isLegalPage]);
+
+  if (isLegalPage) {
+    return null;
+  }
 
   return (
     <div
       ref={containerRef}
-      className="ostrum-continuous-journey fixed inset-0 pointer-events-none z-[12] overflow-visible"
+      className="ostrum-continuous-journey fixed inset-0 pointer-events-none overflow-visible will-change-[opacity] z-[18]"
       style={{
-        opacity: 0,
+        opacity: 1,
         transition: 'opacity 0.4s ease',
       }}
       aria-hidden="true"

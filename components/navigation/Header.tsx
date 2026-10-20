@@ -1,18 +1,43 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { usePreloader } from '@/context/PreloaderContext';
 import { OstrumLogo } from '@/components/ui/OstrumLogo';
 
 export function Header() {
-  const { isComplete, phase } = usePreloader();
+  const pathname = usePathname();
+  const isLegalPage =
+    pathname?.startsWith('/terms-and-conditions') ||
+    pathname?.startsWith('/privacy-policy');
+
+  const { isComplete, phase, dockProgress } = usePreloader();
   const [scrolled, setScrolled] = useState(false);
   const [inFooter, setInFooter] = useState(false);
   const [isCinematic, setIsCinematic] = useState(false);
+  const [isLightSection, setIsLightSection] = useState(false);
 
-  const isRevealed = phase === 'stageC' || phase === 'complete';
+  const isRevealed =
+    (phase === 'docking' && dockProgress >= 0.5) ||
+    phase === 'complete' ||
+    isComplete;
+
+  const checkContrast = useCallback(() => {
+    if (typeof document === 'undefined') return false;
+    const headerPointY = 40;
+    const headerPointX = 60;
+    const targetEl = document.elementFromPoint(headerPointX, headerPointY);
+    if (!targetEl) return false;
+
+    const lightAncestor = targetEl.closest(
+      '#testimonials, #capabilities, [data-theme="light"], .bg-white, [style*="background-color: #FFFFFF"], [style*="background-color: rgb(255, 255, 255)"], [style*="#F7F5F2"], [style*="#FAF7F2"]'
+    );
+    return !!lightAncestor;
+  }, []);
 
   useEffect(() => {
+    if (isLegalPage) return;
+
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const docHeight = document.documentElement.scrollHeight;
@@ -29,11 +54,13 @@ export function Header() {
       setScrolled(scrollY > 120 && !nearBottom);
       setInFooter(nearBottom);
       setIsCinematic(inCinematicZone);
+      setIsLightSection(checkContrast());
     };
 
     const handleDarken = (e: Event) => {
       const customEvent = e as CustomEvent<number>;
-      const darken = typeof customEvent.detail === 'number' ? customEvent.detail : 0;
+      const darken =
+        typeof customEvent.detail === 'number' ? customEvent.detail : 0;
       setIsCinematic(darken > 0.15);
     };
 
@@ -44,35 +71,39 @@ export function Header() {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('ostrum:bg-darken', handleDarken);
     };
-  }, []);
+  }, [isLegalPage, checkContrast]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // If on dedicated legal pages, they render their own editorial header
+  if (isLegalPage) return null;
+
+  const textColorClass = isLightSection ? 'text-[#161514]' : 'text-[#FFF8F3]';
+
   return (
     <header
-      className={`header fixed top-6 right-6 left-6 z-40 flex items-center transition-all duration-500 ease-out pointer-events-none mix-blend-difference text-white ${
-        scrolled ? 'justify-between' : 'justify-end'
-      } ${!isRevealed || inFooter || isCinematic ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      className={`header fixed top-6 right-6 left-6 z-40 flex items-center justify-start transition-colors duration-300 ease-out pointer-events-none ${textColorClass} ${
+        !isRevealed || inFooter || isCinematic
+          ? 'opacity-0 pointer-events-none'
+          : 'opacity-100'
+      }`}
     >
       {/* Mini logo revealed on scroll */}
       <button
         onClick={scrollToTop}
-        className={`pointer-events-auto transition-all duration-500 text-white cursor-pointer ${
-          scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+        className={`pointer-events-auto transition-all duration-500 cursor-pointer ${textColorClass} ${
+          scrolled
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 -translate-y-2 pointer-events-none'
         }`}
         aria-label="Back to top"
       >
         <div className="w-[100px] h-auto">
-          <OstrumLogo />
+          <OstrumLogo className={textColorClass} />
         </div>
       </button>
-
-      {/* Top-Right Micro Label (Quiet discipline mark) */}
-      <div className="pointer-events-auto text-[10px] md:text-[11px] tracking-[0.2em] text-white/50 uppercase font-sans font-normal py-2 px-3 select-none">
-        DESIGN · TECHNOLOGY · VENTURES
-      </div>
     </header>
   );
 }

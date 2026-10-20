@@ -57,6 +57,25 @@
   --white-rgb: 255, 255, 255;
 
   /* ==========================================================================
+     OSTRUM MASTER BRAND COLOR TOKENS
+     Canonical triadic palette: Red, White, Black + Architectural Neutrals
+     ========================================================================== */
+  --ostrum-red: #C9362B;
+  --ostrum-red-rgb: 201, 54, 43;
+  --ostrum-red-accent: #FF4D30;
+  --ostrum-red-accent-rgb: 255, 77, 48;
+  --ostrum-black: #050505;
+  --ostrum-black-rgb: 5, 5, 5;
+  --ostrum-white: #FFFFFF;
+  --ostrum-white-rgb: 255, 255, 255;
+  --ostrum-paper: #F7F5F2;
+  --ostrum-paper-rgb: 247, 245, 242;
+  --ostrum-neutral: #EAE7E2;
+  --ostrum-neutral-rgb: 234, 231, 226;
+  --ostrum-muted-black: #161616;
+  --ostrum-muted-black-rgb: 22, 22, 22;
+
+  /* ==========================================================================
      OSTRUM FOOTER ACCENT TOKEN & ROLLBACK
      - Canonical Hero Red: #FF4D30 (matching hero 3D rim light & LivingThread core)
      - Previous Working Footer Red: #F04438 (documented rollback)
@@ -66,6 +85,8 @@
   --ostrum-footer-accent-previous-rgb: 240, 68, 56;
   --ostrum-footer-accent: #FF4D30;
   --ostrum-footer-accent-rgb: 255, 77, 48;
+  --ostrum-footer-label-accent: #FF765E;
+  --ostrum-footer-label-accent-rgb: 255, 118, 94;
 }
 
 html {
@@ -476,30 +497,12 @@ body {
   contain: layout paint;
 }
 
-.selected-work-overview-sculpture {
-  top: 50%;
-  left: clamp(2rem, 4vw, 4.5rem);
-  width: min(28vw, 31.25rem);
-  transform: translateY(-50%);
-  contain: layout paint;
-}
-
 .ostrum-signature-sculpture {
   display: block;
   width: 100%;
   height: auto;
   overflow: visible;
   will-change: transform;
-}
-
-.ostrum-signature-sculpture--selected-work {
-  animation: selectedWorkSculptureDrift 18s ease-in-out infinite;
-  transform-origin: center;
-}
-
-@keyframes selectedWorkSculptureDrift {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -5px, 0); }
 }
 
 .capability-card:focus-visible {
@@ -515,12 +518,6 @@ body {
   transform: scale(1.07);
 }
 
-@media (max-width: 1279px) {
-  .selected-work-overview-sculpture {
-    left: clamp(1.5rem, 3vw, 3rem);
-    width: min(30vw, 21.25rem);
-  }
-}
 
 @media (hover: hover) and (pointer: fine) {
   .capability-card:hover {
@@ -535,12 +532,6 @@ body {
   }
 }
 
-@media (max-width: 639px) {
-  .selected-work-overview-sculpture {
-    left: 0.5rem;
-    width: min(26vw, 6.875rem);
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .ostrum-signature-sculpture,
@@ -560,5 +551,80 @@ body {
     transform: none !important;
   }
 }
+
+/* ==========================================================================
+   BACKGROUND-AWARE TEXT SELECTION STYLING
+   ========================================================================== */
+
+::selection {
+  background-color: #C9362B;
+  color: #FFFFFF;
+}
+
+::-moz-selection {
+  background-color: #C9362B;
+  color: #FFFFFF;
+}
+
+/* Light Background Surfaces (Testimonials, Capabilities, White Cards) */
+.bg-white ::selection,
+[style*="background-color: #FFFFFF"] ::selection,
+[style*="background-color: #FAF7F2"] ::selection,
+[style*="background-color: #FFF8F3"] ::selection,
+[data-testid="contact-form-panel"] ::selection {
+  background-color: #D24B2C !important;
+  color: #FFFFFF !important;
+}
+
+.bg-white ::-moz-selection,
+[style*="background-color: #FFFFFF"] ::-moz-selection,
+[style*="background-color: #FAF7F2"] ::-moz-selection,
+[style*="background-color: #FFF8F3"] ::-moz-selection,
+[data-testid="contact-form-panel"] ::-moz-selection {
+  background-color: #D24B2C !important;
+  color: #FFFFFF !important;
+}
+
+/* Legal Pages: Deep Oxblood with Warm Off-White Text */
+.legal-page ::selection {
+  background-color: #42100F !important;
+  color: #FFF8F3 !important;
+}
+
+.legal-page ::-moz-selection {
+  background-color: #42100F !important;
+  color: #FFF8F3 !important;
+}
+
+/* Deep Crimson / Oxblood Surfaces (Footer, Resting Wheel) */
+[style*="#64120F"] ::selection,
+.theatre-stage ::selection,
+footer ::selection {
+  background-color: #FFF8F3 !important;
+  color: #050505 !important;
+}
+
+[style*="#64120F"] ::-moz-selection,
+.theatre-stage ::-moz-selection,
+footer ::-moz-selection {
+  background-color: #FFF8F3 !important;
+  color: #050505 !important;
+}
+
+/* Pure Black / Dark Surfaces (Hero, Energy Narrative, CTA) */
+.bg-black ::selection,
+.bg-\[\#050505\] ::selection,
+.theatre-curtain ::selection {
+  background-color: #C9362B !important;
+  color: #FFFFFF !important;
+}
+
+.bg-black ::-moz-selection,
+.bg-\[\#050505\] ::-moz-selection,
+.theatre-curtain ::-moz-selection {
+  background-color: #C9362B !important;
+  color: #FFFFFF !important;
+}
+
 
 

@@ -9,10 +9,10 @@ import { LivingThread } from '@/components/ui/LivingThread';
 
 export function IntroHero() {
   const { t } = useLanguage();
-  const { phase } = usePreloader();
+  const { phase, dockProgress } = usePreloader();
   const [scrolled, setScrolled] = useState(false);
 
-  const isRevealed = phase === 'stageC' || phase === 'complete';
+  const isRevealed = (phase === 'docking' && dockProgress >= 0.45) || phase === 'complete';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,7 +24,7 @@ export function IntroHero() {
   }, []);
 
   return (
-    <section className="intro relative w-full h-[100svh] min-h-[640px] flex flex-col items-center justify-center overflow-hidden px-4">
+    <section className="intro relative z-[10] w-full h-[100svh] min-h-[640px] flex flex-col items-center justify-center overflow-hidden px-4">
       {/* Living Connected Strand - Signature organic art element */}
       <div
         className={`transition-opacity duration-700 ease-out ${
@@ -36,7 +36,7 @@ export function IntroHero() {
 
       {/* Monumental Upward Parallax Wordmark */}
       <div
-        className={`w-[85vw] max-w-[1250px] -mt-[4vw] z-10 transition-all duration-700 ease-out ${
+        className={`w-[85vw] max-w-[1250px] -mt-[4vw] z-[10] relative transition-all duration-700 ease-out ${
           isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'
         }`}
       >
@@ -79,13 +79,14 @@ export function IntroHero() {
 
       {/* Subtle Restrained Scroll Cue */}
       <div
-        className={`scroll-cue absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] tracking-[0.24em] text-white/45 uppercase font-sans select-none pointer-events-none transition-opacity duration-500 z-10 ${
+        data-testid="hero-scroll-cue"
+        className={`scroll-cue absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[11px] tracking-[0.24em] text-white/80 uppercase font-sans font-medium select-none pointer-events-none transition-opacity duration-500 z-10 ${
           scrolled || !isRevealed ? 'opacity-0' : 'opacity-100'
         }`}
         aria-hidden="true"
       >
         <span>Scroll to explore</span>
-        <span className="scroll-cue-arrow inline-block">↓</span>
+        <span className="scroll-cue-arrow inline-block text-white/80">↓</span>
       </div>
     </section>
   );

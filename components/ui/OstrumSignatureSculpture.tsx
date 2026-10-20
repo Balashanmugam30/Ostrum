@@ -25,33 +25,33 @@ export function OstrumSignatureSculpture({
     >
       <defs>
         <radialGradient id={auraId} cx="0" cy="0" r="1" gradientTransform="matrix(0 190 -190 0 240 232)" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#A8C8FF" stopOpacity=".27" />
-          <stop offset=".62" stopColor="#D9CEFF" stopOpacity=".11" />
+          <stop stopColor="#C9362B" stopOpacity=".2" />
+          <stop offset=".62" stopColor="#64120F" stopOpacity=".08" />
           <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </radialGradient>
         <linearGradient id={mainRibbonId} x1="76" y1="146" x2="394" y2="327" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FDFDFF" />
-          <stop offset=".2" stopColor="#BACDFF" />
-          <stop offset=".48" stopColor="#7A79E9" />
-          <stop offset=".72" stopColor="#C8BEF5" />
-          <stop offset="1" stopColor="#FCFDFF" />
+          <stop stopColor="#FFF8F3" />
+          <stop offset=".2" stopColor="#FFDDD8" />
+          <stop offset=".48" stopColor="#C9362B" />
+          <stop offset=".72" stopColor="#8D2620" />
+          <stop offset="1" stopColor="#FFF8F3" />
         </linearGradient>
         <linearGradient id={deepRibbonId} x1="97" y1="331" x2="375" y2="122" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#34334D" />
-          <stop offset=".28" stopColor="#7779B9" />
-          <stop offset=".56" stopColor="#F4F2FF" />
-          <stop offset=".78" stopColor="#A9B8EA" />
-          <stop offset="1" stopColor="#393951" />
+          <stop stopColor="#2A0B0A" />
+          <stop offset=".28" stopColor="#64120F" />
+          <stop offset=".56" stopColor="#FFF8F3" />
+          <stop offset=".78" stopColor="#C9362B" />
+          <stop offset="1" stopColor="#42100F" />
         </linearGradient>
         <linearGradient id={glintId} x1="103" y1="166" x2="352" y2="285" gradientUnits="userSpaceOnUse">
           <stop stopColor="#fff" stopOpacity=".86" />
-          <stop offset=".5" stopColor="#D7F7FF" stopOpacity=".66" />
+          <stop offset=".5" stopColor="#FFE8E4" stopOpacity=".66" />
           <stop offset="1" stopColor="#fff" stopOpacity=".2" />
         </linearGradient>
       </defs>
 
       <ellipse cx="240" cy="236" rx="196" ry="190" fill={`url(#${auraId})`} />
-      <ellipse cx="241" cy="374" rx="100" ry="10" fill="#55547A" fillOpacity=".08" />
+      <ellipse cx="241" cy="374" rx="100" ry="10" fill="#42100F" fillOpacity=".08" />
 
       {/* Fine orbital traces give the sculpture depth without adding another renderer. */}
       <ellipse
@@ -60,7 +60,7 @@ export function OstrumSignatureSculpture({
         rx="166"
         ry="70"
         transform="rotate(-28 240 235)"
-        stroke="#7C88D0"
+        stroke="#C9362B"
         strokeOpacity=".34"
         strokeWidth="1.5"
       />
@@ -70,8 +70,8 @@ export function OstrumSignatureSculpture({
         rx="151"
         ry="83"
         transform="rotate(31 240 235)"
-        stroke="#B8A9EF"
-        strokeOpacity=".42"
+        stroke="#FF765E"
+        strokeOpacity=".35"
         strokeWidth="1.2"
       />
 
@@ -105,8 +105,8 @@ export function OstrumSignatureSculpture({
         opacity=".86"
       />
 
-      <circle cx="346" cy="151" r="4" fill="#F8FCFF" />
-      <circle cx="133" cy="325" r="3.5" fill="#D8D5FF" />
+      <circle cx="346" cy="151" r="4" fill="#FFF8F3" />
+      <circle cx="133" cy="325" r="3.5" fill="#FFDDD8" />
     </svg>
   );
 }

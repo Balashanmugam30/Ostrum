@@ -474,6 +474,7 @@ export default function BeamWordmarkFooter({
 
   const vars = {
     '--bwf-bg': background,
+    backgroundColor: background,
     '--bwf-bg-rgb': hexToRgb(background, '5, 5, 5'),
     '--bwf-ink': ink,
     '--bwf-ink-rgb': hexToRgb(ink, '244, 244, 245'),
@@ -497,7 +498,7 @@ export default function BeamWordmarkFooter({
     <footer
       ref={rootRef}
       id="studio-footer"
-      data-testid="studio-footer"
+      data-testid="beam-wordmark-footer"
       className={'bwf ' + className}
       style={vars}
       data-in={seen || reduced ? 'true' : 'false'}

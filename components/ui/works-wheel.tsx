@@ -42,56 +42,68 @@ export interface ProjectTheme {
   linkColor: string;
 }
 
-export const LIGHT_OVAL_THEME: ProjectTheme = {
-  primary: "#362BEB",
-  secondary: "#7482F8",
-  deep: "#F1F1FA",
+export const RESTING_WHEEL_THEME: ProjectTheme = {
+  primary: "#C9362B",
+  secondary: "#FF4D30",
+  deep: "#64120F",
   sheen: "#FFFFFF",
-  textColor: "#0B0B10",
-  textMuted: "rgba(11, 11, 16, 0.75)",
-  linkColor: "#362BEB",
+  textColor: "#FFFFFF",
+  textMuted: "rgba(255, 255, 255, 0.85)",
+  linkColor: "#FF765E",
+};
+
+export const SOLID_RED_THEME: ProjectTheme = RESTING_WHEEL_THEME;
+
+export const LIGHT_OVAL_THEME: ProjectTheme = {
+  primary: "#C9362B",
+  secondary: "#161616",
+  deep: "#F7F5F2",
+  sheen: "#FFFFFF",
+  textColor: "#050505",
+  textMuted: "rgba(22, 22, 22, 0.75)",
+  linkColor: "#C9362B",
 };
 
 export const PROJECT_THEMES: ProjectTheme[] = [
-  // 1. TMR AI Car Care (Vermilion / Copper)
+  // 1. TMR AI Car Care (Signature Red #C9362B)
   {
     primary: "#C9362B",
-    secondary: "#F19A68",
-    deep: "#42100F",
-    sheen: "#F8D7BD",
-    textColor: "#FFF8F5",
-    textMuted: "rgba(255, 248, 245, 0.82)",
-    linkColor: "#F8D7BD",
-  },
-  // 2. Saraswati Driving School (Cobalt / Electric Blue)
-  {
-    primary: "#3047E8",
-    secondary: "#68BDEB",
-    deep: "#0F1A4E",
-    sheen: "#D7E9FF",
-    textColor: "#F4F8FF",
-    textMuted: "rgba(244, 248, 255, 0.82)",
-    linkColor: "#8EC8FF",
-  },
-  // 3. MNESA (Violet / Electric Purple)
-  {
-    primary: "#7438D8",
-    secondary: "#B58AF0",
-    deep: "#230E48",
-    sheen: "#E4D5FF",
-    textColor: "#FAF6FF",
-    textMuted: "rgba(250, 246, 255, 0.82)",
-    linkColor: "#D4B8FF",
-  },
-  // 4. Our Capabilities (Light White / Pale Lavender Canvas)
-  {
-    primary: "#362BEB",
-    secondary: "#7482F8",
-    deep: "#F8F9FE",
+    secondary: "#FF4D30",
+    deep: "#C9362B",
     sheen: "#FFFFFF",
-    textColor: "#0B0B10",
-    textMuted: "rgba(11, 11, 16, 0.75)",
-    linkColor: "#362BEB",
+    textColor: "#FFFFFF",
+    textMuted: "rgba(255, 255, 255, 0.85)",
+    linkColor: "#F7F5F2",
+  },
+  // 2. Saraswati Driving School (Paper White #F7F5F2)
+  {
+    primary: "#C9362B",
+    secondary: "#161616",
+    deep: "#F7F5F2",
+    sheen: "#FFFFFF",
+    textColor: "#050505",
+    textMuted: "rgba(22, 22, 22, 0.75)",
+    linkColor: "#C9362B",
+  },
+  // 3. MNESA (Obsidian Black #050505 with Indigo #2563EB Accent)
+  {
+    primary: "#2563EB",
+    secondary: "#1D4ED8",
+    deep: "#050505",
+    sheen: "#FFFFFF",
+    textColor: "#FFFFFF",
+    textMuted: "rgba(255, 255, 255, 0.75)",
+    linkColor: "#60A5FA",
+  },
+  // 4. Our Capabilities (Warm stone #FAF7F2 with dark ink #161514 and terracotta #D24B2C)
+  {
+    primary: "#D24B2C",
+    secondary: "#161514",
+    deep: "#FAF7F2",
+    sheen: "#FFFFFF",
+    textColor: "#161514",
+    textMuted: "#50545C",
+    linkColor: "#D24B2C",
   },
 ];
 
@@ -100,7 +112,7 @@ export interface WorksWheelHandle {
   to: (next: number) => void;
   snapTo: (next: number) => void;
   getTurn: () => number;
-  setLeftPanelOpacity?: (opacity: number) => void;
+  setLeftPanelOpacity?: (opacity: number | null) => void;
   setWheelOpacity?: (opacity: number) => void;
 }
 
@@ -199,42 +211,12 @@ function InteractiveCardArtwork({
   href?: string;
   isCapabilities?: boolean;
 }) {
-  const containerRef = React.useRef<HTMLSpanElement>(null);
-  const imgRef = React.useRef<HTMLImageElement>(null);
-  const sheenRef = React.useRef<HTMLSpanElement>(null);
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    const el = containerRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const nx = (e.clientX - rect.left) / rect.width - 0.5;
-    const ny = (e.clientY - rect.top) / rect.height - 0.5;
-
-    if (imgRef.current) {
-      imgRef.current.style.transform = `translate3d(${nx * 8}px, ${ny * 8}px, 0) scale(1.05)`;
-    }
-    if (sheenRef.current) {
-      sheenRef.current.style.opacity = "1";
-      sheenRef.current.style.background = `radial-gradient(circle at ${(nx + 0.5) * 100}% ${(ny + 0.5) * 100}%, rgba(255,255,255,0.32) 0%, rgba(54,43,235,0.10) 38%, transparent 68%)`;
-    }
-  };
-
-  const handlePointerLeave = () => {
-    if (imgRef.current) {
-      imgRef.current.style.transform = "translate3d(0, 0, 0) scale(1.0)";
-    }
-    if (sheenRef.current) {
-      sheenRef.current.style.opacity = "0";
-    }
-  };
-
   if (isCapabilities) {
     return (
       <span
-        ref={containerRef}
         data-testid="capabilities-transition-anchor"
         data-transition-anchor="capabilities"
-        className="block size-full rounded-2xl pointer-events-none select-none"
+        className="block size-full rounded-2xl pointer-events-none select-none opacity-0"
         aria-hidden="true"
       />
     );
@@ -242,31 +224,21 @@ function InteractiveCardArtwork({
 
   return (
     <span
-      ref={containerRef}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
-      className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(11,11,16,0.18)] border border-black/[0.08] bg-white/40 backdrop-blur-sm transition-all duration-300 group-hover:border-[#362beb]/50 group-hover:shadow-[0_25px_50px_-10px_rgba(54,43,235,0.25)]"
+      className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(0,0,0,0.35)] border border-white/10 bg-black/20"
     >
       <img
-        ref={imgRef}
         src={src}
         alt={alt}
         draggable={false}
-        className="size-full object-cover transition-transform duration-300 ease-out will-change-transform"
+        className="size-full object-cover"
         loading="eager"
-      />
-      {/* Subtle fluid pearlescent reflection sheen */}
-      <span
-        ref={sheenRef}
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 ease-out"
-        aria-hidden="true"
       />
       {/* Subtle live destination indicator on front card */}
       {href?.startsWith("http") && (
-        <span className="pointer-events-none absolute right-3.5 bottom-3.5 flex translate-y-1 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium opacity-0 backdrop-blur-md transition group-hover:translate-y-0 group-hover:opacity-100 shadow-sm bg-white/95 text-[#0b0b10] border border-black/10">
+        <span className="pointer-events-none absolute right-3.5 bottom-3.5 flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium opacity-0 backdrop-blur-md transition group-hover:opacity-100 shadow-sm bg-white/95 text-[#0b0b10] border border-black/10">
           <svg
             viewBox="0 0 12 12"
-            className="size-2.5 text-[#362beb]"
+            className="size-2.5 text-[#C9362B]"
             aria-hidden="true"
           >
             <path
@@ -310,15 +282,11 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
     // The wheel's position and target
     const turn = React.useRef(0);
     const target = React.useRef(0);
-    const activeRef = React.useRef(0);
+    const activeRef = React.useRef(-1);
     const [active, setActive] = React.useState(0);
     const [stage, setStage] = React.useState<Stage>({ w: 0, h: 0 });
 
-    const activeTheme =
-      theme ??
-      (active < PROJECT_THEMES.length
-        ? PROJECT_THEMES[active]
-        : LIGHT_OVAL_THEME);
+    const activeTheme = theme ?? (PROJECT_THEMES[active] ?? RESTING_WHEEL_THEME);
 
     const count = items.length;
     const last = Math.max(count - 1, 0);
@@ -432,6 +400,14 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
     const animFrame = React.useRef(0);
     const leftPanelOpacityOverride = React.useRef<number | null>(null);
 
+    // Style write caches to prevent DOM thrashing
+    const prevTransforms = React.useRef<(string | null)[]>([]);
+    const prevOpacities = React.useRef<(string | null)[]>([]);
+    const prevZIndices = React.useRef<(string | null)[]>([]);
+    const prevPointerEvents = React.useRef<(string | null)[]>([]);
+    const prevLabelOpacity = React.useRef<string | null>(null);
+    const prevLeftPanelOpacity = React.useRef<string | null>(null);
+
     const renderScene = React.useCallback(() => {
       const { ringRx, ringRy, ringScale, drumR, bow, drumShiftX, drumShiftY } = metrics;
       const t = turn.current;
@@ -439,16 +415,12 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
       const pos = Math.max(0, t - 1);
       const curScale = lerp(ringScale, 1, m);
 
-      if (wheelRef.current) {
-        wheelRef.current.style.transform = "translate3d(0, 0, 0)";
-      }
-
       for (let i = 0; i < count; i++) {
         const d = i - pos;
         const drumDeg = d * STEP;
         const card = cardRefs.current[i];
         if (card) {
-          card.style.transform = placeOval(
+          const transformStr = placeOval(
             i * (360 / count),
             drumDeg,
             ringRx,
@@ -460,6 +432,10 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
             curScale,
             m,
           );
+          if (prevTransforms.current[i] !== transformStr) {
+            card.style.transform = transformStr;
+            prevTransforms.current[i] = transformStr;
+          }
 
           // Card opacity rule:
           // Front card (dist <= 0.45) is always fully visible (dominant presentation).
@@ -480,33 +456,62 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
             cardOpacity = lerp(ovalFade, drumFade, m);
           }
 
-          card.style.opacity = cardOpacity.toFixed(3);
-          card.style.zIndex = String(Math.round(100 - dist * 10));
-          card.style.pointerEvents = (m > 0.7 && dist > 0.45) || cardOpacity < 0.05 ? "none" : "auto";
+          const opacityStr = cardOpacity.toFixed(3);
+          if (prevOpacities.current[i] !== opacityStr) {
+            card.style.opacity = opacityStr;
+            prevOpacities.current[i] = opacityStr;
+          }
+
+          const zIndexStr = String(Math.round(100 - dist * 10));
+          if (prevZIndices.current[i] !== zIndexStr) {
+            card.style.zIndex = zIndexStr;
+            prevZIndices.current[i] = zIndexStr;
+          }
+
+          const peStr = (m > 0.7 && dist > 0.45) || cardOpacity < 0.05 ? "none" : "auto";
+          if (prevPointerEvents.current[i] !== peStr) {
+            card.style.pointerEvents = peStr;
+            prevPointerEvents.current[i] = peStr;
+          }
         }
       }
 
       // Central label fades away as drum opens
       if (labelRef.current) {
-        labelRef.current.style.opacity = String(Math.max(0, 1 - m * 2.2));
+        const labelOpStr = String(Math.max(0, 1 - m * 2.2));
+        if (prevLabelOpacity.current !== labelOpStr) {
+          labelRef.current.style.opacity = labelOpStr;
+          prevLabelOpacity.current = labelOpStr;
+        }
       }
       // Left text panel fades in as drum opens, with subtle sync during project changes
       if (leftPanelRef.current) {
+        let leftOpStr: string;
         if (leftPanelOpacityOverride.current !== null) {
-          leftPanelRef.current.style.opacity = String(leftPanelOpacityOverride.current);
+          leftOpStr = String(leftPanelOpacityOverride.current);
         } else {
           const morphFade = Math.max(0, (m - 0.20) / 0.80);
           const projectDistFromInt = Math.abs(pos - Math.round(pos));
           const projectFade = m > 0.8 ? Math.max(0.15, 1 - projectDistFromInt * 1.8) : 1;
-          leftPanelRef.current.style.opacity = (morphFade * projectFade).toFixed(3);
+          leftOpStr = (morphFade * projectFade).toFixed(3);
+        }
+        if (prevLeftPanelOpacity.current !== leftOpStr) {
+          leftPanelRef.current.style.opacity = leftOpStr;
+          prevLeftPanelOpacity.current = leftOpStr;
         }
       }
 
-      const near = clamp(Math.round(pos), 0, last);
-      if (near !== activeRef.current) {
-        activeRef.current = near;
-        setActive(near);
-        onActiveChange?.(near);
+      if (m >= 0.45) {
+        const near = clamp(Math.round(pos), 0, last);
+        if (near !== activeRef.current) {
+          activeRef.current = near;
+          setActive(near);
+          onActiveChange?.(near);
+        }
+      } else {
+        if (activeRef.current !== -1) {
+          activeRef.current = -1;
+        }
       }
       onTurnChange?.(t);
     }, [metrics, count, last, onActiveChange, onTurnChange]);
@@ -558,6 +563,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
     const setTurn = React.useCallback(
       (val: number) => {
         const clamped = clamp(val, 0, last + 1);
+        if (Math.abs(clamped - turn.current) < 0.0001) return;
         turn.current = clamped;
         target.current = clamped;
         renderSceneRef.current();
@@ -573,15 +579,25 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         to,
         snapTo: (next: number) => setTurn(next),
         getTurn: () => turn.current,
-        setLeftPanelOpacity: (op: number) => {
+        setLeftPanelOpacity: (op: number | null) => {
           leftPanelOpacityOverride.current = op;
           if (leftPanelRef.current) {
-            leftPanelRef.current.style.opacity = String(op);
+            if (op !== null) {
+              const opStr = String(op);
+              if (leftPanelRef.current.style.opacity !== opStr) {
+                leftPanelRef.current.style.opacity = opStr;
+              }
+            } else {
+              renderSceneRef.current();
+            }
           }
         },
         setWheelOpacity: (op: number) => {
           if (wheelRef.current) {
-            wheelRef.current.style.opacity = String(op);
+            const opStr = String(op);
+            if (wheelRef.current.style.opacity !== opStr) {
+              wheelRef.current.style.opacity = opStr;
+            }
           }
         },
       }),
@@ -773,6 +789,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
           <div
             ref={wheelRef}
             className="absolute top-1/2 left-1/2 [transform-style:preserve-3d]"
+            style={{ transform: "translate3d(0, 0, 0)" }}
           >
             {items.map((item, i) => {
               const isCurrent = i === active;
@@ -885,8 +902,9 @@ export const OSTRUM_WORKS: WorksWheelItem[] = [
   {
     title: "MNESA",
     description:
-      "High-dimensional neural memory retrieval system enabling persistent context indexing across distributed intelligence nodes.",
+      "Opportunity capture and follow-through platform designed to transform ephemeral observations and inspirations into structured, actionable commitments.",
     image: "/images/works/mnesa.jpg",
+    href: "https://github.com/Balashanmugam30/mnesa",
   },
   {
     title: "Our Capabilities",

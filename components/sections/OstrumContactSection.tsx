@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import OstrumLiquidGlass from '@/components/ui/OstrumLiquidGlass';
 
 interface FormData {
   name: string;
@@ -89,7 +88,7 @@ export function OstrumContactSection() {
       }
     } catch (err) {
       console.error('Submission error:', err);
-      setErrorMessage('Network error occurred. You can reach us directly at hello@ostrum.co.');
+      setErrorMessage('Network error occurred. You can reach us directly at hello@theostrum.com.');
     } finally {
       setIsSubmitting(false);
     }
@@ -108,11 +107,11 @@ export function OstrumContactSection() {
           <div className="lg:col-span-5 flex flex-col items-start lg:sticky lg:top-28">
             <h2
               data-testid="contact-heading"
-              className="font-condensed font-bold uppercase text-black tracking-[-0.01em] select-none"
+              className="font-condensed font-bold uppercase text-[#FFF8F3] tracking-[-0.01em] select-none"
               style={{
                 fontSize: 'clamp(3.2rem, 7.5vw, 96px)',
                 lineHeight: '0.92',
-                color: '#000000',
+                color: '#FFF8F3',
               }}
             >
               Reach Out
@@ -120,16 +119,16 @@ export function OstrumContactSection() {
               To Us
             </h2>
 
-            <p className="font-sans text-base sm:text-lg text-[#2E3542] leading-relaxed max-w-md mt-6 sm:mt-8 font-normal">
+            <p className="font-sans text-base sm:text-lg text-[#FFF8F3]/90 leading-relaxed max-w-md mt-6 sm:mt-8 font-normal">
               Tell us about the product, system, or digital experience you&apos;re building. We&apos;ll review your requirements and discuss the next steps.
             </p>
           </div>
 
-          {/* Right Column: Tall Portrait Liquid-Glass Form Panel */}
+          {/* Right Column: Solid Warm-White Form Panel */}
           <div className="lg:col-span-7 w-full flex justify-center lg:justify-end">
-            <OstrumLiquidGlass
-              radius={28}
-              className="w-full max-w-[580px]"
+            <div
+              data-testid="contact-form-panel"
+              className="w-full max-w-[580px] rounded-[28px] bg-[#FFF8F3] border border-[#DCD4CE] shadow-[0_24px_60px_-15px_rgba(20,10,10,0.08),0_8px_24px_-4px_rgba(20,10,10,0.04)] relative overflow-hidden"
             >
               <div
                 id="contact-form"
@@ -140,7 +139,7 @@ export function OstrumContactSection() {
                     data-testid="contact-success-state"
                     className="py-16 flex flex-col items-center text-center select-none"
                   >
-                    <div className="w-16 h-16 rounded-full bg-[#7A52A8]/15 border border-[#7A52A8]/30 flex items-center justify-center text-[#5A2C8F] text-2xl mb-6">
+                    <div className="w-16 h-16 rounded-full bg-[#D24B2C]/10 border border-[#D24B2C]/30 flex items-center justify-center text-[#D24B2C] text-2xl mb-6 font-semibold">
                       ✓
                     </div>
                     <h3 className="font-sans text-2xl sm:text-3xl font-bold text-black mb-3">
@@ -152,7 +151,7 @@ export function OstrumContactSection() {
                     <button
                       type="button"
                       onClick={() => setSubmitSuccess(false)}
-                      className="px-8 py-3.5 rounded-full bg-[#111827] text-white font-sans font-semibold text-sm hover:bg-black transition-colors cursor-pointer"
+                      className="px-8 py-3.5 rounded-full bg-[#050505] text-white font-sans font-semibold text-sm hover:bg-black transition-colors cursor-pointer"
                     >
                       Submit Another Enquiry
                     </button>
@@ -166,11 +165,11 @@ export function OstrumContactSection() {
                   >
                     {/* Panel Header */}
                     <div className="flex items-center justify-between pb-3 border-b border-black/10">
-                      <span className="font-sans text-xs uppercase tracking-wider text-[#4A3B69] font-bold">
+                      <span className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-bold">
                         Project Enquiry
                       </span>
                       <span className="font-mono text-[11px] text-[#6B7280]">
-                        * Required
+                        <span className="text-[#D24B2C]">*</span> Required
                       </span>
                     </div>
 
@@ -190,7 +189,7 @@ export function OstrumContactSection() {
                         htmlFor="contact-name"
                         className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
                       >
-                        Name <span className="text-[#8B5CF6]">*</span>
+                        Name <span className="text-[#D24B2C]">*</span>
                       </label>
                       <input
                         id="contact-name"
@@ -201,7 +200,7 @@ export function OstrumContactSection() {
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="e.g. Elena Vance"
-                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
 
@@ -211,7 +210,7 @@ export function OstrumContactSection() {
                         htmlFor="contact-email"
                         className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
                       >
-                        Work Email <span className="text-[#8B5CF6]">*</span>
+                        Work Email <span className="text-[#D24B2C]">*</span>
                       </label>
                       <input
                         id="contact-email"
@@ -222,7 +221,7 @@ export function OstrumContactSection() {
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="elena@company.com"
-                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
 
@@ -242,7 +241,7 @@ export function OstrumContactSection() {
                         value={formData.company}
                         onChange={handleChange}
                         placeholder="e.g. Vance Dynamics"
-                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
 
@@ -259,7 +258,7 @@ export function OstrumContactSection() {
                         name="projectType"
                         value={formData.projectType}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm cursor-pointer"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] border border-[#DCD4CE] outline-none transition-all font-sans text-sm cursor-pointer"
                       >
                         <option value="">Select project type...</option>
                         {PROJECT_TYPE_OPTIONS.map((opt) => (
@@ -286,7 +285,7 @@ export function OstrumContactSection() {
                         value={formData.phone}
                         onChange={handleChange}
                         placeholder="e.g. +61 400 000 000"
-                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
 
@@ -296,7 +295,7 @@ export function OstrumContactSection() {
                         htmlFor="contact-message"
                         className="font-sans text-xs uppercase tracking-wider text-[#1F2937] font-semibold"
                       >
-                        Message <span className="text-[#8B5CF6]">*</span>
+                        Message <span className="text-[#D24B2C]">*</span>
                       </label>
                       <textarea
                         id="contact-message"
@@ -306,7 +305,7 @@ export function OstrumContactSection() {
                         value={formData.message}
                         onChange={handleChange}
                         placeholder="Describe your project goals, scope, and technical timeline..."
-                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-white/35 hover:bg-white/50 focus:bg-white/85 text-[#111827] placeholder:text-[#6B7280] border border-black/10 focus:border-[#7A52A8] focus:ring-2 focus:ring-[#C7A6E3]/40 outline-none transition-all font-sans text-sm min-h-[120px] resize-y"
+                        className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm min-h-[120px] resize-y"
                       />
                     </div>
 
@@ -315,7 +314,7 @@ export function OstrumContactSection() {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full py-4 px-8 rounded-full bg-[#111827] hover:bg-black text-white font-sans font-semibold text-base transition-all duration-300 shadow-[0_8px_20px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.22)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 cursor-pointer group"
+                        className="w-full py-4 px-8 rounded-full bg-[#050505] hover:bg-black text-white font-sans font-semibold text-base transition-all duration-300 shadow-[0_8px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.28)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 cursor-pointer group"
                       >
                         {isSubmitting ? (
                           <>
@@ -341,7 +340,7 @@ export function OstrumContactSection() {
                   </form>
                 )}
               </div>
-            </OstrumLiquidGlass>
+            </div>
           </div>
         </div>
       </div>

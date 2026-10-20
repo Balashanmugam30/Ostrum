@@ -25,7 +25,6 @@ export function OstrumEngineSection() {
 
   // DOM element refs for GSAP ScrollTrigger timeline
   const sectionRef = useRef<HTMLElement>(null);
-  const kickerRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const descRef = useRef<HTMLDivElement>(null);
   const compositionWrapperRef = useRef<HTMLDivElement>(null);
@@ -50,7 +49,6 @@ export function OstrumEngineSection() {
 
     // In reduced motion, skip all entrance transforms and ensure 100% visibility
     if (prefersReducedMotion) {
-      if (kickerRef.current) kickerRef.current.style.opacity = '1';
       if (headlineRef.current) headlineRef.current.style.opacity = '1';
       if (descRef.current) descRef.current.style.opacity = '1';
       if (sculptureWrapperRef.current) {
@@ -78,13 +76,6 @@ export function OstrumEngineSection() {
       });
 
       headerTl.fromTo(
-        kickerRef.current,
-        { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.18, ease: 'power2.out' },
-        0
-      );
-
-      headerTl.fromTo(
         headlineRef.current,
         { y: 36, opacity: 0, filter: 'blur(3px)' },
         {
@@ -94,14 +85,14 @@ export function OstrumEngineSection() {
           duration: 0.28,
           ease: 'power2.out',
         },
-        0.06
+        0
       );
 
       headerTl.fromTo(
         descRef.current,
         { y: 22, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.25, ease: 'power2.out' },
-        0.12
+        0.08
       );
 
       // 2. Section 02 Master Pinned Hold and Choreography Timeline:
@@ -178,7 +169,7 @@ export function OstrumEngineSection() {
           );
         }
         holdTl.to(
-          [headlineRef.current, descRef.current, kickerRef.current],
+          [headlineRef.current, descRef.current],
           { opacity: 0, y: -20, duration: 0.22, ease: 'power2.in' },
           0.76
         );
@@ -194,33 +185,21 @@ export function OstrumEngineSection() {
     <section
       ref={sectionRef}
       id="engine"
-      className="ostrum-engine-section relative w-full pt-20 sm:pt-28 md:pt-36 lg:pt-40 pb-28 md:pb-48 px-6 md:px-[6vw] lg:px-[8vw] flex flex-col items-center z-10 overflow-x-clip bg-transparent text-center select-none"
+      className="ostrum-engine-section relative w-full pt-20 sm:pt-28 md:pt-36 lg:pt-40 pb-28 md:pb-48 px-6 md:px-[6vw] lg:px-[8vw] flex flex-col items-center overflow-x-clip bg-transparent text-center select-none"
     >
       {/* Living Connection Threads across Section 02 background */}
       <div ref={threadWrapperRef} className="opacity-80 transition-opacity">
         <LivingThread />
       </div>
 
-      <div className="w-full max-w-[1360px] flex flex-col items-center relative z-10 bg-transparent">
+      <div className="w-full max-w-[1360px] flex flex-col items-center relative bg-transparent">
         {/* ==============================================================
-            SECTION HEADER: METADATA & MONUMENTAL DUAL STATEMENT
+            SECTION HEADER: MONUMENTAL DUAL STATEMENT
             ============================================================== */}
-        {/* Small Chapter Label */}
-        <div
-          ref={kickerRef}
-          className="flex items-center gap-3 text-[11px] sm:text-[12px] uppercase tracking-[0.28em] font-sans text-white/70 mb-6 md:mb-8 select-none"
-        >
-          <span className="text-[#ff5c4a] font-mono font-medium">
-            {engine.index}
-          </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
-          <span>{engine.badge}</span>
-        </div>
-
-        {/* Monumental Editorial Headline in Romie Serif */}
+        {/* Monumental Editorial Headline in Romie Serif (z-[10] behind 3D sculpture z-[18] for layered overlap) */}
         <div
           ref={headlineRef}
-          className="w-full max-w-[980px] flex flex-col items-center"
+          className="w-full max-w-[980px] flex flex-col items-center relative z-[10]"
         >
           <h2 className="font-serif text-white font-normal tracking-[-1.8px] sm:tracking-[-2.4px] leading-[0.96] text-[clamp(42px,5.8vw,88px)]">
             <span className="block drop-shadow-sm">
@@ -232,10 +211,10 @@ export function OstrumEngineSection() {
           </h2>
         </div>
 
-        {/* Minimal Supporting Philosophy Copy */}
+        {/* Supporting Philosophy Copy (z-[10] behind 3D sculpture z-[18] for layered overlap) */}
         <div
           ref={descRef}
-          className="mt-6 md:mt-8 max-w-[640px] mx-auto px-4"
+          className="mt-6 md:mt-8 max-w-[640px] mx-auto px-4 relative z-[10]"
         >
           <p className="text-base sm:text-[17px] md:text-[18px] text-white/90 font-normal leading-[1.5] tracking-[-0.015em] drop-shadow-sm">
             {engine.description}
@@ -249,7 +228,7 @@ export function OstrumEngineSection() {
             ============================================================== */}
         <div
           ref={compositionWrapperRef}
-          className="w-full mt-12 md:mt-16 lg:mt-20 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-6 relative bg-transparent"
+          className="w-full mt-12 md:mt-16 lg:mt-20 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-6 relative z-[22] bg-transparent"
         >
           {/* ============================================================
               LEFT IDENTITY ANCHOR: 01 / FOR BUSINESS

@@ -6,6 +6,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Testimonial } from '@/types/testimonials';
 import { TESTIMONIALS_DATA } from '@/data/testimonials';
+import { MnesaLogo } from '@/components/ui/MnesaLogo';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -240,23 +241,16 @@ export function OstrumTestimonialsSection({
                 {/* Logo Area */}
                 <div className="h-10 sm:h-12 flex items-center justify-center text-center select-none mb-5">
                   {testimonial.logoType === 'mnesa-mark' ? (
-                    <div
+                    <a
+                      href="https://github.com/Balashanmugam30/mnesa"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       data-testid="mnesa-blue-m-mark"
-                      className="flex items-center justify-center h-10 w-10"
-                      aria-label="MNESA Mark"
+                      className="inline-flex items-center justify-center transition-opacity hover:opacity-80 py-1"
+                      aria-label="MNESA repository on GitHub"
                     >
-                      <span
-                        className="font-bold text-[#1E5BF0] select-none leading-none tracking-tight"
-                        style={{
-                          fontSize: '38px',
-                          fontFamily: 'var(--font-oswald), "Barlow Condensed", sans-serif',
-                          fontWeight: 900,
-                          color: '#1E5BF0',
-                        }}
-                      >
-                        M
-                      </span>
-                    </div>
+                      <MnesaLogo size={32} variant="full" />
+                    </a>
                   ) : testimonial.logoSrc ? (
                     <Image
                       src={testimonial.logoSrc}
@@ -353,23 +347,16 @@ export function OstrumTestimonialsSection({
               {/* Element 1 (Top Area): Authentic Client Logo or MNESA Mark */}
               <div className="h-10 sm:h-12 flex items-center justify-center text-center select-none shrink-0">
                 {testimonial.logoType === 'mnesa-mark' ? (
-                  <div
+                  <a
+                    href="https://github.com/Balashanmugam30/mnesa"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     data-testid="mnesa-blue-m-mark"
-                    className="flex items-center justify-center h-10 w-10"
-                    aria-label="MNESA Mark"
+                    className="inline-flex items-center justify-center transition-opacity hover:opacity-80 py-1"
+                    aria-label="MNESA repository on GitHub"
                   >
-                    <span
-                      className="font-bold text-[#1E5BF0] select-none leading-none tracking-tight"
-                      style={{
-                        fontSize: '38px',
-                        fontFamily: 'var(--font-oswald), "Barlow Condensed", sans-serif',
-                        fontWeight: 900,
-                        color: '#1E5BF0',
-                      }}
-                    >
-                      M
-                    </span>
-                  </div>
+                    <MnesaLogo size={32} variant="full" />
+                  </a>
                 ) : testimonial.logoSrc ? (
                   <Image
                     src={testimonial.logoSrc}
