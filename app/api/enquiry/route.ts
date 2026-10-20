@@ -12,10 +12,27 @@ export async function POST(request: Request) {
   const timestamp = new Date().toISOString();
   const correlationId = 'req_' + Math.random().toString(36).substring(2, 10);
 
-  // 1. IP & Rate limiting
-  const forwardedFor = request.headers.get('x-forwarded-for');
+  // 1. Trusted Client IP extraction & Rate limiting
+  // Evaluates platform-specific proxy headers in order of platform trust:
+  // - x-vercel-forwarded-for (Vercel edge trusted client IP)
+  // - cf-connecting-ip (Cloudflare edge trusted client IP)
+  // - x-real-ip (Standard reverse proxy client IP)
+  // - x-forwarded-for (First untrusted hop fallback)
+  const vercelIp = request.headers.get('x-vercel-forwarded-for');
+  const cfIp = request.headers.get('cf-connecting-ip');
   const realIp = request.headers.get('x-real-ip');
-  const clientIp = (forwardedFor ? forwardedFor.split(',')[0].trim() : realIp) || '127.0.0.1';
+  const forwardedFor = request.headers.get('x-forwarded-for');
+
+  const rawIp =
+    vercelIp ||
+    cfIp ||
+    realIp ||
+    (forwardedFor ? forwardedFor.split(',')[0].trim() : '') ||
+    '127.0.0.1';
+
+  // Sanitize IP format to valid IPv4 / IPv6 syntax, discarding spoofed characters
+  const ipRegex = /^[a-fA-F0-9:.]+$/;
+  const clientIp = ipRegex.test(rawIp) && rawIp.length <= 45 ? rawIp : '127.0.0.1';
 
   if (!checkRateLimit(clientIp)) {
     console.warn('[Enquiry API Rate Limit Exceeded]', {

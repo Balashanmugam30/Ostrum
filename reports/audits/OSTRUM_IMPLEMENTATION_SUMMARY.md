@@ -1,9 +1,8 @@
 # OSTRUM — Master Implementation & Engineering Audit Summary
 
-**Date:** 2026-10-20T14:50:00+05:30  
+**Date:** 2026-10-20T15:35:00+05:30  
 **Repository:** `Balashanmugam30/Ostrum`  
-**Working Branch:** `feat/cinematic-ostrum-loader`  
-**Target Release Branch:** `main`  
+**Current Branch:** `main`  
 **Lead Engineer:** Senior Full-Stack Engineer, Next.js Production Architect & Release Manager  
 
 ---
@@ -20,15 +19,22 @@ Every engineering dimension is classified into six standard operational categori
 
 ### Summary of Completed Objectives:
 1. **Critical Form Fix: Real Enquiry Notifications via Resend [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Replaced false-success mock with official `resend` Node SDK.
-   - Built [`lib/email/enquiry-mailer.ts`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/lib/email/enquiry-mailer.ts) with input sanitization, HTML escaping, RFC 5322 validation, sliding-window rate limiting, and honeypot protection.
-   - Server-only recipient (`OSTRUM_ENQUIRY_TO`), server-controlled sender (`OSTRUM_ENQUIRY_FROM`), and visitor `replyTo`.
-   - Privacy-preserving logging: zero personal data or message bodies written to server logs.
-   - 14/14 automated unit tests passing via `npm test`.
-   - Truthful delivery status: Marked as **[BLOCKED: RESEND_API_KEY not configured]** for live sends until the owner provisions the secret in hosting environment.
+   - Official `resend` Node SDK (`^6.34.1`) integrated into [`lib/email/enquiry-mailer.ts`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/lib/email/enquiry-mailer.ts) and [`app/api/enquiry/route.ts`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app/api/enquiry/route.ts).
+   - Input sanitization, HTML escaping (`escapeHtml`), single-line header injection stripping, and RFC 5322 regex validation.
+   - Anti-spam honeypot (`website_url` and `hp_check`).
+   - Server-only recipient (`OSTRUM_ENQUIRY_TO || hello@theostrum.com`), server-controlled sender (`OSTRUM_ENQUIRY_FROM || OSTRUM Website <website@theostrum.com>`), and visitor `replyTo`.
+   - Security hardening: `RESEND_MOCK=true` is forbidden when `NODE_ENV === 'production'` and returns HTTP 500 error.
+   - Missing configuration returns HTTP 503 with user-safe maintenance notice; never produces false success.
+   - Trusted IP parsing: evaluates `x-vercel-forwarded-for`, `cf-connecting-ip`, `x-real-ip`, and `x-forwarded-for` with strict IPv4/IPv6 regex sanitization.
+   - Sliding-window rate limiting (5 req/10 min per IP). Multi-instance serverless limitation documented: in-memory limiter acts as single-container circuit breaker; horizontal scaling requires external store (e.g. Upstash Redis / Vercel KV).
+   - Zero-PII logging: no names, email addresses, or message content written to server logs.
+   - 15/15 unit tests passing via `npm test`.
+   - Playwright end-to-end integration test passed (`scripts/test_live_enquiry_form.mjs`): validation, honeypot rejection, missing config 503 handling, and form state preservation verified.
+   - Truthful delivery status: Marked as **[BLOCKED: RESEND_API_KEY not configured]** for live sends until the owner provisions the secret in the hosting environment.
 2. **Domain & Contact Centralization [FIXED IN CODE / VERIFIED LOCALLY]:**
    - Unified `lib/site-config.ts` as single source of truth for `theostrum.com` and `hello@theostrum.com`.
    - Replaced stale `mailto:contact@ostrum.com` in Selected Work with `#contact` navigation.
+   - Domain empirical verification: `theostrum.com` is unregistered (`available: true`) with no active DNS.
 3. **LinkedIn Placeholder with Strict Validation [FIXED IN CODE / VERIFIED LOCALLY]:**
    - Implemented strict hostname validation (`(^|\.)linkedin\.com$`) and path checks.
    - Placeholder URL `https://www.linkedin.com/company/replace-with-real-ostrum-profile/` displays an accessible `Pending` badge; never enters JSON-LD structured data and is not linked externally.
@@ -53,8 +59,8 @@ Every engineering dimension is classified into six standard operational categori
 | File Path | Action | Description |
 | :--- | :---: | :--- |
 | `package.json` | **Modified** | Added `resend` dependency, scripts `typecheck`, `test`, and `test:audit`. |
-| `lib/email/enquiry-mailer.ts` | **Created** | Resend email routing, HTML escaping, sliding-window rate limiter, and honeypot validation. |
-| `app/api/enquiry/route.ts` | **Modified** | Replaced mock handler with validated Resend dispatch, rate limiting, and safe error codes. |
+| `lib/email/enquiry-mailer.ts` | **Modified** | Resend email routing, HTML escaping, sliding-window rate limiter, honeypot validation, and production mock prohibition. |
+| `app/api/enquiry/route.ts` | **Modified** | Validated Resend dispatch, trusted IP proxy precedence, rate limiting, and safe error codes. |
 | `components/sections/OstrumContactSection.tsx` | **Modified** | Integrated anti-spam honeypot, double-submit prevention, and field preservation on failure. |
 | `components/sections/OstrumSelectedWorkSection.tsx` | **Modified** | Corrected stale `mailto:contact@ostrum.com` to `#contact`. |
 | `lib/site-config.ts` | **Modified** | Added strict LinkedIn hostname validation, placeholder rejection, and safe `getVerifiedLinkedInUrl()`. |
@@ -69,7 +75,8 @@ Every engineering dimension is classified into six standard operational categori
 | `public/images/ostrum-og.png` | **Created** | 1200 × 630 luxury brand Open Graph card (1.09 MB). |
 | `scripts/generate_brand_assets.mjs` | **Created** | Reproducible asset generator for brand logo and social cards. |
 | `scripts/run_master_regression_and_performance_audit.mjs` | **Created** | Multi-viewport automated regression and performance benchmarking runner. |
-| `tests/enquiry.test.mjs` | **Created** | 14 automated unit tests for mailer, rate limiter, honeypot, and LinkedIn validation. |
+| `scripts/test_live_enquiry_form.mjs` | **Created** | Automated Playwright live integration test for form validation, honeypot, and error states. |
+| `tests/enquiry.test.mjs` | **Modified** | 15 automated unit tests for mailer, rate limiter, honeypot, production mock prohibition, and LinkedIn validation. |
 | `.env.example` | **Modified** | Documented server-only Resend and public site environment variables. |
 
 ---
@@ -80,7 +87,7 @@ The software engineering pass is complete and verified. The following external a
 
 | # | Action Item | Dependency | Status |
 | :-: | :--- | :--- | :---: |
-| 1 | **Purchase Domain:** Register `theostrum.com` at domain registrar. | Registrar (Cloudflare, Namecheap, etc.) | Pending Owner |
+| 1 | **Purchase Domain:** Register `theostrum.com` at domain registrar (confirmed available). | Registrar (Cloudflare, Namecheap, etc.) | Pending Owner |
 | 2 | **DNS Record Setup:** Map A/AAAA records to production hosting provider. | Hosting Provider (Vercel, Render, etc.) | Pending Owner |
 | 3 | **Provision Mailbox:** Create `hello@theostrum.com` with valid MX/SPF/DKIM. | Google Workspace / ProtonMail | Pending Owner |
 | 4 | **Configure Resend:** Obtain API key and verify sender domain (`website@theostrum.com`). | Resend Dashboard | Pending Owner |

@@ -308,6 +308,21 @@ export async function sendEnquiryNotification(
 
   // If mock mode is enabled for testing
   if (process.env.RESEND_MOCK === 'true' && !options?.customResend) {
+    // Prohibit simulated success in production deployments
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[Enquiry Mailer Security Error]', {
+        correlationId,
+        timestamp,
+        error: 'RESEND_MOCK is forbidden in production environment.',
+      });
+      return {
+        success: false,
+        status: 500,
+        errorCategory: 'provider_error',
+        error: 'Enquiry delivery configuration error.',
+      };
+    }
+
     console.log('[Enquiry Mailer: Mocked Mode Accepted]', {
       correlationId,
       timestamp,

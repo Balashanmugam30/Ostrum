@@ -193,6 +193,28 @@ describe('4. Resend Mailer Dispatch & Mock Integration', () => {
     assert.strictEqual(res.errorCategory, 'provider_error');
     assert.match(res.error, /Unable to deliver notification at this time/);
   });
+
+  test('prohibits RESEND_MOCK in production environment and returns 500', async () => {
+    const originalEnv = process.env.NODE_ENV;
+    const originalMock = process.env.RESEND_MOCK;
+    process.env.NODE_ENV = 'production';
+    process.env.RESEND_MOCK = 'true';
+
+    try {
+      const res = await sendEnquiryNotification(validData);
+      assert.strictEqual(res.success, false);
+      assert.strictEqual(res.status, 500);
+      assert.strictEqual(res.errorCategory, 'provider_error');
+      assert.match(res.error, /configuration error/);
+    } finally {
+      process.env.NODE_ENV = originalEnv;
+      if (originalMock !== undefined) {
+        process.env.RESEND_MOCK = originalMock;
+      } else {
+        delete process.env.RESEND_MOCK;
+      }
+    }
+  });
 });
 
 describe('5. Rate Limiting Protection', () => {
