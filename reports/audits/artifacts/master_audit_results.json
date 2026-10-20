@@ -1,5 +1,11 @@
 {
-  "timestamp": "2026-10-20T07:10:25.540Z",
+  "timestamp": "2026-10-20T09:10:01.840Z",
+  "environment": {
+    "node": "v22.20.0",
+    "platform": "win32",
+    "browser": "Chromium (Playwright)",
+    "host": "http://localhost:3000"
+  },
   "viewportsAudited": [
     {
       "name": "large-desktop",
@@ -8,7 +14,7 @@
       "horizontalOverflow": false,
       "customCursorAbsent": true,
       "bodyCursor": "auto",
-      "linkedInVisible": true,
+      "linkedInIconVisible": true,
       "linkedInType": "pending"
     },
     {
@@ -18,7 +24,7 @@
       "horizontalOverflow": false,
       "customCursorAbsent": true,
       "bodyCursor": "auto",
-      "linkedInVisible": true,
+      "linkedInIconVisible": true,
       "linkedInType": "pending"
     },
     {
@@ -28,7 +34,7 @@
       "horizontalOverflow": false,
       "customCursorAbsent": true,
       "bodyCursor": "auto",
-      "linkedInVisible": true,
+      "linkedInIconVisible": true,
       "linkedInType": "pending"
     },
     {
@@ -38,7 +44,7 @@
       "horizontalOverflow": false,
       "customCursorAbsent": true,
       "bodyCursor": "auto",
-      "linkedInVisible": true,
+      "linkedInIconVisible": true,
       "linkedInType": "pending"
     },
     {
@@ -48,7 +54,7 @@
       "horizontalOverflow": false,
       "customCursorAbsent": true,
       "bodyCursor": "auto",
-      "linkedInVisible": true,
+      "linkedInIconVisible": true,
       "linkedInType": "pending"
     },
     {
@@ -58,7 +64,7 @@
       "horizontalOverflow": false,
       "customCursorAbsent": true,
       "bodyCursor": "auto",
-      "linkedInVisible": true,
+      "linkedInIconVisible": true,
       "linkedInType": "pending"
     },
     {
@@ -68,7 +74,7 @@
       "horizontalOverflow": false,
       "customCursorAbsent": true,
       "bodyCursor": "auto",
-      "linkedInVisible": true,
+      "linkedInIconVisible": true,
       "linkedInType": "pending"
     },
     {
@@ -78,7 +84,7 @@
       "horizontalOverflow": false,
       "customCursorAbsent": true,
       "bodyCursor": "auto",
-      "linkedInVisible": true,
+      "linkedInIconVisible": true,
       "linkedInType": "pending"
     },
     {
@@ -88,7 +94,7 @@
       "horizontalOverflow": false,
       "customCursorAbsent": true,
       "bodyCursor": "auto",
-      "linkedInVisible": true,
+      "linkedInIconVisible": true,
       "linkedInType": "pending"
     },
     {
@@ -98,28 +104,73 @@
       "horizontalOverflow": false,
       "customCursorAbsent": true,
       "bodyCursor": "auto",
-      "linkedInVisible": true,
+      "linkedInIconVisible": true,
       "linkedInType": "pending"
     }
   ],
-  "cursorRemovalVerified": true,
-  "linkedInFooterVerified": false,
-  "legalRoutesVerified": true,
+  "customCursorAudit": {
+    "customCursorAbsent": true,
+    "bodyCursorStyle": "auto",
+    "linkCursorStyle": "pointer",
+    "cursorElementsCount": 0,
+    "activeClassesPresent": false
+  },
+  "linkedInFooterAudit": {
+    "iconRendered": true,
+    "textLabelRendered": true,
+    "status": "pending",
+    "isPlaceholderActive": true,
+    "realUrlConfigured": false,
+    "externalLinkFunctional": false,
+    "aggregateVerified": true
+  },
+  "legalRoutesAudit": {
+    "termsHasNoCTA": true,
+    "privacyHasNoCTA": true,
+    "termsCurtainPresent": true,
+    "privacyCurtainPresent": true,
+    "termsMastheadClean": true,
+    "privacyMastheadClean": true,
+    "desktopCurtainVerified": true,
+    "mobileCurtainVerified": true
+  },
   "performanceMetrics": {
-    "ttfb": 3,
-    "domContentLoaded": 18,
-    "loadComplete": 71,
-    "fcp": 180,
-    "totalRequests": 34,
-    "totalTransferKB": 3,
-    "jsTransferKB": 0,
-    "cssTransferKB": 1,
-    "imgTransferKB": 0,
-    "canvases": 9,
+    "ttfbMs": 6,
+    "domContentLoadedMs": 188,
+    "loadCompleteMs": 189,
+    "fcpMs": 392,
+    "totalRequests": 33,
+    "transferSizeKB": 3,
+    "decodedBodySizeKB": 3401,
+    "jsDecodedKB": 1319,
+    "cssDecodedKB": 1051,
+    "imgDecodedKB": 1016,
+    "activeCanvases": 9,
     "memory": {
-      "usedJSHeapSize": 61,
-      "totalJSHeapSize": 82
+      "usedJSHeapSizeMB": 36,
+      "totalJSHeapSizeMB": 73
     }
   },
-  "seoMetaVerified": true
+  "scrollFrameRateAudit": {
+    "sampleFrames": 59,
+    "medianFrameMs": 250,
+    "maxFrameMs": 616.6,
+    "droppedFrames": 59,
+    "estimatedFps": 4
+  },
+  "seoAndAssetsAudit": {
+    "homeCanonical": "https://theostrum.com",
+    "termsCanonical": "https://theostrum.com/terms-and-conditions",
+    "privacyCanonical": "https://theostrum.com/privacy-policy",
+    "homeTitle": "OSTRUM — Digital Transformation & Engineering Studio",
+    "termsTitle": "Terms & Conditions — OSTRUM",
+    "privacyTitle": "Privacy Policy — OSTRUM",
+    "noDuplicateSuffix": true,
+    "frenchRobots": "noindex, follow",
+    "logoAssetStatus": 200,
+    "ogAssetStatus": 200,
+    "robotsValid": true,
+    "sitemapValid": true,
+    "jsonLdVerified": true
+  }
 }

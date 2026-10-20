@@ -96,51 +96,17 @@ export function LegalDocumentLayout({
     <div className="legal-page min-h-screen bg-[#FAF7F2] text-[#2D3139] antialiased selection:bg-[#42100F] selection:text-[#FFF8F3]">
       {/* Top Editorial Flow (No Full-Width Sticky Bar) */}
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 sm:pb-24">
-        {/* Document Masthead Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 pb-8 border-b border-[#E5DFD7]">
-          {/* Standalone OSTRUM Wordmark linking to Home */}
-          <div className="flex items-center gap-6">
-            <Link
-              href="/"
-              className="inline-block transition-opacity hover:opacity-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D24B2C] rounded"
-              aria-label="OSTRUM Home"
-            >
-              <div className="w-24 sm:w-28 text-[#161514]">
-                <OstrumLogo className="text-[#161514]" />
-              </div>
-            </Link>
-            <span className="hidden sm:inline-block w-px h-5 bg-[#E5DFD7]" aria-hidden="true" />
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-[#6B707B] hover:text-[#161514] transition-colors font-medium"
-            >
-              <span aria-hidden="true">&larr;</span> Back to Studio
-            </Link>
-          </div>
-
-          {/* Document Switcher Segmented Pills */}
-          <div className="flex items-center gap-2">
-            <Link
-              href="/terms-and-conditions"
-              className={`px-3.5 py-1.5 rounded-full font-mono text-xs uppercase tracking-wider transition-all duration-200 font-semibold border ${
-                activeTab === 'terms'
-                  ? 'bg-[#161514] text-white border-[#161514] shadow-sm'
-                  : 'bg-white/80 text-[#50545C] border-[#E5DFD7] hover:border-[#161514]/30 hover:text-[#161514]'
-              }`}
-            >
-              Terms &amp; Conditions
-            </Link>
-            <Link
-              href="/privacy-policy"
-              className={`px-3.5 py-1.5 rounded-full font-mono text-xs uppercase tracking-wider transition-all duration-200 font-semibold border ${
-                activeTab === 'privacy'
-                  ? 'bg-[#161514] text-white border-[#161514] shadow-sm'
-                  : 'bg-white/80 text-[#50545C] border-[#E5DFD7] hover:border-[#161514]/30 hover:text-[#161514]'
-              }`}
-            >
-              Privacy Policy
-            </Link>
-          </div>
+        {/* Restrained Standalone OSTRUM Wordmark linking to Home */}
+        <div className="pb-8">
+          <Link
+            href="/"
+            className="inline-block transition-opacity hover:opacity-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D24B2C] rounded"
+            aria-label="OSTRUM Home"
+          >
+            <div className="w-24 sm:w-28 text-[#161514]">
+              <OstrumLogo className="text-[#161514]" />
+            </div>
+          </Link>
         </div>
 
         {/* Hero / Document Header */}

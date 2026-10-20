@@ -1,81 +1,95 @@
 import { NextResponse } from 'next/server';
+import {
+  checkRateLimit,
+  validateEnquiryPayload,
+  sendEnquiryNotification,
+  type RawEnquiryPayload,
+} from '@/lib/email/enquiry-mailer';
 
-export interface EnquiryPayload {
-  name: string;
-  email: string;
-  city?: string;
-  phone?: string;
-  company?: string;
-  position?: string;
-  projectType?: string;
-  message: string;
-}
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-  try {
-    const body: EnquiryPayload = await request.json();
+  const timestamp = new Date().toISOString();
+  const correlationId = 'req_' + Math.random().toString(36).substring(2, 10);
 
-    const { name, email, city, phone, company, position, projectType, message } = body;
+  // 1. IP & Rate limiting
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  const realIp = request.headers.get('x-real-ip');
+  const clientIp = (forwardedFor ? forwardedFor.split(',')[0].trim() : realIp) || '127.0.0.1';
 
-    // Validate required fields
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Full name is required.' },
-        { status: 400 }
-      );
-    }
-
-    if (!email || typeof email !== 'string' || email.trim().length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Email address is required.' },
-        { status: 400 }
-      );
-    }
-
-    // RFC 5322 compliant email regex check
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      return NextResponse.json(
-        { success: false, error: 'Please provide a valid email address.' },
-        { status: 400 }
-      );
-    }
-
-    if (!message || typeof message !== 'string' || message.trim().length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Project description or message is required.' },
-        { status: 400 }
-      );
-    }
-
-    // Server-side audit log
-    console.log('[Ostrum Enquiry Received]', {
-      timestamp: new Date().toISOString(),
-      name: name.trim(),
-      email: email.trim(),
-      company: company?.trim() || 'N/A',
-      projectType: projectType?.trim() || 'N/A',
-      phone: phone?.trim() || 'N/A',
-      city: city?.trim() || 'N/A',
-      position: position?.trim() || 'N/A',
-      messageLength: message.trim().length,
+  if (!checkRateLimit(clientIp)) {
+    console.warn('[Enquiry API Rate Limit Exceeded]', {
+      correlationId,
+      timestamp,
+      result: 'rate_limited',
     });
 
-    // In a production environment with email credentials (e.g. RESEND_API_KEY, SENDGRID_API_KEY),
-    // you can dispatch an email to hello@ostrum.co here.
     return NextResponse.json(
       {
-        success: true,
-        message:
-          'Thank you for reaching out. We have received your project details and a studio partner will be in touch within 24 hours.',
+        success: false,
+        error: 'Too many enquiry submissions from this connection. Please wait a few moments or email hello@theostrum.com directly.',
       },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('[Ostrum Enquiry Error]', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to process enquiry. Please try again or email hello@ostrum.co directly.' },
-      { status: 500 }
+      { status: 429 }
     );
   }
+
+  // 2. Content-type and payload parsing
+  const contentType = request.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    return NextResponse.json(
+      { success: false, error: 'Invalid request content type. Expected application/json.' },
+      { status: 415 }
+    );
+  }
+
+  let body: RawEnquiryPayload;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { success: false, error: 'Malformed JSON payload.' },
+      { status: 400 }
+    );
+  }
+
+  // 3. Validation & Honeypot checking
+  const validation = validateEnquiryPayload(body);
+  if (!validation.data || validation.error) {
+    console.warn('[Enquiry API Validation Rejected]', {
+      correlationId,
+      timestamp,
+      result: validation.category || 'validation_error',
+    });
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: validation.error || 'Please check your submitted details.',
+      },
+      { status: 400 }
+    );
+  }
+
+  // 4. Dispatch notification via Resend
+  const mailerResult = await sendEnquiryNotification(validation.data);
+
+  if (!mailerResult.success) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: mailerResult.error || 'Failed to submit enquiry. Please try again.',
+      },
+      { status: mailerResult.status }
+    );
+  }
+
+  // 5. Accepted send
+  return NextResponse.json(
+    {
+      success: true,
+      message:
+        'Thank you for reaching out. We have received your project details and a studio partner will be in touch within 24 hours.',
+    },
+    { status: 200 }
+  );
 }

@@ -7,9 +7,19 @@ import {
 } from '@/components/legal/LegalDocumentLayout';
 
 export const metadata: Metadata = {
-  title: 'Terms & Conditions — OSTRUM',
+  title: 'Terms & Conditions',
   description:
     'Terms and Conditions governing the use of the Ostrum public website, technology showcase, and project enquiry channels.',
+  alternates: {
+    canonical: '/terms-and-conditions',
+  },
+  openGraph: {
+    title: 'Terms & Conditions — OSTRUM',
+    description:
+      'Terms and Conditions governing the use of the Ostrum public website, technology showcase, and project enquiry channels.',
+    url: '/terms-and-conditions',
+    images: ['/images/ostrum-og.png'],
+  },
 };
 
 const SECTIONS: LegalSectionItem[] = [
@@ -32,7 +42,7 @@ const SECTIONS: LegalSectionItem[] = [
 ];
 
 export default function TermsAndConditionsPage() {
-  const lastUpdated = '19 October 2026';
+  const lastUpdated = '20 October 2026';
 
   return (
     <LegalDocumentLayout
@@ -202,7 +212,7 @@ export default function TermsAndConditionsPage() {
           This includes, without limitation, damages for loss of profits, commercial interruption, lost business data, goodwill impairment, or hardware malfunction arising out of or in connection with your access to, use of, or inability to use this website, whether grounded in contract, tort (including negligence), strict liability, or any other legal doctrine.
         </p>
         <p className="mt-3">
-          In jurisdictions where limitation of liability for consequential or incidental damages is constrained, our total aggregate liability for all claims related to website use shall not exceed the amount of five hundred Indian Rupees (₹500 INR) or fifty United States Dollars ($50 USD).
+          To the maximum extent permissible by applicable law, our aggregate liability for direct claims arising solely out of your use of this public informational showcase website shall be limited to the minimum statutory amount recognized by the governing jurisdiction. (Note: Specific monetary liability caps remain subject to formal legal review upon commercial incorporation).
         </p>
       </section>
 

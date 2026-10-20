@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { SITE_CONFIG } from '@/lib/site-config';
 
 interface FormData {
   name: string;
@@ -9,6 +10,7 @@ interface FormData {
   projectType: string;
   phone: string;
   message: string;
+  website_url?: string;
 }
 
 const INITIAL_FORM_DATA: FormData = {
@@ -18,6 +20,7 @@ const INITIAL_FORM_DATA: FormData = {
   projectType: '',
   phone: '',
   message: '',
+  website_url: '',
 };
 
 const PROJECT_TYPE_OPTIONS = [
@@ -45,6 +48,7 @@ export function OstrumContactSection() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setErrorMessage(null);
 
     // Client-side validation
@@ -88,7 +92,7 @@ export function OstrumContactSection() {
       }
     } catch (err) {
       console.error('Submission error:', err);
-      setErrorMessage('Network error occurred. You can reach us directly at hello@theostrum.com.');
+      setErrorMessage(`Network error occurred. You can reach us directly at ${SITE_CONFIG.contactEmail}.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -182,6 +186,20 @@ export function OstrumContactSection() {
                         <span>{errorMessage}</span>
                       </div>
                     )}
+
+                    {/* Anti-spam honeypot (hidden from human visitors) */}
+                    <div style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0, overflow: 'hidden' }} aria-hidden="true">
+                      <label htmlFor="website_url">Website URL</label>
+                      <input
+                        id="website_url"
+                        name="website_url"
+                        type="text"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={formData.website_url || ''}
+                        onChange={handleChange}
+                      />
+                    </div>
 
                     {/* 1. Name — required */}
                     <div className="flex flex-col gap-1.5 w-full">

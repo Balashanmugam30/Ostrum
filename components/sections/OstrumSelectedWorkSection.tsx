@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SITE_CONFIG } from '@/lib/site-config';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -593,7 +594,7 @@ export function OstrumSelectedWorkSection() {
           </div>
 
           <a
-            href="mailto:contact@ostrum.com"
+            href="#contact"
             className="px-6 py-3 rounded-full bg-white text-black font-medium text-xs sm:text-sm tracking-wide hover:bg-white/90 hover:shadow-[0_0_25px_rgba(255,255,255,0.25)] transition-all duration-300 whitespace-nowrap cursor-pointer"
           >
             Start a Conversation →

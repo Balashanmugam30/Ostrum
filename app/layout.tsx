@@ -7,7 +7,7 @@ import { OstrumContinuousJourney } from '@/components/visuals/OstrumContinuousJo
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
 import { SmoothScroll } from '@/components/providers/SmoothScroll';
-import { SITE_CONFIG } from '@/lib/site-config';
+import { SITE_CONFIG, hasValidLinkedIn, getVerifiedLinkedInUrl } from '@/lib/site-config';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.baseUrl),
@@ -39,12 +39,21 @@ export const metadata: Metadata = {
     siteName: 'OSTRUM',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/images/ostrum-og.png',
+        width: 1200,
+        height: 630,
+        alt: 'OSTRUM — Digital Experience & Technology Studio',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'OSTRUM — Digital Transformation & Engineering Studio',
     description:
       'Independent digital engineering, technology architecture, and product design studio.',
+    images: ['/images/ostrum-og.png'],
   },
   robots: {
     index: true,
@@ -65,6 +74,11 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const verifiedSameAs = [
+  SITE_CONFIG.githubUrl,
+  ...(hasValidLinkedIn() && getVerifiedLinkedInUrl() ? [getVerifiedLinkedInUrl()!] : []),
+].filter(Boolean);
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -78,9 +92,7 @@ const jsonLd = {
       email: SITE_CONFIG.contactEmail,
       description:
         'Independent digital product engineering, technology architecture, and venture design studio.',
-      sameAs: [
-        'https://github.com/Balashanmugam30/Ostrum',
-      ],
+      sameAs: verifiedSameAs,
     },
     {
       '@type': 'WebSite',

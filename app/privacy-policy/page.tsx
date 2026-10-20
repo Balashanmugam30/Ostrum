@@ -7,9 +7,19 @@ import {
 } from '@/components/legal/LegalDocumentLayout';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — OSTRUM',
+  title: 'Privacy Policy',
   description:
     'Privacy Policy outlining the collection, use, security, and protection of personal data in compliance with the DPDP Act and international privacy principles.',
+  alternates: {
+    canonical: '/privacy-policy',
+  },
+  openGraph: {
+    title: 'Privacy Policy — OSTRUM',
+    description:
+      'Privacy Policy outlining the collection, use, security, and protection of personal data in compliance with the DPDP Act and international privacy principles.',
+    url: '/privacy-policy',
+    images: ['/images/ostrum-og.png'],
+  },
 };
 
 const SECTIONS: LegalSectionItem[] = [
@@ -31,7 +41,7 @@ const SECTIONS: LegalSectionItem[] = [
 ];
 
 export default function PrivacyPolicyPage() {
-  const lastUpdated = '19 October 2026';
+  const lastUpdated = '20 October 2026';
 
   return (
     <LegalDocumentLayout
@@ -166,7 +176,7 @@ export default function PrivacyPolicyPage() {
         </p>
         <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#50545C]">
           <li><strong>Edge Hosting &amp; Serverless Infrastructure:</strong> High-performance content delivery networks (CDNs) for static asset distribution and serverless API execution;</li>
-          <li><strong>Email Infrastructure:</strong> Encrypted mail routing services utilized solely to deliver submitted enquiries to studio personnel;</li>
+          <li><strong>Email Delivery Infrastructure (Resend):</strong> Transactional email service provider utilized to route submitted project enquiries securely to studio notification mailboxes (<code className="px-1 py-0.5 rounded bg-[#FAF7F2] text-[#161514] font-mono text-xs">hello@theostrum.com</code>);</li>
           <li><strong>Security &amp; DDoS Shielding:</strong> Edge firewalls that monitor inbound request patterns to prevent distributed denial-of-service attacks.</li>
         </ul>
       </section>
@@ -255,7 +265,7 @@ export default function PrivacyPolicyPage() {
           Do Not Track &amp; Browser Privacy Controls
         </h2>
         <p>
-          Because our website operates without third-party tracking cookies or behavioral profile collectors, our baseline architecture is inherently privacy-preserving and complies by default with browser-level &ldquo;Do Not Track&rdquo; (DNT) and Global Privacy Control (GPC) signals.
+          Our public showcase website does not deploy third-party advertising cookies, commercial tracking pixels, or cross-site behavioral profiling tools. Standard website browsing does not initiate behavioral data capture mechanisms addressed by &ldquo;Do Not Track&rdquo; (DNT) or Global Privacy Control (GPC) signals.
         </p>
       </section>
 
@@ -280,11 +290,11 @@ export default function PrivacyPolicyPage() {
           Contact Us &amp; Grievance Redressal
         </h2>
         <p>
-          If you have questions, inquiries, requests, or grievances concerning this Privacy Policy or our data handling practices, please contact our designated privacy triage officer:
+          If you have questions, inquiries, requests, or statutory grievances concerning this Privacy Policy or our data handling practices, please contact our studio team:
         </p>
         <div className="mt-4 p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7] font-mono text-xs sm:text-sm text-[#161514]">
           <p>
-            <span className="text-[#70757E]">Privacy &amp; Data Inquiries:</span>{' '}
+            <span className="text-[#70757E]">Studio Contact for Privacy Inquiries:</span>{' '}
             <a
               href={`mailto:${SITE_CONFIG.contactEmail}?subject=Privacy%20Inquiry`}
               className="text-[#D24B2C] font-semibold hover:underline"
@@ -294,6 +304,9 @@ export default function PrivacyPolicyPage() {
           </p>
           <p className="mt-1 text-[#70757E]">
             Studio Designation: OSTRUM Digital Engineering &amp; Technology Studio
+          </p>
+          <p className="mt-2 text-[11px] text-[#8C827A]">
+            * Note: Formal statutory grievance officer designations will be updated upon final commercial incorporation.
           </p>
         </div>
       </section>

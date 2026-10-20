@@ -37,17 +37,15 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
     const stage = stageRef.current;
     if (!container || !curtain || !stage) return;
 
-    // Use gsap.matchMedia for clean, responsive desktop/tablet theatre curtain reveal
     const mm = gsap.matchMedia();
 
+    // 1. DESKTOP & TABLET IMPLEMENTATION (>= 768px)
     mm.add('(min-width: 768px)', () => {
       const ctaHeight = curtain.offsetHeight;
       const liftDistance = showCTA
         ? Math.max(ctaHeight, window.innerHeight)
         : Math.max(ctaHeight, window.innerHeight * 0.45);
 
-      // Stacking structure:
-      // Curtain sits as absolute foreground cover (z-20) over stage (z-10)
       gsap.set(curtain, {
         position: 'absolute',
         top: 0,
@@ -67,11 +65,7 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         width: '100%',
       });
 
-      // Pinned theatre-curtain lift timeline directly driven by scroll progress
-      const tl = gsap.timeline({
-        paused: true,
-      });
-
+      const tl = gsap.timeline({ paused: true });
       tl.to(curtain, {
         y: -liftDistance,
         ease: 'power2.inOut',
@@ -85,17 +79,13 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         pinSpacing: true,
         scrub: 0.8,
         anticipatePin: 1,
-        id: 'theatre-curtain-reveal',
+        id: 'theatre-curtain-reveal-desktop',
         invalidateOnRefresh: true,
         animation: tl,
         onUpdate: (self) => {
           if (curtain) {
-            // Once curtain lifts past 35%, disable pointer events on the curtain so the exposed
-            // footer tiles and directory links are immediately clickable without any invisible overlay blocking them
             curtain.style.pointerEvents = showCTA && self.progress < 0.35 ? 'auto' : 'none';
-            // Fade out as it completes
             curtain.style.opacity = self.progress > 0.92 ? '0' : '1';
-            // Completely hide from hit testing when near end
             curtain.style.visibility = self.progress > 0.96 ? 'hidden' : 'visible';
           }
         },
@@ -127,16 +117,98 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
       };
     });
 
+    // 2. MOBILE IMPLEMENTATION (< 768px)
+    // Lightweight scrubbed curtain reveal tailored for mobile touch ergonomics
+    mm.add('(max-width: 767px)', () => {
+      const ctaHeight = curtain.offsetHeight;
+      const liftDistance = showCTA
+        ? Math.max(ctaHeight, window.innerHeight * 0.85)
+        : Math.max(ctaHeight, window.innerHeight * 0.35);
+
+      gsap.set(curtain, {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        minHeight: showCTA ? '100svh' : '35svh',
+        height: showCTA ? '100%' : 'auto',
+        zIndex: 20,
+        y: 0,
+        autoAlpha: 1,
+        pointerEvents: showCTA ? 'auto' : 'none',
+      });
+
+      gsap.set(stage, {
+        position: 'relative',
+        zIndex: 10,
+        width: '100%',
+      });
+
+      const tl = gsap.timeline({ paused: true });
+      tl.to(curtain, {
+        y: -liftDistance,
+        ease: 'power2.out',
+      });
+
+      const trigger = ScrollTrigger.create({
+        trigger: container,
+        start: 'top top',
+        end: `+=${liftDistance * 1.05}`,
+        pin: container,
+        pinSpacing: true,
+        scrub: 0.5,
+        anticipatePin: 1,
+        id: 'theatre-curtain-reveal-mobile',
+        invalidateOnRefresh: true,
+        animation: tl,
+        onUpdate: (self) => {
+          if (curtain) {
+            curtain.style.pointerEvents = showCTA && self.progress < 0.35 ? 'auto' : 'none';
+            curtain.style.opacity = self.progress > 0.90 ? '0' : '1';
+            curtain.style.visibility = self.progress > 0.95 ? 'hidden' : 'visible';
+          }
+        },
+        onLeave: () => {
+          if (curtain) {
+            curtain.style.pointerEvents = 'none';
+            curtain.style.opacity = '0';
+            curtain.style.visibility = 'hidden';
+          }
+        },
+        onEnterBack: (self) => {
+          if (curtain) {
+            curtain.style.pointerEvents = showCTA && self.progress < 0.35 ? 'auto' : 'none';
+            curtain.style.opacity = self.progress > 0.90 ? '0' : '1';
+            curtain.style.visibility = self.progress > 0.95 ? 'hidden' : 'visible';
+          }
+        },
+      });
+
+      const refreshTimeout = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 150);
+
+      return () => {
+        clearTimeout(refreshTimeout);
+        trigger.kill();
+        tl.kill();
+        gsap.set([curtain, stage], { clearProps: 'all' });
+      };
+    });
+
     return () => {
       mm.revert();
     };
   }, [showCTA]);
 
-  // Reduced motion fallback: show footer in normal document flow
-  if (isReducedMotion && !showCTA) {
+  // Reduced motion fallback: show components sequentially in normal document flow
+  if (isReducedMotion) {
     return (
-      <div className="relative z-10 w-full bg-[#64120F]">
-        <OstrumStudioFooter />
+      <div className="relative w-full overflow-hidden bg-[#64120F]">
+        {showCTA && <OstrumLiquidSandCTA />}
+        <div className="relative z-10 w-full bg-[#64120F]">
+          <OstrumStudioFooter />
+        </div>
       </div>
     );
   }

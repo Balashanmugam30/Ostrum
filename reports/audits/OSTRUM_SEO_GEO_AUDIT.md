@@ -1,7 +1,7 @@
 # OSTRUM — Technical SEO, Content SEO & GEO/AEO Audit
 
 **Audit Target Domain:** `https://theostrum.com`  
-**Audit Date:** 2026-10-20T12:46:00+05:30  
+**Audit Date:** 2026-10-20T14:46:00+05:30  
 **Stack:** Next.js 15 App Router, React 19, TypeScript, Tailwind CSS  
 **Auditor:** Senior Frontend Architect & Technical SEO/GEO Specialist  
 
@@ -17,51 +17,74 @@ This audit strictly adheres to current official Google Search Central and web en
 
 ---
 
-## 1. Executive Summary & Status Classification
+## 1. Executive Summary & Verification Classification
 
-Every audit dimension is classified into four transparent operational categories:
-1. **[FIXED IN CODE]**: Fully implemented, type-checked, and committed into the codebase.
-2. **[VERIFIED LOCALLY]**: Verified via automated Playwright checks and local HTTP server tests.
-3. **[REQUIRES LIVE DOMAIN]**: Requires live public deployment, TLS certification, and DNS propagation on `theostrum.com`.
-4. **[OWNER ACTION REQUIRED]**: Actions external to source code (e.g., domain registrar purchase, Google Search Console account creation, email provisioning).
+Every dimension is classified into six operational categories:
+- **[FIXED IN CODE]**: Fully implemented, compiled, and verified in code.
+- **[VERIFIED LOCALLY]**: Verified via automated Playwright checks and local HTTP server tests.
+- **[VERIFIED AGAINST LIVE DOMAIN]**: Blocked until `theostrum.com` is publicly live.
+- **[BLOCKED BY MISSING SECRET/DOMAIN/MAILBOX/PROFILE]**: External dependencies requiring owner configuration.
+- **[OWNER ACTION REQUIRED]**: Actions external to source code.
+- **[NOT TESTED / UNKNOWN]**: Measurements requiring field user traffic.
 
 ---
 
 ## 2. Technical Crawl & Indexing Audit
 
-### 2.1 Canonical Hostname & Metadata Base [FIXED IN CODE]
-- **Status:** Complete.
-- **Implementation:** Centrally managed in `lib/site-config.ts` via `SITE_CONFIG.baseUrl = 'https://theostrum.com'`.
-- **Root Layout:** In `app/layout.tsx`:
-  ```ts
-  metadataBase: new URL('https://theostrum.com'),
-  alternates: { canonical: '/' },
-  ```
-- **Validation:** Eliminated mixed references (`ostrum.com`, `ostrum.co`). All canonical links and Open Graph endpoints resolve to the unified `https://theostrum.com` origin.
+### 2.1 Canonical Hostname & Route-Specific Canonicals [FIXED IN CODE / VERIFIED LOCALLY]
+- **Status:** Complete & Verified.
+- **Homepage Canonical:** `https://theostrum.com/` (verified in rendered `<head>`).
+- **Terms Canonical:** `https://theostrum.com/terms-and-conditions` (verified in rendered `<head>`).
+- **Privacy Canonical:** `https://theostrum.com/privacy-policy` (verified in rendered `<head>`).
+- **Title Deduplication:**
+  - Root template is `'%s — OSTRUM'`.
+  - Child pages declare `title: 'Terms & Conditions'` and `title: 'Privacy Policy'`.
+  - Rendered title verified: `Terms & Conditions — OSTRUM` (no duplicate `— OSTRUM — OSTRUM`).
 
 ### 2.2 Sitemaps & Robots.txt [FIXED IN CODE / VERIFIED LOCALLY]
-- **Status:** Complete.
-- **Robots Endpoint:** Built via Next.js App Router convention in [`app/robots.ts`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app/robots.ts):
+- **Status:** Complete & Verified.
+- **Robots Endpoint (`/robots.txt`):**
   - Allows all user-agents to crawl public pages.
   - Disallows internal `/api/` endpoints.
-  - References the canonical sitemap at `https://theostrum.com/sitemap.xml`.
-- **Sitemap Endpoint:** Built via Next.js App Router convention in [`app/sitemap.ts`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app/sitemap.ts):
+  - References `Sitemap: https://theostrum.com/sitemap.xml`.
+  - Tested: HTTP 200 with valid syntax.
+- **Sitemap Endpoint (`/sitemap.xml`):**
   - Lists `/` (priority 1.0, monthly change frequency).
   - Lists `/terms-and-conditions` (priority 0.5, monthly change frequency).
   - Lists `/privacy-policy` (priority 0.5, monthly change frequency).
-- **Local Verification:** Verified via HTTP `fetch('http://localhost:3000/robots.txt')` and `/sitemap.xml`, returning valid XML and text declarations.
+  - Omitted fabricated static timestamps; uses defensible canonical URLs.
+  - Tested: HTTP 200 with valid XML declaration.
 
-### 2.3 Semantic HTML & SSR Crawlability [VERIFIED LOCALLY]
-- **Status:** Pass.
-- **Finding:** Unlike pure client-side SPAs that require JavaScript execution to discover content, Next.js Server Components pre-render all headings, paragraphs, legal sections, and navigation into the initial HTML response.
-- **Proof:** Text-only crawlers (e.g. Googlebot without JS rendering) can read all 16 Terms sections, all 15 Privacy sections, client case studies, and studio capabilities directly from raw HTML.
+### 2.3 French (`/fr`) Incomplete Route Policy [FIXED IN CODE / VERIFIED LOCALLY]
+- **Status:** Complete & Verified.
+- **Decision:** As `/fr` currently renders only a subset of the homepage in developmental preview, an explicit layout was added in [`app/fr/layout.tsx`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app/fr/layout.tsx) with:
+  ```ts
+  export const metadata: Metadata = {
+    robots: { index: false, follow: true },
+  };
+  ```
+- **Local Verification:** Rendered HTML for `/fr` includes `<meta name="robots" content="noindex, follow" />`. `/fr` is excluded from `/sitemap.xml`.
 
 ---
 
-## 3. Structured Data & Business Entity Graph (JSON-LD)
+## 3. Brand Assets & Open Graph Verification
 
-### 3.1 Organization & WebSite Schemas [FIXED IN CODE]
-In [`app/layout.tsx`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app/layout.tsx), a valid JSON-LD script is injected into the `<head>`:
+### 3.1 Static Brand Logo & Social Cards [FIXED IN CODE / VERIFIED LOCALLY]
+- **`public/images/ostrum-logo.png`:**
+  - Rendered from the authentic OSTRUM Romie wordmark SVG at 2x resolution with transparent background (38.9 KB).
+  - Verified: Serves HTTP 200 with `image/png`.
+- **`public/images/ostrum-og.png`:**
+  - High-resolution 1200 × 630 luxury Open Graph card generated using genuine brand typography and radial oxblood gradient (1.09 MB).
+  - Verified: Serves HTTP 200 with `image/png`.
+- **Open Graph / Twitter Card Tags:**
+  - Rendered in root `<head>` pointing to `/images/ostrum-og.png`.
+
+---
+
+## 4. Structured Data & Entity Graph (JSON-LD)
+
+### 4.1 Organization & WebSite Schemas [FIXED IN CODE / VERIFIED LOCALLY]
+In [`app/layout.tsx`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app/layout.tsx), a valid JSON-LD script is injected:
 
 ```json
 {
@@ -93,67 +116,28 @@ In [`app/layout.tsx`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app
 }
 ```
 
-### 3.2 Factual Integrity Rules
-- **No Fabricated Data:** Did not invent fake physical addresses, corporate registration numbers, employee headcount, or phone numbers.
-- **No Fake Ratings / Reviews:** Refrained from adding `AggregateRating` or fabricated customer star ratings, which violate Google Search Central structured data policies and can trigger manual penalties.
-- **Verified Socials Only:** GitHub repository is included in `sameAs`. LinkedIn is excluded from `sameAs` until the official company profile URL is configured.
+### 4.2 Factual Integrity Rules:
+- **No Fabricated Socials:** The unverified LinkedIn placeholder is strictly excluded from `sameAs` until a real company URL is configured.
+- **No Fabricated Ratings or Reviews:** Zero artificial customer star ratings or review schemas that violate Google Search Central policies.
+- **No Fabricated Corporate Identifiers:** Physical addresses, phone numbers, and registration numbers remain omitted until formal incorporation.
 
 ---
 
-## 4. Content SEO & Keyword Intent Mapping
+## 5. GEO / AEO (Generative Engine Optimization) Readiness
 
-| Service / Topic Cluster | Target Intent | Primary Keywords | Representative On-Page Asset |
-| :--- | :--- | :--- | :--- |
-| **Studio Positioning** | Commercial / Brand | Digital engineering studio, technology architecture, venture studio | Hero, Intro narrative, Footer wordmark |
-| **Intelligent Systems** | Solution / B2B | AI systems, AI agent integrations, intelligent automation | Capabilities Card 01, TMR AI Car Care |
-| **Digital Experiences** | Creative / Technical | Immersive web experiences, WebGL, 3D interactive design | Selected Work 3D Wheel, MNESA |
-| **Enterprise Engineering** | Technical Architecture | Custom software development, system integrations, Next.js architecture | Capabilities Card 02, Engine section |
-| **Legal Transparency** | Informational / Trust | DPDP Act 2023 compliance, digital privacy, studio terms | `/terms-and-conditions`, `/privacy-policy` |
+Adhering to Google's official AI Search and Generative Guidance:
+1. **Semantic HTML Pre-rendering:** All 6 Capabilities, 3 Selected Work case studies, 5 FAQ items, and all 31 legal clauses are pre-rendered server-side into static HTML, allowing AI indexing crawlers (e.g. Googlebot, Bingbot, PerplexityBot) to parse content without relying on client-side JS hydration.
+2. **Entity Consistency:** Clear brand identity as an independent digital engineering, technology architecture, and venture design studio.
+3. **No Speculative Guarantee Disclosures:** Adding `llms.txt` or AI metadata does not guarantee generative AI placement. Entity clarity, crawlable text, and original technical case studies remain the primary determiners of AI search indexing.
 
 ---
 
-## 5. Generative AI Search & GEO/AEO Readiness
+## 6. Pre-Launch Owner Action Items [OWNER ACTION REQUIRED]
 
-### 5.1 Evidence-Based Realities vs. Industry Myths
-Current official guidance from Google Search Central explicitly establishes:
-1. **No "Magic" GEO Protocol:** There is no secret tag or format that guarantees placement in Google AI Overviews or AI Mode.
-2. **`llms.txt` Is Not Required:** Google Search does not consume or require `llms.txt` for indexing or AI Overviews inclusion.
-3. **Fundamentals Drive AI Retrieval:** AI-driven search engines rely on the same foundational signals as standard search: semantic structure, entity clarity, factual authority, crawlable HTML, and helpful original information.
-
-### 5.2 GEO-Readiness Audit Checklist
-
-- [x] **Entity Uniqueness:** OSTRUM is clearly defined as a digital product engineering and technology architecture studio across meta tags, headings, and schema.
-- [x] **Information Extraction:** Key offerings are organized with semantic HTML (`h2`, `h3`, `p`, `ul`, `li`), allowing LLMs to parse capabilities without executing complex canvas code.
-- [x] **Case Study Specificity:** TMR AI Car Care, Saraswati Driving School, and MNESA have explicit technical scopes, avoiding generic claims.
-- [x] **DPDP Act 2023 Precision:** Legal documents clearly articulate data governance, controller designations, and grievance redressal under Indian law.
-- [x] **Zero Cloaking:** Content presented to search crawlers matches exactly what human visitors see.
-
----
-
-## 6. External Domain Launch Prerequisites & Action Plan
-
-The following tasks cannot be completed in local code and require external account/DNS actions:
-
-### Phase A: Domain & DNS Activation [OWNER ACTION REQUIRED]
-1. **Acquire `theostrum.com`:** Complete domain purchase with preferred registrar (e.g. Cloudflare, Namecheap, Google Domains/Squarespace).
-2. **Attach Domain in Hosting:** Configure `theostrum.com` in Vercel / Cloudflare / Netlify project settings.
-3. **Apex & `www` Strategy:** Set `theostrum.com` as primary; configure a permanent 301 redirect from `www.theostrum.com` to `theostrum.com` (or vice-versa) to avoid duplicate indexation.
-4. **TLS / SSL Issuance:** Verify automatic Let's Encrypt / hosting edge certificate provisioning.
-
-### Phase B: Email Provisioning [OWNER ACTION REQUIRED]
-1. **Set Up Mailbox:** Create business email mailbox for `hello@theostrum.com` (e.g., Google Workspace, Proton, Zoho).
-2. **DNS Authentication Records:**
-   - Configure **MX records** pointing to mail servers.
-   - Configure **SPF** (`v=spf1 ... ~all`).
-   - Configure **DKIM** public key for cryptographic signature.
-   - Configure **DMARC** policy (`v=DMARC1; p=quarantine; ...`) to prevent domain spoofing.
-
-### Phase C: Search Console & Webmaster Verification [OWNER ACTION REQUIRED]
-1. **Google Search Console (GSC):** Create a Domain property for `theostrum.com` via DNS TXT verification.
-2. **Bing Webmaster Tools:** Import or verify ownership via GSC.
-3. **Submit Sitemap:** Submit `https://theostrum.com/sitemap.xml` directly in GSC.
-4. **Index Inspection:** Request manual indexing of `/`, `/terms-and-conditions`, and `/privacy-policy`.
-
-### Phase D: Social Presence [OWNER ACTION REQUIRED]
-1. **Create LinkedIn Company Page:** Establish the official OSTRUM LinkedIn presence.
-2. **Configure Environment:** Set `NEXT_PUBLIC_OSTRUM_LINKEDIN_URL=https://www.linkedin.com/company/your-company-slug` in hosting environment variables to activate the live footer link.
+| Item | Description | Owner Action |
+| :--- | :--- | :---: |
+| **Domain Registration** | Purchase `theostrum.com` on registrar | Pending Owner |
+| **DNS Setup** | Map A/AAAA records to hosting CDN | Pending Owner |
+| **Mailbox Provisioning** | Set up MX records for `hello@theostrum.com` | Pending Owner |
+| **Google Search Console** | Claim property via DNS TXT and submit sitemap | Post-Launch |
+| **Resend Domain Verification**| Verify DKIM/SPF in Resend dashboard | Post-Purchase |
