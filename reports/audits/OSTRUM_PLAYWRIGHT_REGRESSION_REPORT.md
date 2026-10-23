@@ -109,19 +109,32 @@ Every dimension is classified into six standard operational categories:
 
 ---
 
-### 3.5 Legal Pages Visual Refinement, Footer Wordmark & End-Spacing Optimization
-- **Audit Focus:**
-  1. *Footer Wordmark Click-Hop & Clipping Fix:* Eliminated letter hop animation (`.is-hop`, `@keyframes bwf-hop`), changed hover translation to avoid container clipping, added vertical headroom in `.bwf-word-box` (`0.06em`), and set `cursor: default` on wordmark letters.
-  2. *Legal Document End Spacing & Stage Padding:* Reduced bottom padding on legal reading card wrapper from `pb-24` (96px) to `pb-8` (32px), reduced top padding on footer stage from `pt-44` (176px) to `pt-24` (96px), and calibrated legal route lift scroll distance to `0.65 * liftDistance` so the user transitions seamlessly into contact tiles without scrolling through empty blank zones.
-  3. *Legal Layout Palette & Metadata:* Removed traffic-signal green status dot (`#16A34A`), removed `Version 2.0 (Public Release)` and `Studio Legal Affairs`, streamlined category badges (`TERMS & CONDITIONS`, `PRIVACY POLICY`), adopted cohesive `#FAF7F2` canvas, `#FFFFFF` card, `#050505` headings, `#302A28` body copy, and `#64120F` brand accents.
-  4. *Legal Copy Audit:* Removed informal drafting commentary from Section 11 of Terms (liability cap note) and Section 15 of Privacy (grievance officer note).
-- **Automated Playwright Results:**
-  - Wordmark click hop: `0.000px` delta on all letters (`O`, `S`, `T`, `R`, `U`, `M`), `hasHop: false`, `cursor: default`, `isClipped: false`.
-  - Green dot (`#16A34A` / `rgb(22, 163, 74)`): 0 occurrences found across all legal templates.
-  - Version 2.0 / Studio Legal Affairs: 0 occurrences found.
-  - Internal drafting notes: 0 occurrences found.
-  - Homepage CTA-to-footer reveal: 100% intact with CTA panel and stage reveal preserved.
-  - Multi-viewport matrix: 8/8 viewports passed with 0 horizontal overflow and responsive wordmark scaling.
+### 3.5 Legal Pages Structure Redesign, Wordmark Click-Hop Restored & Curtain Gap Elimination
+- **Audit Focus & Implemented Fixes:**
+  1. *Footer Wordmark Click-Hop Restored Without Clipping:*
+     - Restored original elastic vertical click-hop animation (`@keyframes bwf-hop`), `.bwf-l.is-hop`, and `hop` click handler with DOM reflow trigger (`void el.offsetWidth; el.classList.add('is-hop')`) ensuring repeat clicks restart cleanly.
+     - Restored hover translation (`translateY(-.048em)`) and `cursor: pointer`.
+     - Completely eliminated letter clipping by setting `.bwf-word` to `overflow-x: clip; overflow-y: visible;` and reserving generous upward headroom (`clamp(24px, 4.5cqw, 64px)` top padding in `.bwf-word-box` and `(0.8 + cut + 0.22) * 26cqw` word height).
+     - Automated Playwright verification measured **~57.55px upward hop amplitude**, `peakClipped: false`, `settleDiff: 0.00px`, and clean repeat-trigger behavior.
+  2. *Legal Page Structure Redesign & Single Navigation System:*
+     - Removed duplicate top Table of Contents overview card (`data-testid="table-of-contents-overview"`).
+     - Maintained a single, elegant navigation system: desktop sticky left rail (`sticky-legal-sidebar`) with active section spy and `#64120F` burgundy indicator; mobile collapsible "Contents" drawer.
+     - Canvas set to pure white (`#FFFFFF`); replaced nested card (`rounded-3xl shadow-[0_12px_40px...]`) with a calm editorial reading surface (`max-w-[75ch]`) featuring `#262626` body copy, `#050505` headings, `#E5E5E5` hairline dividers, and `#64120F` brand accents.
+     - Publication date updated to `23 October 2026`.
+  3. *Elimination of End-of-Document Blank Gap & Compact Curtain Mask:*
+     - On legal routes (`showCTA === false`), curtain mask height is dynamically calibrated to match only the underlying contact-tile header (`getLegalRevealDistance() = 448px` on desktop, `596px` on mobile) instead of forcing full `100svh`.
+     - Curtain lift distance and ScrollTrigger `end` scrub are synchronized directly to this compact travel distance (`+=448px` on desktop, `+=596px` on mobile).
+     - Outer reading surface bottom padding set to `pb-8` (32px), creating an exact **32px breathing gap** to `#theatre-stage-wrapper` (within the 24–40px target).
+     - Completely eliminated the dead scroll zone. On reaching document end, a brief, effortless scroll smoothly lifts the white curtain mask (`y: -448px`), immediately revealing the contact tiles and `#64120F` footer stage.
+     - `onLeave` sets `visibility: hidden; pointerEvents: none;`. Scroll reversal cleanly restores `visibility: visible` and slides the curtain back down.
+  4. *Homepage CTA-to-Footer Reveal Preservation:*
+     - Homepage (`showCTA === true`) remains 100% intact: `100svh` black `#050505` CTA surface, full `window.innerHeight` lift distance, and pinned theatre curtain reveal.
+- **Automated Playwright Results (`scripts/verify_legal_structure_and_wordmark_hop.mjs`):**
+  - Wordmark hop: **57.55px delta**, `peakClipped: false`, `settleDiff: 0.00px`, `cursor: pointer`, restartable on double-click.
+  - Legal structure: Duplicate TOC overview count = 0, sticky sidebar verified, pure white `#FFFFFF` canvas, nested card removed, date 23 October 2026.
+  - End spacing & curtain: **32px gap** between reading surface and stage wrapper (target 24–40px), **448px compact curtain** (not 100svh), curtain translated to -448px and hidden, wordmark visible, reverse scroll verified.
+  - Homepage CTA: Full-viewport CTA intact, black `#050505` curtain mask, footer reveal intact.
+  - Multi-viewport matrix: 8/8 viewports passed with 0 horizontal overflow and responsive scaling (1920×1080 down to 360×800).
   - Accessibility: `prefers-reduced-motion: reduce` verified for graceful static flow.
 
 ---

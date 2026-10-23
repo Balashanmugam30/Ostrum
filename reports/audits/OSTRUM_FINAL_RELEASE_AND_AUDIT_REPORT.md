@@ -1,9 +1,9 @@
 # OSTRUM — Final Release & Multi-Axis Audit Report
 
-**Date:** 2026-10-20T15:35:00+05:30  
+**Date:** 2026-10-23T15:30:00+05:30  
 **Repository:** `Balashanmugam30/Ostrum`  
 **Current Branch:** `main`  
-**Release Commit:** `4d9b68d` (and subsequent hardening commits)  
+**Release Commit:** `8a80c98` (and subsequent legal refinement commits)  
 **Target Domain:** `https://theostrum.com`  
 
 ---
@@ -13,8 +13,8 @@
 This final release report consolidates all engineering deliverables, automated audit benchmarks, visual regression tests, and security verifications completed for the OSTRUM website.
 
 ### Status Classification:
-- **[FIXED IN CODE]**: Resend integration, production mock prohibition, rate limiting, honeypot, trusted IP proxy precedence, domain centralization, strict LinkedIn validation, route canonicals, brand assets (`ostrum-logo.png`, `ostrum-og.png`), legal layout cleanup, and mobile/desktop curtain reveal.
-- **[VERIFIED LOCALLY]**: Production build succeeded, 15/15 unit tests passed, 10/10 viewports passed with 0px horizontal overflow, native cursor restored everywhere, Playwright live enquiry form test passed (validation, honeypots, missing config, UI data preservation), and HTTP 200 confirmed on all routes, assets, robots, and sitemap.
+- **[FIXED IN CODE]**: Resend integration, production mock prohibition, rate limiting, honeypot, trusted IP proxy precedence, domain centralization, strict LinkedIn validation, route canonicals, brand assets (`ostrum-logo.png`, `ostrum-og.png`), footer wordmark click-hop restoration without clipping, legal page structure single-index redesign, and compact legal theatre-curtain reveal.
+- **[VERIFIED LOCALLY]**: Production build succeeded, 15/15 unit tests passed, 10/10 viewports passed with 0px horizontal overflow, native cursor restored everywhere, footer wordmark ~57.55px elastic hop verified with zero clipping, Playwright live enquiry form test passed (validation, honeypots, missing config, UI data preservation), and HTTP 200 confirmed on all routes, assets, robots, and sitemap.
 - **[VERIFIED AGAINST LIVE DOMAIN]**: Blocked until `theostrum.com` is registered, deployed, and live on public DNS. Empirical query confirmed `theostrum.com` is currently unregistered (`available: true`).
 - **[BLOCKED BY MISSING SECRET/DOMAIN/MAILBOX/PROFILE]**: Live Resend email sending is blocked pending owner provisioning of `RESEND_API_KEY` and verified sender domain DNS. Real LinkedIn link is blocked pending owner creation of official company page.
 - **[OWNER ACTION REQUIRED]**: Domain registration, DNS mapping, mailbox provisioning, Resend secret configuration, and LinkedIn profile setup.
@@ -36,8 +36,7 @@ This final release report consolidates all engineering deliverables, automated a
    - 10 / 10 viewports passed with **0 px horizontal overflow**.
    - Custom cursor completely removed (0 DOM nodes, native `auto`/`pointer`/`text` cursors active).
    - LinkedIn item reconciled: authentic SVG + label rendered with truthful "Pending" badge.
-   - Legal routes render zero CTA section, clean standalone wordmark, and warm-ivory (`#FAF7F2`) theatre curtain reveal on both desktop (`>= 768px`) and mobile (`< 768px`).
-- Black screen transition fix: Curtain geometry unified to `100svh`, eliminating empty black space below homepage CTA and hardcoded black mask on legal routes; full translation to `-window.innerHeight` with zero blank viewport gap.
+   - Legal routes render zero CTA section, clean standalone wordmark, pure white (`#FFFFFF`) reading canvas, and compact theatre-curtain reveal on both desktop (`>= 768px`) and mobile (`< 768px`).
    - Playwright automated form test: client-side validation, error banners, and form field preservation verified.
 3. **[Lab Performance Profiling](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/OSTRUM_PERFORMANCE_AUDIT.md):**
    - Navigation TTFB: **6 ms** | FCP: **392 ms** | DOMContentLoaded: **188 ms** (local production server).
@@ -52,10 +51,11 @@ This final release report consolidates all engineering deliverables, automated a
 
 ---
 
-5. **[Legal Pages Visual Refinement & Wordmark Hop Fix](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/OSTRUM_PLAYWRIGHT_REGRESSION_REPORT.md):**
-   - Eliminated footer wordmark click-hop animation and container clipping; cursor set to default.
-   - Calibrated legal document bottom padding (32px), footer top stage padding (96px), and curtain scroll distance (0.65x lift), removing dead scroll gaps.
-   - Removed green status dot, Version 2.0 label, Studio Legal Affairs marker, and drafting commentary across Terms & Privacy pages.
+5. **[Legal Pages Structure, Wordmark Click-Hop Restored & Curtain Gap Fix](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/OSTRUM_PLAYWRIGHT_REGRESSION_REPORT.md):**
+   - **Footer Wordmark Click-Hop Restored Without Clipping:** Restored `@keyframes bwf-hop`, `.bwf-l.is-hop`, and click handler with reflow reset. Restored hover state and `cursor: pointer`. Eliminated clipping by setting `.bwf-word` to `overflow-x: clip; overflow-y: visible;` and reserving upward clearance in `.bwf-word-box` (`clamp(24px, 4.5cqw, 64px)` padding, `+0.22cqw` word height). Measured **57.55px** upward hop delta with `peakClipped: false`.
+   - **Legal Page Structure Single Navigation:** Removed duplicate top Table of Contents overview card (`data-testid="table-of-contents-overview"`). Single desktop sticky rail navigation (`sticky-legal-sidebar`) and mobile collapsible drawer. Pure white `#FFFFFF` canvas, editorial reading column (`max-w-[75ch]`) without heavy card shadows, `#262626` body text, `#050505` headings, `#E5E5E5` hairline dividers, and updated publication date `23 October 2026`.
+   - **Dead Scroll Space Elimination & Compact Curtain:** Dynamic legal curtain mask derived from footer stage contact-tile header (`448px` desktop, `596px` mobile) instead of `100svh`. ScrollTrigger scrub tied to compact lift distance (`+=448px`), resulting in an exact **32px breathing gap** between legal text and footer stage wrapper. Full reverse scroll and lifecycle hiding verified.
+   - **Homepage CTA-to-Footer Reveal Intact:** Full `100svh` black CTA panel and curtain reveal completely untouched on homepage.
    - Full Playwright automated verification passed across 8 viewport form factors and reduced motion.
 
 ---

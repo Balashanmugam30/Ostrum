@@ -39,16 +39,31 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
 
     const mm = gsap.matchMedia();
 
+    // Calculate legal mask and reveal distance based on stage's contact header region
+    const getLegalRevealDistance = () => {
+      if (stage) {
+        const tiles = stage.querySelector('.grid');
+        if (tiles) {
+          const stageRect = stage.getBoundingClientRect();
+          const tilesRect = tiles.getBoundingClientRect();
+          const measured = tilesRect.bottom - stageRect.top + 32;
+          if (measured > 250) return Math.ceil(measured);
+        }
+      }
+      return window.innerWidth >= 768 ? 448 : 596;
+    };
+
     // 1. DESKTOP & TABLET IMPLEMENTATION (>= 768px)
     mm.add('(min-width: 768px)', () => {
-      const getLiftDistance = () => window.innerHeight;
+      const getLiftDistance = () => (showCTA ? window.innerHeight : getLegalRevealDistance());
+      const initialLift = getLiftDistance();
 
       gsap.set(curtain, {
         position: 'absolute',
         top: 0,
         left: 0,
         width: '100%',
-        height: '100svh',
+        height: showCTA ? '100svh' : `${initialLift}px`,
         zIndex: 20,
         y: 0,
         autoAlpha: 1,
@@ -71,12 +86,12 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
       const trigger = ScrollTrigger.create({
         trigger: container,
         start: 'top top',
-        end: () => `+=${Math.round(getLiftDistance() * (showCTA ? 1.0 : 0.65))}`,
+        end: () => `+=${getLiftDistance()}`,
         pin: container,
         pinSpacing: true,
-        scrub: 0.6,
+        scrub: showCTA ? 0.6 : 0.5,
         anticipatePin: 1,
-        id: 'theatre-curtain-reveal-desktop',
+        id: showCTA ? 'theatre-curtain-reveal-desktop' : 'legal-curtain-reveal-desktop',
         invalidateOnRefresh: true,
         animation: tl,
         onUpdate: (self) => {
@@ -113,16 +128,16 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
     });
 
     // 2. MOBILE IMPLEMENTATION (< 768px)
-    // Lightweight scrubbed curtain reveal tailored for mobile touch ergonomics
     mm.add('(max-width: 767px)', () => {
-      const getLiftDistance = () => window.innerHeight;
+      const getLiftDistance = () => (showCTA ? window.innerHeight : getLegalRevealDistance());
+      const initialLift = getLiftDistance();
 
       gsap.set(curtain, {
         position: 'absolute',
         top: 0,
         left: 0,
         width: '100%',
-        height: '100svh',
+        height: showCTA ? '100svh' : `${initialLift}px`,
         zIndex: 20,
         y: 0,
         autoAlpha: 1,
@@ -145,12 +160,12 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
       const trigger = ScrollTrigger.create({
         trigger: container,
         start: 'top top',
-        end: () => `+=${Math.round(getLiftDistance() * (showCTA ? 0.95 : 0.55))}`,
+        end: () => `+=${getLiftDistance()}`,
         pin: container,
         pinSpacing: true,
-        scrub: 0.5,
+        scrub: showCTA ? 0.5 : 0.45,
         anticipatePin: 1,
-        id: 'theatre-curtain-reveal-mobile',
+        id: showCTA ? 'theatre-curtain-reveal-mobile' : 'legal-curtain-reveal-mobile',
         invalidateOnRefresh: true,
         animation: tl,
         onUpdate: (self) => {
@@ -214,11 +229,11 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
       <div
         ref={curtainRef}
         data-testid="theatre-curtain-panel"
-        className={`theatre-curtain relative z-20 w-full min-h-[100svh] ${
-          showCTA ? 'bg-[#050505]' : 'bg-[#FAF7F2]'
+        className={`theatre-curtain absolute top-0 left-0 z-20 w-full ${
+          showCTA ? 'min-h-[100svh] bg-[#050505]' : 'bg-white'
         }`}
         style={{
-          height: '100svh',
+          height: showCTA ? '100svh' : undefined,
         }}
         aria-hidden={!showCTA}
       >
@@ -227,7 +242,11 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         ) : (
           <div
             data-testid="legal-curtain-mask"
-            className="w-full h-full min-h-[100svh] bg-[#FAF7F2] select-none pointer-events-none"
+            className="w-full bg-white select-none pointer-events-none"
+            style={{
+              height: '100%',
+              minHeight: '448px',
+            }}
           />
         )}
       </div>

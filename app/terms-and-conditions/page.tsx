@@ -42,7 +42,7 @@ const SECTIONS: LegalSectionItem[] = [
 ];
 
 export default function TermsAndConditionsPage() {
-  const lastUpdated = '20 October 2026';
+  const lastUpdated = '23 October 2026';
 
   return (
     <LegalDocumentLayout
@@ -53,7 +53,7 @@ export default function TermsAndConditionsPage() {
       sections={SECTIONS}
     >
       {/* Section 1 */}
-      <section id="acceptance" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="acceptance" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">01</span>
           Acceptance of Terms
@@ -67,13 +67,13 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 2 */}
-      <section id="identity" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="identity" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">02</span>
           Studio Identity &amp; Planned Brand Domain
         </h2>
         <p>
-          OSTRUM operates as an independent digital product engineering, technology architecture, and venture design studio. The studio is in the active process of acquiring and provisioning its primary branded domain, planned as <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#050505] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>, with associated studio communications planned at <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#050505] font-mono text-xs">{SITE_CONFIG.contactEmail}</code>.
+          OSTRUM operates as an independent digital product engineering, technology architecture, and venture design studio. The studio is in the active process of acquiring and provisioning its primary branded domain, planned as <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>, with associated studio communications planned at <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">{SITE_CONFIG.contactEmail}</code>.
         </p>
         <p className="mt-3">
           The publication of planned domain endpoints, studio designations, and future infrastructure within this website reflects current architectural planning and does not assert that third-party domain registrar transfers, external mail server MX records, or related public infrastructure have concluded final administrative provisioning.
@@ -81,7 +81,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 3 */}
-      <section id="showcase" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="showcase" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">03</span>
           Nature of Website &amp; Non-Binding Showcase
@@ -95,7 +95,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 4 */}
-      <section id="enquiries" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="enquiries" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">04</span>
           Project Enquiries &amp; Commercial Engagements
@@ -109,7 +109,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 5 */}
-      <section id="acceptable-use" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="acceptable-use" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">05</span>
           Acceptable Use &amp; System Integrity
@@ -127,7 +127,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 6 */}
-      <section id="intellectual-property" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="intellectual-property" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">06</span>
           Intellectual Property &amp; Studio Assets
@@ -141,7 +141,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 7 */}
-      <section id="case-studies" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="case-studies" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">07</span>
           Client Case Studies &amp; Attribution
@@ -155,7 +155,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 8 */}
-      <section id="external-links" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="external-links" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">08</span>
           External Links &amp; Open-Source Repositories
@@ -169,7 +169,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 9 */}
-      <section id="availability" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="availability" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">09</span>
           Availability &amp; Maintenance
@@ -183,7 +183,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 10 */}
-      <section id="disclaimers" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="disclaimers" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">10</span>
           Disclaimers of Warranties
@@ -200,7 +200,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 11 */}
-      <section id="liability" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="liability" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">11</span>
           Limitation of Liability
@@ -217,7 +217,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 12 */}
-      <section id="indemnification" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="indemnification" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">12</span>
           Indemnification
@@ -228,7 +228,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 13 */}
-      <section id="modifications" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="modifications" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">13</span>
           Modifications to Terms
@@ -242,7 +242,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 14 */}
-      <section id="severability" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="severability" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">14</span>
           Severability &amp; Entire Agreement
@@ -256,7 +256,7 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 15 */}
-      <section id="governing-law" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+      <section id="governing-law" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">15</span>
           Governing Law &amp; Dispute Resolution
@@ -278,7 +278,7 @@ export default function TermsAndConditionsPage() {
         <p>
           Formal legal notices, queries regarding these Terms, or copyright inquiries should be directed to the studio leadership via our official enquiry channel:
         </p>
-        <div className="mt-4 p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7] font-mono text-xs sm:text-sm text-[#050505]">
+        <div className="mt-4 p-5 rounded-2xl bg-[#F5F5F5] border border-[#E5E5E5] font-mono text-xs sm:text-sm text-[#050505]">
           <p>
             <span className="text-[#70757E]">Direct Inquiries:</span>{' '}
             <a
