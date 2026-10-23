@@ -267,7 +267,7 @@ export function LegalDocumentLayout({
         </div>
       </div>
 
-      {/* Real Theatre-Curtain Reveal without CTA: Clean mask (#050505) lifts to reveal Studio Footer (#64120F) */}
+      {/* Real Theatre-Curtain Reveal without CTA: Warm-ivory mask (#FAF7F2) lifts to reveal Studio Footer (#64120F) */}
       <OstrumFooterReveal showCTA={false} />
     </div>
   );

@@ -83,11 +83,29 @@ Every dimension is classified into six standard operational categories:
   - `document.querySelector('[data-testid="liquid-sand-cta-section"]')` evaluates to `null` on both legal routes.
 - **Clean Masthead:**
   - Full masthead bar and Terms/Privacy pill switcher removed as requested. Standalone OSTRUM wordmark rendered with high-contrast text `#161514` on `#FAF7F2` background.
-- **Curtain Reveal Mobile & Desktop:**
-  - `data-testid="legal-curtain-mask"` is mounted above the theatre stage panel.
-  - Desktop: GSAP ScrollTrigger pins `#theatre-stage-wrapper` and lifts the curtain by `-liftDistance`.
-  - Mobile: GSAP ScrollTrigger with responsive touch-friendly lift distance (`0.35 * innerHeight`) and smooth unpinning.
-  - Reduced-motion: Sequential document flow without scroll pinning when `prefers-reduced-motion` is enabled.
+- **Warm-Ivory Legal Curtain Reveal:**
+  - `data-testid="legal-curtain-mask"` is rendered with exact warm-ivory `#FAF7F2` (`rgb(250, 247, 242)`) background, completely eliminating the legacy pitch-black `#050505` mask.
+  - Curtain panel explicitly sized to `100svh` with seamless ivory flow at document end.
+  - Desktop & Mobile: GSAP ScrollTrigger pins `#theatre-stage-wrapper` and lifts the curtain upward by `-window.innerHeight`, progressively revealing the underlying `#64120F` studio footer stage without any black panel, gap, or blank viewport.
+  - Reduced-motion: Sequential document flow without scroll pinning and zero curtain mask when `prefers-reduced-motion` is enabled.
+
+### 3.4 Theatre Curtain Reveal Fix (Homepage & Legal Routes)
+- **Component File:** [`components/sections/OstrumFooterReveal.tsx`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/components/sections/OstrumFooterReveal.tsx)
+- **Root Cause Diagnosed:**
+  1. *Legal Mask Color Mismatch:* On warm-ivory (`#FAF7F2`) legal pages, the curtain was hardcoded to `#050505` black, causing an abrupt pitch-black panel to sit at the end of the legal document.
+  2. *Curtain Height & Lift Geometry Mismatch:* Absolute curtain was given `height: 100%`, forcing it to inherit the 1328px height of the footer stage while the CTA inside was only `100svh` (900px). The lift distance was calculated from the 900px CTA, leaving 428px of empty black curtain in the viewport that was abruptly snapped to `opacity: 0` at 0.92 progress.
+- **Permanent Solution Implemented:**
+  1. *Surface Contract:* Explicitly bound curtain to `#050505` when `showCTA=true` (homepage) and `#FAF7F2` when `showCTA=false` (legal pages).
+  2. *Exact Viewport Height:* Set curtain height to `100svh` across desktop and mobile, ensuring zero empty black space below CTA and seamless full-viewport coverage on legal pages.
+  3. *Full-Travel Translation:* Animate `y: () => -window.innerHeight` with `ease: "none"` and 1:1 scrub duration `end: () => "+=" + window.innerHeight`. At progress 1.0, curtain is completely lifted off the top of the viewport (`bottom: 0px`).
+  4. *Reverse Scroll & Lifecycle:* `onLeave` sets `visibility: hidden` and `pointerEvents: none`; `onEnterBack` restores `visibility: visible`. Reverse scrolling smoothly returns through the reveal across all viewports.
+- **Empirical Pixel Verification:**
+  - `desktop_terms_1_before.png`: Top 15% `#FAF7F2`, Center `#FAF7F2`, Bot 85% `#FAF7F2` (100% ivory, 0 black pixels).
+  - `desktop_terms_3_mid.png`: Top 15% `#FAF7F2`, Center `#FAF7F2`, Bot 85% `#64120F` (crimson footer revealed).
+  - `desktop_terms_5_fully_revealed.png`: Top 15% `#64120F`, Center `#64120F`, Bot 85% `#64120F` (pure crimson footer).
+  - `desktop_homepage_2_start.png`: `#050505` CTA surface.
+  - `desktop_homepage_5_fully_revealed.png`: 100% `#64120F` footer with zero blank viewport gap.
+  - All 8 responsive viewports and reduced-motion validated with Playwright.
 
 ---
 

@@ -41,21 +41,18 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
 
     // 1. DESKTOP & TABLET IMPLEMENTATION (>= 768px)
     mm.add('(min-width: 768px)', () => {
-      const ctaHeight = curtain.offsetHeight;
-      const liftDistance = showCTA
-        ? Math.max(ctaHeight, window.innerHeight)
-        : Math.max(ctaHeight, window.innerHeight * 0.45);
+      const getLiftDistance = () => window.innerHeight;
 
       gsap.set(curtain, {
         position: 'absolute',
         top: 0,
         left: 0,
         width: '100%',
-        minHeight: showCTA ? '100svh' : '40svh',
-        height: showCTA ? '100%' : 'auto',
+        height: '100svh',
         zIndex: 20,
         y: 0,
         autoAlpha: 1,
+        visibility: 'visible',
         pointerEvents: showCTA ? 'auto' : 'none',
       });
 
@@ -67,47 +64,45 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
 
       const tl = gsap.timeline({ paused: true });
       tl.to(curtain, {
-        y: -liftDistance,
-        ease: 'power2.inOut',
+        y: () => -getLiftDistance(),
+        ease: 'none',
       });
 
       const trigger = ScrollTrigger.create({
         trigger: container,
         start: 'top top',
-        end: `+=${liftDistance * 1.15}`,
+        end: () => `+=${getLiftDistance()}`,
         pin: container,
         pinSpacing: true,
-        scrub: 0.8,
+        scrub: 0.6,
         anticipatePin: 1,
         id: 'theatre-curtain-reveal-desktop',
         invalidateOnRefresh: true,
         animation: tl,
         onUpdate: (self) => {
-          if (curtain) {
-            curtain.style.pointerEvents = showCTA && self.progress < 0.35 ? 'auto' : 'none';
-            curtain.style.opacity = self.progress > 0.92 ? '0' : '1';
-            curtain.style.visibility = self.progress > 0.96 ? 'hidden' : 'visible';
+          if (curtain && showCTA) {
+            curtain.style.pointerEvents = self.progress < 0.25 ? 'auto' : 'none';
           }
         },
         onLeave: () => {
           if (curtain) {
             curtain.style.pointerEvents = 'none';
-            curtain.style.opacity = '0';
             curtain.style.visibility = 'hidden';
           }
         },
         onEnterBack: (self) => {
           if (curtain) {
-            curtain.style.pointerEvents = showCTA && self.progress < 0.35 ? 'auto' : 'none';
-            curtain.style.opacity = self.progress > 0.92 ? '0' : '1';
-            curtain.style.visibility = self.progress > 0.96 ? 'hidden' : 'visible';
+            curtain.style.visibility = 'visible';
+            if (showCTA) {
+              curtain.style.pointerEvents = self.progress < 0.25 ? 'auto' : 'none';
+            }
           }
         },
       });
 
       const refreshTimeout = setTimeout(() => {
         ScrollTrigger.refresh();
-      }, 150);
+      }, 200);
 
       return () => {
         clearTimeout(refreshTimeout);
@@ -120,21 +115,18 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
     // 2. MOBILE IMPLEMENTATION (< 768px)
     // Lightweight scrubbed curtain reveal tailored for mobile touch ergonomics
     mm.add('(max-width: 767px)', () => {
-      const ctaHeight = curtain.offsetHeight;
-      const liftDistance = showCTA
-        ? Math.max(ctaHeight, window.innerHeight * 0.85)
-        : Math.max(ctaHeight, window.innerHeight * 0.35);
+      const getLiftDistance = () => window.innerHeight;
 
       gsap.set(curtain, {
         position: 'absolute',
         top: 0,
         left: 0,
         width: '100%',
-        minHeight: showCTA ? '100svh' : '35svh',
-        height: showCTA ? '100%' : 'auto',
+        height: '100svh',
         zIndex: 20,
         y: 0,
         autoAlpha: 1,
+        visibility: 'visible',
         pointerEvents: showCTA ? 'auto' : 'none',
       });
 
@@ -146,14 +138,14 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
 
       const tl = gsap.timeline({ paused: true });
       tl.to(curtain, {
-        y: -liftDistance,
-        ease: 'power2.out',
+        y: () => -getLiftDistance(),
+        ease: 'none',
       });
 
       const trigger = ScrollTrigger.create({
         trigger: container,
         start: 'top top',
-        end: `+=${liftDistance * 1.05}`,
+        end: () => `+=${Math.round(getLiftDistance() * 0.95)}`,
         pin: container,
         pinSpacing: true,
         scrub: 0.5,
@@ -162,31 +154,29 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         invalidateOnRefresh: true,
         animation: tl,
         onUpdate: (self) => {
-          if (curtain) {
-            curtain.style.pointerEvents = showCTA && self.progress < 0.35 ? 'auto' : 'none';
-            curtain.style.opacity = self.progress > 0.90 ? '0' : '1';
-            curtain.style.visibility = self.progress > 0.95 ? 'hidden' : 'visible';
+          if (curtain && showCTA) {
+            curtain.style.pointerEvents = self.progress < 0.25 ? 'auto' : 'none';
           }
         },
         onLeave: () => {
           if (curtain) {
             curtain.style.pointerEvents = 'none';
-            curtain.style.opacity = '0';
             curtain.style.visibility = 'hidden';
           }
         },
         onEnterBack: (self) => {
           if (curtain) {
-            curtain.style.pointerEvents = showCTA && self.progress < 0.35 ? 'auto' : 'none';
-            curtain.style.opacity = self.progress > 0.90 ? '0' : '1';
-            curtain.style.visibility = self.progress > 0.95 ? 'hidden' : 'visible';
+            curtain.style.visibility = 'visible';
+            if (showCTA) {
+              curtain.style.pointerEvents = self.progress < 0.25 ? 'auto' : 'none';
+            }
           }
         },
       });
 
       const refreshTimeout = setTimeout(() => {
         ScrollTrigger.refresh();
-      }, 150);
+      }, 200);
 
       return () => {
         clearTimeout(refreshTimeout);
@@ -224,9 +214,12 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
       <div
         ref={curtainRef}
         data-testid="theatre-curtain-panel"
-        className={`theatre-curtain relative z-20 w-full bg-[#050505] ${
-          showCTA ? 'min-h-[100svh]' : 'min-h-[35svh] sm:min-h-[40svh]'
+        className={`theatre-curtain relative z-20 w-full min-h-[100svh] ${
+          showCTA ? 'bg-[#050505]' : 'bg-[#FAF7F2]'
         }`}
+        style={{
+          height: '100svh',
+        }}
         aria-hidden={!showCTA}
       >
         {showCTA ? (
@@ -234,7 +227,7 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         ) : (
           <div
             data-testid="legal-curtain-mask"
-            className="w-full h-full min-h-[35svh] sm:min-h-[40svh] bg-[#050505] select-none pointer-events-none"
+            className="w-full h-full min-h-[100svh] bg-[#FAF7F2] select-none pointer-events-none"
           />
         )}
       </div>

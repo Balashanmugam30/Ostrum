@@ -36,7 +36,8 @@ This final release report consolidates all engineering deliverables, automated a
    - 10 / 10 viewports passed with **0 px horizontal overflow**.
    - Custom cursor completely removed (0 DOM nodes, native `auto`/`pointer`/`text` cursors active).
    - LinkedIn item reconciled: authentic SVG + label rendered with truthful "Pending" badge.
-   - Legal routes render zero CTA section, clean standalone wordmark, and theatre curtain reveal on both desktop (`>= 768px`) and mobile (`< 768px`).
+   - Legal routes render zero CTA section, clean standalone wordmark, and warm-ivory (`#FAF7F2`) theatre curtain reveal on both desktop (`>= 768px`) and mobile (`< 768px`).
+- Black screen transition fix: Curtain geometry unified to `100svh`, eliminating empty black space below homepage CTA and hardcoded black mask on legal routes; full translation to `-window.innerHeight` with zero blank viewport gap.
    - Playwright automated form test: client-side validation, error banners, and form field preservation verified.
 3. **[Lab Performance Profiling](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/OSTRUM_PERFORMANCE_AUDIT.md):**
    - Navigation TTFB: **6 ms** | FCP: **392 ms** | DOMContentLoaded: **188 ms** (local production server).
