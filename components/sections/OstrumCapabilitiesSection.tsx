@@ -25,8 +25,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '01 / 06',
     title: 'DIGITAL EXPERIENCES',
     description:
-      'Digital touchpoints designed to make your business easier to discover, use and buy from.',
-    tags: ['Websites', 'E-commerce', 'Customer Portals'],
+      'High-conversion websites, modern web applications, and customer portals engineered for clarity, speed, and measurable growth.',
+    tags: ['Websites', 'Web Applications', 'E-commerce'],
     gradient:
       'linear-gradient(112deg, #D7B5FA 0%, #F2D4FF 48%, #CDE6FC 100%)',
     variant: 1,
@@ -36,8 +36,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '02 / 06',
     title: 'AI SYSTEMS & AGENTS',
     description:
-      'Intelligent systems that respond, reason and carry work forward across your business.',
-    tags: ['AI Receptionists', 'AI Agents', 'Workflow Automation'],
+      'Autonomous AI agents, customer communication assistants, and practical workflow automations solving real operational bottlenecks.',
+    tags: ['AI Agents', 'Workflow Automation', 'Intelligent Intake'],
     gradient:
       'linear-gradient(112deg, #86FFF8 0%, #D2F6F0 52%, #F4C5CF 100%)',
     variant: 2,
@@ -47,8 +47,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '03 / 06',
     title: 'BUSINESS PLATFORMS',
     description:
-      'Connected systems that bring customer relationships, daily operations and business data into focus.',
-    tags: ['CRM & ERP', 'Operations Dashboards', 'Business Workflows'],
+      'Connected internal platforms, CRM and ERP integrations, and operations dashboards that unite data and streamline operations.',
+    tags: ['Internal Platforms', 'CRM & ERP', 'Operations Dashboards'],
     gradient:
       'linear-gradient(112deg, #FAC274 0%, #F2A460 100%)',
     variant: 3,
@@ -58,8 +58,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '04 / 06',
     title: 'SOFTWARE & PRODUCT ENGINEERING',
     description:
-      'From a promising idea to a dependable digital product built for real-world use.',
-    tags: ['Web & Mobile Apps', 'SaaS & MVPs', 'APIs & Integrations'],
+      'Full-cycle engineering from discovery to production SaaS platforms, MVPs, and custom APIs built for dependable performance.',
+    tags: ['SaaS Engineering', 'MVPs', 'API Architecture'],
     gradient:
       'linear-gradient(112deg, #BBCBFF 0%, #DDE4FF 53%, #EAD9FF 100%)',
     variant: 4,
@@ -67,10 +67,10 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
   },
   {
     index: '05 / 06',
-    title: 'HARDWARE & CONNECTED TECHNOLOGY',
+    title: 'CONNECTED TECHNOLOGY',
     description:
-      'Physical technology that brings sensors, devices and software together to solve practical problems.',
-    tags: ['IoT & Embedded Systems', 'Smart Devices', 'Hardware Integration'],
+      'Physical sensor integrations, IoT embedded software, and connected device interfaces bridging hardware and digital platforms.',
+    tags: ['IoT Systems', 'Embedded Software', 'Device Integration'],
     gradient:
       'linear-gradient(112deg, #BDECCF 0%, #CFF7EF 55%, #C4E7F8 100%)',
     variant: 5,
@@ -80,8 +80,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '06 / 06',
     title: 'CUSTOM ENGINEERING',
     description:
-      'Some challenges do not fit a category. We design the right solution around the problem.',
-    tags: ['Product R&D', 'Prototyping', 'End-to-End Systems'],
+      'Bespoke software for non-standard challenges, legacy systems modernization, and technical architectures tailored to your business.',
+    tags: ['Systems Architecture', 'Modernization', 'Technical R&D'],
     gradient:
       'linear-gradient(112deg, #E9C9F6 0%, #F5CDD8 52%, #FFD9B7 100%)',
     variant: 6,
@@ -312,7 +312,7 @@ export function OstrumCapabilitiesSection() {
     // Measure the full track travel and reserve deliberate reading distance for
     // each card-to-card movement. The major Energy Narrative uses about 1,000px
     // per beat (5,000px across five beats); these shorter catalogue reads use a
-    // responsive 58–70% of the viewport height, with the real card geometry as
+    // responsive 58% to 70% of the viewport height, with the real card geometry as
     // a lower bound.
     const getScrollMetrics = () => {
       const horizontalTravel = Math.max(
@@ -432,7 +432,7 @@ export function OstrumCapabilitiesSection() {
       id="capabilities"
       ref={sectionRef}
       data-testid="capabilities-section"
-      className="relative z-[35] w-full min-h-screen select-none"
+      className="relative z-[35] w-full min-h-screen select-text"
       style={{
         backgroundColor: 'transparent',
       }}
@@ -482,7 +482,7 @@ export function OstrumCapabilitiesSection() {
               data-testid="capabilities-supporting-statement"
               className="font-sans text-sm sm:text-base md:text-base lg:text-lg text-[#0B0B10]/75 max-w-[46ch] sm:max-w-[50ch] md:max-w-[52ch] leading-relaxed"
             >
-              OSTRUM designs and develops digital experiences, AI systems, custom software, business platforms, and connected hardware that help businesses improve customer experiences, streamline operations, and grow.
+              OSTRUM engineers custom software, intelligent AI systems, digital business platforms, and modern web applications that help ambitious businesses streamline operations and scale.
             </p>
           </div>
         </header>

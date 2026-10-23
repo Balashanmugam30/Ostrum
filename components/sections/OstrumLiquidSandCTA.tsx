@@ -53,7 +53,7 @@ export function OstrumLiquidSandCTA() {
           {/* Main Headline in Ostrum Condensed Font */}
           <h2
             data-testid="cta-heading"
-            className="font-condensed font-bold uppercase text-[#FAF9FF] tracking-[-0.01em] select-none text-balance"
+            className="font-condensed font-bold uppercase text-[#FAF9FF] tracking-[-0.01em] select-text text-balance"
             style={{
               fontSize: 'clamp(3.2rem, 8.5vw, 118px)',
               lineHeight: '0.90',
@@ -68,12 +68,12 @@ export function OstrumLiquidSandCTA() {
 
           {/* Supporting Sentence */}
           <p
-            className="font-sans text-base sm:text-lg md:text-xl text-[#FAF9FF] font-medium leading-relaxed max-w-xl mt-5 sm:mt-6 text-pretty select-none"
+            className="font-sans text-base sm:text-lg md:text-xl text-[#FAF9FF] font-medium leading-relaxed max-w-xl mt-5 sm:mt-6 text-pretty select-text"
             style={{
               textShadow: '0 1px 3px rgba(0,0,0,0.95), 0 2px 9px rgba(0,0,0,0.62)',
             }}
           >
-            Digital products, intelligent systems, and experiences built around what you need.
+            Custom software, intelligent AI systems, and digital platforms engineered around your business.
           </p>
 
           {/* Primary CTA Button pointing to /#contact */}

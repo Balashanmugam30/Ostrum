@@ -1,0 +1,191 @@
+{
+  "timestamp": "2026-10-23T15:59:03.604Z",
+  "dashScan": {
+    "homepage": {
+      "emCount": 0,
+      "enCount": 0,
+      "samples": []
+    },
+    "terms": {
+      "emCount": 0,
+      "enCount": 0,
+      "samples": []
+    },
+    "privacy": {
+      "emCount": 0,
+      "enCount": 0,
+      "samples": []
+    }
+  },
+  "textSelection": {
+    "Capabilities Card": {
+      "selectable": true,
+      "sample": "High-conversion websites, modern web applications,"
+    },
+    "FAQ Question": {
+      "selectable": true,
+      "sample": "What does OSTRUM build?"
+    },
+    "Contact Heading": {
+      "selectable": true,
+      "sample": "REACH OUT\nTO US"
+    },
+    "Liquid Sand CTA": {
+      "selectable": true,
+      "sample": "HAVE AN IDEA?\nLET’S BUILD IT."
+    },
+    "Engine Statement": {
+      "selectable": true,
+      "sample": "\"Custom systems engineered around how your busines"
+    },
+    "Footer Note": {
+      "selectable": true,
+      "sample": "Custom software, intelligent systems, and high-imp"
+    },
+    "Terms Section 01": {
+      "selectable": true,
+      "sample": "These Terms and Conditions (“Terms”) establish the"
+    }
+  },
+  "heroNavigation": {
+    "systemsArchitecture": {
+      "href": "#capabilities",
+      "ariaLabel": "Navigate to Systems Architecture capabilities",
+      "valid": true
+    },
+    "originalVentures": {
+      "href": "#selected-work",
+      "ariaLabel": "Navigate to Original Ventures selected work",
+      "valid": true
+    }
+  },
+  "wordmarkContrast": {},
+  "footerWordmarkJump": {
+    "verified": true,
+    "initialY": 642.9702758789062,
+    "hopY": 602.1632080078125,
+    "delta": 40.80706787109375
+  },
+  "curtainReveals": {
+    "termsGap": 32,
+    "termsCurtainHeight": 0,
+    "homepageCtaIntact": true
+  },
+  "selectedWorkArtwork": {
+    "tmr": {
+      "status": 200,
+      "sizeBytes": 686003,
+      "ok": true
+    },
+    "saraswati": {
+      "status": 200,
+      "sizeBytes": 758332,
+      "ok": true
+    },
+    "mnesa": {
+      "status": 200,
+      "sizeBytes": 638325,
+      "ok": true
+    }
+  },
+  "contactForm": {
+    "emptyValidationWorking": true,
+    "emailValidationWorking": true,
+    "fieldPreservationWorking": true
+  },
+  "seoAndStructuredData": {
+    "homepage": {
+      "title": "OSTRUM | Digital Product Engineering & Custom Software Studio",
+      "desc": "Independent digital product engineering and custom software studio in India. We design and build custom software, AI systems, modern web platforms, and original ventures.",
+      "canonical": "https://theostrum.com",
+      "ogTitle": "OSTRUM | Digital Product Engineering & Custom Software Studio",
+      "ogImage": "https://theostrum.com/images/ostrum-og.png"
+    },
+    "terms": {
+      "title": "Terms & Conditions | OSTRUM",
+      "desc": "Terms and Conditions governing the use of the Ostrum public website, technology showcase, and project enquiry channels.",
+      "canonical": "https://theostrum.com/terms-and-conditions",
+      "ogTitle": "Terms & Conditions | OSTRUM",
+      "ogImage": "https://theostrum.com/images/ostrum-og.png"
+    },
+    "privacy": {
+      "title": "Privacy Policy | OSTRUM",
+      "desc": "Privacy Policy outlining the collection, use, security, and protection of personal data in compliance with the DPDP Act and international privacy principles.",
+      "canonical": "https://theostrum.com/privacy-policy",
+      "ogTitle": "Privacy Policy | OSTRUM",
+      "ogImage": "https://theostrum.com/images/ostrum-og.png"
+    },
+    "robotsStatus": 200,
+    "sitemapStatus": 200
+  },
+  "overflowMatrix": [
+    {
+      "device": "large-desktop",
+      "width": 1920,
+      "height": 1080,
+      "scrollWidth": 1920,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "device": "desktop",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "device": "laptop",
+      "width": 1280,
+      "height": 800,
+      "scrollWidth": 1280,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "device": "small-desktop",
+      "width": 1024,
+      "height": 768,
+      "scrollWidth": 1024,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "device": "tablet-portrait",
+      "width": 768,
+      "height": 1024,
+      "scrollWidth": 768,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "device": "mobile-large",
+      "width": 430,
+      "height": 932,
+      "scrollWidth": 430,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "device": "mobile-medium",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "device": "mobile-compact",
+      "width": 360,
+      "height": 800,
+      "scrollWidth": 360,
+      "overflowPx": 0,
+      "pass": true
+    }
+  ],
+  "reducedMotion": {
+    "staticLayout": true
+  },
+  "consoleErrors": []
+}

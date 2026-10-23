@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 /**
- * Beam Wordmark Footer — Ostrum Adaptation
+ * Beam Wordmark Footer : Ostrum Adaptation
  *
  * Adapted from the 21st.dev component by Kedhar.
  * Full backdrop beam, wash, bands, glow, grain, and top hairline removed.

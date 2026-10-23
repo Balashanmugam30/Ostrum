@@ -448,7 +448,7 @@ export function OstrumContinuousJourney() {
       const slotWorldUnits = (slotPixelTarget / window.innerHeight) * vHeight;
       const sScale = Math.max(0.25, Math.min(0.55, slotWorldUnits / 3.35));
 
-      // 3. Section 03 Scale Target: Subtle focal zoom (4–5% larger than Section 02 slot size)
+      // 3. Section 03 Scale Target: Subtle focal zoom (4-5% larger than Section 02 slot size)
       // Restrained medium focal scale (~94.5% of previous), visually balanced against narrative typography
       const eScale = sScale * 1.04;
 
@@ -796,7 +796,7 @@ export function OstrumContinuousJourney() {
           });
         }
       }
-      // Stage 3: Phase B — Connected Darkening, Gentle Zoom & Stationary Orientation Hold
+      // Stage 3: Phase B : Connected Darkening, Gentle Zoom & Stationary Orientation Hold
       else if (scrollY < energyStart) {
         ribbonGroup.visible = false;
         modelRoot.visible = true;

@@ -186,7 +186,7 @@ export function buildEnquiryHtml(
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>New Project Enquiry — OSTRUM</title>
+  <title>New Project Enquiry: OSTRUM</title>
 </head>
 <body style="margin: 0; padding: 32px 16px; background-color: #0A0A0A; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #FFFFFF;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #141414; border: 1px solid #282828; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 32px rgba(0,0,0,0.5);">
@@ -268,7 +268,7 @@ export function buildEnquiryText(
   correlationId: string
 ): string {
   return `
-NEW PROJECT ENQUIRY — OSTRUM
+NEW PROJECT ENQUIRY: OSTRUM
 ============================================================
 Timestamp: ${timestamp}
 Reference ID: ${correlationId}

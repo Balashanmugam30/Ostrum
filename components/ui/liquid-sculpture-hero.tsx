@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Sculpture Hero — liquid particle hero
+ * Sculpture Hero : liquid particle hero
  * Adapted for Ostrum Digital Transformation Studio
  * Based on Liquid Sculpture Hero by Guglielmo Giannattasio (guglielmogiannattasio.it)
  * Distributed under MIT License (see THIRD_PARTY_NOTICES.md)
@@ -38,7 +38,7 @@ export interface EngineOptions {
   bg: [number, number, number]
   /** null = detected from the image corners */
   imgBg: [number, number, number] | null
-  /** 0 – 2: how much the whole sculpture flows while the cursor is over it */
+  /** 0 to 2: how much the whole sculpture flows while the cursor is over it */
   liquid: number
 }
 
@@ -1100,30 +1100,30 @@ export interface SculptureHeroProps {
   sculptureY?: number
 
   interactive?: boolean
-  /** 0 – 2 */
+  /** 0 to 2 */
   strength?: number
   /** Radius of the disturbance, in px at 1440px wide. */
   radius?: number
-  /** 0 – 2, multiplies the particle count. */
+  /** 0 to 2, multiplies the particle count. */
   particleDensity?: number
-  /** 0 – 3, size of each particle relative to the grid. */
+  /** 0 to 3, size of each particle relative to the grid. */
   dotSize?: number
-  /** 0 – 2, how far particles travel when disturbed. */
+  /** 0 to 2, how far particles travel when disturbed. */
   particleSpread?: number
-  /** 0 – 2, liquid swirl of the disturbed material. */
+  /** 0 to 2, liquid swirl of the disturbed material. */
   turbulence?: number
-  /** 0 – 2, how much the whole sculpture flows while hovered. */
+  /** 0 to 2, how much the whole sculpture flows while hovered. */
   liquid?: number
   /** Stretch fast particles into liquid streaks. */
   streaks?: boolean
   /** At rest: the crisp image, or the particle field itself. Default is "image". */
   restStyle?: "image" | "particles"
-  /** 0 – 2, how quickly the material settles back. */
+  /** 0 to 2, how quickly the material settles back. */
   returnSpeed?: number
   ambient?: boolean
-  /** 0 – 2 */
+  /** 0 to 2 */
   ambientIntensity?: number
-  /** 0.25 – 3 */
+  /** 0.25 to 3 */
   speed?: number
   /** Assembly animation on load. */
   intro?: boolean
@@ -1155,10 +1155,10 @@ export const DEFAULTS = {
     { label: "Journal", href: "#" },
   ],
   navCta: { label: "Contact", href: "#" },
-  eyebrow: "Independent studio — Est. 2019",
+  eyebrow: "Independent studio : Est. 2019",
   headline: "Form that\nanswers back.",
   headlineAccent: "answers back.",
-  body: "We shape products, identities and spaces with the precision of engineering and the patience of craft — work that holds up under attention.",
+  body: "We shape products, identities and spaces with the precision of engineering and the patience of craft : work that holds up under attention.",
   primaryCta: { label: "Start a project", href: "#" },
   secondaryCta: { label: "Selected work", href: "#" },
   hint: "Move across the form",

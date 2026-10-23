@@ -111,7 +111,7 @@ export function OstrumContactSection() {
           <div className="lg:col-span-5 flex flex-col items-start lg:sticky lg:top-28">
             <h2
               data-testid="contact-heading"
-              className="font-condensed font-bold uppercase text-[#FFF8F3] tracking-[-0.01em] select-none"
+              className="font-condensed font-bold uppercase text-[#FFF8F3] tracking-[-0.01em] select-text"
               style={{
                 fontSize: 'clamp(3.2rem, 7.5vw, 96px)',
                 lineHeight: '0.92',
@@ -124,7 +124,7 @@ export function OstrumContactSection() {
             </h2>
 
             <p className="font-sans text-base sm:text-lg text-[#FFF8F3]/90 leading-relaxed max-w-md mt-6 sm:mt-8 font-normal">
-              Tell us about the product, system, or digital experience you&apos;re building. We&apos;ll review your requirements and discuss the next steps.
+              Tell us about the software system, digital product, or AI workflow you are building. We will review your requirements and schedule an architectural discovery call.
             </p>
           </div>
 
@@ -141,7 +141,7 @@ export function OstrumContactSection() {
                 {submitSuccess ? (
                   <div
                     data-testid="contact-success-state"
-                    className="py-16 flex flex-col items-center text-center select-none"
+                    className="py-16 flex flex-col items-center text-center select-text"
                   >
                     <div className="w-16 h-16 rounded-full bg-[#D24B2C]/10 border border-[#D24B2C]/30 flex items-center justify-center text-[#D24B2C] text-2xl mb-6 font-semibold">
                       ✓
@@ -201,7 +201,7 @@ export function OstrumContactSection() {
                       />
                     </div>
 
-                    {/* 1. Name — required */}
+                    {/* 1. Name : required */}
                     <div className="flex flex-col gap-1.5 w-full">
                       <label
                         htmlFor="contact-name"
@@ -217,12 +217,12 @@ export function OstrumContactSection() {
                         autoComplete="name"
                         value={formData.name}
                         onChange={handleChange}
-                        placeholder="e.g. Elena Vance"
+                        placeholder="e.g. Rahul Sharma"
                         className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
 
-                    {/* 2. Work Email — required */}
+                    {/* 2. Work Email : required */}
                     <div className="flex flex-col gap-1.5 w-full">
                       <label
                         htmlFor="contact-email"
@@ -238,12 +238,12 @@ export function OstrumContactSection() {
                         autoComplete="email"
                         value={formData.email}
                         onChange={handleChange}
-                        placeholder="elena@company.com"
+                        placeholder="rahul@company.com"
                         className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
 
-                    {/* 3. Company — optional */}
+                    {/* 3. Company : optional */}
                     <div className="flex flex-col gap-1.5 w-full">
                       <label
                         htmlFor="contact-company"
@@ -258,12 +258,12 @@ export function OstrumContactSection() {
                         autoComplete="organization"
                         value={formData.company}
                         onChange={handleChange}
-                        placeholder="e.g. Vance Dynamics"
+                        placeholder="e.g. Apex Enterprises"
                         className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
 
-                    {/* 4. Project Type — optional select */}
+                    {/* 4. Project Type : optional select */}
                     <div className="flex flex-col gap-1.5 w-full">
                       <label
                         htmlFor="contact-project-type"
@@ -287,7 +287,7 @@ export function OstrumContactSection() {
                       </select>
                     </div>
 
-                    {/* 5. Phone Number — optional */}
+                    {/* 5. Phone Number : optional */}
                     <div className="flex flex-col gap-1.5 w-full">
                       <label
                         htmlFor="contact-phone"
@@ -302,12 +302,12 @@ export function OstrumContactSection() {
                         autoComplete="tel"
                         value={formData.phone}
                         onChange={handleChange}
-                        placeholder="e.g. +61 400 000 000"
+                        placeholder="e.g. +91 98420 12345"
                         className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
 
-                    {/* 6. Message — required */}
+                    {/* 6. Message : required */}
                     <div className="flex flex-col gap-1.5 w-full">
                       <label
                         htmlFor="contact-message"

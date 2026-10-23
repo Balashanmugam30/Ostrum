@@ -27,7 +27,7 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     contentType: 'testimonial',
     subtext: 'Automotive Intelligence Platform',
     quote:
-      'The automated diagnostic intake and customer communications platform transformed our service bays. Turnaround is faster, workshop operations are transparent, and car owners trust every repair recommendation.',
+      'The automated intake and customer communication platform streamlined our detailing bays. Turnaround is faster, studio operations are clear, and clients trust the booking process.',
     company: 'TMR AI Car Care',
     role: 'Automotive Intelligence',
     approved: false,
@@ -59,7 +59,7 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     contentType: 'project-note',
     subtext: 'Opportunity Capture & Follow-Through Platform',
     quote:
-      'Architected as an intelligent opportunity capture and commitment engine, transforming fleeting ideas, voice memos, and visual references into structured, executable pipelines with zero cognitive drag.',
+      'Architected as an intelligent opportunity capture and commitment engine, transforming fleeting observations and notes into structured, executable pipelines.',
     company: 'Ostrum Ventures',
     role: 'Internal Venture Platform',
     approved: true,

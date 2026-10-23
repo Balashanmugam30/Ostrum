@@ -239,7 +239,7 @@ export function OstrumTestimonialsSection({
                 }}
               >
                 {/* Logo Area */}
-                <div className="h-10 sm:h-12 flex items-center justify-center text-center select-none mb-5">
+                <div className="h-10 sm:h-12 flex items-center justify-center text-center select-text mb-5">
                   {testimonial.logoType === 'mnesa-mark' ? (
                     <a
                       href="https://github.com/Balashanmugam30/mnesa"
@@ -288,7 +288,7 @@ export function OstrumTestimonialsSection({
       id="testimonials"
       ref={sectionRef}
       data-testid="testimonials-section"
-      className="relative z-[26] w-full bg-white select-none overflow-visible"
+      className="relative z-[26] w-full bg-white select-text overflow-visible"
       style={{ backgroundColor: '#FFFFFF' }}
       aria-label="Testimonials"
     >
@@ -307,7 +307,7 @@ export function OstrumTestimonialsSection({
           <h2
             ref={headingRef}
             data-testid="testimonials-heading"
-            className="font-condensed font-bold uppercase text-black text-center select-none w-full whitespace-nowrap tracking-[-0.01em]"
+            className="font-condensed font-bold uppercase text-black text-center select-text w-full whitespace-nowrap tracking-[-0.01em]"
             style={{
               fontSize: 'clamp(3.2rem, 26vw, 395px)',
               lineHeight: '0.85',
@@ -345,7 +345,7 @@ export function OstrumTestimonialsSection({
               }}
             >
               {/* Element 1 (Top Area): Authentic Client Logo or MNESA Mark */}
-              <div className="h-10 sm:h-12 flex items-center justify-center text-center select-none shrink-0">
+              <div className="h-10 sm:h-12 flex items-center justify-center text-center select-text shrink-0">
                 {testimonial.logoType === 'mnesa-mark' ? (
                   <a
                     href="https://github.com/Balashanmugam30/mnesa"

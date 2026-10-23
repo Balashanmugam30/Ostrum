@@ -471,9 +471,7 @@ body {
   .primary-btn *,
   .scroll-cue-arrow,
   .ostrum-engine-section,
-  .ostrum-engine-section *,
-  [data-testid="works-wheel-curios"],
-  [data-testid="works-wheel-curios"] * {
+  .ostrum-engine-section * {
     transition: none !important;
     animation: none !important;
     transform: none !important;

@@ -7,62 +7,62 @@ export interface FaqItem {
 export const OSTRUM_FAQ_DATA: FaqItem[] = [
   {
     id: 'what-does-ostrum-do',
-    question: 'What does Ostrum do?',
+    question: 'What does OSTRUM build?',
     answer:
-      'Ostrum is a digital transformation studio and venture foundry. We design, engineer, and deploy high-performance software systems, intelligent AI agents, modern digital experiences, and connected hardware infrastructure that empower ambitious organizations to scale efficiently.',
+      'OSTRUM is a digital product engineering and venture studio. We scope, design, and build custom business software, intelligent AI systems, high-conversion web platforms, mobile applications, and connected technology for growing companies and ambitious founders.',
   },
   {
     id: 'services-supported',
-    question: 'What services can Ostrum help with?',
+    question: 'What specific services do you deliver?',
     answer:
-      'We deliver end-to-end solutions across our six core capabilities: Digital Experiences, AI Systems & Agents, Business Platforms, Software & Product Engineering, Hardware & Connected Technology, and Custom Engineering. Each engagement is tailored to address specific operational and technical goals.',
+      'We deliver full-cycle engineering across six areas: Digital Experiences (websites, web applications, portals), AI Systems & Agents (autonomous workflow automations, intelligent assistants), Business Platforms (internal operations software, CRM and ERP integrations), Software & Product Engineering (SaaS platforms, MVPs, APIs), Connected Technology (IoT and embedded systems), and Custom Engineering (bespoke architectures and modernization).',
   },
   {
-    id: 'how-to-start',
-    question: 'How do we start a project with Ostrum?',
+    id: 'working-with-businesses',
+    question: 'Do you work with small businesses or enterprises?',
     answer:
-      'Engagements begin when you submit an enquiry outlining your objectives. We then conduct an initial technical discovery to understand your workflow, constraints, and deliverables before establishing an agreed project scope and milestone roadmap.',
+      'We work with both. We help small and medium businesses replace manual spreadsheets and disconnected tools with focused, affordable custom systems. For growing companies and enterprises, we architect scalable platforms, modernize legacy infrastructure, and automate complex operational workflows.',
   },
   {
-    id: 'project-cost',
-    question: 'How much does a project cost?',
+    id: 'custom-vs-off-the-shelf',
+    question: 'Why choose custom software over off-the-shelf SaaS?',
     answer:
-      'Project estimates depend directly on technical complexity, deliverable scope, third-party integrations, and timeline requirements. We invite you to submit an enquiry so we can prepare a tailored proposal aligned with your exact needs.',
+      'Generic software forces your business to adapt its processes to rigid subscription templates, often resulting in paying for features you do not need while missing the exact workflows you do. Custom software fits your exact operations, scales without per-seat licensing penalties, and remains an asset you own.',
   },
   {
-    id: 'project-timeline',
-    question: 'How long will a project take?',
+    id: 'technology-selection',
+    question: 'How do you select technologies for a project?',
     answer:
-      'Duration varies based on system complexity, architecture requirements, feedback turnaround, and milestone milestones. Prototyping and focused digital products often move quickly, while enterprise platforms and multi-agent systems are delivered in disciplined, phased deployments.',
+      'We are technology-agnostic and problem-led. We select frameworks, databases, and architectures based on your performance requirements, security considerations, maintainability, internal team skills, and long-term ownership goals rather than following temporary developer trends.',
   },
   {
-    id: 'existing-product-work',
-    question: 'Can Ostrum work on an existing website or product?',
+    id: 'ai-systems-integration',
+    question: 'How does OSTRUM integrate practical AI and automation?',
     answer:
-      'Yes. We regularly assess existing systems to audit architecture, modernize technical infrastructure, eliminate performance bottlenecks, and integrate custom APIs or AI workflows alongside active engineering teams.',
+      'We build practical AI systems that resolve clear business bottlenecks, such as automated customer enquiry intake, document processing, data synthesis, and task routing. We focus on verifiable utility, privacy controls, and human oversight rather than surface-level marketing gimmicks.',
   },
   {
-    id: 'mobile-responsiveness',
-    question: 'Will my website work on mobile devices?',
+    id: 'existing-systems-modernization',
+    question: 'Can OSTRUM modernize or integrate with our existing systems?',
     answer:
-      'Yes. Every digital interface we engineer follows a responsive, multi-device design approach. We optimize layouts, touch interactions, typography, and asset loading across smartphone, tablet, and desktop viewports.',
+      'Yes. We frequently audit active applications, build custom APIs, connect legacy databases to modern interfaces, and integrate core platforms like CRMs, ERPs, and payment gateways without disrupting day-to-day business operations.',
   },
   {
-    id: 'project-revisions',
-    question: 'Can I request revisions during a project?',
+    id: 'project-pricing-and-scoping',
+    question: 'How are project scoping and pricing structured?',
     answer:
-      'Revision rounds and design iterations are structured directly into the agreed project proposal and milestone phases. This collaborative review process ensures deliverables remain closely aligned with your strategic expectations before production deployment.',
+      'Engagements begin with a transparent technical discovery where we define required outcomes, system architecture, and milestone deliverables. Pricing is structured around defined scope milestones, providing predictable investment without surprise hidden charges.',
   },
   {
-    id: 'asset-ownership',
-    question: 'Who owns the finished website and project assets?',
+    id: 'ip-and-code-ownership',
+    question: 'Who owns the intellectual property and source code?',
     answer:
-      'Asset ownership, source code licensing, and handover details are clearly defined in the client engagement agreement. Upon milestone completion and settlement, agreed custom code and deliverables transfer directly to your organization.',
+      'You do. Full intellectual property rights, source code, design assets, and deployment configurations transfer directly to your organization upon milestone completion and settlement, as established in our client services agreement.',
   },
   {
     id: 'post-launch-support',
-    question: 'What support is available after launch?',
+    question: 'What support and maintenance do you offer after launch?',
     answer:
-      'Continuing maintenance, infrastructure monitoring, software updates, and extended engineering support can be structured to fit your ongoing operational needs. We discuss post-launch arrangements during the scoping phase.',
+      'We provide structured warranty support following production launch, covering stabilization and performance tuning. Ongoing maintenance, infrastructure monitoring, security updates, and phased feature additions can be scheduled to suit your operational needs.',
   },
 ];

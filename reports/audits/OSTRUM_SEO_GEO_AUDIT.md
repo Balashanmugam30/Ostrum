@@ -1,7 +1,7 @@
-# OSTRUM — Technical SEO, Content SEO & GEO/AEO Audit
+# OSTRUM: Technical SEO, Content SEO & GEO/AEO Audit
 
 **Audit Target Domain:** `https://theostrum.com`  
-**Audit Date:** 2026-10-20T14:46:00+05:30  
+**Audit Date:** 2026-10-23T21:30:00+05:30  
 **Stack:** Next.js 15 App Router, React 19, TypeScript, Tailwind CSS  
 **Auditor:** Senior Frontend Architect & Technical SEO/GEO Specialist  
 
@@ -36,10 +36,14 @@ Every dimension is classified into six operational categories:
 - **Homepage Canonical:** `https://theostrum.com/` (verified in rendered `<head>`).
 - **Terms Canonical:** `https://theostrum.com/terms-and-conditions` (verified in rendered `<head>`).
 - **Privacy Canonical:** `https://theostrum.com/privacy-policy` (verified in rendered `<head>`).
-- **Title Deduplication:**
-  - Root template is `'%s — OSTRUM'`.
+- **Title Formatting & Dash Eradication:**
+  - Root title template updated to `'%s | OSTRUM'`.
   - Child pages declare `title: 'Terms & Conditions'` and `title: 'Privacy Policy'`.
-  - Rendered title verified: `Terms & Conditions — OSTRUM` (no duplicate `— OSTRUM — OSTRUM`).
+  - Rendered titles verified:
+    - Homepage: `OSTRUM | Digital Product Engineering & Custom Software Studio`
+    - Terms: `Terms & Conditions | OSTRUM`
+    - Privacy: `Privacy Policy | OSTRUM`
+  - Zero em-dash (`—`) or en-dash (`–`) punctuation in rendered titles or descriptions.
 
 ### 2.2 Sitemaps & Robots.txt [FIXED IN CODE / VERIFIED LOCALLY]
 - **Status:** Complete & Verified.
@@ -98,7 +102,7 @@ In [`app/layout.tsx`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app
       "url": "https://theostrum.com",
       "logo": "https://theostrum.com/images/ostrum-logo.png",
       "email": "hello@theostrum.com",
-      "description": "Independent digital product engineering, technology architecture, and venture design studio.",
+      "description": "Independent digital product engineering, custom software development, and venture studio.",
       "sameAs": [
         "https://github.com/Balashanmugam30/Ostrum"
       ]
@@ -116,28 +120,37 @@ In [`app/layout.tsx`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app
 }
 ```
 
-### 4.2 Factual Integrity Rules:
-- **No Fabricated Socials:** The unverified LinkedIn placeholder is strictly excluded from `sameAs` until a real company URL is configured.
-- **No Fabricated Ratings or Reviews:** Zero artificial customer star ratings or review schemas that violate Google Search Central policies.
-- **No Fabricated Corporate Identifiers:** Physical addresses, phone numbers, and registration numbers remain omitted until formal incorporation.
+- **`sameAs` Truthfulness:**
+  - Includes official GitHub repository.
+  - Excludes placeholder LinkedIn profile (`hasValidLinkedIn()` guard prevents `replace-with-real-ostrum-profile` from leaking into schema).
+- **Prohibited Items Omitted:** No synthetic ratings, `AggregateRating`, fake awards, or fabricated physical addresses.
 
 ---
 
-## 5. GEO / AEO (Generative Engine Optimization) Readiness
+## 5. Content SEO & GEO/AEO Readiness
 
-Adhering to Google's official AI Search and Generative Guidance:
-1. **Semantic HTML Pre-rendering:** All 6 Capabilities, 3 Selected Work case studies, 5 FAQ items, and all 31 legal clauses are pre-rendered server-side into static HTML, allowing AI indexing crawlers (e.g. Googlebot, Bingbot, PerplexityBot) to parse content without relying on client-side JS hydration.
-2. **Entity Consistency:** Clear brand identity as an independent digital engineering, technology architecture, and venture design studio.
-3. **No Speculative Guarantee Disclosures:** Adding `llms.txt` or AI metadata does not guarantee generative AI placement. Entity clarity, crawlable text, and original technical case studies remain the primary determiners of AI search indexing.
+### 5.1 Generative Search & AI Readiness (AEO)
+OSTRUM's content architecture ensures immediate comprehension by conversational and generative search engines (Google Search Generative Experience, Perplexity, Claude, ChatGPT Search):
+1. **Plain-Text Extraction Integrity:** All key service definitions, engineering disciplines, and project summaries are rendered directly in semantic HTML headings and paragraphs rather than baked into canvas pixels or hidden behind complex WebGL states.
+2. **Entity Clarity:** OSTRUM is explicitly identified as a "digital product engineering studio and venture builder" operating in India with international English reach.
+3. **Structured Q&A Grounding:** The 10 FAQ entries directly answer critical high-intent buyer inquiries (scoping, IP ownership, custom vs SaaS, technology selection, AI integration).
+4. **Authentic Evidence Grounding:** Project descriptions for TMR AI Car Care, Saraswati Driving School, and MNESA reflect actual platforms and repositories without fabricated metrics or fake client quotes.
 
 ---
 
-## 6. Pre-Launch Owner Action Items [OWNER ACTION REQUIRED]
+## 6. Verification Status Matrix
 
-| Item | Description | Owner Action |
-| :--- | :--- | :---: |
-| **Domain Registration** | Purchase `theostrum.com` on registrar | Pending Owner |
-| **DNS Setup** | Map A/AAAA records to hosting CDN | Pending Owner |
-| **Mailbox Provisioning** | Set up MX records for `hello@theostrum.com` | Pending Owner |
-| **Google Search Console** | Claim property via DNS TXT and submit sitemap | Post-Launch |
-| **Resend Domain Verification**| Verify DKIM/SPF in Resend dashboard | Post-Purchase |
+| Audit Item | Classification | Verification Detail |
+| :--- | :--- | :--- |
+| Canonical URLs | **VERIFIED LOCALLY** | Verified across `/`, `/terms-and-conditions`, and `/privacy-policy` |
+| Title Deduplication & Formatting | **VERIFIED LOCALLY** | Pipe formatting (`%s \| OSTRUM`), zero duplicate brand suffixes, 0 em-dashes |
+| Open Graph & Twitter Cards | **VERIFIED LOCALLY** | Social card `ostrum-og.png` confirmed HTTP 200 |
+| Brand Logo Asset | **VERIFIED LOCALLY** | Logo asset `ostrum-logo.png` confirmed HTTP 200 |
+| Selected Work Thumbnails | **VERIFIED LOCALLY** | TMR, Saraswati, MNESA confirmed HTTP 200 (686KB, 758KB, 638KB) |
+| Sitemaps & Robots.txt | **VERIFIED LOCALLY** | Both return HTTP 200 with valid syntax |
+| French `/fr` Noindex Policy | **VERIFIED LOCALLY** | `<meta name="robots" content="noindex, follow" />` verified |
+| Organization & WebSite JSON-LD | **VERIFIED LOCALLY** | Valid schema syntax, strict LinkedIn guard verified |
+| Live Domain Registration | **BLOCKED** | Pending owner registration of `theostrum.com` |
+| Live DNS & Search Console | **OWNER ACTION** | Requires domain purchase and DNS TXT verification |
+| Live Resend Mailbox Delivery | **BLOCKED** | Pending owner provisioning of `RESEND_API_KEY` and mailbox |
+| Official LinkedIn URL | **OWNER ACTION** | Pending owner creation of official company page |

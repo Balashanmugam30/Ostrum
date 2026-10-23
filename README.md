@@ -7,7 +7,7 @@
         </a>
         <br />
         <p style="margin-top: 14px; margin-bottom: 0; color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600;">
-          Digital Experience &amp; Technology Studio
+          Digital Product Engineering &amp; Venture Studio
         </p>
       </td>
     </tr>
@@ -32,9 +32,9 @@
 
 ## 1. About OSTRUM
 
-**OSTRUM is a digital experience and technology studio.** We engineer high-performance software, AI-enabled intelligence platforms, custom operational business systems, and connected digital products for ambitious enterprises and founders.
+**OSTRUM is a digital product engineering and venture studio.** We engineer custom software, practical AI systems, scalable business platforms, and modern web applications for ambitious companies and founders.
 
-Our practice unites art-directed design, spatial motion, and resilient full-stack engineering. We replace fragmented digital stacks with cohesive, interconnected systems engineered to scale reliably without operational friction.
+Our practice unites art-directed design, spatial motion, and resilient full-stack engineering. We replace fragmented digital tools with cohesive, interconnected systems engineered to scale reliably without operational friction.
 
 ---
 

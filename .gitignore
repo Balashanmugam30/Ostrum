@@ -29,4 +29,6 @@ Thumbs.db
 reference-capture/
 rebuild-capture/
 .test-results/
+scratch/
+tmp/
 

@@ -2,11 +2,11 @@
 
 // A portfolio showcase built as a circular ring that opens into a large 3D perspective drum.
 //
-// At rest (turn = 0), the projects form a generous circular ring (70–74% viewport height)
+// At rest (turn = 0), the projects form a generous circular ring (70% to 74% viewport height)
 // around a minimal, restrained central label ("Selected Work").
 //
 // As the user scrolls (turn >= 1), the ring transitions into a two-column drum:
-// - RIGHT: The active project artwork moves to the front as a large, cinematic thumbnail (42–46% width, 48–56% height).
+// - RIGHT: The active project artwork moves to the front as a large, cinematic thumbnail (42% to 46% width, 48% to 56% height).
 // - LEFT: Clean, prominent project information (title, description, and live destination link).
 // - Surrounding cards curve back into 3D perspective above and below.
 import * as React from "react";
@@ -841,7 +841,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         <div
           ref={leftPanelRef}
           data-testid="works-wheel-left-panel"
-          className="pointer-events-none absolute top-1/2 left-[6%] sm:left-[8%] lg:left-[9%] -translate-y-1/2 max-w-[85vw] sm:max-w-[42vw] lg:max-w-[36vw] z-20 select-none"
+          className="pointer-events-auto absolute top-1/2 left-[6%] sm:left-[8%] lg:left-[9%] -translate-y-1/2 max-w-[85vw] sm:max-w-[42vw] lg:max-w-[36vw] z-20 select-text"
           style={{ opacity: 0 }}
         >
           <h3
@@ -888,28 +888,28 @@ export const OSTRUM_WORKS: WorksWheelItem[] = [
   {
     title: "TMR AI Car Care",
     description:
-      "Autonomous workflow and client intelligence platform built for high-precision luxury automotive detailing studios.",
+      "Autonomous workflow and client intelligence platform built for precision luxury automotive detailing studios.",
     image: "/images/works/tmr-ai-car-care.jpg",
     href: "https://tmraicarcare.com/",
   },
   {
     title: "Saraswati Driving School",
     description:
-      "Modern booking and fleet logistics infrastructure engineered for certified driver training and student dispatch.",
+      "Modern booking and fleet scheduling infrastructure engineered for certified driver training and lesson dispatch.",
     image: "/images/works/saraswati-driving-school.jpg",
     href: "https://saraswati-driving-school.vercel.app/",
   },
   {
     title: "MNESA",
     description:
-      "Opportunity capture and follow-through platform designed to transform ephemeral observations and inspirations into structured, actionable commitments.",
+      "Intelligent opportunity capture and commitment engine, transforming fleeting observations and notes into structured action.",
     image: "/images/works/mnesa.jpg",
     href: "https://github.com/Balashanmugam30/mnesa",
   },
   {
     title: "Our Capabilities",
     description:
-      "From digital experiences and intelligent AI systems to business platforms, product engineering and connected hardware, we build the technology that moves businesses forward.",
+      "From custom software and practical AI systems to business platforms and connected tech, we engineer systems that scale businesses.",
     image: "",
     isCapabilities: true,
   },

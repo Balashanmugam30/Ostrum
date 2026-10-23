@@ -49,7 +49,7 @@ export default function OstrumCore3DPreviewPage() {
             {currentConfig.name}
           </h1>
           <p className="text-xs text-white/60 font-sans max-w-md">
-            {currentConfig.subtitle} &mdash;{' '}
+            {currentConfig.subtitle}:{' '}
             <span className="text-amber-300/80 italic">{currentConfig.character}</span>
           </p>
         </div>
@@ -224,7 +224,7 @@ export default function OstrumCore3DPreviewPage() {
         /* Minimal pill in clean presentation mode */
         <div className="z-20 fixed bottom-6 flex items-center gap-3 bg-black/60 backdrop-blur-md border border-white/15 px-4 py-2 rounded-full shadow-2xl">
           <span className="text-xs font-mono text-white/70">
-            {currentConfig.name.split('—')[1]?.trim() || currentConfig.name} &bull;{' '}
+            {currentConfig.name.split(/[:\-]/)[1]?.trim() || currentConfig.name} &bull;{' '}
             <span className="text-amber-300">{rotationDegrees.toFixed(0)}°</span>
           </span>
           <button

@@ -15,7 +15,7 @@ export function OstrumStudioFooter() {
     const id = targetId.replace(/^#/, '');
     const element = document.getElementById(id);
     if (!element) {
-      // Element not on this page (e.g. from legal routes) — allow natural navigation to /#id
+      // Element not on this page (e.g. from legal routes) : allow natural navigation to /#id
       return;
     }
     e.preventDefault();
@@ -283,7 +283,7 @@ export function OstrumStudioFooter() {
                 OSTRUM
               </span>
               <p className="font-sans text-xs text-[#B9B0AF] mt-2 leading-relaxed">
-                Digital systems, intelligent software, and high-impact venture engineering.
+                Custom software, intelligent systems, and high-impact product engineering.
               </p>
             </div>
 

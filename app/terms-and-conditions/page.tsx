@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     canonical: '/terms-and-conditions',
   },
   openGraph: {
-    title: 'Terms & Conditions — OSTRUM',
+    title: 'Terms & Conditions | OSTRUM',
     description:
       'Terms and Conditions governing the use of the Ostrum public website, technology showcase, and project enquiry channels.',
     url: '/terms-and-conditions',

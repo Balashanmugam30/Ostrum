@@ -107,7 +107,7 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
           <div className="lg:col-span-5 flex flex-col items-start lg:sticky lg:top-28">
             <h2
               data-testid="faq-heading"
-              className="font-condensed font-bold uppercase text-[#161514] tracking-[-0.01em] select-none"
+              className="font-condensed font-bold uppercase text-[#161514] tracking-[-0.01em] select-text"
               style={{
                 fontSize: 'clamp(2.8rem, 6vw, 76px)',
                 lineHeight: '0.92',

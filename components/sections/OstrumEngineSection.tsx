@@ -185,7 +185,7 @@ export function OstrumEngineSection() {
     <section
       ref={sectionRef}
       id="engine"
-      className="ostrum-engine-section relative w-full pt-20 sm:pt-28 md:pt-36 lg:pt-40 pb-28 md:pb-48 px-6 md:px-[6vw] lg:px-[8vw] flex flex-col items-center overflow-x-clip bg-transparent text-center select-none"
+      className="ostrum-engine-section relative w-full pt-20 sm:pt-28 md:pt-36 lg:pt-40 pb-28 md:pb-48 px-6 md:px-[6vw] lg:px-[8vw] flex flex-col items-center overflow-x-clip bg-transparent text-center select-text"
     >
       {/* Living Connection Threads across Section 02 background */}
       <div ref={threadWrapperRef} className="opacity-80 transition-opacity">
@@ -247,7 +247,7 @@ export function OstrumEngineSection() {
                 new CustomEvent('ostrum:focus-bias', { detail: 0 })
               );
             }}
-            className={`w-full lg:w-[28%] max-w-[360px] flex flex-col text-left transition-all duration-300 cursor-default select-none ${
+            className={`w-full lg:w-[28%] max-w-[360px] flex flex-col text-left transition-all duration-300 cursor-default select-text ${
               activeFocus === 'business' ? 'translate-x-1.5' : ''
             }`}
           >
@@ -273,18 +273,22 @@ export function OstrumEngineSection() {
             </p>
 
             {/* 4. Micro-label with Hairline Expansion */}
-            <div className="mt-5 flex items-center gap-3">
+            <a
+              href="#capabilities"
+              aria-label="Navigate to Systems Architecture capabilities"
+              className="mt-5 inline-flex items-center gap-3 self-start group/link focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#ff5c4a] rounded-sm py-0.5 cursor-pointer"
+            >
               <div
                 className={`h-[1px] transition-all duration-500 ${
                   activeFocus === 'business'
                     ? 'w-16 bg-[#ff5c4a]'
-                    : 'w-8 bg-white/35'
+                    : 'w-8 bg-white/35 group-hover/link:w-16 group-hover/link:bg-[#ff5c4a]'
                 }`}
               />
-              <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-white/60">
+              <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-white/60 group-hover/link:text-white transition-colors">
                 SYSTEMS ARCHITECTURE
               </span>
-            </div>
+            </a>
           </div>
 
           {/* ============================================================
@@ -320,7 +324,7 @@ export function OstrumEngineSection() {
                 new CustomEvent('ostrum:focus-bias', { detail: 0 })
               );
             }}
-            className={`w-full lg:w-[28%] max-w-[360px] flex flex-col text-left lg:text-right lg:items-end transition-all duration-300 cursor-default select-none ${
+            className={`w-full lg:w-[28%] max-w-[360px] flex flex-col text-left lg:text-right lg:items-end transition-all duration-300 cursor-default select-text ${
               activeFocus === 'next' ? '-translate-x-1.5' : ''
             }`}
           >
@@ -346,18 +350,22 @@ export function OstrumEngineSection() {
             </p>
 
             {/* 4. Micro-label with Hairline Reveal */}
-            <div className="mt-5 flex items-center gap-3 lg:flex-row-reverse">
+            <a
+              href="#selected-work"
+              aria-label="Navigate to Original Ventures selected work"
+              className="mt-5 inline-flex items-center gap-3 lg:flex-row-reverse self-start lg:self-end group/link focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#ff5c4a] rounded-sm py-0.5 cursor-pointer"
+            >
               <div
                 className={`h-[1px] transition-all duration-500 ${
                   activeFocus === 'next'
                     ? 'w-16 bg-[#ff5c4a]'
-                    : 'w-8 bg-white/35'
+                    : 'w-8 bg-white/35 group-hover/link:w-16 group-hover/link:bg-[#ff5c4a]'
                 }`}
               />
-              <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-white/60">
+              <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-white/60 group-hover/link:text-white transition-colors">
                 ORIGINAL VENTURES
               </span>
-            </div>
+            </a>
           </div>
         </div>
       </div>

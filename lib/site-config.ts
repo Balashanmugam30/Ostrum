@@ -13,7 +13,7 @@ export const LINKEDIN_PLACEHOLDER =
 export const SITE_CONFIG = {
   brandName: 'OSTRUM',
   brandLegalName: 'Ostrum',
-  brandTagline: 'Digital Experience & Technology Studio',
+  brandTagline: 'Digital Product Engineering & Custom Software Studio',
 
   // Planned production base URL (unverified / planned for purchase)
   baseUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://theostrum.com',

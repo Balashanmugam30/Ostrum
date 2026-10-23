@@ -12,11 +12,11 @@ import { SITE_CONFIG, hasValidLinkedIn, getVerifiedLinkedInUrl } from '@/lib/sit
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.baseUrl),
   title: {
-    default: 'OSTRUM — Digital Transformation & Engineering Studio',
-    template: '%s — OSTRUM',
+    default: 'OSTRUM | Digital Product Engineering & Custom Software Studio',
+    template: '%s | OSTRUM',
   },
   description:
-    'Independent digital engineering, technology architecture, and product design studio. We build intelligent systems, business platforms, and immersive web experiences.',
+    'Independent digital product engineering and custom software studio in India. We design and build custom software, AI systems, modern web platforms, and original ventures.',
   keywords: [
     'Ostrum',
     'Digital Transformation',
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'OSTRUM — Digital Transformation & Engineering Studio',
+    title: 'OSTRUM | Digital Product Engineering & Custom Software Studio',
     description:
-      'Independent digital engineering, technology architecture, and product design studio.',
+      'Independent digital product engineering, custom software, and AI systems studio.',
     url: SITE_CONFIG.baseUrl,
     siteName: 'OSTRUM',
     locale: 'en_US',
@@ -44,13 +44,13 @@ export const metadata: Metadata = {
         url: '/images/ostrum-og.png',
         width: 1200,
         height: 630,
-        alt: 'OSTRUM — Digital Experience & Technology Studio',
+        alt: 'OSTRUM: Digital Experience & Technology Studio',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OSTRUM — Digital Transformation & Engineering Studio',
+    title: 'OSTRUM | Digital Product Engineering & Custom Software Studio',
     description:
       'Independent digital engineering, technology architecture, and product design studio.',
     images: ['/images/ostrum-og.png'],
@@ -91,7 +91,7 @@ const jsonLd = {
       logo: `${SITE_CONFIG.baseUrl}/images/ostrum-logo.png`,
       email: SITE_CONFIG.contactEmail,
       description:
-        'Independent digital product engineering, technology architecture, and venture design studio.',
+        'Independent digital product engineering, custom software development, and venture studio.',
       sameAs: verifiedSameAs,
     },
     {

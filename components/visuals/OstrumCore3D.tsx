@@ -103,7 +103,7 @@ export const OSTRUM_VARIATIONS: Record<
 > = {
   'ostrum-pearl': {
     key: 'ostrum-pearl',
-    name: 'Variation A — Ostrum Pearl',
+    name: 'Variation A : Ostrum Pearl',
     subtitle: 'Warm porcelain & restrained champagne highlights',
     character: 'Architectural, elegant, and timeless gallery porcelain',
     material: {
@@ -143,7 +143,7 @@ export const OSTRUM_VARIATIONS: Record<
   },
   'crimson-porcelain': {
     key: 'crimson-porcelain',
-    name: 'Variation B — Crimson Porcelain',
+    name: 'Variation B : Crimson Porcelain',
     subtitle: 'Pearl-white base with blush & muted crimson reflected tones',
     character: 'Most recognisably Ostrum-themed, harmonized with the crimson caustics',
     material: {
@@ -183,7 +183,7 @@ export const OSTRUM_VARIATIONS: Record<
   },
   'sculptural-satin': {
     key: 'sculptural-satin',
-    name: 'Variation C — Sculptural Satin',
+    name: 'Variation C : Sculptural Satin',
     subtitle: 'Ivory & warm sandstone with tactile micro-surface response',
     character: 'Understated, tactile, and gallery-quality stone/wax honesty',
     material: {

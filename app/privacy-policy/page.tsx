@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     canonical: '/privacy-policy',
   },
   openGraph: {
-    title: 'Privacy Policy — OSTRUM',
+    title: 'Privacy Policy | OSTRUM',
     description:
       'Privacy Policy outlining the collection, use, security, and protection of personal data in compliance with the DPDP Act and international privacy principles.',
     url: '/privacy-policy',
