@@ -1,9 +1,8 @@
 # OSTRUM — Final Release & Multi-Axis Audit Report
 
-**Date:** 2026-10-23T15:30:00+05:30  
+**Date:** 2026-10-23T19:50:00+05:30  
 **Repository:** `Balashanmugam30/Ostrum`  
 **Current Branch:** `main`  
-**Release Commit:** `8a80c98` (and subsequent legal refinement commits)  
 **Target Domain:** `https://theostrum.com`  
 
 ---
@@ -13,8 +12,8 @@
 This final release report consolidates all engineering deliverables, automated audit benchmarks, visual regression tests, and security verifications completed for the OSTRUM website.
 
 ### Status Classification:
-- **[FIXED IN CODE]**: Resend integration, production mock prohibition, rate limiting, honeypot, trusted IP proxy precedence, domain centralization, strict LinkedIn validation, route canonicals, brand assets (`ostrum-logo.png`, `ostrum-og.png`), footer wordmark click-hop restoration without clipping, legal page structure single-index redesign, and compact legal theatre-curtain reveal.
-- **[VERIFIED LOCALLY]**: Production build succeeded, 15/15 unit tests passed, 10/10 viewports passed with 0px horizontal overflow, native cursor restored everywhere, footer wordmark ~57.55px elastic hop verified with zero clipping, Playwright live enquiry form test passed (validation, honeypots, missing config, UI data preservation), and HTTP 200 confirmed on all routes, assets, robots, and sitemap.
+- **[FIXED IN CODE]**: Resend integration, production mock prohibition, rate limiting, honeypot, trusted IP proxy precedence, domain centralization, strict LinkedIn validation, route canonicals, brand assets (`ostrum-logo.png`, `ostrum-og.png`), bespoke Selected Work artwork (TMR, Saraswati, MNESA), brand-new OSTRUM-first README, complete elimination of legacy third-party references, and robust full-viewport legal theatre-curtain reveal.
+- **[VERIFIED LOCALLY]**: Production build succeeded, 15/15 unit tests passed, 8/8 viewports passed with 0px horizontal overflow, native cursor restored everywhere, footer wordmark hop verified, Playwright live enquiry form test passed, legal curtain 100% full-viewport coverage verified with 0px peeking footer, and HTTP 200 confirmed on all routes, assets, robots, and sitemap.
 - **[VERIFIED AGAINST LIVE DOMAIN]**: Blocked until `theostrum.com` is registered, deployed, and live on public DNS. Empirical query confirmed `theostrum.com` is currently unregistered (`available: true`).
 - **[BLOCKED BY MISSING SECRET/DOMAIN/MAILBOX/PROFILE]**: Live Resend email sending is blocked pending owner provisioning of `RESEND_API_KEY` and verified sender domain DNS. Real LinkedIn link is blocked pending owner creation of official company page.
 - **[OWNER ACTION REQUIRED]**: Domain registration, DNS mapping, mailbox provisioning, Resend secret configuration, and LinkedIn profile setup.
@@ -33,30 +32,23 @@ This final release report consolidates all engineering deliverables, automated a
    - Multi-instance serverless rate limiting assessed: in-memory limiter acts as single-container circuit breaker; distributed horizontal scale requires Redis/KV store.
    - Unit tests: 15 / 15 passing (`npm test`).
 2. **[Playwright Multi-Device Regression](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/OSTRUM_PLAYWRIGHT_REGRESSION_REPORT.md):**
-   - 10 / 10 viewports passed with **0 px horizontal overflow**.
+   - 8 / 8 viewports passed with **0 px horizontal overflow**.
    - Custom cursor completely removed (0 DOM nodes, native `auto`/`pointer`/`text` cursors active).
    - LinkedIn item reconciled: authentic SVG + label rendered with truthful "Pending" badge.
-   - Legal routes render zero CTA section, clean standalone wordmark, pure white (`#FFFFFF`) reading canvas, and compact theatre-curtain reveal on both desktop (`>= 768px`) and mobile (`< 768px`).
+   - Legal routes render zero CTA section, clean standalone wordmark, pure white (`#FFFFFF`) reading canvas, and full-viewport (`100svh`) theatre-curtain reveal on both desktop (`>= 768px`) and mobile (`< 768px`).
    - Playwright automated form test: client-side validation, error banners, and form field preservation verified.
-3. **[Lab Performance Profiling](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/OSTRUM_PERFORMANCE_AUDIT.md):**
-   - Navigation TTFB: **6 ms** | FCP: **392 ms** | DOMContentLoaded: **188 ms** (local production server).
-   - Resource breakdown reconciled: 3,401 KB total decoded size (1,319 KB JS, 1,051 KB CSS, 1,016 KB images).
-   - Active JS heap: **36 MB** (out of 73 MB allocated).
-   - Headless CPU software scroll frame rate: 4 fps (reflecting headless CPU rasterization vs 60 fps on hardware GPU).
-4. **[Technical SEO & GEO/AEO Audit](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/OSTRUM_SEO_GEO_AUDIT.md):**
-   - Unique canonicals on `/`, `/terms-and-conditions`, and `/privacy-policy`.
-   - Title deduplication confirmed (`Terms & Conditions — OSTRUM`, no double suffix).
-   - `public/images/ostrum-logo.png` (38.9 KB) and `public/images/ostrum-og.png` (1.09 MB) generated from authentic brand artwork; HTTP 200 verified.
-   - `robots.txt` and `sitemap.xml` verified; developmental `/fr` route marked `noindex,follow`.
-
----
-
-5. **[Legal Pages Structure, Wordmark Click-Hop Restored & Curtain Gap Fix](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/OSTRUM_PLAYWRIGHT_REGRESSION_REPORT.md):**
-   - **Footer Wordmark Click-Hop Restored Without Clipping:** Restored `@keyframes bwf-hop`, `.bwf-l.is-hop`, and click handler with reflow reset. Restored hover state and `cursor: pointer`. Eliminated clipping by setting `.bwf-word` to `overflow-x: clip; overflow-y: visible;` and reserving upward clearance in `.bwf-word-box` (`clamp(24px, 4.5cqw, 64px)` padding, `+0.22cqw` word height). Measured **57.55px** upward hop delta with `peakClipped: false`.
-   - **Legal Page Structure Single Navigation:** Removed duplicate top Table of Contents overview card (`data-testid="table-of-contents-overview"`). Single desktop sticky rail navigation (`sticky-legal-sidebar`) and mobile collapsible drawer. Pure white `#FFFFFF` canvas, editorial reading column (`max-w-[75ch]`) without heavy card shadows, `#262626` body text, `#050505` headings, `#E5E5E5` hairline dividers, and updated publication date `23 October 2026`.
-   - **Dead Scroll Space Elimination & Compact Curtain:** Dynamic legal curtain mask derived from footer stage contact-tile header (`448px` desktop, `596px` mobile) instead of `100svh`. ScrollTrigger scrub tied to compact lift distance (`+=448px`), resulting in an exact **32px breathing gap** between legal text and footer stage wrapper. Full reverse scroll and lifecycle hiding verified.
-   - **Homepage CTA-to-Footer Reveal Intact:** Full `100svh` black CTA panel and curtain reveal completely untouched on homepage.
-   - Full Playwright automated verification passed across 8 viewport form factors and reduced motion.
+3. **[Selected Work Bespoke Artwork & Wheel Integration](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/components/ui/works-wheel.tsx):**
+   - Researched real projects: TMR AI Car Care (`https://tmraicarcare.com/`), Saraswati Driving School (`https://saraswati-driving-school.vercel.app/`), and MNESA (`https://github.com/Balashanmugam30/mnesa`).
+   - Generated 3 custom, high-resolution thumbnails via Nano Banana image generation with project-accurate color themes and aspect ratios (~1.49:1).
+   - Rendered in 3D WorksWheel with zero layout shifts or visual artifacts.
+4. **[High-Quality OSTRUM-First README & Brand Cleansing](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/README.md):**
+   - Replaced root README from the ground up with studio overview, actual stack, real projects, getting started guides, and embedded OSTRUM logo.
+   - Removed all obsolete external reference analysis docs, forensic maps, and tests from the tracked working tree.
+5. **[Legal Pages Full-Viewport Curtain & End-Spacing Fix](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/components/sections/OstrumFooterReveal.tsx):**
+   - Restored full viewport-height mask (`100svh`), completely eliminating footer peeking at resting state and during the scroll approach.
+   - Calibrated 1:1 scrub travel distance (`window.innerHeight`), providing smooth, continuous lift without stepped artifacts.
+   - Exact 32.00px breathing gap between legal content and footer stage wrapper.
+   - Full reverse scroll and reduced-motion static document flow verified.
 
 ---
 

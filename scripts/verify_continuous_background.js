@@ -5,7 +5,7 @@ const path = require('path');
 const ARTIFACTS_DIR = 'C:/Users/balashanmugam/.gemini/antigravity/brain/e61a5bf4-ec20-4604-866c-28b2350ab0c5';
 
 async function runContinuousBackgroundAudit() {
-  console.log('🚀 Starting Continuous Background Reconstruction & Visual Verification...');
+  console.log('🚀 Starting Continuous Background Architecture & Visual Verification...');
 
   const browser = await chromium.launch({ headless: true });
   const viewports = [

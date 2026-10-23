@@ -1,7 +1,7 @@
 # Ostrum — Comprehensive Design System Specification
 
 > **Status:** RATIFIED & PRODUCTION READY  
-> **Aesthetic Northstar:** Direction E (Art-Directed Future Editorial) + Clarté Reference Experience Quality  
+> **Aesthetic Northstar:** Direction E (Art-Directed Future Editorial)  
 > **Mandate:** Strictly Light-First • Architectural Precision • Tactile Alabaster Grounds • Multi-Color Harmonies • Zero Neon / Cyberpunk Clichés  
 
 ---
@@ -93,14 +93,14 @@ Ostrum operates on an organic, multi-tonal light architectural palette designed 
 
 - **Desktop Container:** `max-width: 1240px`, centered, padding `0 32px`.
 - **Narrow Container (Editorial):** `max-width: 920px`, centered, padding `0 24px`.
-- **Vertical Section Breathing Room:** `padding: clamp(80px, 10vw, 160px) 0` (inspired by Clarté's confident negative space).
+- **Vertical Section Breathing Room:** `padding: clamp(80px, 10vw, 160px) 0` (inspired by confident architectural negative space).
 - **Asymmetric Split:** 40% Left Narrative Column + 60% Right Visual / Interactive Stage.
 
 ---
 
 ## 5. UI Primitives & Interaction Patterns
 
-### 1. Clarté-Inspired Rolling Action Button (`.rolling-btn`)
+### 1. Kinetic Rolling Action Button (`.rolling-btn`)
 ```html
 <button class="rolling-btn btn-terracotta">
   <span class="rolling-text-wrap">

@@ -1,0 +1,215 @@
+{
+  "timestamp": "2026-10-23T14:21:51.429Z",
+  "termsCurtain": {
+    "geo": {
+      "viewportHeight": 900,
+      "viewportWidth": 1440,
+      "scrollHeight": 7510,
+      "gapBetweenLegalAndStage": 0,
+      "gapBetweenSection16AndStage": 32,
+      "sec16TopDoc": 5128.171875,
+      "stageWrapperTopDoc": 5362.171875
+    },
+    "peekCheckBeforeReveal": {
+      "scrollY": 5128,
+      "wrapperTop": 234.171875,
+      "curtainTop": 234.171875,
+      "curtainBottom": 1134.171875,
+      "curtainCoversToViewportBottom": true,
+      "tilesTop": 330.171875,
+      "tilesVisibleInViewport": true
+    },
+    "stInfo": {
+      "start": 5362,
+      "end": 6262,
+      "totalDistance": 900
+    },
+    "progressSamples": [
+      {
+        "p": 0,
+        "scrollY": 5362,
+        "stProgress": 0,
+        "curtainTop": 0.15837499499320984,
+        "curtainBottom": 900.1583749949932,
+        "curtainVisibility": "visible",
+        "curtainPointerEvents": "auto",
+        "curtainTransform": "matrix(1, 0, 0, 1, 0, -0.0135)",
+        "tilesTop": 96.171875,
+        "hitElementOnTiles": "legal-curtain-mask"
+      },
+      {
+        "p": 0.25,
+        "scrollY": 5587,
+        "stProgress": 0.25,
+        "curtainTop": -223.40792846679688,
+        "curtainBottom": 676.5920715332031,
+        "curtainVisibility": "visible",
+        "curtainPointerEvents": "auto",
+        "curtainTransform": "matrix(1, 0, 0, 1, 0, -223.58)",
+        "tilesTop": 96.171875,
+        "hitElementOnTiles": "legal-curtain-mask"
+      },
+      {
+        "p": 0.5,
+        "scrollY": 5812,
+        "stProgress": 0.5,
+        "curtainTop": -448.4601135253906,
+        "curtainBottom": 451.5398864746094,
+        "curtainVisibility": "visible",
+        "curtainPointerEvents": "auto",
+        "curtainTransform": "matrix(1, 0, 0, 1, 0, -448.632)",
+        "tilesTop": 96.171875,
+        "hitElementOnTiles": "legal-curtain-mask"
+      },
+      {
+        "p": 0.75,
+        "scrollY": 6037,
+        "stProgress": 0.75,
+        "curtainTop": -674.7057495117188,
+        "curtainBottom": 225.29425048828125,
+        "curtainVisibility": "visible",
+        "curtainPointerEvents": "auto",
+        "curtainTransform": "matrix(1, 0, 0, 1, 0, -674.878)",
+        "tilesTop": 96.171875,
+        "hitElementOnTiles": "legal-curtain-mask"
+      },
+      {
+        "p": 1,
+        "scrollY": 6262,
+        "stProgress": 1,
+        "curtainTop": -898.4682006835938,
+        "curtainBottom": 1.53179931640625,
+        "curtainVisibility": "hidden",
+        "curtainPointerEvents": "none",
+        "curtainTransform": "matrix(1, 0, 0, 1, 0, -898.64)",
+        "tilesTop": 96.171875,
+        "hitElementOnTiles": "SPAN"
+      }
+    ],
+    "reverseCheck": {
+      "curtainVisibility": "visible",
+      "curtainTop": 0.171875,
+      "curtainBottom": 900.171875,
+      "covered": true
+    },
+    "consoleErrors": [],
+    "passed": true
+  },
+  "privacyCurtain": {
+    "geo": {
+      "gapBetweenSection15AndStage": 32,
+      "sec15TopDoc": 4997.171875
+    },
+    "endCheck": {
+      "curtainVisibility": "hidden",
+      "tilesVisible": true,
+      "wordmarkPresent": true
+    },
+    "passed": true
+  },
+  "homepageCTARegression": {
+    "ctaCheck": {
+      "ctaPresent": true,
+      "curtainBg": "rgb(5, 5, 5)",
+      "stStart": 25179,
+      "stEnd": 26079
+    },
+    "passed": true
+  },
+  "selectedWorkArtwork": {
+    "imageAudits": {
+      "tmr": {
+        "src": "/images/works/tmr-ai-car-care.jpg",
+        "loaded": true,
+        "width": 1264,
+        "height": 848,
+        "aspectRatio": "1.491"
+      },
+      "saraswati": {
+        "src": "/images/works/saraswati-driving-school.jpg",
+        "loaded": true,
+        "width": 1264,
+        "height": 848,
+        "aspectRatio": "1.491"
+      },
+      "mnesa": {
+        "src": "/images/works/mnesa.jpg",
+        "loaded": true,
+        "width": 1264,
+        "height": 848,
+        "aspectRatio": "1.491"
+      }
+    },
+    "passed": true
+  },
+  "responsiveMatrix": {
+    "profiles": [
+      {
+        "profile": "1920x1080 Desktop Workstation",
+        "viewport": "1920x1080",
+        "overflow": 0,
+        "curtainWidth": 1920,
+        "passed": true
+      },
+      {
+        "profile": "1440x900 Standard Desktop",
+        "viewport": "1440x900",
+        "overflow": 0,
+        "curtainWidth": 1440,
+        "passed": true
+      },
+      {
+        "profile": "1280x800 Compact Laptop",
+        "viewport": "1280x800",
+        "overflow": 0,
+        "curtainWidth": 1280,
+        "passed": true
+      },
+      {
+        "profile": "1024x768 Landscape Tablet",
+        "viewport": "1024x768",
+        "overflow": 0,
+        "curtainWidth": 1024,
+        "passed": true
+      },
+      {
+        "profile": "768x1024 Portrait Tablet",
+        "viewport": "768x1024",
+        "overflow": 0,
+        "curtainWidth": 768,
+        "passed": true
+      },
+      {
+        "profile": "430x932 iPhone 14/15 Pro Max",
+        "viewport": "430x932",
+        "overflow": 0,
+        "curtainWidth": 430,
+        "passed": true
+      },
+      {
+        "profile": "390x844 iPhone 12/13/14",
+        "viewport": "390x844",
+        "overflow": 0,
+        "curtainWidth": 390,
+        "passed": true
+      },
+      {
+        "profile": "360x800 Small Android",
+        "viewport": "360x800",
+        "overflow": 0,
+        "curtainWidth": 360,
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "reducedMotion": {
+    "rmMetrics": {
+      "curtainPresent": false,
+      "footerPresent": true,
+      "scrollTriggerActive": false
+    },
+    "passed": true
+  },
+  "passedAll": true
+}

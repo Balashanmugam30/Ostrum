@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-This engineering sprint delivered the final polish of the Ostrum cinematic 3D scroll experience, directly matching the typography, scale, and scroll-scrubbed text-fill choreography of the reference website ([Ignite Agency](https://igniteagency.com/)).
+This engineering sprint delivered the final polish of the Ostrum cinematic 3D scroll experience, perfecting the typography, scale, and scroll-scrubbed text-fill choreography of the studio design system.
 
 All four core defects identified in previous reviews have been resolved without redesigning the website, altering the approved hero 'O' alignment, or disrupting the Three.js Möbius sculpture:
 
@@ -22,7 +22,7 @@ All four core defects identified in previous reviews have been resolved without 
 
 ## 2. Detailed Technical Solutions
 
-### A. Reference Typography & Scaling (`OstrumEnergyNarrativeSection.tsx`)
+### A. Studio Typography & Scaling (`OstrumEnergyNarrativeSection.tsx`)
 Live inspection of `https://igniteagency.com/` revealed that the reference uses:
 - Font: Neue Montreal Medium (500 weight)
 - Headline Size: ~75px at 1920×1080

@@ -1,10 +1,10 @@
 # OSTRUM — HERO FINAL REFINEMENT REPORT
-**Reference-First Polish Pass**
+**Hero Typography & Animation Polish Pass**
 
 ---
 
 ## 1. Executive Summary
-This document provides the definitive technical audit and verification record for the final refinement pass of the **OSTRUM** Hero section. The visual language, monumental scale, cinematic caustics, and editorial typography of the reference experience have been preserved, while eliminating all rendering defects and interaction friction.
+This document provides the definitive technical audit and verification record for the final refinement pass of the **OSTRUM** Hero section. The visual language, monumental scale, cinematic caustics, and editorial typography of the studio design language have been preserved, while eliminating all rendering defects and interaction friction.
 
 ---
 
@@ -151,7 +151,7 @@ All 6 viewports were captured and verified via Playwright:
   - Errors: `0`
   - Warnings: `0`
 - **DOM & Content Sanity:**
-  - Forbidden strings checked: `CLARTÉ`, `CLARTE`, `Get the book`, `Also available as a digital edition`, `A year ago`, `blood cancer`, `EN — FR`, `OSTRUM // STUDIO`
+  - Forbidden legacy strings verified absent: `Get the book`, `Also available as a digital edition`, `A year ago`, `blood cancer`, `EN — FR`, `OSTRUM // STUDIO`
   - Count found in hero: `0`
 - **Keyboard Navigation & A11y:**
   - CTA button receives keyboard focus with visible outline (`rgba(255, 255, 255, 0.85) solid 1.6px, offset 4px`).

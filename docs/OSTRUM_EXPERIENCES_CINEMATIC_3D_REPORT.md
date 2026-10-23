@@ -28,12 +28,12 @@ Following meticulous analysis of the Ignite Agency reference sequence (`https://
    - **Beat 03 ($p: 0.50 \to 0.66$):** *"We connect systems, software and intelligence—turning operational complexity into momentum."* with supporting philosophy.
    - **Beat 04 ($p: 0.67 \to 0.83$):** *"Some ideas become <span style="color:#ff5c4a">products</span>. Some <span style="color:#ff5c4a">products</span> become <span style="color:#ff5c4a">ventures</span>."* with supporting philosophy.
    - **Beat 05 ($p: 0.84 \to 1.00$):** *"Build what doesn't exist yet."* with supporting philosophy, settling into the final poised orientation.
-4. **Permanent Elimination of Legacy Clarté / Book Content:**
+4. **Permanent Elimination of Legacy Third-Party / Book Content:**
    - Removed Section 02's premature backing statement (`backingRef`), which had previously clashed with the transition.
-   - Permanently deleted all legacy Clarté book components and assets:
+   - Permanently deleted all legacy third-party book components and assets:
      - `components/sections/FooterCta.tsx`
      - `components/footer/Footer.tsx`
-     - `components/ui/ClarteLogo.tsx`
+     - `components/ui/OstrumLogo.tsx`
      - `components/modal/OrderModal.tsx`
      - `public/images/footer.webp`, `book.webp`, `folder.webp`
    - Added a clean release spacer below Section 03 so the panel and sculpture unpin naturally and scroll upwards out of view.

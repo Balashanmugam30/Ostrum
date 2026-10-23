@@ -1,0 +1,37 @@
+{
+  "tmr": {
+    "status": 200,
+    "url": "https://tmraicarcare.com/",
+    "title": "TMR AI Car Care | Car Detailing & Automotive Protection in Tiruppur",
+    "h1": [
+      "THE ART OF CAR CARE."
+    ],
+    "h2": [
+      "EVERY SURFACE MATTERS.",
+      "PRECISION IN MOTION.",
+      "CRAFT, NOT COMMERCE.",
+      "FINISHED WITH INTENT.",
+      "FOR PEOPLE\nWHO CARE\nABOUT THEIR\nCARS.",
+      "PRECISION IN MOTION.",
+      "01 ARRIVE",
+      "PROTECT\nTHE FINISH.",
+      "THE INVISIBLE\nSHIELD.",
+      "FROM\nDEFECT\nTO REFLECTION.",
+      "PROOF IN THE\nREFLECTION.",
+      "COME SEE\nTHE DIFFERENCE.",
+      "BEFORE\nYOU ARRIVE.",
+      "THE FINISH MATTERS."
+    ],
+    "metaDescription": "TMR AI Car Care is Tiruppur's premier studio for professional car detailing, 10H ceramic coating, self-healing PPF & sun-control films.",
+    "textSnippet": "HOME\nSERVICES\nPRODUCTS\nGALLERY\nABOUT\nCONTACT\nCONTACT\nTMR\nCAR CARE\nPRECISION / PROTECTION / PERFECTION\nTHE ART OF CAR CARE.\n\nPrecision begins with the surface.\n\nEXPLORE SERVICES\n↗\nEVERY SURFACE MATTERS.\n\nPaint. Reflection. Finish.\n\nPRECISION IN MOTION.\n\nMeasured work. Controlled finish.\n\nCRAFT, NOT COMMERCE.\n\nEvery pass is intentional.\n\nFINISHED WITH INTENT.\n\nThe final surface is the standard.\n\nBOOK YOUR DETAIL\n↗\nSCROLL\n↓\n01\n05\nFOR PEOPLE\nWHO CARE\nABOUT THEIR\nCARS.\nPRECISION IN MOTION.\n\n\"We engineer every stage around the condition of the vehicle, the surface, and the finish.\"\n\nDISCOVER THE TMR METHOD\n↗\nSTUDIO RECEPTION & INITIAL PROTOCOL\n\n\"EVERY VEHICLE ENTERS A CLIMATE-CONTROLLED STUDIO ENVIRONMENT DESIGNED TO ELIMINATE CONTAMINATION BEFORE WORK BEGINS.\"\n\n01\nARRIVE\n02\nINSPECT\n03\nPREPARE\n04\nTRANSFORM\n05\nREVEAL\n01 ARRIVE\nPROTECT\nTHE FINISH.\n\n\"Protection begins when the surface clearcoat becomes the standard.\"\n\nEXPLORE CERAMIC PACKAGES\n↗\nFINISH\nHIGH-GLOSS\nHYDROPHOBIC\nACTIVE\nPROTECTION\nLO"
+  },
+  "saraswati": {
+    "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://saraswati-driving-school.vercel.app/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  "mnesa": {
+    "status": 200,
+    "url": "https://github.com/Balashanmugam30/mnesa",
+    "title": "GitHub - Balashanmugam30/mnesa: MNESA — AI-powered opportunity capture and follow-through platform. Capture it. We'll remember. · GitHub",
+    "readmeSnippet": "MNESA\n\nCapture it. We'll remember.\nNever miss what matters.\n\n       \n\n1. Executive Summary\n\nMNESA is an AI-powered opportunity capture and follow-through platform designed for ambitious individuals who discover critical opportunities while busy and risk forgetting them.\n\nWhether it is an internship, job posting, hackathon, scholarship, competition, research grant, workshop, conference, or deadline-sensitive application, MNESA transforms passive discovery into proactive execution:\n\nSEE → SHARE → UNDERSTAND → SAVE → REMIND → ACT → COMPLETE\n\nThe Core Problem Solved\n\nPeople encounter high-value career and educational opportunities in fragmented environments (LinkedIn, Twitter/X, Instagram, WhatsApp, Telegram, email, campus portals). Traditional capture methods fail:\n\nBookmarks are forgotten graves.\nTaking screenshots accumulates unsearchable image clutter.\nMessaging oneself loses context and deadline urgency.\nManually creating reminders incurs high cognitive friction.\nThe MNESA Solution\n\nThe fastest path to capture something important is the default path. With native Android sharing (ACTION_SEND), sharing any URL, text snippet, or screenshot to MNESA captures it in less than 200ms without interrupting the user's flow. MNESA's backend and AI service extract actionable metadata, structured deadlines, and key requirements, and automatically orchestrate a proactive reminder cadence.\n\n2. Locked Architecture & Technology Stack\n\nMNESA is built on an enterprise-grade, production-oriented architecture with strict technological invariants:\n\nTier\tTechnology\tPurpose\tInvariants\nAndroid Client\tPure Java 21, Android SDK 35\tNative mobile client, system share target\tXML/View system, Material 3, MVVM, Clean Architecture, Hilt, Room, Retrofit, OkHttp, RxJava 3, WorkManager. No Kotlin, No Compose.\nBackend API\tJava 21, Spring Boot 3.4\tCore business logic, data persistence, scheduling\tModular monolith first, Spring Security, Spring Data JPA, Hibernate, Bean Validation, Flyway migrations, Gra"
+  }
+}

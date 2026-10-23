@@ -12,7 +12,7 @@
 A critical visual regression was diagnosed and resolved where the interactive cursor-reactive background glow and 3D Möbius sculpture would freeze or revert to a static image after 30–60 seconds, during idle periods, or after user interaction. 
 
 Following strict root-cause diagnosis using browser runtime telemetry, we identified two core failure mechanisms:
-1. **WebGL Context Exhaustion & Static Fallback Crash:** Unstable inline callback dependencies (`onFpsUpdate`) triggered re-renders of the parent section every second, which in turn tore down and reconstructed the Three.js scene and `WebGLRenderer` every 1,000ms. After ~16 iterations, Chromium exhausted available WebGL hardware contexts, threw an exception, and flipped `hasError = true`, replacing the 3D canvas with a static fallback image (`/images/ostrum-core-front.webp`).
+1. **WebGL Context Exhaustion & Static Fallback Crash:** Unstable inline callback dependencies (`onFpsUpdate`) triggered re-renders of the parent section every second, which in turn tore down and re-instantiated the Three.js scene and `WebGLRenderer` every 1,000ms. After ~16 iterations, Chromium exhausted available WebGL hardware contexts, threw an exception, and flipped `hasError = true`, replacing the 3D canvas with a static fallback image (`/images/ostrum-core-front.webp`).
 2. **Background Caustics Black Screen & GPU Overload:** In `BackgroundCaustics.tsx`, a shader scroll offset calculation (`texUV.y -= uScrollY`) shifted UV coordinates outside `[0, 1]`, causing up to 80% of the viewport to turn solid black when scrolling. Concurrently, evaluating un-clamped 3D Simplex noise per pixel at high device pixel ratios overwhelmed integrated GPU pipelines, while unbounded `uTime` in the grain formula caused floating-point precision collapse after 60 seconds.
 
 Both defects have been eradicated. Furthermore, a **single continuous 3D scroll journey** was implemented: the Möbius sculpture begins nestled directly within the **O** of the hero wordmark (`OSTRUM`), releases smoothly on scroll, expands and rotates 360° through space, and docks seamlessly into Section 02 between the two identity anchors ("01 · FOR BUSINESS" & "02 · FOR WHAT'S NEXT").
@@ -183,10 +183,10 @@ Both defects have been eradicated. Furthermore, a **single continuous 3D scroll 
 
 ---
 
-## 6. Targeted Fixes: Clarté Atmospheric Burgundy Vignette, Editorial Pinned 3D Hold & Lenis Smooth Scrolling (October 10, 2026)
+## 6. Targeted Fixes: OSTRUM Atmospheric Burgundy Vignette, Editorial Pinned 3D Hold & Lenis Smooth Scrolling (October 10, 2026)
 
 ### 6.1 Atmospheric Burgundy Vignette & Enhanced Scroll Parallax (`components/canvas/BackgroundCaustics.tsx`)
-* **Reference Direction:** Inspired by the supplied CLARTÉ recording: deep burgundy and obsidian dark red toward the outer edges and corners, a concentrated luminous scarlet focal core, organic radial strands, and responsive liquid parallax.
+* **Reference Direction:** Pure OSTRUM brand identity: deep burgundy and obsidian dark red toward the outer edges and corners, a concentrated luminous scarlet focal core, organic radial strands, and responsive liquid parallax.
 * **Shader Architecture:**
   - Implemented aspect-corrected radial coordinates centered at $(50\%, 46\%)$ in the fragment shader:
     ```glsl

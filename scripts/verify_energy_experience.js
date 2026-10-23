@@ -50,7 +50,7 @@ async function runVerification() {
     const legacyFooter = await page.$('.footer-section');
     const legacyOrderModal = await page.$('#order-modal');
     if (!legacyFooterCta && !legacyFooter && !legacyOrderModal) {
-      console.log('✓ VERIFIED: Legacy Clarté book content (FooterCta, Footer, OrderModal) completely eliminated.');
+      console.log('✓ VERIFIED: Legacy third-party book content (FooterCta, Footer, OrderModal) completely eliminated.');
       results.testsPassed++;
     } else {
       console.error('✗ ERROR: Legacy content still present!');
