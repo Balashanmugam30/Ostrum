@@ -95,7 +95,7 @@ export function LegalDocumentLayout({
   return (
     <div className="legal-page min-h-screen bg-[#FAF7F2] text-[#2D3139] antialiased selection:bg-[#42100F] selection:text-[#FFF8F3]">
       {/* Top Editorial Flow (No Full-Width Sticky Bar) */}
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 sm:pb-24">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-6 sm:pb-8">
         {/* Restrained Standalone OSTRUM Wordmark linking to Home */}
         <div className="pb-8">
           <Link
@@ -110,22 +110,15 @@ export function LegalDocumentLayout({
         </div>
 
         {/* Hero / Document Header */}
-        <header className="pt-10 sm:pt-14 pb-10 sm:pb-12 max-w-4xl">
-          <p className="font-mono text-xs uppercase tracking-[0.22em] font-bold text-[#D24B2C] mb-3">
+        <header className="pt-10 sm:pt-14 pb-10 sm:pb-12 max-w-4xl transition-all duration-700 ease-out">
+          <p className="font-mono text-xs uppercase tracking-[0.22em] font-bold text-[#64120F] mb-3">
             {badge}
           </p>
-          <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold tracking-tight text-[#161514] leading-[1.1] mb-5">
+          <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold tracking-tight text-[#050505] leading-[1.1] mb-5">
             {title}
           </h1>
-          <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-[#70757E]">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#16A34A]" aria-hidden="true" />
-              Effective: {effectiveDate}
-            </span>
-            <span className="text-[#D0C9C0]" aria-hidden="true">&bull;</span>
-            <span>Version 2.0 (Public Release)</span>
-            <span className="text-[#D0C9C0]" aria-hidden="true">&bull;</span>
-            <span>Studio Legal Affairs</span>
+          <div className="flex items-center text-xs font-mono text-[#706864]">
+            <span>Last updated: {effectiveDate}</span>
           </div>
         </header>
 
@@ -139,7 +132,7 @@ export function LegalDocumentLayout({
             <h2 className="font-mono text-xs uppercase tracking-[0.18em] font-bold text-[#161514]">
               Table of Contents ({sections.length} Sections)
             </h2>
-            <p className="font-sans text-xs text-[#70757E]">
+            <p className="font-sans text-xs text-[#706864]">
               Select any section to jump directly to its provisions
             </p>
           </div>
@@ -150,9 +143,9 @@ export function LegalDocumentLayout({
                 key={sec.id}
                 href={`#${sec.id}`}
                 onClick={(e) => handleLinkClick(e, sec.id)}
-                className="group flex items-baseline gap-2.5 py-1.5 px-2 rounded-lg text-[#50545C] hover:text-[#161514] hover:bg-[#FAF7F2] transition-colors"
+                className="group flex items-baseline gap-2.5 py-1.5 px-2 rounded-lg text-[#302A28] hover:text-[#050505] hover:bg-[#FAF7F2] transition-colors"
               >
-                <span className="font-mono text-[11px] font-semibold text-[#D24B2C] group-hover:text-[#42100F] shrink-0">
+                <span className="font-mono text-[11px] font-semibold text-[#64120F] shrink-0">
                   {sec.num}
                 </span>
                 <span className="group-hover:underline underline-offset-4 line-clamp-1">
@@ -167,7 +160,7 @@ export function LegalDocumentLayout({
         <div className="lg:hidden sticky top-4 z-30 mb-6">
           <div className="p-3 rounded-xl bg-white/95 backdrop-blur-md border border-[#E5DFD7] shadow-md flex items-center justify-between gap-3">
             <div className="min-w-0 flex items-baseline gap-2">
-              <span className="font-mono text-[10px] font-bold text-[#D24B2C]">
+              <span className="font-mono text-[10px] font-bold text-[#64120F]">
                 {activeSectionNum}
               </span>
               <span className="font-sans text-xs font-semibold text-[#161514] truncate">
@@ -194,8 +187,8 @@ export function LegalDocumentLayout({
                   onClick={(e) => handleLinkClick(e, sec.id)}
                   className={`flex items-baseline gap-2.5 py-2 px-2.5 rounded-lg transition-colors ${
                     activeSectionId === sec.id
-                      ? 'bg-[#FAF7F2] text-[#161514] font-semibold'
-                      : 'text-[#50545C] hover:text-[#161514]'
+                      ? 'bg-[#FAF7F2] text-[#050505] font-semibold'
+                      : 'text-[#706864] hover:text-[#050505]'
                   }`}
                 >
                   <span className="font-mono text-[11px] font-semibold text-[#D24B2C]">
@@ -220,7 +213,7 @@ export function LegalDocumentLayout({
                 <h3 className="font-mono text-[11px] uppercase tracking-wider font-bold text-[#161514]">
                   On This Page
                 </h3>
-                <span className="font-mono text-[10px] text-[#8C909A]">
+                <span className="font-mono text-[10px] text-[#706864]">
                   {sections.length} parts
                 </span>
               </div>
@@ -237,14 +230,14 @@ export function LegalDocumentLayout({
                       onClick={(e) => handleLinkClick(e, sec.id)}
                       className={`flex items-baseline gap-2 py-1.5 px-2 rounded-lg transition-all duration-150 ${
                         isCurrent
-                          ? 'bg-[#FAF7F2] text-[#161514] font-semibold shadow-xs border-l-2 border-[#D24B2C]'
-                          : 'text-[#6B707B] hover:text-[#161514] hover:bg-[#FAF7F2]/60'
+                          ? 'bg-[#FAF7F2] text-[#050505] font-semibold shadow-xs border-l-2 border-[#64120F]'
+                          : 'text-[#706864] hover:text-[#050505] hover:bg-[#FAF7F2]/60'
                       }`}
                     >
                       <span
                         className={`font-mono text-[11px] shrink-0 ${
                           isCurrent
-                            ? 'text-[#D24B2C] font-bold'
+                            ? 'text-[#64120F] font-bold'
                             : 'text-[#9CA3AF]'
                         }`}
                       >
@@ -260,7 +253,7 @@ export function LegalDocumentLayout({
 
           {/* Reading Column: Solid White Architectural Reading Surface */}
           <main className="lg:col-span-9 bg-white border border-[#E5DFD7] rounded-3xl p-6 sm:p-10 md:p-14 shadow-[0_12px_40px_-15px_rgba(22,21,20,0.06)]">
-            <article className="space-y-12 sm:space-y-14 font-sans text-[15px] sm:text-base leading-relaxed text-[#4A4E57]">
+            <article className="space-y-12 sm:space-y-14 font-sans text-[15px] sm:text-base leading-relaxed text-[#302A28]">
               {children}
             </article>
           </main>

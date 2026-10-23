@@ -71,7 +71,7 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
       const trigger = ScrollTrigger.create({
         trigger: container,
         start: 'top top',
-        end: () => `+=${getLiftDistance()}`,
+        end: () => `+=${Math.round(getLiftDistance() * (showCTA ? 1.0 : 0.65))}`,
         pin: container,
         pinSpacing: true,
         scrub: 0.6,
@@ -145,7 +145,7 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
       const trigger = ScrollTrigger.create({
         trigger: container,
         start: 'top top',
-        end: () => `+=${Math.round(getLiftDistance() * 0.95)}`,
+        end: () => `+=${Math.round(getLiftDistance() * (showCTA ? 0.95 : 0.55))}`,
         pin: container,
         pinSpacing: true,
         scrub: 0.5,

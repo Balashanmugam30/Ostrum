@@ -52,6 +52,14 @@ This final release report consolidates all engineering deliverables, automated a
 
 ---
 
+5. **[Legal Pages Visual Refinement & Wordmark Hop Fix](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/OSTRUM_PLAYWRIGHT_REGRESSION_REPORT.md):**
+   - Eliminated footer wordmark click-hop animation and container clipping; cursor set to default.
+   - Calibrated legal document bottom padding (32px), footer top stage padding (96px), and curtain scroll distance (0.65x lift), removing dead scroll gaps.
+   - Removed green status dot, Version 2.0 label, Studio Legal Affairs marker, and drafting commentary across Terms & Privacy pages.
+   - Full Playwright automated verification passed across 8 viewport form factors and reduced motion.
+
+---
+
 ## 3. Ranked Owner Action Items Prior to Public Launch
 
 1. **Acquire Domain [Priority 1]:** Register `theostrum.com` at domain registrar (confirmed available for purchase).

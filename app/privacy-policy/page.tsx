@@ -46,15 +46,15 @@ export default function PrivacyPolicyPage() {
   return (
     <LegalDocumentLayout
       title="Privacy Policy"
-      badge="DATA PRIVACY · TRANSPARENCY"
+      badge="PRIVACY POLICY"
       effectiveDate={lastUpdated}
       activeTab="privacy"
       sections={SECTIONS}
     >
       {/* Section 1 */}
-      <section id="commitment" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">01</span>
+      <section id="commitment" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">01</span>
           Commitment to Privacy &amp; Scope
         </h2>
         <p>
@@ -66,23 +66,23 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Section 2 */}
-      <section id="controller" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">02</span>
+      <section id="controller" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">02</span>
           Studio Identity &amp; Data Controller
         </h2>
         <p>
-          The data controller responsible for personal information processed through this website is OSTRUM. Studio operations and inquiries are centrally administered through our designated contact mailbox at <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#D24B2C] hover:underline font-medium">{SITE_CONFIG.contactEmail}</a>.
+          The data controller responsible for personal information processed through this website is OSTRUM. Studio operations and inquiries are centrally administered through our designated contact mailbox at <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#64120F] hover:underline font-medium">{SITE_CONFIG.contactEmail}</a>.
         </p>
         <p className="mt-3">
-          Our planned primary domain is <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#161514] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>. All electronic correspondence submitted through form handlers or direct email arrives directly in our studio triage queue.
+          Our planned primary domain is <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#050505] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>. All electronic correspondence submitted through form handlers or direct email arrives directly in our studio triage queue.
         </p>
       </section>
 
       {/* Section 3 */}
-      <section id="data-collected" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">03</span>
+      <section id="data-collected" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">03</span>
           Personal Information We Collect
         </h2>
         <p>
@@ -90,11 +90,11 @@ export default function PrivacyPolicyPage() {
         </p>
         <div className="mt-4 space-y-4">
           <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7]">
-            <h3 className="font-bold text-[#161514] text-sm">A. Information You Voluntarily Provide</h3>
-            <p className="mt-1 text-xs sm:text-sm text-[#50545C]">
+            <h3 className="font-bold text-[#050505] text-sm">A. Information You Voluntarily Provide</h3>
+            <p className="mt-1 text-xs sm:text-sm text-[#302A28]">
               When you submit a project enquiry through our contact form, we collect:
             </p>
-            <ul className="list-disc pl-5 mt-2 space-y-1.5 text-xs sm:text-sm text-[#50545C]">
+            <ul className="list-disc pl-5 mt-2 space-y-1.5 text-xs sm:text-sm text-[#302A28]">
               <li><strong>Full Name:</strong> To address you professionally in communications;</li>
               <li><strong>Work Email Address:</strong> To respond to your inquiry and discuss project scope;</li>
               <li><strong>Company / Organization Name:</strong> To contextualize business requirements;</li>
@@ -105,8 +105,8 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7]">
-            <h3 className="font-bold text-[#161514] text-sm">B. Technical &amp; Diagnostic Telemetry</h3>
-            <p className="mt-1 text-xs sm:text-sm text-[#50545C]">
+            <h3 className="font-bold text-[#050505] text-sm">B. Technical &amp; Diagnostic Telemetry</h3>
+            <p className="mt-1 text-xs sm:text-sm text-[#302A28]">
               When you browse our website, our hosting infrastructure automatically logs standard technical metadata, including your IP address (anonymized where feasible), browser type and version, operating system, referring URL, timestamp of access, and general hardware capabilities (e.g. WebGL support for 3D visual rendering).
             </p>
           </div>
@@ -114,15 +114,15 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Section 4 */}
-      <section id="legal-bases" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">04</span>
+      <section id="legal-bases" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">04</span>
           Legal Bases for Processing
         </h2>
         <p>
           Under applicable data protection laws, we process your personal data based upon the following lawful grounds:
         </p>
-        <ul className="list-disc pl-5 mt-3 space-y-2 text-[#50545C]">
+        <ul className="list-disc pl-5 mt-3 space-y-2 text-[#302A28]">
           <li><strong>Legitimate Interests:</strong> Operating, securing, diagnosing, and enhancing our public studio platform, and responding accurately to commercial inquiries initiated by prospective clients;</li>
           <li><strong>Pre-Contractual Measures:</strong> Evaluating technical project parameters, preparing engineering estimates, and drafting proposals at your express request prior to entering into a formal agreement;</li>
           <li><strong>Statutory Compliance:</strong> Fulfilling accounting, recordkeeping, and regulatory obligations mandated by applicable Indian law;</li>
@@ -131,30 +131,30 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Section 5 */}
-      <section id="purposes" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">05</span>
+      <section id="purposes" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">05</span>
           Purposes of Processing
         </h2>
         <p>
           We utilize collected information exclusively for the following defined purposes:
         </p>
-        <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#50545C]">
+        <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#302A28]">
           <li>Reviewing and responding to project enquiries, architecture consultations, and studio inquiries;</li>
           <li>Conducting preliminary technical scoping, resource allocation, and feasibility assessments;</li>
           <li>Drafting Statements of Work (SOW) and commercial proposals;</li>
           <li>Preventing fraudulent form submissions, brute-force attacks, and abusive bot interactions;</li>
           <li>Ensuring cross-browser compatibility and hardware-accelerated 3D rendering stability.</li>
         </ul>
-        <p className="mt-3 font-medium text-[#161514]">
+        <p className="mt-3 font-medium text-[#050505]">
           We never sell, rent, monetize, or trade your personal or corporate information to third-party data brokers or marketing aggregators under any circumstances.
         </p>
       </section>
 
       {/* Section 6 */}
-      <section id="retention" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">06</span>
+      <section id="retention" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">06</span>
           Retention of Enquiry Data
         </h2>
         <p>
@@ -166,25 +166,25 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Section 7 */}
-      <section id="service-providers" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">07</span>
+      <section id="service-providers" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">07</span>
           Third-Party Service Providers
         </h2>
         <p>
           To deliver a modern, resilient, high-speed web experience, we partner with specialized cloud infrastructure and hosting providers. These service providers act as data processors under binding obligations of confidentiality and security:
         </p>
-        <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#50545C]">
+        <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#302A28]">
           <li><strong>Edge Hosting &amp; Serverless Infrastructure:</strong> High-performance content delivery networks (CDNs) for static asset distribution and serverless API execution;</li>
-          <li><strong>Email Delivery Infrastructure (Resend):</strong> Transactional email service provider utilized to route submitted project enquiries securely to studio notification mailboxes (<code className="px-1 py-0.5 rounded bg-[#FAF7F2] text-[#161514] font-mono text-xs">hello@theostrum.com</code>);</li>
+          <li><strong>Email Delivery Infrastructure (Resend):</strong> Transactional email service provider utilized to route submitted project enquiries securely to studio notification mailboxes (<code className="px-1 py-0.5 rounded bg-[#FAF7F2] text-[#050505] font-mono text-xs">hello@theostrum.com</code>);</li>
           <li><strong>Security &amp; DDoS Shielding:</strong> Edge firewalls that monitor inbound request patterns to prevent distributed denial-of-service attacks.</li>
         </ul>
       </section>
 
       {/* Section 8 */}
-      <section id="international-transfers" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">08</span>
+      <section id="international-transfers" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">08</span>
           International Data Transfers
         </h2>
         <p>
@@ -196,23 +196,23 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Section 9 */}
-      <section id="cookies" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">09</span>
+      <section id="cookies" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">09</span>
           Cookies &amp; Local Storage
         </h2>
         <p>
           Our public website does not employ third-party advertising cookies, cross-site behavioral tracking scripts, or commercial marketing pixels.
         </p>
         <p className="mt-3">
-          We utilize only minimal, essential browser storage mechanisms necessary for the core operation of the site, including ephemeral session flags (such as recording completion of the initial visual cinematic sequence during a single browsing session) and user interface accessibility preferences (such as respecting <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#161514] font-mono text-xs">prefers-reduced-motion</code>).
+          We utilize only minimal, essential browser storage mechanisms necessary for the core operation of the site, including ephemeral session flags (such as recording completion of the initial visual cinematic sequence during a single browsing session) and user interface accessibility preferences (such as respecting <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#050505] font-mono text-xs">prefers-reduced-motion</code>).
         </p>
       </section>
 
       {/* Section 10 */}
-      <section id="security" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">10</span>
+      <section id="security" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">10</span>
           Data Security Measures
         </h2>
         <p>
@@ -224,15 +224,15 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Section 11 */}
-      <section id="your-rights" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">11</span>
+      <section id="your-rights" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">11</span>
           Your Data Protection Rights
         </h2>
         <p>
           Under the DPDP Act 2023, the GDPR, and applicable privacy frameworks, you hold specific statutory rights regarding your personal data:
         </p>
-        <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#50545C]">
+        <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#302A28]">
           <li><strong>Right to Access:</strong> Request confirmation of whether we process your personal data and obtain a summary of such information;</li>
           <li><strong>Right to Correction &amp; Erasure:</strong> Request the correction of inaccurate data or the deletion of personal information no longer required for its original purpose;</li>
           <li><strong>Right to Restrict Processing:</strong> Request the restriction of processing under specified statutory circumstances;</li>
@@ -240,14 +240,14 @@ export default function PrivacyPolicyPage() {
           <li><strong>Right to Withdraw Consent:</strong> Where processing relies on consent, withdraw that consent at any time without affecting past lawful processing.</li>
         </ul>
         <p className="mt-3">
-          To exercise any of these rights, contact us at <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#D24B2C] hover:underline font-medium">{SITE_CONFIG.contactEmail}</a>. We verify identity and respond within statutory timeframes.
+          To exercise any of these rights, contact us at <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#64120F] hover:underline font-medium">{SITE_CONFIG.contactEmail}</a>. We verify identity and respond within statutory timeframes.
         </p>
       </section>
 
       {/* Section 12 */}
-      <section id="children" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">12</span>
+      <section id="children" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">12</span>
           Children&apos;s Privacy
         </h2>
         <p>
@@ -259,9 +259,9 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Section 13 */}
-      <section id="do-not-track" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">13</span>
+      <section id="do-not-track" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">13</span>
           Do Not Track &amp; Browser Privacy Controls
         </h2>
         <p>
@@ -270,9 +270,9 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Section 14 */}
-      <section id="changes" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">14</span>
+      <section id="changes" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">14</span>
           Changes to This Privacy Policy
         </h2>
         <p>
@@ -285,19 +285,19 @@ export default function PrivacyPolicyPage() {
 
       {/* Section 15 */}
       <section id="contact" className="scroll-mt-24 pt-2">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">15</span>
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">15</span>
           Contact Us &amp; Grievance Redressal
         </h2>
         <p>
           If you have questions, inquiries, requests, or statutory grievances concerning this Privacy Policy or our data handling practices, please contact our studio team:
         </p>
-        <div className="mt-4 p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7] font-mono text-xs sm:text-sm text-[#161514]">
+        <div className="mt-4 p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7] font-mono text-xs sm:text-sm text-[#050505]">
           <p>
             <span className="text-[#70757E]">Studio Contact for Privacy Inquiries:</span>{' '}
             <a
               href={`mailto:${SITE_CONFIG.contactEmail}?subject=Privacy%20Inquiry`}
-              className="text-[#D24B2C] font-semibold hover:underline"
+              className="text-[#64120F] font-semibold hover:underline"
             >
               {SITE_CONFIG.contactEmail}
             </a>
@@ -305,9 +305,7 @@ export default function PrivacyPolicyPage() {
           <p className="mt-1 text-[#70757E]">
             Studio Designation: OSTRUM Digital Engineering &amp; Technology Studio
           </p>
-          <p className="mt-2 text-[11px] text-[#8C827A]">
-            * Note: Formal statutory grievance officer designations will be updated upon final commercial incorporation.
-          </p>
+          
         </div>
       </section>
     </LegalDocumentLayout>

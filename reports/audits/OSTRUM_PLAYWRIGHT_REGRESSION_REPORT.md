@@ -109,6 +109,23 @@ Every dimension is classified into six standard operational categories:
 
 ---
 
+### 3.5 Legal Pages Visual Refinement, Footer Wordmark & End-Spacing Optimization
+- **Audit Focus:**
+  1. *Footer Wordmark Click-Hop & Clipping Fix:* Eliminated letter hop animation (`.is-hop`, `@keyframes bwf-hop`), changed hover translation to avoid container clipping, added vertical headroom in `.bwf-word-box` (`0.06em`), and set `cursor: default` on wordmark letters.
+  2. *Legal Document End Spacing & Stage Padding:* Reduced bottom padding on legal reading card wrapper from `pb-24` (96px) to `pb-8` (32px), reduced top padding on footer stage from `pt-44` (176px) to `pt-24` (96px), and calibrated legal route lift scroll distance to `0.65 * liftDistance` so the user transitions seamlessly into contact tiles without scrolling through empty blank zones.
+  3. *Legal Layout Palette & Metadata:* Removed traffic-signal green status dot (`#16A34A`), removed `Version 2.0 (Public Release)` and `Studio Legal Affairs`, streamlined category badges (`TERMS & CONDITIONS`, `PRIVACY POLICY`), adopted cohesive `#FAF7F2` canvas, `#FFFFFF` card, `#050505` headings, `#302A28` body copy, and `#64120F` brand accents.
+  4. *Legal Copy Audit:* Removed informal drafting commentary from Section 11 of Terms (liability cap note) and Section 15 of Privacy (grievance officer note).
+- **Automated Playwright Results:**
+  - Wordmark click hop: `0.000px` delta on all letters (`O`, `S`, `T`, `R`, `U`, `M`), `hasHop: false`, `cursor: default`, `isClipped: false`.
+  - Green dot (`#16A34A` / `rgb(22, 163, 74)`): 0 occurrences found across all legal templates.
+  - Version 2.0 / Studio Legal Affairs: 0 occurrences found.
+  - Internal drafting notes: 0 occurrences found.
+  - Homepage CTA-to-footer reveal: 100% intact with CTA panel and stage reveal preserved.
+  - Multi-viewport matrix: 8/8 viewports passed with 0 horizontal overflow and responsive wordmark scaling.
+  - Accessibility: `prefers-reduced-motion: reduce` verified for graceful static flow.
+
+---
+
 ## 4. Visual Regression Artifacts
 
 Repository-relative artifacts captured during the automated test run in [`reports/audits/artifacts/`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/artifacts/):

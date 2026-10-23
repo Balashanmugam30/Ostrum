@@ -181,7 +181,7 @@ const CSS = `
 }
 .bwf-word-box {
   width: 100%;
-  padding: 0 clamp(16px, 3.5cqw, 48px);
+  padding: 0.06em clamp(16px, 3.5cqw, 48px) 0;
   max-width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
@@ -213,7 +213,7 @@ const CSS = `
 /* Letters with traveling beam and pointer glow */
 .bwf-l {
   display: inline-block;
-  cursor: pointer;
+  cursor: default;
   color: transparent;
   letter-spacing: normal;
   padding-right: 0.04em;
@@ -239,22 +239,11 @@ const CSS = `
     ),
     /* Layer 3: Base vertical wordmark gradient */
     linear-gradient(180deg, var(--bwf-wt) var(--bwf-top), var(--bwf-wf) var(--bwf-bot));
-  transition: transform .5s cubic-bezier(.2, .9, .25, 1.2), filter .4s;
+  transition: filter .4s;
   transform-origin: 50% 100%;
 }
 .bwf-l:hover {
-  transform: translateY(-.048em);
-  filter: brightness(1.4) saturate(1.15);
-}
-.bwf-l.is-hop {
-  animation: bwf-hop .75s cubic-bezier(.2, .8, .2, 1);
-}
-@keyframes bwf-hop {
-  0% { transform: translateY(0) scale(1, 1); }
-  18% { transform: translateY(.02em) scale(1.06, .9); }
-  45% { transform: translateY(-.14em) scale(.97, 1.05); }
-  70% { transform: translateY(.01em) scale(1.02, .97); }
-  100% { transform: translateY(-.048em) scale(1, 1); }
+  filter: brightness(1.25) saturate(1.1);
 }
 
 /* Bottom fade sinking wordmark into black background */
@@ -464,13 +453,6 @@ export default function BeamWordmarkFooter({
     p.inside = e.type !== 'pointerleave';
   };
 
-  const hop = (e: React.MouseEvent<HTMLSpanElement>) => {
-    if (reduced) return;
-    const el = e.currentTarget;
-    el.classList.remove('is-hop');
-    void el.offsetWidth;
-    el.classList.add('is-hop');
-  };
 
   const vars = {
     '--bwf-bg': background,
@@ -538,10 +520,6 @@ export default function BeamWordmarkFooter({
               >
                 <span
                   className="bwf-l"
-                  onClick={hop}
-                  onAnimationEnd={(e) =>
-                    e.currentTarget.classList.remove('is-hop')
-                  }
                   title={word}
                 >
                   {ch === ' ' ? '\u00A0' : ch}

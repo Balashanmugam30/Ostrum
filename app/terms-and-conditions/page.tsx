@@ -47,15 +47,15 @@ export default function TermsAndConditionsPage() {
   return (
     <LegalDocumentLayout
       title="Terms & Conditions"
-      badge="LEGAL AGREEMENT · STUDIO TERMS"
+      badge="TERMS & CONDITIONS"
       effectiveDate={lastUpdated}
       activeTab="terms"
       sections={SECTIONS}
     >
       {/* Section 1 */}
-      <section id="acceptance" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">01</span>
+      <section id="acceptance" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">01</span>
           Acceptance of Terms
         </h2>
         <p>
@@ -67,13 +67,13 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 2 */}
-      <section id="identity" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">02</span>
+      <section id="identity" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">02</span>
           Studio Identity &amp; Planned Brand Domain
         </h2>
         <p>
-          OSTRUM operates as an independent digital product engineering, technology architecture, and venture design studio. The studio is in the active process of acquiring and provisioning its primary branded domain, planned as <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#161514] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>, with associated studio communications planned at <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#161514] font-mono text-xs">{SITE_CONFIG.contactEmail}</code>.
+          OSTRUM operates as an independent digital product engineering, technology architecture, and venture design studio. The studio is in the active process of acquiring and provisioning its primary branded domain, planned as <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#050505] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>, with associated studio communications planned at <code className="px-1.5 py-0.5 rounded bg-[#FAF7F2] text-[#050505] font-mono text-xs">{SITE_CONFIG.contactEmail}</code>.
         </p>
         <p className="mt-3">
           The publication of planned domain endpoints, studio designations, and future infrastructure within this website reflects current architectural planning and does not assert that third-party domain registrar transfers, external mail server MX records, or related public infrastructure have concluded final administrative provisioning.
@@ -81,9 +81,9 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 3 */}
-      <section id="showcase" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">03</span>
+      <section id="showcase" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">03</span>
           Nature of Website &amp; Non-Binding Showcase
         </h2>
         <p>
@@ -95,9 +95,9 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 4 */}
-      <section id="enquiries" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">04</span>
+      <section id="enquiries" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">04</span>
           Project Enquiries &amp; Commercial Engagements
         </h2>
         <p>
@@ -109,9 +109,9 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 5 */}
-      <section id="acceptable-use" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">05</span>
+      <section id="acceptable-use" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">05</span>
           Acceptable Use &amp; System Integrity
         </h2>
         <p>
@@ -127,9 +127,9 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 6 */}
-      <section id="intellectual-property" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">06</span>
+      <section id="intellectual-property" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">06</span>
           Intellectual Property &amp; Studio Assets
         </h2>
         <p>
@@ -141,9 +141,9 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 7 */}
-      <section id="case-studies" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">07</span>
+      <section id="case-studies" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">07</span>
           Client Case Studies &amp; Attribution
         </h2>
         <p>
@@ -155,13 +155,13 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 8 */}
-      <section id="external-links" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">08</span>
+      <section id="external-links" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">08</span>
           External Links &amp; Open-Source Repositories
         </h2>
         <p>
-          This website provides hyperlinks to external destinations, including client live production deployments (such as tmraicarcare.com and saraswati-driving-school.vercel.app) and open-source GitHub repositories (including the MNESA repository at <a href={SITE_CONFIG.mnesaGithubUrl} target="_blank" rel="noopener noreferrer" className="text-[#D24B2C] hover:underline font-medium">{SITE_CONFIG.mnesaGithubUrl}</a>).
+          This website provides hyperlinks to external destinations, including client live production deployments (such as tmraicarcare.com and saraswati-driving-school.vercel.app) and open-source GitHub repositories (including the MNESA repository at <a href={SITE_CONFIG.mnesaGithubUrl} target="_blank" rel="noopener noreferrer" className="text-[#64120F] hover:underline font-medium">{SITE_CONFIG.mnesaGithubUrl}</a>).
         </p>
         <p className="mt-3">
           These links are supplied solely for informational reference and technical verification. Ostrum does not exercise continuous control over third-party domains and assumes no responsibility for third-party content, terms of service, uptime, or privacy practices.
@@ -169,9 +169,9 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 9 */}
-      <section id="availability" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">09</span>
+      <section id="availability" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">09</span>
           Availability &amp; Maintenance
         </h2>
         <p>
@@ -183,12 +183,12 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 10 */}
-      <section id="disclaimers" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">10</span>
+      <section id="disclaimers" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">10</span>
           Disclaimers of Warranties
         </h2>
-        <p className="uppercase text-xs font-semibold tracking-wider text-[#161514]">
+        <p className="uppercase text-xs font-semibold tracking-wider text-[#050505]">
           Website Provided &ldquo;As Is&rdquo; and &ldquo;As Available&rdquo;
         </p>
         <p className="mt-2">
@@ -200,9 +200,9 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 11 */}
-      <section id="liability" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">11</span>
+      <section id="liability" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">11</span>
           Limitation of Liability
         </h2>
         <p>
@@ -212,14 +212,14 @@ export default function TermsAndConditionsPage() {
           This includes, without limitation, damages for loss of profits, commercial interruption, lost business data, goodwill impairment, or hardware malfunction arising out of or in connection with your access to, use of, or inability to use this website, whether grounded in contract, tort (including negligence), strict liability, or any other legal doctrine.
         </p>
         <p className="mt-3">
-          To the maximum extent permissible by applicable law, our aggregate liability for direct claims arising solely out of your use of this public informational showcase website shall be limited to the minimum statutory amount recognized by the governing jurisdiction. (Note: Specific monetary liability caps remain subject to formal legal review upon commercial incorporation).
+          To the maximum extent permissible by applicable law, our aggregate liability for direct claims arising solely out of your use of this public informational showcase website shall not exceed the amount actually paid by you, if any, for accessing this website, or the minimum amount permitted under applicable law.
         </p>
       </section>
 
       {/* Section 12 */}
-      <section id="indemnification" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">12</span>
+      <section id="indemnification" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">12</span>
           Indemnification
         </h2>
         <p>
@@ -228,9 +228,9 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 13 */}
-      <section id="modifications" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">13</span>
+      <section id="modifications" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">13</span>
           Modifications to Terms
         </h2>
         <p>
@@ -242,9 +242,9 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 14 */}
-      <section id="severability" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">14</span>
+      <section id="severability" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">14</span>
           Severability &amp; Entire Agreement
         </h2>
         <p>
@@ -256,9 +256,9 @@ export default function TermsAndConditionsPage() {
       </section>
 
       {/* Section 15 */}
-      <section id="governing-law" className="scroll-mt-24 pb-10 border-b border-[#EFEBE5]">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">15</span>
+      <section id="governing-law" className="scroll-mt-24 pb-10 border-b border-[#E5DFD7]">
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">15</span>
           Governing Law &amp; Dispute Resolution
         </h2>
         <p>
@@ -271,19 +271,19 @@ export default function TermsAndConditionsPage() {
 
       {/* Section 16 */}
       <section id="contact" className="scroll-mt-24 pt-2">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#161514] mb-3 flex items-baseline gap-3">
-          <span className="font-mono text-sm text-[#D24B2C] font-semibold">16</span>
+        <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
+          <span className="font-mono text-sm text-[#64120F] font-semibold">16</span>
           Contact &amp; Legal Notices
         </h2>
         <p>
           Formal legal notices, queries regarding these Terms, or copyright inquiries should be directed to the studio leadership via our official enquiry channel:
         </p>
-        <div className="mt-4 p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7] font-mono text-xs sm:text-sm text-[#161514]">
+        <div className="mt-4 p-5 rounded-2xl bg-[#FAF7F2] border border-[#E5DFD7] font-mono text-xs sm:text-sm text-[#050505]">
           <p>
             <span className="text-[#70757E]">Direct Inquiries:</span>{' '}
             <a
               href={`mailto:${SITE_CONFIG.contactEmail}`}
-              className="text-[#D24B2C] font-semibold hover:underline"
+              className="text-[#64120F] font-semibold hover:underline"
             >
               {SITE_CONFIG.contactEmail}
             </a>

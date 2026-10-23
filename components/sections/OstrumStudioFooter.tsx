@@ -66,7 +66,7 @@ export function OstrumStudioFooter() {
       animate={true}
       className="w-full relative z-10 flex flex-col justify-between"
     >
-      <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 pt-24 sm:pt-36 md:pt-44">
+      <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 pt-16 sm:pt-20 md:pt-24">
         {/* PHASE 3A: TOP CONTACT TILES (Inspired by reference proportions, Ostrum brand identity) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-7">
           {/* Tile 1: White Surface / Email Inquiry */}
