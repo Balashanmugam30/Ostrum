@@ -888,7 +888,7 @@ export const OSTRUM_WORKS: WorksWheelItem[] = [
   {
     title: "TMR AI Car Care",
     description:
-      "Autonomous workflow and client intelligence platform built for precision luxury automotive detailing studios.",
+      "A premium digital experience for an automotive care studio, helping customers explore detailing and paint-protection services, understand the process and make enquiries or bookings.",
     image: "/images/works/tmr-ai-car-care.jpg",
     href: "https://tmraicarcare.com/",
   },
@@ -902,7 +902,7 @@ export const OSTRUM_WORKS: WorksWheelItem[] = [
   {
     title: "MNESA",
     description:
-      "Intelligent opportunity capture and commitment engine, transforming fleeting observations and notes into structured action.",
+      "Intelligent opportunity capture platform exploring how people organize commitments and turn observations into structured follow-through workflows.",
     image: "/images/works/mnesa.jpg",
     href: "https://github.com/Balashanmugam30/mnesa",
   },

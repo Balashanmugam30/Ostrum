@@ -12,29 +12,18 @@ import { SITE_CONFIG, hasValidLinkedIn, getVerifiedLinkedInUrl } from '@/lib/sit
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.baseUrl),
   title: {
-    default: 'OSTRUM | Digital Product Engineering & Custom Software Studio',
+    default: 'OSTRUM | Custom Software, AI Systems & Digital Product Engineering',
     template: '%s | OSTRUM',
   },
   description:
-    'Independent digital product engineering and custom software studio in India. We design and build custom software, AI systems, modern web platforms, and original ventures.',
-  keywords: [
-    'Ostrum',
-    'Digital Transformation',
-    'Technology Studio',
-    'Software Architecture',
-    'AI Systems',
-    'Integrations',
-    'Next.js',
-    'WebGL',
-    'Product Engineering',
-  ],
+    'OSTRUM is an India-focused digital product engineering studio building custom business software, AI systems, web and mobile applications, and original digital products for ambitious businesses and founders.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'OSTRUM | Digital Product Engineering & Custom Software Studio',
+    title: 'OSTRUM | Custom Software & AI Product Engineering',
     description:
-      'Independent digital product engineering, custom software, and AI systems studio.',
+      'Custom software, AI automation, digital products and connected systems engineered around real business needs.',
     url: SITE_CONFIG.baseUrl,
     siteName: 'OSTRUM',
     locale: 'en_US',
@@ -50,9 +39,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OSTRUM | Digital Product Engineering & Custom Software Studio',
+    title: 'OSTRUM | Custom Software & AI Product Engineering',
     description:
-      'Independent digital engineering, technology architecture, and product design studio.',
+      'Custom software, AI automation, digital products and connected systems engineered around real business needs.',
     images: ['/images/ostrum-og.png'],
   },
   robots: {
@@ -91,7 +80,7 @@ const jsonLd = {
       logo: `${SITE_CONFIG.baseUrl}/images/ostrum-logo.png`,
       email: SITE_CONFIG.contactEmail,
       description:
-        'Independent digital product engineering, custom software development, and venture studio.',
+        'Independent digital product engineering, custom software development, AI systems, and venture studio.',
       sameAs: verifiedSameAs,
     },
     {

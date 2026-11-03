@@ -204,8 +204,14 @@ export function OstrumStudioFooter() {
                   {SITE_CONFIG.contactEmail}
                 </a>
               </li>
-              <li className="text-xs sm:text-sm text-[#B9B0AF]">
-                Direct Partner Line
+              <li>
+                <Link
+                  href="/#contact"
+                  onClick={(e) => handleNavClick(e, '#contact')}
+                  className="transition-colors hover:text-white hover:underline underline-offset-4"
+                >
+                  Project Enquiries
+                </Link>
               </li>
               <li className="pt-2">
                 {hasValidLinkedIn() ? (
@@ -283,7 +289,7 @@ export function OstrumStudioFooter() {
                 OSTRUM
               </span>
               <p className="font-sans text-xs text-[#B9B0AF] mt-2 leading-relaxed">
-                Custom software, intelligent systems, and high-impact product engineering.
+                Custom software, AI systems and original digital products, engineered by OSTRUM.
               </p>
             </div>
 

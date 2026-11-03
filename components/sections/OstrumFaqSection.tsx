@@ -206,14 +206,8 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
                     }`}
                   >
                     <div className="overflow-hidden">
-                      {/* Accessible Full Answer for Screen Readers */}
-                      <p className="sr-only">{item.answer}</p>
-
-                      {/* Visual Letter-by-Letter Animated Text */}
-                      <p
-                        aria-hidden="true"
-                        className="font-sans text-sm sm:text-base md:text-[16px] leading-relaxed text-[#242424] pb-7 pt-1 max-w-2xl font-normal"
-                      >
+                      {/* Single Accessible Answer: clean DOM extraction without duplicates */}
+                      <p className="font-sans text-sm sm:text-base md:text-[16px] leading-relaxed text-[#242424] pb-7 pt-1 max-w-2xl font-normal">
                         {isOpen ? item.answer.slice(0, typedLength) : ''}
                         {isOpen && typedLength < item.answer.length && (
                           <span

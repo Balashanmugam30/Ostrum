@@ -1,6 +1,6 @@
 # OSTRUM — Playwright Multi-Device Regression & Visual Audit Report
 
-**Audit Date:** 2026-10-23T21:30:00+05:30  
+**Audit Date:** 2026-11-03T12:25:00+05:30  
 **Repository:** `Balashanmugam30/Ostrum`  
 **Branch:** `main`  
 **Test Framework:** Playwright v1.64.0 (Chromium Headless, High-DPI 2.0x Scale Factor)  
@@ -25,23 +25,26 @@ Every dimension is classified into six standard operational categories:
    - Results: Homepage (0 em, 0 en), Terms & Conditions (0 em, 0 en), Privacy Policy (0 em, 0 en). Zero oversized typographical dashes remain in public copy.
 2. **Normal Text Selection Restoration [FIXED IN CODE / VERIFIED LOCALLY]:**
    - Blanket `select-none` eliminated across all informational sections. Users can select and copy text freely across Capabilities cards, FAQ accordions, Contact section, Liquid Sand CTA, Engine statement, Footer studio note, and legal documents.
-3. **Engine Micro-Labels Semantic Navigation [FIXED IN CODE / VERIFIED LOCALLY]:**
+3. **Clean FAQ DOM Text Extraction (Zero Duplication) [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - Single accessible `<p>` rendered per answer without hidden duplicate DOM tags, resolving screen-reader / text-extraction duplication.
+4. **Engine Micro-Labels Semantic Navigation [FIXED IN CODE / VERIFIED LOCALLY]:**
    - "SYSTEMS ARCHITECTURE" is a functional, accessible anchor link (`#capabilities`) with ARIA label and focus outline.
    - "ORIGINAL VENTURES" is a functional, accessible anchor link (`#selected-work`) with ARIA label and focus outline.
-4. **Footer Wordmark Click-Hop & Beam Sheen [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Click trigger applies `.is-hop` class with 40.81px elevation (resting Y: 642.97px → apex Y: 602.16px).
+5. **Footer Wordmark Click-Hop & Beam Sheen [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - Click trigger applies `.is-hop` class with vertical elevation (initial Y: 641.3px → peak Y: 614.2px, delta: 27.1px).
    - Wordmark container uses `overflow-visible`, completely preventing letter clipping during animation.
-5. **Bespoke Selected Work Artwork Loaded [FIXED IN CODE / VERIFIED LOCALLY]:**
+6. **Bespoke Selected Work Artwork Loaded [FIXED IN CODE / VERIFIED LOCALLY]:**
    - TMR AI Car Care (`tmr-ai-car-care.jpg`, 686 KB): HTTP 200, clean aspect ratio.
    - Saraswati Driving School (`saraswati-driving-school.jpg`, 758 KB): HTTP 200, clean aspect ratio.
    - MNESA (`mnesa.jpg`, 638 KB): HTTP 200, clean aspect ratio.
-6. **Contact Form Validation & State Preservation [FIXED IN CODE / VERIFIED LOCALLY]:**
+7. **Contact Form Validation & State Preservation [FIXED IN CODE / VERIFIED LOCALLY]:**
    - Empty field submission triggers accessible inline error alerts.
    - Invalid email triggers RFC format alert.
    - Correct input preserves visitor entries without field resets upon failed submission.
-7. **8-Device Viewport Audit Matrix [VERIFIED LOCALLY]:**
+   - 9 distinct project-type categories fully selectable.
+8. **8-Device Viewport Audit Matrix [VERIFIED LOCALLY]:**
    - Zero horizontal overflow (`scrollWidth === innerWidth`) across all 8 standard screen widths (1920px down to 360px).
-8. **Browser Console Errors [VERIFIED LOCALLY]:**
+9. **Browser Console Errors [VERIFIED LOCALLY]:**
    - Exact count: 0 errors during the entire master test lifecycle.
 
 ---
@@ -50,14 +53,14 @@ Every dimension is classified into six standard operational categories:
 
 | # | Profile Name | Viewport (W × H) | Category | Horizontal Overflow | Curtain Width | Text Selection | Engine Nav | Hop Status | Status |
 | :-: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| 1 | **Large Desktop** | 1920 × 1080 | Desktop Workstation | **Pass (0 px)** | 1920 px | **Pass** | **Pass** | **Pass (40.8px)** | **PASS** |
-| 2 | **Standard Desktop** | 1440 × 900 | Laptop / Desktop | **Pass (0 px)** | 1440 px | **Pass** | **Pass** | **Pass (40.8px)** | **PASS** |
-| 3 | **Compact Laptop** | 1280 × 800 | 13" Laptop | **Pass (0 px)** | 1280 px | **Pass** | **Pass** | **Pass (40.8px)** | **PASS** |
-| 4 | **Landscape Tablet** | 1024 × 768 | iPad / Tablet H | **Pass (0 px)** | 1024 px | **Pass** | **Pass** | **Pass (40.8px)** | **PASS** |
-| 5 | **Portrait Tablet** | 768 × 1024 | iPad / Tablet V | **Pass (0 px)** | 768 px | **Pass** | **Pass** | **Pass (40.8px)** | **PASS** |
-| 6 | **Large Mobile** | 430 × 932 | iPhone 14/15 Pro Max | **Pass (0 px)** | 430 px | **Pass** | **Pass** | **Pass (40.8px)** | **PASS** |
-| 7 | **Common Mobile** | 390 × 844 | iPhone 12/13/14 | **Pass (0 px)** | 390 px | **Pass** | **Pass** | **Pass (40.8px)** | **PASS** |
-| 8 | **Narrow Mobile** | 360 × 800 | Android Small Form | **Pass (0 px)** | 360 px | **Pass** | **Pass** | **Pass (40.8px)** | **PASS** |
+| 1 | **Large Desktop** | 1920 × 1080 | Desktop Workstation | **Pass (0 px)** | 1920 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
+| 2 | **Standard Desktop** | 1440 × 900 | Laptop / Desktop | **Pass (0 px)** | 1440 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
+| 3 | **Compact Laptop** | 1280 × 800 | 13" Laptop | **Pass (0 px)** | 1280 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
+| 4 | **Landscape Tablet** | 1024 × 768 | iPad / Tablet H | **Pass (0 px)** | 1024 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
+| 5 | **Portrait Tablet** | 768 × 1024 | iPad / Tablet V | **Pass (0 px)** | 768 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
+| 6 | **Large Mobile** | 430 × 932 | iPhone 14/15 Pro Max | **Pass (0 px)** | 430 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
+| 7 | **Common Mobile** | 390 × 844 | iPhone 12/13/14 | **Pass (0 px)** | 390 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
+| 8 | **Narrow Mobile** | 360 × 800 | Android Small Form | **Pass (0 px)** | 360 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
 
 **Summary Result:** 8 / 8 Viewports Passed with 0 Horizontal Overflow and 0 Regressions.
 
@@ -74,32 +77,32 @@ Every dimension is classified into six standard operational categories:
 - **Replacement Strategy:** Natural commas, full stops, colons, or parentheses substituted based on grammatical context.
 
 ### 3.2 Text Selection Verification Samples
-- **Capabilities Card:** `window.getSelection().toString()` returned `"High-conversion websites, modern web applications,"`.
-- **FAQ Question:** returned `"What does OSTRUM build?"`.
-- **Contact Heading:** returned `"REACH OUT\nTO US"`.
-- **Liquid Sand CTA:** returned `"HAVE AN IDEA?\nLET’S BUILD IT."`.
-- **Engine Statement:** returned `"Custom systems engineered around how your business operates..."`.
-- **Footer Studio Note:** returned `"Custom software, intelligent systems, and high-impact..."`.
+- **Capabilities Card:** `window.getSelection().toString()` returned `"Website design and development, UI/..."`.
+- **FAQ Question:** returned `"What does OSTRUM build?..."`.
+- **Contact Heading:** returned `"REACH OUT\nTO US..."`.
+- **Liquid Sand CTA:** returned `"HAVE A BUSINESS PROBLEM OR PRODUCT ..."`.
+- **Engine Statement:** returned `"\"Custom systems engineered around h..."`.
+- **Footer Studio Note:** returned `"Custom software, AI systems and ori..."`.
 - **Terms Section 01:** returned `"These Terms and Conditions (“Terms”) establish the..."`.
 
 ### 3.3 Engine Navigation Links
 - `#capabilities` link verified on element `<a href="#capabilities" aria-label="Navigate to Systems Architecture capabilities">`.
 - `#selected-work` link verified on element `<a href="#selected-work" aria-label="Navigate to Original Ventures selected work">`.
-- Both elements feature visible keyboard focus rings (`focus-visible:outline-white`).
+- Both elements feature visible keyboard focus rings (`focus-visible:ring-1 focus-visible:ring-[#ff5c4a]`).
 
 ### 3.4 Footer Wordmark Hop Animation & Boundary Geometry
 - Element: `[data-testid="ostrum-wordmark-title"]`.
 - Click event successfully dispatched.
-- Animation elevates wordmark along Y axis by `40.81px`.
-- CSS bounding box: `overflow: visible` on wrapper ensures apex elevation remains fully visible without bottom or top clipping.
+- Animation elevates wordmark along Y axis by `27.1px` without letter clipping.
+- CSS bounding box: `overflow: visible` on wrapper ensures apex elevation remains fully visible.
 
 ### 3.5 Contact Form Validation & State Preservation
-- **Empty Form Test:** Form submission without input triggers native required alerts / validation states.
-- **Email Regex Test:** Entering `notanemail` in email field prevents submission and focuses user on correcting address.
-- **State Preservation Test:** Entering Name `Rahul Sharma` and submitting with empty email preserves name in DOM.
+- **Empty Form Test:** Form submission without input triggers accessible error alert (`Please enter your name.`).
+- **Email Regex Test:** Entering `invalid-email-format` triggers alert (`Please enter a valid email address.`).
+- **State Preservation Test:** Entering Name `Rahul Sharma` and submitting with invalid email preserves name in DOM.
 
 ### 3.6 Legal Pages Final Curtain Reveal & End-Spacing
-- Preserved exact 32.00px breathing gap between the end of Section 16 (Terms) / Section 15 (Privacy) and `#theatre-stage-wrapper`.
+- Preserved exact 32.00px breathing gap between the end of legal content and `#theatre-stage-wrapper`.
 - Curtain height `100svh` with `min-height: 100svh` guarantees zero footer peeking before scroll reveal starts.
 - 1:1 scrub reveals burgundy footer smoothly.
 
@@ -129,9 +132,10 @@ All regression acceptance criteria have been met:
 - [x] Zero em/en dashes across all user-facing pages and metadata.
 - [x] Normal text selection restored across all informational sections.
 - [x] Engine micro-labels provide keyboard-accessible navigation to `#capabilities` and `#selected-work`.
-- [x] Footer wordmark hop and beam sheen elevate 40.8px without letter clipping.
+- [x] Footer wordmark hop and beam sheen elevate without letter clipping.
 - [x] Bespoke project artwork generated, integrated, and verified for TMR, Saraswati, and MNESA.
-- [x] Contact form validates correctly while preserving user inputs.
+- [x] Contact form validates correctly while preserving user inputs across 9 project types.
+- [x] Single accessible FAQ text rendering without duplicate text extraction.
 - [x] Zero horizontal overflow on any audited resolution (1920px down to 360px).
 - [x] Zero console errors during master verification lifecycle.
 - [x] Reduced-motion verified for graceful sequential document flow.

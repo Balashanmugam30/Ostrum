@@ -266,14 +266,40 @@ export function OstrumTestimonialsSection({
                   )}
                 </div>
 
-                {/* Quotation Area */}
-                <div className="py-2 text-center px-1 sm:px-2">
-                  <p
-                    data-testid="testimonial-quote-text"
-                    className="font-sans text-[16px] sm:text-[18px] md:text-[19.5px] lg:text-[20px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
-                  >
-                    &ldquo;{testimonial.quote}&rdquo;
-                  </p>
+                {/* Quotation / Highlight Area */}
+                <div className="py-2 text-center px-1 sm:px-2 flex flex-col items-center justify-center">
+                  {testimonial.contentType === 'project-note' ? (
+                    <>
+                      <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#ff5c4a] font-semibold mb-2">
+                        VENTURE NOTE
+                      </span>
+                      <p
+                        data-testid="testimonial-quote-text"
+                        className="font-sans text-[15px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
+                      >
+                        {testimonial.quote}
+                      </p>
+                    </>
+                  ) : testimonial.contentType === 'project-highlight' || !testimonial.approved ? (
+                    <>
+                      <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-black/55 font-semibold mb-2">
+                        PROJECT HIGHLIGHT
+                      </span>
+                      <p
+                        data-testid="testimonial-quote-text"
+                        className="font-sans text-[15px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
+                      >
+                        {testimonial.quote}
+                      </p>
+                    </>
+                  ) : (
+                    <p
+                      data-testid="testimonial-quote-text"
+                      className="font-sans text-[16px] sm:text-[18px] md:text-[19.5px] lg:text-[20px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
+                    >
+                      &ldquo;{testimonial.quote}&rdquo;
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
@@ -373,14 +399,40 @@ export function OstrumTestimonialsSection({
                 )}
               </div>
 
-              {/* Element 2 (Main Area): Testimonial Quotation */}
-              <div className="my-auto flex items-center justify-center py-1 sm:py-2 text-center px-1 sm:px-2">
-                <p
-                  data-testid="testimonial-quote-text"
-                  className="font-sans text-[16px] sm:text-[18px] md:text-[19.5px] lg:text-[20px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
-                >
-                  &ldquo;{testimonial.quote}&rdquo;
-                </p>
+              {/* Element 2 (Main Area): Project Highlight or Testimonial */}
+              <div className="my-auto flex flex-col items-center justify-center py-1 sm:py-2 text-center px-1 sm:px-2">
+                {testimonial.contentType === 'project-note' ? (
+                  <>
+                    <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#ff5c4a] font-semibold mb-2">
+                      VENTURE NOTE
+                    </span>
+                    <p
+                      data-testid="testimonial-quote-text"
+                      className="font-sans text-[15px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
+                    >
+                      {testimonial.quote}
+                    </p>
+                  </>
+                ) : testimonial.contentType === 'project-highlight' || !testimonial.approved ? (
+                  <>
+                    <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-black/55 font-semibold mb-2">
+                      PROJECT HIGHLIGHT
+                    </span>
+                    <p
+                      data-testid="testimonial-quote-text"
+                      className="font-sans text-[15px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
+                    >
+                      {testimonial.quote}
+                    </p>
+                  </>
+                ) : (
+                  <p
+                    data-testid="testimonial-quote-text"
+                    className="font-sans text-[16px] sm:text-[18px] md:text-[19.5px] lg:text-[20px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
+                  >
+                    &ldquo;{testimonial.quote}&rdquo;
+                  </p>
+                )}
               </div>
 
               {/* Structural balance spacer: ensures quote remains beautifully centered vertically */}

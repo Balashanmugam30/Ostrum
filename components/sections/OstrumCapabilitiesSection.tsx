@@ -25,8 +25,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '01 / 06',
     title: 'DIGITAL EXPERIENCES',
     description:
-      'High-conversion websites, modern web applications, and customer portals engineered for clarity, speed, and measurable growth.',
-    tags: ['Websites', 'Web Applications', 'E-commerce'],
+      'Website design and development, UI/UX design, e-commerce experiences and customer portals built for usability, accessibility and search visibility. We also support digital growth through SEO, content strategy and performance marketing.',
+    tags: ['Website & UI/UX Design', 'E-commerce Development', 'SEO & Digital Growth'],
     gradient:
       'linear-gradient(112deg, #D7B5FA 0%, #F2D4FF 48%, #CDE6FC 100%)',
     variant: 1,
@@ -36,8 +36,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '02 / 06',
     title: 'AI SYSTEMS & AGENTS',
     description:
-      'Autonomous AI agents, customer communication assistants, and practical workflow automations solving real operational bottlenecks.',
-    tags: ['AI Agents', 'Workflow Automation', 'Intelligent Intake'],
+      'AI agents, intelligent assistants and workflow automation that connect business tools, handle repeatable tasks and support faster decisions, with human oversight defined for each use case.',
+    tags: ['AI Agent Development', 'AI Workflow Automation', 'Business Integrations'],
     gradient:
       'linear-gradient(112deg, #86FFF8 0%, #D2F6F0 52%, #F4C5CF 100%)',
     variant: 2,
@@ -47,8 +47,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '03 / 06',
     title: 'BUSINESS PLATFORMS',
     description:
-      'Connected internal platforms, CRM and ERP integrations, and operations dashboards that unite data and streamline operations.',
-    tags: ['Internal Platforms', 'CRM & ERP', 'Operations Dashboards'],
+      'Custom business platforms, CRM and ERP integrations, customer portals and operations dashboards that connect business data and make everyday workflows easier to manage.',
+    tags: ['Custom Business Software', 'CRM & ERP Integrations', 'Operations Dashboards'],
     gradient:
       'linear-gradient(112deg, #FAC274 0%, #F2A460 100%)',
     variant: 3,
@@ -58,8 +58,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '04 / 06',
     title: 'SOFTWARE & PRODUCT ENGINEERING',
     description:
-      'Full-cycle engineering from discovery to production SaaS platforms, MVPs, and custom APIs built for dependable performance.',
-    tags: ['SaaS Engineering', 'MVPs', 'API Architecture'],
+      'End-to-end custom software development, from product discovery and architecture to SaaS platforms, startup MVPs, web and mobile applications, and production APIs.',
+    tags: ['Custom Software Development', 'SaaS & MVP Engineering', 'Web, Mobile & APIs'],
     gradient:
       'linear-gradient(112deg, #BBCBFF 0%, #DDE4FF 53%, #EAD9FF 100%)',
     variant: 4,
@@ -69,8 +69,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '05 / 06',
     title: 'CONNECTED TECHNOLOGY',
     description:
-      'Physical sensor integrations, IoT embedded software, and connected device interfaces bridging hardware and digital platforms.',
-    tags: ['IoT Systems', 'Embedded Software', 'Device Integration'],
+      'IoT development, embedded software, sensor integrations and hardware-to-software interfaces for connected devices and practical real-world systems.',
+    tags: ['IoT Development', 'Embedded Software', 'Hardware Integration'],
     gradient:
       'linear-gradient(112deg, #BDECCF 0%, #CFF7EF 55%, #C4E7F8 100%)',
     variant: 5,
@@ -80,8 +80,8 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '06 / 06',
     title: 'CUSTOM ENGINEERING',
     description:
-      'Bespoke software for non-standard challenges, legacy systems modernization, and technical architectures tailored to your business.',
-    tags: ['Systems Architecture', 'Modernization', 'Technical R&D'],
+      'Bespoke software, legacy application modernization and complex system integrations for workflows that off-the-shelf products cannot support effectively.',
+    tags: ['Bespoke Software', 'Legacy Modernization', 'Systems Integration'],
     gradient:
       'linear-gradient(112deg, #E9C9F6 0%, #F5CDD8 52%, #FFD9B7 100%)',
     variant: 6,

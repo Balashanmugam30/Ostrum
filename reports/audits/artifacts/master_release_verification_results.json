@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-23T15:59:03.604Z",
+  "timestamp": "2026-11-03T06:56:09.861Z",
   "dashScan": {
     "homepage": {
       "emCount": 0,
@@ -20,7 +20,7 @@
   "textSelection": {
     "Capabilities Card": {
       "selectable": true,
-      "sample": "High-conversion websites, modern web applications,"
+      "sample": "Website design and development, UI/UX design, e-co"
     },
     "FAQ Question": {
       "selectable": true,
@@ -32,7 +32,7 @@
     },
     "Liquid Sand CTA": {
       "selectable": true,
-      "sample": "HAVE AN IDEA?\nLET’S BUILD IT."
+      "sample": "HAVE A BUSINESS PROBLEM OR PRODUCT IDEA?\nLET’S BUI"
     },
     "Engine Statement": {
       "selectable": true,
@@ -40,7 +40,7 @@
     },
     "Footer Note": {
       "selectable": true,
-      "sample": "Custom software, intelligent systems, and high-imp"
+      "sample": "Custom software, AI systems and original digital p"
     },
     "Terms Section 01": {
       "selectable": true,
@@ -62,9 +62,9 @@
   "wordmarkContrast": {},
   "footerWordmarkJump": {
     "verified": true,
-    "initialY": 642.9702758789062,
-    "hopY": 602.1632080078125,
-    "delta": 40.80706787109375
+    "initialY": 641.2916259765625,
+    "hopY": 614.1600341796875,
+    "delta": 27.131591796875
   },
   "curtainReveals": {
     "termsGap": 32,
@@ -95,10 +95,10 @@
   },
   "seoAndStructuredData": {
     "homepage": {
-      "title": "OSTRUM | Digital Product Engineering & Custom Software Studio",
-      "desc": "Independent digital product engineering and custom software studio in India. We design and build custom software, AI systems, modern web platforms, and original ventures.",
+      "title": "OSTRUM | Custom Software, AI Systems & Digital Product Engineering",
+      "desc": "OSTRUM is an India-focused digital product engineering studio building custom business software, AI systems, web and mobile applications, and original digital products for ambitious businesses and founders.",
       "canonical": "https://theostrum.com",
-      "ogTitle": "OSTRUM | Digital Product Engineering & Custom Software Studio",
+      "ogTitle": "OSTRUM | Custom Software & AI Product Engineering",
       "ogImage": "https://theostrum.com/images/ostrum-og.png"
     },
     "terms": {

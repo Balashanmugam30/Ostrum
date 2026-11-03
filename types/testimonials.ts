@@ -1,5 +1,5 @@
 export type TestimonialLogoType = 'image' | 'mnesa-mark' | 'wordmark';
-export type TestimonialContentType = 'testimonial' | 'project-note';
+export type TestimonialContentType = 'testimonial' | 'project-note' | 'project-highlight';
 
 export interface Testimonial {
   id: string;

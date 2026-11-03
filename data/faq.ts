@@ -9,60 +9,60 @@ export const OSTRUM_FAQ_DATA: FaqItem[] = [
     id: 'what-does-ostrum-do',
     question: 'What does OSTRUM build?',
     answer:
-      'OSTRUM is a digital product engineering and venture studio. We scope, design, and build custom business software, intelligent AI systems, high-conversion web platforms, mobile applications, and connected technology for growing companies and ambitious founders.',
+      'OSTRUM is a digital product engineering and venture studio. We design and develop custom business software, web and mobile applications, AI systems, business platforms, connected technology and digital experiences. We also build original products through OSTRUM Ventures.',
   },
   {
     id: 'services-supported',
     question: 'What specific services do you deliver?',
     answer:
-      'We deliver full-cycle engineering across six areas: Digital Experiences (websites, web applications, portals), AI Systems & Agents (autonomous workflow automations, intelligent assistants), Business Platforms (internal operations software, CRM and ERP integrations), Software & Product Engineering (SaaS platforms, MVPs, APIs), Connected Technology (IoT and embedded systems), and Custom Engineering (bespoke architectures and modernization).',
+      'Our work includes custom software development, website and web application development, mobile app development, UI/UX design, e-commerce platforms, AI agents and workflow automation, CRM and ERP integrations, APIs, IoT and embedded systems, SEO, content strategy and digital marketing. We scope each engagement around the business problem and the services it genuinely requires.',
   },
   {
     id: 'working-with-businesses',
     question: 'Do you work with small businesses or enterprises?',
     answer:
-      'We work with both. We help small and medium businesses replace manual spreadsheets and disconnected tools with focused, affordable custom systems. For growing companies and enterprises, we architect scalable platforms, modernize legacy infrastructure, and automate complex operational workflows.',
+      'Yes. We work with small and medium businesses that need practical software to replace manual processes, as well as established companies that need integrations, modernization or more complex platforms. Scope, architecture and engagement size are tailored to the project.',
   },
   {
     id: 'custom-vs-off-the-shelf',
     question: 'Why choose custom software over off-the-shelf SaaS?',
     answer:
-      'Generic software forces your business to adapt its processes to rigid subscription templates, often resulting in paying for features you do not need while missing the exact workflows you do. Custom software fits your exact operations, scales without per-seat licensing penalties, and remains an asset you own.',
+      'Custom software can be a better fit when your workflows, integrations, data requirements or product plans do not fit existing tools. It offers more control over features and roadmap, but it also requires investment in development, hosting, maintenance and support. We help compare custom development, existing SaaS and hybrid approaches before recommending a solution.',
   },
   {
     id: 'technology-selection',
     question: 'How do you select technologies for a project?',
     answer:
-      'We are technology-agnostic and problem-led. We select frameworks, databases, and architectures based on your performance requirements, security considerations, maintainability, internal team skills, and long-term ownership goals rather than following temporary developer trends.',
+      'We are technology-agnostic and problem-led. We choose languages, frameworks, databases and infrastructure based on the project\'s requirements, integration needs, performance, security, maintainability and long-term ownership. The goal is the right technology for the system, not a particular trend.',
   },
   {
     id: 'ai-systems-integration',
     question: 'How does OSTRUM integrate practical AI and automation?',
     answer:
-      'We build practical AI systems that resolve clear business bottlenecks, such as automated customer enquiry intake, document processing, data synthesis, and task routing. We focus on verifiable utility, privacy controls, and human oversight rather than surface-level marketing gimmicks.',
+      'We identify repeatable tasks and operational bottlenecks where AI or automation can provide practical value. Solutions may include enquiry handling, document workflows, information extraction, data synthesis and task routing. We define data access, privacy safeguards, human review and failure handling around each use case.',
   },
   {
     id: 'existing-systems-modernization',
     question: 'Can OSTRUM modernize or integrate with our existing systems?',
     answer:
-      'Yes. We frequently audit active applications, build custom APIs, connect legacy databases to modern interfaces, and integrate core platforms like CRMs, ERPs, and payment gateways without disrupting day-to-day business operations.',
+      'Yes. We can assess existing applications, databases and workflows, then plan APIs, CRM and ERP integrations, payment connections or phased modernization. We review dependencies and operational risks before implementation to reduce disruption.',
   },
   {
     id: 'project-pricing-and-scoping',
     question: 'How are project scoping and pricing structured?',
     answer:
-      'Engagements begin with a transparent technical discovery where we define required outcomes, system architecture, and milestone deliverables. Pricing is structured around defined scope milestones, providing predictable investment without surprise hidden charges.',
+      'We begin by understanding your goals, users, existing systems and constraints. We then define scope, deliverables, milestones, assumptions and pricing in a written proposal. Any material change to scope, third-party service or delivery plan is discussed and approved before additional work begins.',
   },
   {
     id: 'ip-and-code-ownership',
     question: 'Who owns the intellectual property and source code?',
     answer:
-      'You do. Full intellectual property rights, source code, design assets, and deployment configurations transfer directly to your organization upon milestone completion and settlement, as established in our client services agreement.',
+      'Ownership and licensing are defined in the signed project agreement. Where agreed, final custom deliverables and source code transfer to the client after the applicable payment obligations are met. Pre-existing tools, reusable frameworks and third-party components remain subject to their separate ownership and licence terms.',
   },
   {
     id: 'post-launch-support',
     question: 'What support and maintenance do you offer after launch?',
     answer:
-      'We provide structured warranty support following production launch, covering stabilization and performance tuning. Ongoing maintenance, infrastructure monitoring, security updates, and phased feature additions can be scheduled to suit your operational needs.',
+      'We can provide launch stabilization, bug fixes within the agreed warranty scope, performance improvements, maintenance, monitoring and future feature development. The support period, response expectations and ongoing responsibilities are defined in the project agreement.',
   },
 ];

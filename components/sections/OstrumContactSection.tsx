@@ -24,12 +24,15 @@ const INITIAL_FORM_DATA: FormData = {
 };
 
 const PROJECT_TYPE_OPTIONS = [
-  'Digital Experiences (Web, Platforms, Portals)',
-  'AI Systems & Agents (Autonomous Automation)',
-  'Business Platforms (CRM, ERP, Operations)',
-  'Software & Product Engineering (SaaS, APIs)',
-  'Hardware & Connected Tech (IoT, Embedded)',
-  'Custom Engineering & Architecture',
+  'Custom Software & Business Platforms',
+  'Website, Web App & E-commerce Development',
+  'AI Systems & Workflow Automation',
+  'Mobile App & SaaS Product Development',
+  'UI/UX & Digital Product Design',
+  'SEO & Digital Marketing',
+  'API, CRM & ERP Integrations',
+  'IoT, Embedded & Connected Technology',
+  'Other / Not Sure Yet',
 ];
 
 export function OstrumContactSection() {
@@ -124,7 +127,7 @@ export function OstrumContactSection() {
             </h2>
 
             <p className="font-sans text-base sm:text-lg text-[#FFF8F3]/90 leading-relaxed max-w-md mt-6 sm:mt-8 font-normal">
-              Tell us about the software system, digital product, or AI workflow you are building. We will review your requirements and schedule an architectural discovery call.
+              Tell us what you want to build, improve or grow, from custom software and web or mobile applications to AI automation, e-commerce and digital marketing. Share your goals and requirements. Our team will review your brief and respond with the appropriate next step.
             </p>
           </div>
 

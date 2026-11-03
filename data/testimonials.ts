@@ -1,19 +1,19 @@
 import { Testimonial } from '@/types/testimonials';
 
 /**
- * Authoritative Testimonials Dataset for Ostrum Phase 6
+ * Authoritative Testimonials & Project Showcase Dataset
  *
  * SAFETY & TRUTHFULNESS COMPLIANCE:
  * 1. Entry 01: TMR AI Car Care (Client website: https://tmraicarcare.com/)
- *    Authentic client logo image. Draft quotation pending formal client approval.
- *    Marked `approved: false` and `isPlaceholder: true`.
+ *    Authentic client logo image. Factual project highlight.
+ *    Marked contentType: 'project-highlight', approved: false, isPlaceholder: true.
  * 2. Entry 02: Saraswati Driving School (Client website: https://saraswati-driving-school.vercel.app/)
- *    Authentic client logo image. Draft quotation pending formal client approval.
- *    Marked `approved: false` and `isPlaceholder: true`.
- * 3. Entry 03: MNESA (Ostrum Internal Venture / Neural Memory Architecture)
- *    Custom large geometric blue capital 'M' mark. Truthful product architecture statement.
- *    Marked `contentType: 'project-note'`, `approved: true`, and `isPlaceholder: false`.
- *    Ensures zero false or fabricated external client endorsement claims.
+ *    Authentic client logo image. Factual project highlight.
+ *    Marked contentType: 'project-highlight', approved: false, isPlaceholder: true.
+ * 3. Entry 03: MNESA (OSTRUM Internal Venture / Opportunity Capture)
+ *    Custom geometric blue capital 'M' mark. Truthful product architecture note.
+ *    Marked contentType: 'project-note', approved: true, isPlaceholder: false.
+ *    Ensures zero unapproved or fabricated external client endorsements.
  */
 export const TESTIMONIALS_DATA: Testimonial[] = [
   {
@@ -24,12 +24,12 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     logoSrc: '/images/clients/tmr-ai-car-care-logo-light.png',
     logoAlt: 'TMR AI Car Care Logo',
     logoType: 'image',
-    contentType: 'testimonial',
-    subtext: 'Automotive Intelligence Platform',
+    contentType: 'project-highlight',
+    subtext: 'Automotive Digital Platform',
     quote:
-      'The automated intake and customer communication platform streamlined our detailing bays. Turnaround is faster, studio operations are clear, and clients trust the booking process.',
+      'Custom digital platform for automotive detailing and ceramic protection studios, connecting customer intake, service exploration, and online booking workflows.',
     company: 'TMR AI Car Care',
-    role: 'Automotive Intelligence',
+    role: 'Client System Showcase',
     approved: false,
     isPlaceholder: true,
   },
@@ -41,12 +41,12 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     logoSrc: '/images/clients/saraswati-driving-school-logo-dark.png',
     logoAlt: 'Saraswati Driving School Logo',
     logoType: 'image',
-    contentType: 'testimonial',
+    contentType: 'project-highlight',
     subtext: 'Digital Scheduling & Dispatch',
     quote:
-      'Ostrum built an intuitive booking and instructor scheduling system that replaced our manual logbooks entirely. Students find scheduling effortless and our instructors stay synchronized on every lesson.',
+      'Digital booking and fleet lesson scheduling system engineered to coordinate student training schedules, vehicle dispatch, and RTO licensing instruction.',
     company: 'Saraswati Driving School',
-    role: 'Instruction Systems',
+    role: 'Client System Showcase',
     approved: false,
     isPlaceholder: true,
   },
@@ -59,7 +59,7 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     contentType: 'project-note',
     subtext: 'Opportunity Capture & Follow-Through Platform',
     quote:
-      'Architected as an intelligent opportunity capture and commitment engine, transforming fleeting observations and notes into structured, executable pipelines.',
+      'MNESA is an OSTRUM venture exploring how people can capture opportunities, organize commitments and turn useful observations into structured follow-through workflows.',
     company: 'Ostrum Ventures',
     role: 'Internal Venture Platform',
     approved: true,
@@ -67,16 +67,10 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
   },
 ];
 
-/**
- * Get all testimonials for development, testing, and interaction verification.
- */
 export function getAllTestimonials(): Testimonial[] {
   return TESTIMONIALS_DATA;
 }
 
-/**
- * Public production selector.
- */
 export function getPublicTestimonials(): Testimonial[] {
   return TESTIMONIALS_DATA;
 }

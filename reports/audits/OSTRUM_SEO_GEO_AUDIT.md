@@ -1,7 +1,7 @@
 # OSTRUM: Technical SEO, Content SEO & GEO/AEO Audit
 
 **Audit Target Domain:** `https://theostrum.com`  
-**Audit Date:** 2026-10-23T21:30:00+05:30  
+**Audit Date:** 2026-11-03T12:25:00+05:30  
 **Stack:** Next.js 15 App Router, React 19, TypeScript, Tailwind CSS  
 **Auditor:** Senior Frontend Architect & Technical SEO/GEO Specialist  
 
@@ -9,6 +9,9 @@
 This audit strictly adheres to current official Google Search Central and web engineering documentation:
 - [Google AI Optimization & Generative Search Guidance](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
 - [Creating Helpful, Reliable, People-First Content](https://developers.google.com/search/docs/fundamentals/creating-helpful-content)
+- [Google Special Tags / Supported Meta Tags (Confirms meta-keywords is ignored)](https://developers.google.com/search/docs/crawling-indexing/special-tags)
+- [Google Title Link Best Practices](https://developers.google.com/search/docs/appearance/title-link)
+- [Google Crawlable Links](https://developers.google.com/search/docs/crawling-indexing/links-crawlable)
 - [Google JavaScript SEO Basics](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics)
 - [Google Organization Structured Data](https://developers.google.com/search/docs/appearance/structured-data/organization)
 - [Google Sitemaps Best Practices](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap)
@@ -40,12 +43,16 @@ Every dimension is classified into six operational categories:
   - Root title template updated to `'%s | OSTRUM'`.
   - Child pages declare `title: 'Terms & Conditions'` and `title: 'Privacy Policy'`.
   - Rendered titles verified:
-    - Homepage: `OSTRUM | Digital Product Engineering & Custom Software Studio`
+    - Homepage: `OSTRUM | Custom Software, AI Systems & Digital Product Engineering`
     - Terms: `Terms & Conditions | OSTRUM`
     - Privacy: `Privacy Policy | OSTRUM`
-  - Zero em-dash (`—`) or en-dash (`–`) punctuation in rendered titles or descriptions.
+  - Zero em-dash (`—`) or en-dash (`–`) punctuation in rendered titles, headings, or descriptions.
 
-### 2.2 Sitemaps & Robots.txt [FIXED IN CODE / VERIFIED LOCALLY]
+### 2.2 Meta Keywords Removal [FIXED IN CODE / VERIFIED LOCALLY]
+- **Finding:** The site previously utilized a `meta name="keywords"` tag in `app/layout.tsx`. Google Search Central explicitly documents that Google ignores the `meta keywords` tag for indexing and ranking.
+- **Fix:** Removed the `keywords: [...]` property entirely from Next.js metadata. The visible H1, introductory paragraphs, capability cards, FAQ answers, project descriptions, and semantic internal links carry the keyword weight naturally.
+
+### 2.3 Sitemaps & Robots.txt [FIXED IN CODE / VERIFIED LOCALLY]
 - **Status:** Complete & Verified.
 - **Robots Endpoint (`/robots.txt`):**
   - Allows all user-agents to crawl public pages.
@@ -59,98 +66,62 @@ Every dimension is classified into six operational categories:
   - Omitted fabricated static timestamps; uses defensible canonical URLs.
   - Tested: HTTP 200 with valid XML declaration.
 
-### 2.3 French (`/fr`) Incomplete Route Policy [FIXED IN CODE / VERIFIED LOCALLY]
-- **Status:** Complete & Verified.
-- **Decision:** As `/fr` currently renders only a subset of the homepage in developmental preview, an explicit layout was added in [`app/fr/layout.tsx`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app/fr/layout.tsx) with:
-  ```ts
-  export const metadata: Metadata = {
-    robots: { index: false, follow: true },
-  };
-  ```
-- **Local Verification:** Rendered HTML for `/fr` includes `<meta name="robots" content="noindex, follow" />`. `/fr` is excluded from `/sitemap.xml`.
+### 2.4 FAQ Clean Extraction (Elimination of DOM Duplication) [FIXED IN CODE / VERIFIED LOCALLY]
+- **Finding:** Previously, `OstrumFaqSection.tsx` rendered both an accessible `<p className="sr-only">` and a visual `<p aria-hidden="true">` for typewriter animation, which caused the first answer to appear twice in text extraction tools.
+- **Fix:** Replaced with a single accessible `<p>` element without `aria-hidden="true"`, ensuring clean text extraction and assistive technology presentation with zero duplicate text.
 
 ---
 
-## 3. Brand Assets & Open Graph Verification
+## 3. Structured Data & Entity Grounding (JSON-LD)
 
-### 3.1 Static Brand Logo & Social Cards [FIXED IN CODE / VERIFIED LOCALLY]
-- **`public/images/ostrum-logo.png`:**
-  - Rendered from the authentic OSTRUM Romie wordmark SVG at 2x resolution with transparent background (38.9 KB).
-  - Verified: Serves HTTP 200 with `image/png`.
-- **`public/images/ostrum-og.png`:**
-  - High-resolution 1200 × 630 luxury Open Graph card generated using genuine brand typography and radial oxblood gradient (1.09 MB).
-  - Verified: Serves HTTP 200 with `image/png`.
-- **Open Graph / Twitter Card Tags:**
-  - Rendered in root `<head>` pointing to `/images/ostrum-og.png`.
+### 3.1 Organization & WebSite Graph [FIXED IN CODE / VERIFIED LOCALLY]
+- Embedded JSON-LD script on all pages at `@id: https://theostrum.com/#organization`.
+- Declares official legal entity name, canonical URL, high-DPI logo (`/images/ostrum-logo.png`), contact email (`hello@theostrum.com`), and accurate description:
+  `'Independent digital product engineering, custom software development, AI systems, and venture studio.'`
+- `sameAs` array dynamically includes verified GitHub profile (`https://github.com/Balashanmugam30`). LinkedIn URL is strictly gated behind `hasValidLinkedIn()` to prevent emitting dead placeholder URLs.
+- LocalBusiness schema intentionally omitted: avoids claiming an unverified public walk-in storefront in accordance with Google's physical location requirements.
 
 ---
 
-## 4. Structured Data & Entity Graph (JSON-LD)
+## 4. On-Page Content & Search Intent Optimization
 
-### 4.1 Organization & WebSite Schemas [FIXED IN CODE / VERIFIED LOCALLY]
-In [`app/layout.tsx`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app/layout.tsx), a valid JSON-LD script is injected:
+### 4.1 India-First Commercial Positioning
+- **Hero Statement:** Direct value proposition without sentence fragments:
+  *We engineer custom software and AI systems for ambitious businesses.*
+  *We build original digital products for problems worth solving.*
+- **Supporting Narrative:** Mentions custom business software, web and mobile applications, practical AI automation, and connected digital platforms.
+- **Engine Architecture:**
+  - *Systems Architecture:* Custom business software, web applications, API integrations, and AI workflow automation.
+  - *Original Ventures:* Unmet needs validation, original software products, and venture development through OSTRUM Ventures.
+- **Full Capability Scope Across 6 Cards:**
+  1. *Digital Experiences:* Website design, UI/UX design, e-commerce, customer portals, SEO, and performance marketing.
+  2. *AI Systems & Agents:* AI agents, intelligent assistants, and workflow automation with human oversight.
+  3. *Business Platforms:* Custom business software, CRM/ERP integrations, and operations dashboards.
+  4. *Software & Product Engineering:* SaaS platforms, startup MVPs, web and mobile applications, and production APIs.
+  5. *Connected Technology:* IoT development, embedded software, and sensor integrations.
+  6. *Custom Engineering:* Bespoke software, legacy modernization, and complex systems integration.
 
-```json
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": "https://theostrum.com/#organization",
-      "name": "OSTRUM",
-      "legalName": "Ostrum",
-      "url": "https://theostrum.com",
-      "logo": "https://theostrum.com/images/ostrum-logo.png",
-      "email": "hello@theostrum.com",
-      "description": "Independent digital product engineering, custom software development, and venture studio.",
-      "sameAs": [
-        "https://github.com/Balashanmugam30/Ostrum"
-      ]
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://theostrum.com/#website",
-      "url": "https://theostrum.com",
-      "name": "OSTRUM",
-      "publisher": {
-        "@id": "https://theostrum.com/#organization"
-      }
-    }
-  ]
-}
-```
-
-- **`sameAs` Truthfulness:**
-  - Includes official GitHub repository.
-  - Excludes placeholder LinkedIn profile (`hasValidLinkedIn()` guard prevents `replace-with-real-ostrum-profile` from leaking into schema).
-- **Prohibited Items Omitted:** No synthetic ratings, `AggregateRating`, fake awards, or fabricated physical addresses.
+### 4.2 Proof, Trust & Testimonials Publication Safety [FIXED IN CODE / VERIFIED LOCALLY]
+- **Authentic Client Systems Grounding:**
+  - TMR AI Car Care accurately described as an automotive detailing and ceramic protection studio with a bespoke digital experience, rather than an autonomous software company.
+  - Saraswati Driving School accurately described as a modern booking and fleet scheduling infrastructure for driver training and RTO lesson dispatch.
+- **Publication Safety Safeguards:**
+  - TMR AI Car Care and Saraswati Driving School entries are classified as `contentType: 'project-highlight'`, rendering factual project summaries with a clear "PROJECT HIGHLIGHT" badge, completely avoiding unapproved first-person quotation marks.
+  - MNESA is classified as `contentType: 'project-note'` with a "VENTURE NOTE" badge, clearly identifying it as an internal OSTRUM venture without implied third-party endorsement.
 
 ---
 
-## 5. Content SEO & GEO/AEO Readiness
+## 5. Pre-Launch Production Verification Matrix
 
-### 5.1 Generative Search & AI Readiness (AEO)
-OSTRUM's content architecture ensures immediate comprehension by conversational and generative search engines (Google Search Generative Experience, Perplexity, Claude, ChatGPT Search):
-1. **Plain-Text Extraction Integrity:** All key service definitions, engineering disciplines, and project summaries are rendered directly in semantic HTML headings and paragraphs rather than baked into canvas pixels or hidden behind complex WebGL states.
-2. **Entity Clarity:** OSTRUM is explicitly identified as a "digital product engineering studio and venture builder" operating in India with international English reach.
-3. **Structured Q&A Grounding:** The 10 FAQ entries directly answer critical high-intent buyer inquiries (scoping, IP ownership, custom vs SaaS, technology selection, AI integration).
-4. **Authentic Evidence Grounding:** Project descriptions for TMR AI Car Care, Saraswati Driving School, and MNESA reflect actual platforms and repositories without fabricated metrics or fake client quotes.
-
----
-
-## 6. Verification Status Matrix
-
-| Audit Item | Classification | Verification Detail |
-| :--- | :--- | :--- |
-| Canonical URLs | **VERIFIED LOCALLY** | Verified across `/`, `/terms-and-conditions`, and `/privacy-policy` |
-| Title Deduplication & Formatting | **VERIFIED LOCALLY** | Pipe formatting (`%s \| OSTRUM`), zero duplicate brand suffixes, 0 em-dashes |
-| Open Graph & Twitter Cards | **VERIFIED LOCALLY** | Social card `ostrum-og.png` confirmed HTTP 200 |
-| Brand Logo Asset | **VERIFIED LOCALLY** | Logo asset `ostrum-logo.png` confirmed HTTP 200 |
-| Selected Work Thumbnails | **VERIFIED LOCALLY** | TMR, Saraswati, MNESA confirmed HTTP 200 (686KB, 758KB, 638KB) |
-| Sitemaps & Robots.txt | **VERIFIED LOCALLY** | Both return HTTP 200 with valid syntax |
-| French `/fr` Noindex Policy | **VERIFIED LOCALLY** | `<meta name="robots" content="noindex, follow" />` verified |
-| Organization & WebSite JSON-LD | **VERIFIED LOCALLY** | Valid schema syntax, strict LinkedIn guard verified |
-| Live Domain Registration | **BLOCKED** | Pending owner registration of `theostrum.com` |
-| Live DNS & Search Console | **OWNER ACTION** | Requires domain purchase and DNS TXT verification |
-| Live Resend Mailbox Delivery | **BLOCKED** | Pending owner provisioning of `RESEND_API_KEY` and mailbox |
-| Official LinkedIn URL | **OWNER ACTION** | Pending owner creation of official company page |
+| Check | Tool / Method | Expected Result | Status |
+| :--- | :--- | :--- | :---: |
+| **Em/En Dash Elimination** | Playwright TreeWalker | 0 em-dashes, 0 en-dashes | **PASS (0 / 0)** |
+| **Meta Keywords Elimination** | Source Code Audit | No `keywords` tag in `<head>` | **PASS** |
+| **Clean FAQ DOM Text** | Playwright DOM Extraction | Single `<p>` per answer, 0 duplicates | **PASS** |
+| **Contact Form Scope Options** | DOM Inspection | 9 comprehensive service categories | **PASS** |
+| **Engine Navigation Links** | Anchor Verification | `#capabilities`, `#selected-work` | **PASS** |
+| **8-Device Viewport Overflow** | Playwright Matrix | 0px horizontal overflow (1920px to 360px) | **PASS** |
+| **Static HTML Generation** | Next.js Build | 10/10 static pages compiled | **PASS** |
+| **Unit Test Coverage** | Node Test Runner | 15/15 unit tests passing | **PASS** |
+| **Live Domain Resolution** | DNS Lookup | Blocked pending domain registration | **PENDING OWNER** |
+| **Live Resend Delivery** | Resend SMTP API | Blocked pending `RESEND_API_KEY` | **PENDING OWNER** |

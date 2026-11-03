@@ -1,6 +1,6 @@
 # OSTRUM — Master Implementation & Engineering Audit Summary
 
-**Date:** 2026-10-23T21:30:00+05:30  
+**Date:** 2026-11-03T12:25:00+05:30  
 **Repository:** `Balashanmugam30/Ostrum`  
 **Current Branch:** `main`  
 **Lead Engineer:** Senior Full-Stack Engineer, Next.js Production Architect & Release Manager  
@@ -19,63 +19,47 @@ Every engineering dimension is classified into six standard operational categori
 
 ### Summary of Completed Objectives:
 
-1. **Strategic Content Rewrite & India-First Positioning [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Shifted positioning to "Digital Product Engineering & Custom Software Studio", addressing an India-first market with English-language international reach.
-   - Benefit-led copy across Hero, Engine, 5 Energy Continuum beats, Capabilities, Selected Work, Testimonials, FAQ, Contact, and Footer.
-   - Contact placeholders calibrated to India standards (`+91 98420 12345`, `Rahul Sharma`).
-   - FAQ expanded to 10 high-value buyer queries covering custom vs. SaaS, engineering stack selection, AI integration, IP ownership, pricing, and timelines.
-2. **Typographical Dash Eradication [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Removed all oversized em-dashes (`—` U+2014) and en-dashes (`–` U+2013) across the entire public DOM, metadata, schema markup, and titles.
-   - Verified 0 em-dashes and 0 en-dashes in automated Playwright scan across homepage, terms, and privacy routes.
-   - Replaced dashes with natural punctuation (commas, colons, parentheses, or pipe separators in titles).
-3. **Normal Text Selection Restoration [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Removed blanket `select-none` from `OstrumCapabilitiesSection`, `OstrumTestimonialsSection`, `OstrumFaqSection`, `OstrumContactSection`, `OstrumLiquidSandCTA`, `OstrumEngineSection`, and `works-wheel.tsx`.
-   - Applied `select-text` across all reading surfaces while leaving 3D canvas drag targets and decorative visual components protected.
-   - Verified via Playwright selection tests across all primary sections.
-4. **Engine Micro-Labels Semantic Navigation [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Converted "SYSTEMS ARCHITECTURE" and "ORIGINAL VENTURES" into accessible anchor links (`<a href="#capabilities">` and `<a href="#selected-work">`).
-   - Added explicit `aria-label` tags and focus ring styling (`focus-visible:outline-white`).
-5. **Safe Dead Code Elimination (8 Components Safely Removed) [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Safely deleted 8 unreferenced dead components via Git:
-     1. `components/sections/BookInfos.tsx` (unreferenced alias)
-     2. `components/sections/FoundrySection.tsx` (unreferenced alias)
-     3. `components/sections/OstrumSelectedWorkSection.tsx` (superseded by `OstrumWorksWheelSection.tsx`)
-     4. `components/ui/MagnetWrap.tsx` (unreferenced)
-     5. `components/ui/OstrumLiquidGlass.tsx` (unreferenced)
-     6. `components/ui/OstrumSignatureSculpture.tsx` (unreferenced)
-     7. `components/ui/anodized-ink.tsx` (unmounted raw shader)
-     8. `components/ui/works-wheel-curios.tsx` (unreferenced SVG curios)
-   - Cleaned dead CSS selector `[data-testid="works-wheel-curios"]` from `app/globals.css`.
-   - Verified clean typecheck, lint, unit tests, and production build with zero broken imports.
-6. **Critical Form Fix: Real Enquiry Notifications via Resend [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Official `resend` Node SDK (`^6.34.1`) integrated into [`lib/email/enquiry-mailer.ts`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/lib/email/enquiry-mailer.ts) and [`app/api/enquiry/route.ts`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/app/api/enquiry/route.ts).
-   - Input sanitization, HTML escaping (`escapeHtml`), single-line header injection stripping, and RFC 5322 regex validation.
-   - Anti-spam honeypot (`website_url` and `hp_check`).
-   - Server-only recipient (`OSTRUM_ENQUIRY_TO || hello@theostrum.com`), server-controlled sender (`OSTRUM_ENQUIRY_FROM || OSTRUM Website <website@theostrum.com>`), and visitor `replyTo`.
-   - Security hardening: `RESEND_MOCK=true` is forbidden when `NODE_ENV === 'production'` and returns HTTP 500 error.
-   - Missing configuration returns HTTP 503 with user-safe maintenance notice; never produces false success.
-   - Trusted IP parsing: evaluates `x-vercel-forwarded-for`, `cf-connecting-ip`, `x-real-ip`, and `x-forwarded-for` with strict IPv4/IPv6 regex sanitization.
-   - Sliding-window rate limiting (5 req/10 min per IP).
-   - Zero-PII logging: no names, email addresses, or message content written to server logs.
-   - 15/15 unit tests passing via `npm test`.
-7. **Legal Pages Spacing & Full-Viewport Curtain Reveal [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Eliminated partial-mask defect by setting legal curtain to `100svh` with `min-height: 100svh` and `width: 100%`, preventing any footer peeking before reveal starts.
-   - Unified 1:1 scrub travel distance (`window.innerHeight`) on desktop and mobile, ensuring smooth, continuous lift without stepped artifacts.
-   - Shielded hidden footer contact tiles from pointer clicks until revealed (`pointer-events: auto` switching to `'none'` at 0.95 progress).
-   - Calibrated exact 32.00px breathing gap at document end on both Terms and Privacy pages.
-   - Verified full reverse-scroll behavior and reduced-motion static document flow.
-8. **Selected Work Real Project Research & Custom Artwork [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Researched live project systems: TMR AI Car Care, Saraswati Driving School, and MNESA.
-   - Generated 3 high-resolution thumbnails via Nano Banana image generation with project-true color palettes.
-   - Integrated into 3D WorksWheel with verified 1264×848 rendering and zero layout shift.
-9. **Authoritative OSTRUM-First README & Brand Cleansing [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Replaced root README from scratch with studio overview, real architecture, genuine project showcases, and embedded logo.
-   - Eradicated all obsolete external reference analysis docs, forensic maps, and tests from the tracked working tree.
-10. **SEO Metadata, Route Canonicals & Generated Assets [FIXED IN CODE / VERIFIED LOCALLY]:**
-    - Route-specific canonicals for `/`, `/terms-and-conditions`, and `/privacy-policy`.
-    - Title templates updated to `%s | OSTRUM` without em-dashes.
-    - Dynamic App Router handlers for `app/robots.ts` and `app/sitemap.ts`.
-    - Generated authentic high-DPI `public/images/ostrum-logo.png` (38.9 KB) and `public/images/ostrum-og.png` (1.09 MB).
+1. **Root Metadata & SEO Hardening [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - Removed `meta name="keywords"` tag from `app/layout.tsx` in accordance with official Google Search guidance.
+   - Set homepage title default to `'OSTRUM | Custom Software, AI Systems & Digital Product Engineering'`.
+   - Set meta description to `'OSTRUM is an India-focused digital product engineering studio building custom business software, AI systems, web and mobile applications, and original digital products for ambitious businesses and founders.'`.
+   - Synchronized OpenGraph and Twitter title and description cards.
+   - Updated Organization JSON-LD description to reflect digital product engineering, custom software, AI systems, and venture building.
+2. **Hero Copy & Studio Positioning [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - Hero H1 updated to two grammatically complete, non-fragmented lines:
+     *We engineer custom software and AI systems for ambitious businesses.*
+     *We build original digital products for problems worth solving.*
+   - Hero philosophy supporting copy updated to clearly articulate custom business software, web and mobile applications, practical AI automation, and connected digital platforms.
+   - Engine narrative updated to emphasize bespoke software architecture for today and original products for what comes next.
+3. **Selected Work Project Scope Accuracy [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - TMR AI Car Care project description updated to accurately state what OSTRUM built (a premium digital experience helping customers explore detailing and paint-protection services and book appointments), distinguishing the client's detailing business from software engineering.
+   - MNESA described truthfully as an intelligent opportunity capture platform.
+4. **Full Service Scope Across 6 Capability Cards [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - Digital Experiences: Added website design, UI/UX design, e-commerce development, customer portals, SEO, and performance marketing.
+   - AI Systems & Agents: Framed AI agents, intelligent assistants, and workflow automation with explicit human oversight.
+   - Business Platforms: Custom business platforms, CRM and ERP integrations, customer portals, and operations dashboards.
+   - Software & Product Engineering: End-to-end custom software development, SaaS platforms, startup MVPs, web and mobile applications, and production APIs.
+   - Connected Technology: IoT development, embedded software, and sensor integrations.
+   - Custom Engineering: Bespoke software, legacy modernization, and systems integration.
+5. **Testimonials Publication Safety & Honest Attribution [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - Resolved the publication issue where unapproved placeholder client quotes could be displayed as genuine endorsements.
+   - Classified TMR and Saraswati entries as `contentType: 'project-highlight'`, rendering factual technical highlights with an explicit "PROJECT HIGHLIGHT" badge and zero quotation marks.
+   - Classified MNESA as `contentType: 'project-note'` with a "VENTURE NOTE" badge, clearly identifying it as an internal studio venture.
+6. **FAQ Overhaul & Single Clean DOM Extraction [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - Rewrote all 10 FAQ answers for accuracy, covering custom vs. SaaS, engineering stack selection, AI integration with human oversight, legacy systems, pricing, timelines, IP ownership, and post-launch maintenance.
+   - Resolved DOM text extraction duplication in `OstrumFaqSection.tsx` by eliminating `<p className="sr-only">` and rendering a single accessible `<p>` tag.
+7. **Contact Scope Dropdown Expansion [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - Updated introductory text to invite enquiries across custom software, web/mobile apps, AI automation, e-commerce, and digital marketing.
+   - Expanded project-type options from 6 to 9 distinct categories within the existing dropdown structure.
+8. **Closing CTA & Footer Refinement [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - CTA headline updated to: *"HAVE A BUSINESS PROBLEM OR PRODUCT IDEA? LET'S BUILD THE RIGHT SOLUTION."*
+   - Footer descriptor updated to: *"Custom software, AI systems and original digital products, engineered by OSTRUM."*
+   - Replaced ambiguous "Direct Partner Line" with an active "Project Enquiries" anchor link pointing to `/#contact`.
+9. **Typographical Dash Eradication [FIXED IN CODE / VERIFIED LOCALLY]:**
+   - Verified 0 em-dashes (`—`) and 0 en-dashes (`–`) across all rendered pages, metadata, and data files.
+10. **Dead Code Elimination & Quality Gates [FIXED IN CODE / VERIFIED LOCALLY]:**
+    - 8 unreferenced dead components previously deleted remain pruned.
+    - `npm run typecheck`, `npm run lint`, `npm test` (15/15 passing), and `npm run build` (10/10 static pages) all compile cleanly with code 0.
 
 ---
 
@@ -83,39 +67,28 @@ Every engineering dimension is classified into six standard operational categori
 
 | File Path | Action | Description |
 | :--- | :---: | :--- |
-| `content/messages.ts` | **Modified** | Complete rewrite of hero, engine, continuum copy for India-first studio positioning; removed all dashes. |
-| `components/sections/OstrumEngineSection.tsx` | **Modified** | Removed `select-none`; converted micro-labels into accessible anchor links to `#capabilities` and `#selected-work`. |
-| `components/sections/OstrumCapabilitiesSection.tsx` | **Modified** | Removed `select-none`; rewritten all 6 service cards with benefit-led engineering copy without text clipping. |
-| `components/ui/works-wheel.tsx` | **Modified** | Restored `select-text pointer-events-auto` on project info panel; updated copy for TMR, Saraswati, and MNESA. |
-| `components/sections/OstrumTestimonialsSection.tsx` | **Modified** | Removed `select-none`; updated testimonial quotes to reflect authentic venture and engineering partnerships. |
-| `data/testimonials.ts` | **Modified** | Authored client testimonials with authentic client roles and business outcomes; zero fake star ratings. |
-| `components/sections/OstrumFaqSection.tsx` | **Modified** | Removed `select-none`; updated section header copy. |
-| `data/faq.ts` | **Modified** | 10 buyer-intent FAQs covering custom vs SaaS, tech choices, AI integration, legacy systems, pricing, and IP ownership. |
-| `components/sections/OstrumContactSection.tsx` | **Modified** | Removed `select-none`; updated scope text, Indian placeholder phone number, and Indian sample name. |
-| `components/sections/OstrumLiquidSandCTA.tsx` | **Modified** | Removed `select-none`; refined closing pitch without dashes. |
-| `components/sections/OstrumStudioFooter.tsx` | **Modified** | Restored text selection; updated studio descriptor; cleaned comment dashes. |
-| `app/layout.tsx` | **Modified** | Updated metadata title template (`%s | OSTRUM`), descriptions, and JSON-LD schema without dashes. |
-| `app/terms-and-conditions/page.tsx` | **Modified** | Updated page title and legal copy without em-dashes. |
-| `app/privacy-policy/page.tsx` | **Modified** | Updated page title and DPDP-aligned legal copy without em-dashes. |
-| `README.md` | **Modified** | Updated studio positioning to "Digital Product Engineering & Venture Studio". |
-| `components/sections/BookInfos.tsx` | **Deleted** | Removed unreferenced alias component. |
-| `components/sections/FoundrySection.tsx` | **Deleted** | Removed unreferenced alias component. |
-| `components/sections/OstrumSelectedWorkSection.tsx` | **Deleted** | Removed superseded unused component. |
-| `components/ui/MagnetWrap.tsx` | **Deleted** | Removed unreferenced component. |
-| `components/ui/OstrumLiquidGlass.tsx` | **Deleted** | Removed unreferenced component. |
-| `components/ui/OstrumSignatureSculpture.tsx` | **Deleted** | Removed unreferenced component. |
-| `components/ui/anodized-ink.tsx` | **Deleted** | Removed unmounted shader component. |
-| `components/ui/works-wheel-curios.tsx` | **Deleted** | Removed unreferenced curios SVG component. |
-| `app/globals.css` | **Modified** | Removed dead CSS selector for `works-wheel-curios`. |
-| `components/sections/OstrumFooterReveal.tsx` | **Preserved/Verified** | Full viewport-height mask (`100svh`), 1:1 theatre lift, pointer events defense, zero peeking footer. |
-| `lib/email/enquiry-mailer.ts` | **Preserved/Verified** | Resend email routing, HTML escaping, sliding-window rate limiter, honeypot validation. |
-| `app/api/enquiry/route.ts` | **Preserved/Verified** | Validated Resend dispatch, trusted IP proxy precedence, rate limiting, and safe error codes. |
+| `app/layout.tsx` | **Modified** | Updated default title, description, OG/Twitter metadata; removed obsolete `keywords` list. |
+| `content/messages.ts` | **Modified** | Updated Hero headline, philosophy lines, and Engine bridge copy. |
+| `components/ui/works-wheel.tsx` | **Modified** | Updated project descriptions for TMR AI Car Care and MNESA. |
+| `components/sections/OstrumCapabilitiesSection.tsx` | **Modified** | Updated descriptions and tag chips across all 6 capability cards. |
+| `types/testimonials.ts` | **Modified** | Added `'project-highlight'` to `TestimonialContentType`. |
+| `data/testimonials.ts` | **Modified** | Replaced unapproved draft quotes with factual project highlights for TMR and Saraswati; updated MNESA venture note. |
+| `components/sections/OstrumTestimonialsSection.tsx` | **Modified** | Formatted project highlights and venture notes with explicit badges without quotation marks. |
+| `data/faq.ts` | **Modified** | Updated all 10 Q&As with balanced, accurate buyer answers. |
+| `components/sections/OstrumFaqSection.tsx` | **Modified** | Removed duplicate `<p className="sr-only">` for clean single DOM text extraction. |
+| `components/sections/OstrumContactSection.tsx` | **Modified** | Updated intro text and expanded project-type dropdown to 9 distinct choices. |
+| `components/sections/OstrumLiquidSandCTA.tsx` | **Modified** | Updated closing CTA headline and supporting sentence. |
+| `components/sections/OstrumStudioFooter.tsx` | **Modified** | Updated studio note; replaced Direct Partner Line with Project Enquiries link. |
+| `reports/audits/OSTRUM_KEYWORD_AND_CONTENT_MAP.md` | **Modified** | Updated 3-tier keyword strategy and section mapping. |
+| `reports/audits/OSTRUM_SEO_GEO_AUDIT.md` | **Modified** | Updated SEO/GEO audit report reflecting metadata and content improvements. |
+| `reports/audits/OSTRUM_PLAYWRIGHT_REGRESSION_REPORT.md` | **Modified** | Updated Playwright regression report with clean FAQ extraction and test results. |
+| `reports/audits/OSTRUM_FINAL_RELEASE_AND_AUDIT_REPORT.md` | **Modified** | Updated final release report and consolidated pre-launch checklist. |
 
 ---
 
 ## 3. Pre-Launch Owner Action Checklist [OWNER ACTION REQUIRED]
 
-The software engineering pass is complete and verified. The following external administrative prerequisites must be completed by the domain owner:
+The software engineering and content pass is complete and verified. The following external administrative prerequisites must be completed by the domain owner:
 
 | # | Action Item | Dependency | Status |
 | :-: | :--- | :--- | :--- |
@@ -126,4 +99,5 @@ The software engineering pass is complete and verified. The following external a
 | 5 | **Add Secrets to Hosting:** Place `RESEND_API_KEY`, `OSTRUM_ENQUIRY_TO`, `OSTRUM_ENQUIRY_FROM` in hosting environment. | Production Secret Store | Pending Owner |
 | 6 | **Create LinkedIn Company Page:** Register official company page and set `NEXT_PUBLIC_OSTRUM_LINKEDIN_URL`. | LinkedIn | Pending Owner |
 | 7 | **Google Search Console Verification:** Claim property `https://theostrum.com` and submit sitemap. | Google Search Console | Post-Launch |
-| 8 | **Formal Legal Review:** Have qualified legal counsel review final terms and privacy documents upon incorporation. | Legal Counsel | Post-Incorporation |
+| 8 | **Client Testimonial Approvals:** Obtain formal written approval before restoring first-person quotation marks. | Client Sign-off | Post-Launch |
+| 9 | **Formal Legal Review:** Have qualified legal counsel review final terms and privacy documents upon incorporation. | Legal Counsel | Post-Incorporation |

@@ -49,29 +49,29 @@ export interface ContentMessages {
 export const messages: Record<Locale, ContentMessages> = {
   en: {
     hero: {
-      headline: "We engineer custom software that helps businesses **scale**\nAnd build original products for problems worth solving",
-      philosophyLine1: "Custom digital systems, intelligent AI workflows, and modern web platforms.",
-      philosophyLine2: "Direct access to engineering principals, with an additional venture studio path.",
+      headline: "We engineer custom software and AI systems for ambitious businesses.\nWe build original digital products for problems worth solving",
+      philosophyLine1: "Custom business software, web and mobile applications, practical AI automation, and connected digital platforms.",
+      philosophyLine2: "Work directly with the engineers shaping your solution, with a second path for original products and ventures.",
       cta: "",
       sublabel: "",
     },
     engine: {
       index: "02 / THE OSTRUM CORE",
       badge: "STUDIO · SYSTEMS · VENTURES",
-      headlineLine1: "We build for today.",
+      headlineLine1: "We build for today's business needs.",
       headlineLine2: "We build what's next.",
-      description: "Ostrum operates across two disciplined paths: we scope and engineer custom digital systems for ambitious businesses, and we build focused original products when the right solution does not exist yet.",
+      description: "OSTRUM works across two paths: we design and develop custom software and digital systems for businesses, and we create original products when an important problem needs a new solution.",
       forBusiness: {
         number: "01",
         tag: "FOR BUSINESS",
         statement: "Custom systems engineered around how your business works.",
-        detail: "Tailored business software, modern web platforms, and automated AI workflows built for operational clarity and long-term maintainability.",
+        detail: "Custom business software, web applications, API integrations and AI workflow automation designed around your processes, teams and operational goals.",
       },
       forNext: {
         number: "02",
         tag: "FOR WHAT'S NEXT",
         statement: "Original products engineered around real problems.",
-        detail: "Identifying workflow friction, proving solutions from first principles, and engineering focused software ventures such as the MNESA platform.",
+        detail: "We explore unmet needs, validate product ideas, build working software and develop selected opportunities through OSTRUM Ventures. Venture partnerships and funding are considered selectively, not guaranteed.",
       },
       backing: {
         statement: "Some ideas become products. Some products become ventures.",

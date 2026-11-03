@@ -61,9 +61,9 @@ export function OstrumLiquidSandCTA() {
               textShadow: '0 2px 5px rgba(0,0,0,0.92), 0 4px 14px rgba(0,0,0,0.72), 0 0 24px rgba(0,0,0,0.38)',
             }}
           >
-            HAVE AN IDEA?
+            HAVE A BUSINESS PROBLEM OR PRODUCT IDEA?
             <br />
-            LET’S BUILD IT.
+            LET’S BUILD THE RIGHT SOLUTION.
           </h2>
 
           {/* Supporting Sentence */}
@@ -73,7 +73,7 @@ export function OstrumLiquidSandCTA() {
               textShadow: '0 1px 3px rgba(0,0,0,0.95), 0 2px 9px rgba(0,0,0,0.62)',
             }}
           >
-            Custom software, intelligent AI systems, and digital platforms engineered around your business.
+            Custom software, AI automation, digital products and connected systems shaped around your goals.
           </p>
 
           {/* Primary CTA Button pointing to /#contact */}
