@@ -264,31 +264,13 @@ export function OstrumEngineSection() {
 
             {/* 2. Main Heading */}
             <h3 className="font-serif italic text-2xl sm:text-[27px] text-white font-normal leading-[1.18] tracking-[-0.02em] drop-shadow-sm">
-              &quot;{engine.forBusiness.statement}&quot;
+              {engine.forBusiness.statement}
             </h3>
 
             {/* 3. Supporting Text */}
             <p className="mt-3.5 text-xs sm:text-[14px] text-white/80 leading-[1.48] font-normal">
               {engine.forBusiness.detail}
             </p>
-
-            {/* 4. Micro-label with Hairline Expansion */}
-            <a
-              href="#capabilities"
-              aria-label="Navigate to Systems Architecture capabilities"
-              className="mt-5 inline-flex items-center gap-3 self-start group/link focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#ff5c4a] rounded-sm py-0.5 cursor-pointer"
-            >
-              <div
-                className={`h-[1px] transition-all duration-500 ${
-                  activeFocus === 'business'
-                    ? 'w-16 bg-[#ff5c4a]'
-                    : 'w-8 bg-white/35 group-hover/link:w-16 group-hover/link:bg-[#ff5c4a]'
-                }`}
-              />
-              <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-white/60 group-hover/link:text-white transition-colors">
-                SYSTEMS ARCHITECTURE
-              </span>
-            </a>
           </div>
 
           {/* ============================================================
@@ -341,31 +323,13 @@ export function OstrumEngineSection() {
 
             {/* 2. Main Heading */}
             <h3 className="font-serif italic text-2xl sm:text-[27px] text-white font-normal leading-[1.18] tracking-[-0.02em] drop-shadow-sm">
-              &quot;{engine.forNext.statement}&quot;
+              {engine.forNext.statement}
             </h3>
 
             {/* 3. Supporting Text */}
             <p className="mt-3.5 text-xs sm:text-[14px] text-white/80 leading-[1.48] font-normal">
               {engine.forNext.detail}
             </p>
-
-            {/* 4. Micro-label with Hairline Reveal */}
-            <a
-              href="#selected-work"
-              aria-label="Navigate to Original Ventures selected work"
-              className="mt-5 inline-flex items-center gap-3 lg:flex-row-reverse self-start lg:self-end group/link focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#ff5c4a] rounded-sm py-0.5 cursor-pointer"
-            >
-              <div
-                className={`h-[1px] transition-all duration-500 ${
-                  activeFocus === 'next'
-                    ? 'w-16 bg-[#ff5c4a]'
-                    : 'w-8 bg-white/35 group-hover/link:w-16 group-hover/link:bg-[#ff5c4a]'
-                }`}
-              />
-              <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-white/60 group-hover/link:text-white transition-colors">
-                ORIGINAL VENTURES
-              </span>
-            </a>
           </div>
         </div>
       </div>

@@ -1,0 +1,177 @@
+{
+  "timestamp": "2026-11-09T11:33:41.406Z",
+  "commit": "HEAD",
+  "browserVersion": "156.0.8078.4",
+  "copyAssertions": {
+    "hero": true,
+    "panels": true,
+    "capabilities": true,
+    "selectedWork": true,
+    "faq": true,
+    "contact": true,
+    "bottomCta": true,
+    "footer": true
+  },
+  "heroControls": {
+    "systemsArchitectureAbsent": true,
+    "originalVenturesAbsent": true,
+    "keyboardTabClean": true,
+    "pass": true
+  },
+  "testimonialDomAndSelection": {
+    "backdropIsDomText": true,
+    "selectionIsolation": true,
+    "selectedSnippet": "Custom digital platform for automotive detailing and ceramic",
+    "pass": true
+  },
+  "footerLinkedIn": {
+    "found": true,
+    "href": "https://www.linkedin.com/company/ostrum/",
+    "ariaLabel": "OSTRUM on LinkedIn",
+    "visible": true,
+    "svgWidth": 16,
+    "svgHeight": 16,
+    "noViewAsMember": true,
+    "pass": true
+  },
+  "faviconAndBrandIcons": {
+    "routes": [
+      {
+        "url": "/favicon.ico",
+        "status": 200,
+        "contentType": "image/x-icon",
+        "ok": true
+      },
+      {
+        "url": "/favicon-16x16.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/favicon-32x32.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/apple-touch-icon.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/icon-192.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/icon-512.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/manifest.webmanifest",
+        "status": 200,
+        "contentType": "application/manifest+json",
+        "ok": true
+      },
+      {
+        "url": "/brand/ostrum-3d-symbol-master.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      }
+    ],
+    "pass": true
+  },
+  "contactFormAndInteractions": {
+    "emptyValidationOk": true,
+    "emailValidationOk": true,
+    "preservationOk": true,
+    "pass": true
+  },
+  "viewportsAndOverflow": [
+    {
+      "device": "owner-reference-desktop",
+      "width": 1648,
+      "height": 928,
+      "scrollWidth": 1648,
+      "overflowPx": 0,
+      "screenshot": "C:\\Users\\balashanmugam\\OneDrive\\Desktop\\Ostrum\\reports\\audits\\artifacts\\playwright\\owner-reference-desktop.png",
+      "pass": true
+    },
+    {
+      "device": "large-desktop",
+      "width": 1920,
+      "height": 1080,
+      "scrollWidth": 1920,
+      "overflowPx": 0,
+      "screenshot": "C:\\Users\\balashanmugam\\OneDrive\\Desktop\\Ostrum\\reports\\audits\\artifacts\\playwright\\large-desktop.png",
+      "pass": true
+    },
+    {
+      "device": "standard-desktop",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "overflowPx": 0,
+      "screenshot": "C:\\Users\\balashanmugam\\OneDrive\\Desktop\\Ostrum\\reports\\audits\\artifacts\\playwright\\standard-desktop.png",
+      "pass": true
+    },
+    {
+      "device": "laptop",
+      "width": 1280,
+      "height": 800,
+      "scrollWidth": 1280,
+      "overflowPx": 0,
+      "screenshot": "C:\\Users\\balashanmugam\\OneDrive\\Desktop\\Ostrum\\reports\\audits\\artifacts\\playwright\\laptop.png",
+      "pass": true
+    },
+    {
+      "device": "tablet-portrait",
+      "width": 768,
+      "height": 1024,
+      "scrollWidth": 768,
+      "overflowPx": 0,
+      "screenshot": "C:\\Users\\balashanmugam\\OneDrive\\Desktop\\Ostrum\\reports\\audits\\artifacts\\playwright\\tablet-portrait.png",
+      "pass": true
+    },
+    {
+      "device": "mobile",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "overflowPx": 0,
+      "screenshot": "C:\\Users\\balashanmugam\\OneDrive\\Desktop\\Ostrum\\reports\\audits\\artifacts\\playwright\\mobile.png",
+      "pass": true
+    },
+    {
+      "device": "narrow-mobile",
+      "width": 360,
+      "height": 800,
+      "scrollWidth": 360,
+      "overflowPx": 0,
+      "screenshot": "C:\\Users\\balashanmugam\\OneDrive\\Desktop\\Ostrum\\reports\\audits\\artifacts\\playwright\\narrow-mobile.png",
+      "pass": true
+    }
+  ],
+  "axeAccessibility": {
+    "/": {
+      "violationsCount": 0,
+      "violations": []
+    },
+    "/terms-and-conditions": {
+      "violationsCount": 0,
+      "violations": []
+    },
+    "/privacy-policy": {
+      "violationsCount": 0,
+      "violations": []
+    }
+  },
+  "consoleErrors": [],
+  "overallPass": true
+}

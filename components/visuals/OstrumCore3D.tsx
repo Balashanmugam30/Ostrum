@@ -4,6 +4,7 @@ import React, {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -389,10 +390,13 @@ export const OstrumCore3D = forwardRef<OstrumCore3DHandle, OstrumCore3DProps>(
     // Active configuration
     const activeConfig =
       OSTRUM_VARIATIONS[variation] || OSTRUM_VARIATIONS['crimson-porcelain'];
-    const activeMaterialParams = {
-      ...activeConfig.material,
-      ...customMaterialParams,
-    };
+    const activeMaterialParams = useMemo(
+      () => ({
+        ...activeConfig.material,
+        ...customMaterialParams,
+      }),
+      [activeConfig.material, customMaterialParams]
+    );
     const activeLighting = activeConfig.lighting;
 
     // Apply material adjustments when tier or variation changes
@@ -796,6 +800,8 @@ export const OstrumCore3D = forwardRef<OstrumCore3DHandle, OstrumCore3DProps>(
         renderer.dispose();
         material.dispose();
       };
+      // Three.js scene initialization mounts once per canvas lifecycle
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [cameraDistance]);
 
     if (hasError) {

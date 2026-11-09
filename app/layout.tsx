@@ -20,13 +20,26 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
+  manifest: '/manifest.webmanifest',
   openGraph: {
     title: 'OSTRUM | Custom Software & AI Product Engineering',
     description:
       'Custom software, AI automation, digital products and connected systems engineered around real business needs.',
     url: SITE_CONFIG.baseUrl,
     siteName: 'OSTRUM',
-    locale: 'en_US',
+    locale: 'en_IN',
     type: 'website',
     images: [
       {
@@ -100,7 +113,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark bg-black">
+    <html lang="en-IN" className="dark bg-black">
       <head>
         <script
           type="application/ld+json"

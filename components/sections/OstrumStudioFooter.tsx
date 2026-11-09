@@ -210,13 +210,12 @@ export function OstrumStudioFooter() {
                   onClick={(e) => handleNavClick(e, '#contact')}
                   className="transition-colors hover:text-white hover:underline underline-offset-4"
                 >
-                  Project Enquiries
+                  Start a project
                 </Link>
               </li>
               <li className="pt-2">
-                {hasValidLinkedIn() ? (
                   <a
-                    href={SITE_CONFIG.linkedInUrl}
+                    href="https://www.linkedin.com/company/ostrum/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="transition-colors hover:text-white inline-flex items-center gap-2 group text-[#D4D4D8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ostrum-footer-label-accent,#FF765E)] rounded"
@@ -233,27 +232,7 @@ export function OstrumStudioFooter() {
                     <span className="group-hover:underline underline-offset-4">LinkedIn</span>
                     <span aria-hidden="true" className="text-xs opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
                   </a>
-                ) : (
-                  <div
-                    className="inline-flex items-center gap-2 text-[#D4D4D8]"
-                    title="OSTRUM official LinkedIn profile is currently in preparation"
-                    aria-label="LinkedIn profile in preparation"
-                    data-testid="footer-linkedin-pending"
-                  >
-                    <svg
-                      className="w-4 h-4 fill-current text-[var(--ostrum-footer-label-accent,#FF765E)] shrink-0"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.3a1.64 1.64 0 1 0 0 3.28 1.64 1.64 0 0 0 0-3.28" />
-                    </svg>
-                    <span>LinkedIn</span>
-                    <span className="font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/10 text-[#FFB3A7] border border-white/10">
-                      Pending
-                    </span>
-                  </div>
-                )}
-              </li>
+                </li>
             </ul>
           </div>
 
@@ -289,7 +268,7 @@ export function OstrumStudioFooter() {
                 OSTRUM
               </span>
               <p className="font-sans text-xs text-[#B9B0AF] mt-2 leading-relaxed">
-                Custom software, AI systems and original digital products, engineered by OSTRUM.
+                Custom software, AI systems and original digital products.
               </p>
             </div>
 

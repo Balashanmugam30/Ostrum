@@ -142,28 +142,30 @@ async function runMasterVerification() {
     results.textSelection['Terms Section 01'] = { selectable: !!termsSelected, sample: termsSelected?.substring(0, 50) };
 
     // =========================================================================
-    // 3. HERO / ENGINE LABELS NAVIGATION (Accessible Anchor Links)
+    // 3. HERO CONTROLS REMOVAL & PANEL VERIFICATION
     // =========================================================================
-    console.log('\n--- 3. ENGINE LABELS SEMANTIC NAVIGATION ---');
+    console.log('\n--- 3. HERO REDIRECTION CONTROLS REMOVAL ---');
     await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    const systemsLink = await page.$('a[href="#capabilities"]');
-    const venturesLink = await page.$('a[href="#selected-work"]');
+    const fullContent = await page.content();
+    const hasSystems = fullContent.includes('SYSTEMS ARCHITECTURE');
+    const hasVentures = fullContent.includes('ORIGINAL VENTURES');
+    const hasPanel01 = fullContent.includes('Custom systems, built around your business.');
+    const hasPanel02 = fullContent.includes('Original products for real problems.');
 
-    const systemsHref = await systemsLink?.getAttribute('href');
-    const venturesHref = await venturesLink?.getAttribute('href');
-    const systemsAria = await systemsLink?.getAttribute('aria-label');
-    const venturesAria = await venturesLink?.getAttribute('aria-label');
+    console.log(`[Hero Controls] SYSTEMS ARCHITECTURE absent: ${!hasSystems ? 'PASS ✓' : 'FAIL ✗'}`);
+    console.log(`[Hero Controls] ORIGINAL VENTURES absent: ${!hasVentures ? 'PASS ✓' : 'FAIL ✗'}`);
+    console.log(`[Hero Controls] Panel 01 & 02 headlines present: ${hasPanel01 && hasPanel02 ? 'PASS ✓' : 'FAIL ✗'}`);
 
-    console.log(`[Navigation] SYSTEMS ARCHITECTURE Link: href="${systemsHref}", aria-label="${systemsAria}"`);
-    console.log(`[Navigation] ORIGINAL VENTURES Link: href="${venturesHref}", aria-label="${venturesAria}"`);
+    const heroValid = !hasSystems && !hasVentures && hasPanel01 && hasPanel02;
     results.heroNavigation = {
-      systemsArchitecture: { href: systemsHref, ariaLabel: systemsAria, valid: systemsHref === '#capabilities' },
-      originalVentures: { href: venturesHref, ariaLabel: venturesAria, valid: venturesHref === '#selected-work' },
+      systemsArchitectureRemoved: !hasSystems,
+      originalVenturesRemoved: !hasVentures,
+      panelsIntact: hasPanel01 && hasPanel02,
+      valid: heroValid,
     };
 
-    // =========================================================================
     // 4. FOOTER WORDMARK CLICK-HOP & BEAM SHEEN
     // =========================================================================
     console.log('\n--- 4. FOOTER WORDMARK HOP & BEAM ---');
@@ -411,7 +413,7 @@ async function runMasterVerification() {
   console.log('\n=== FINAL VERIFICATION SUMMARY ===');
   console.log(`1. Zero em/en dashes in public copy: ${zeroEmDashes ? 'PASS ✓' : 'FAIL ✗'}`);
   console.log(`2. Normal text selection across all sections: ${textSelectPass ? 'PASS ✓' : 'FAIL ✗'}`);
-  console.log(`3. Engine labels navigation: ${results.heroNavigation.systemsArchitecture.valid && results.heroNavigation.originalVentures.valid ? 'PASS ✓' : 'FAIL ✗'}`);
+  console.log(`3. Hero controls removal & panels intact: ${results.heroNavigation.valid ? 'PASS ✓' : 'FAIL ✗'}`);
   console.log(`4. Footer wordmark jump & beam sheen: ${results.footerWordmarkJump.verified ? 'PASS ✓' : 'FAIL ✗'}`);
   console.log(`5. Selected Work artwork assets HTTP 200: ${artworkPass ? 'PASS ✓' : 'FAIL ✗'}`);
   console.log(`6. Contact form validation & field preservation: ${results.contactForm.fieldPreservationWorking ? 'PASS ✓' : 'FAIL ✗'}`);

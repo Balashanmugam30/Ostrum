@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-11-09T10:27:56.959Z",
+  "securityHeaders": {
+    "hsts": "max-age=31536000; includeSubDomains",
+    "xContentTypeOptions": "nosniff",
+    "xFrameOptions": "DENY",
+    "referrerPolicy": "strict-origin-when-cross-origin",
+    "permissionsPolicy": "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+    "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://vitals.vercel-insights.com; worker-src 'self' blob:; media-src 'self' data: blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+    "xPoweredBy": null
+  },
+  "faqSsrValidation": {
+    "totalItems": 10,
+    "missingItems": 0,
+    "allAnswersInSsrHtml": true
+  },
+  "faqSchemaValidation": {
+    "hasFaqPageSchema": true
+  },
+  "previewRouteProtection": {
+    "statusCode": 200,
+    "hasNoIndexMeta": true
+  },
+  "ogImageValidation": {
+    "status": 200,
+    "sizeBytes": 136000,
+    "sizeKb": 133,
+    "under300Kb": true
+  },
+  "notFoundRouteValidation": {
+    "statusCode": 404,
+    "isTrue404": true
+  },
+  "axeResults": {
+    "homepage": {
+      "violationsCount": 0,
+      "violations": [],
+      "passesCount": 35
+    },
+    "terms": {
+      "violationsCount": 0,
+      "violations": [],
+      "passesCount": 24
+    },
+    "privacy": {
+      "violationsCount": 0,
+      "violations": [],
+      "passesCount": 24
+    }
+  },
+  "dashScan": {
+    "homepage": {
+      "emCount": 0,
+      "enCount": 0,
+      "samples": []
+    },
+    "terms": {
+      "emCount": 0,
+      "enCount": 0,
+      "samples": []
+    },
+    "privacy": {
+      "emCount": 0,
+      "enCount": 0,
+      "samples": []
+    }
+  },
+  "overflowMatrix": [
+    {
+      "name": "large-desktop",
+      "width": 1920,
+      "height": 1080,
+      "docW": 1920,
+      "winW": 1920,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 900,
+      "docW": 1440,
+      "winW": 1440,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "name": "laptop",
+      "width": 1280,
+      "height": 800,
+      "docW": 1280,
+      "winW": 1280,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "name": "small-desktop",
+      "width": 1024,
+      "height": 768,
+      "docW": 1024,
+      "winW": 1024,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "name": "tablet-portrait",
+      "width": 768,
+      "height": 1024,
+      "docW": 768,
+      "winW": 768,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "name": "mobile-large",
+      "width": 430,
+      "height": 932,
+      "docW": 430,
+      "winW": 430,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "name": "mobile-medium",
+      "width": 390,
+      "height": 844,
+      "docW": 390,
+      "winW": 390,
+      "overflowPx": 0,
+      "pass": true
+    },
+    {
+      "name": "mobile-compact",
+      "width": 360,
+      "height": 800,
+      "docW": 360,
+      "winW": 360,
+      "overflowPx": 0,
+      "pass": true
+    }
+  ],
+  "formStates": {},
+  "consoleErrors": [],
+  "footerLinkedIn": {
+    "hasPendingBadge": false,
+    "pass": true
+  }
+}

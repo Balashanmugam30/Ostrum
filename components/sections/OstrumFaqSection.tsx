@@ -117,7 +117,7 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
               Frequently Asked Questions
             </h2>
             <p className="font-sans text-base sm:text-lg text-[#242424] leading-relaxed max-w-sm mt-6 font-normal">
-              Clear insights into our engineering scope, collaborative process, and technical delivery.
+              A few answers about our work, process and delivery.
             </p>
           </div>
 
@@ -208,12 +208,18 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
                     <div className="overflow-hidden">
                       {/* Single Accessible Answer: clean DOM extraction without duplicates */}
                       <p className="font-sans text-sm sm:text-base md:text-[16px] leading-relaxed text-[#242424] pb-7 pt-1 max-w-2xl font-normal">
-                        {isOpen ? item.answer.slice(0, typedLength) : ''}
-                        {isOpen && typedLength < item.answer.length && (
-                          <span
-                            className="inline-block w-[2px] h-[1.1em] bg-[#D24B2C] ml-0.5 align-middle animate-pulse"
-                            aria-hidden="true"
-                          />
+                        {isOpen ? (
+                          <>
+                            {item.answer.slice(0, typedLength)}
+                            {typedLength < item.answer.length && (
+                              <span
+                                className="inline-block w-[2px] h-[1.1em] bg-[#D24B2C] ml-0.5 align-middle animate-pulse"
+                                aria-hidden="true"
+                              />
+                            )}
+                          </>
+                        ) : (
+                          item.answer
                         )}
                       </p>
                     </div>

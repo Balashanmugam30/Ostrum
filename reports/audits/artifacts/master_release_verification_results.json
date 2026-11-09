@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-09T08:15:44.549Z",
+  "timestamp": "2026-11-09T11:39:15.911Z",
   "dashScan": {
     "homepage": {
       "emCount": 0,
@@ -20,7 +20,7 @@
   "textSelection": {
     "Capabilities Card": {
       "selectable": true,
-      "sample": "Website design and development, UI/UX design, e-co"
+      "sample": "Websites, storefronts and portals designed for cle"
     },
     "FAQ Question": {
       "selectable": true,
@@ -28,7 +28,7 @@
     },
     "Contact Heading": {
       "selectable": true,
-      "sample": "REACH OUT\nTO US"
+      "sample": "TELL US WHAT YOU’RE BUILDING."
     },
     "Liquid Sand CTA": {
       "selectable": true,
@@ -36,7 +36,7 @@
     },
     "Engine Statement": {
       "selectable": true,
-      "sample": "\"Custom systems engineered around how your busines"
+      "sample": "Custom systems, built around your business."
     },
     "Footer Note": {
       "selectable": true,
@@ -48,23 +48,17 @@
     }
   },
   "heroNavigation": {
-    "systemsArchitecture": {
-      "href": "#capabilities",
-      "ariaLabel": "Navigate to Systems Architecture capabilities",
-      "valid": true
-    },
-    "originalVentures": {
-      "href": "#selected-work",
-      "ariaLabel": "Navigate to Original Ventures selected work",
-      "valid": true
-    }
+    "systemsArchitectureRemoved": true,
+    "originalVenturesRemoved": true,
+    "panelsIntact": true,
+    "valid": true
   },
   "wordmarkContrast": {},
   "footerWordmarkJump": {
     "verified": true,
-    "initialY": 642.3348999023438,
-    "hopY": 614.9550170898438,
-    "delta": 27.3798828125
+    "initialY": 642.305908203125,
+    "hopY": 580.7304077148438,
+    "delta": 61.57550048828125
   },
   "curtainReveals": {
     "termsGap": 32,
