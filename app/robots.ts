@@ -7,12 +7,24 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/'],
+        disallow: ['/api/', '/preview/'],
       },
+      // Search crawlers & user-directed AI retrieval explicitly allowed for discovery & citations
       {
-        userAgent: ['OAI-SearchBot', 'ChatGPT-User'],
+        userAgent: [
+          'OAI-SearchBot',
+          'ChatGPT-User',
+          'Claude-SearchBot',
+          'Claude-User',
+          'PerplexityBot',
+        ],
         allow: '/',
-        disallow: ['/api/'],
+        disallow: ['/api/', '/preview/'],
+      },
+      // Model training scrapers restricted to protect proprietary assets & brand content
+      {
+        userAgent: ['GPTBot', 'ClaudeBot', 'CCBot', 'Bytespider'],
+        disallow: ['/'],
       },
     ],
     sitemap: `${SITE_CONFIG.baseUrl}/sitemap.xml`,

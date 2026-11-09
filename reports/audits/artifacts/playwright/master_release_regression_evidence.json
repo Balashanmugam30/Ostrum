@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-09T11:33:41.406Z",
+  "timestamp": "2026-11-09T17:23:20.327Z",
   "commit": "HEAD",
   "browserVersion": "156.0.8078.4",
   "copyAssertions": {
@@ -29,8 +29,8 @@
     "href": "https://www.linkedin.com/company/ostrum/",
     "ariaLabel": "OSTRUM on LinkedIn",
     "visible": true,
-    "svgWidth": 16,
-    "svgHeight": 16,
+    "svgWidth": 18,
+    "svgHeight": 18,
     "noViewAsMember": true,
     "pass": true
   },
@@ -146,6 +146,15 @@
       "scrollWidth": 390,
       "overflowPx": 0,
       "screenshot": "C:\\Users\\balashanmugam\\OneDrive\\Desktop\\Ostrum\\reports\\audits\\artifacts\\playwright\\mobile.png",
+      "pass": true
+    },
+    {
+      "device": "compact-mobile",
+      "width": 375,
+      "height": 667,
+      "scrollWidth": 375,
+      "overflowPx": 0,
+      "screenshot": "C:\\Users\\balashanmugam\\OneDrive\\Desktop\\Ostrum\\reports\\audits\\artifacts\\playwright\\compact-mobile.png",
       "pass": true
     },
     {

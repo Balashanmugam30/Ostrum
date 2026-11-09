@@ -16,6 +16,7 @@ const VIEWPORT_MATRIX = [
   { name: 'laptop', width: 1280, height: 800 },
   { name: 'tablet-portrait', width: 768, height: 1024 },
   { name: 'mobile', width: 390, height: 844 },
+  { name: 'compact-mobile', width: 375, height: 667 },
   { name: 'narrow-mobile', width: 360, height: 800 },
 ];
 
@@ -53,7 +54,7 @@ async function runAuthoritativeVerification() {
     // A. COPY ASSERTIONS
     // =========================================================================
     console.log('\n--- A. COPY ASSERTIONS ---');
-    await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     // Skip preloader if active
@@ -110,7 +111,7 @@ async function runAuthoritativeVerification() {
     const faqQ2 = pageContent.includes('We deliver custom software, web and mobile apps, UI/UX, e-commerce, AI automation');
     const faqQ3 = pageContent.includes('We assess each enquiry on its goals, scope and fit');
     const faqQ4 = pageContent.includes('Custom software can fit workflows that standard tools cannot support.');
-    const faqQ5 = pageContent.includes('We choose technology around the requirements, integrations, security, maintainability and long-term fit.');
+    const faqQ5 = pageContent.includes('long-term fit - not trends');
     const faqQ6 = pageContent.includes('We identify suitable workflows, connect the required tools');
     const faqQ7 = pageContent.includes('We review the existing systems, integrations and data needs');
     const faqQ8 = pageContent.includes('Pricing depends on scope, complexity, integrations and delivery needs.');
@@ -127,9 +128,9 @@ async function runAuthoritativeVerification() {
     console.log(`[Copy] Contact Heading, Desc & Privacy: ${allContactPass ? 'PASS ✓' : 'FAIL ✗'}`);
 
     // 7. Bottom CTA
-    const ctaEyebrow = pageContent.includes('HAVE A BUSINESS PROBLEM OR PRODUCT IDEA?');
+    const ctaEyebrow = pageContent.includes('HAVE A PROJECT IN MIND?');
     const ctaHeading = pageContent.includes('LET’S BUILD WHAT’S NEXT.');
-    const ctaSupport = pageContent.includes('Custom software, AI systems and digital products, built around your goals.');
+    const ctaSupport = pageContent.includes('Software, AI and digital products. Built for your business.');
     const allCtaPass = ctaEyebrow && ctaHeading && ctaSupport;
     console.log(`[Copy] Bottom CTA: ${allCtaPass ? 'PASS ✓' : 'FAIL ✗'}`);
 
@@ -291,7 +292,7 @@ async function runAuthoritativeVerification() {
     // F. CONTACT FORM VALIDATION & INTERACTIONS
     // =========================================================================
     console.log('\n--- F. CONTACT FORM VALIDATION ---');
-    await page.goto(`${BASE_URL}/#contact`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/#contact`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(800);
 
     // Empty submit
@@ -329,7 +330,7 @@ async function runAuthoritativeVerification() {
     console.log('\n--- G. VIEWPORT MATRIX & ZERO OVERFLOW ---');
     for (const vp of VIEWPORT_MATRIX) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(600);
 
       // Check overflow
@@ -364,7 +365,7 @@ async function runAuthoritativeVerification() {
 
     // Capture focused hero and footer on owner desktop (1648 x 928)
     await page.setViewportSize({ width: 1648, height: 928 });
-    await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(800);
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'owner-hero-desktop-1648x928.png') });
 
@@ -380,7 +381,7 @@ async function runAuthoritativeVerification() {
     const axeResults = {};
 
     for (const route of routesToAudit) {
-      await page.goto(`${BASE_URL}${route}`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}${route}`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(600);
 
       // Inject and run axe

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import BeamWordmarkFooter from '@/components/ui/beam-wordmark-footer';
-import { SITE_CONFIG, hasValidLinkedIn } from '@/lib/site-config';
+import { SITE_CONFIG } from '@/lib/site-config';
 
 export function OstrumStudioFooter() {
   const currentYear = new Date().getFullYear();
@@ -67,7 +67,7 @@ export function OstrumStudioFooter() {
       className="w-full relative z-10 flex flex-col justify-between"
     >
       <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 pt-16 sm:pt-20 md:pt-24">
-        {/* PHASE 3A: TOP CONTACT TILES (Inspired by reference proportions, Ostrum brand identity) */}
+        {/* TOP CONTACT TILES */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-7">
           {/* Tile 1: White Surface / Email Inquiry */}
           <a
@@ -105,27 +105,27 @@ export function OstrumStudioFooter() {
             </div>
           </a>
 
-          {/* Tile 2: Ostrum Red Surface / Start a Project CTA */}
+          {/* Tile 2: Crimson Glass / Direct Project Flow */}
           <Link
             href="/#contact"
-            data-testid="footer-tile-project"
             onClick={(e) => handleNavClick(e, '#contact')}
-            className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-[var(--ostrum-footer-accent,#FF4D30)] text-[#050505] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,77,48,0.32)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#050505]"
+            data-testid="footer-tile-project"
+            className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-[#8B1A13]/40 backdrop-blur-xl border border-white/10 text-white transition-all duration-300 hover:bg-[#8B1A13]/60 hover:border-white/20 hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <div>
-              <span className="font-mono text-xs sm:text-[13px] uppercase tracking-[0.2em] font-semibold text-[#050505]/80 block">
-                / NEXT STEP
+              <span className="font-mono text-xs sm:text-[13px] uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-label-accent,#FF765E)] block">
+                / START A PROJECT
               </span>
-              <h3 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#050505] mt-3 sm:mt-4">
-                Start a project
+              <h3 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mt-3 sm:mt-4">
+                Ready to build?
               </h3>
             </div>
 
-            <div className="flex items-center justify-between pt-6 border-t border-black/15">
-              <span className="font-sans text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-[#050505] group-hover:translate-x-1 transition-transform">
-                Start a project
+            <div className="flex items-center justify-between pt-6 border-t border-white/10">
+              <span className="font-sans text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-white group-hover:text-[var(--ostrum-footer-label-accent,#FF765E)] transition-colors">
+                Tell us what you need
               </span>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-black/20 text-[#050505] flex items-center justify-center transition-all duration-300 group-hover:border-[#050505] group-hover:bg-[#050505] group-hover:text-white">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/20 flex items-center justify-center transition-all duration-300 group-hover:border-white group-hover:bg-white group-hover:text-[#64120F]">
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   viewBox="0 0 16 16"
@@ -143,9 +143,9 @@ export function OstrumStudioFooter() {
           </Link>
         </div>
 
-        {/* PHASE 3B: MAIN FOOTER DIRECTORY */}
-        <div className="mt-28 sm:mt-36 md:mt-44 pt-12 sm:pt-16 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-10 sm:gap-12 lg:gap-16">
-          {/* Column 1: EXPLORE */}
+        {/* BOTTOM SITEMAP & BRAND NAVIGATION */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 pt-16 sm:pt-20 pb-12 sm:pb-16 border-t border-white/10 mt-16 sm:mt-20">
+          {/* Column 1: NAVIGATION */}
           <div>
             <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-label-accent,#FF765E)] block mb-5">
               EXPLORE
@@ -178,15 +178,6 @@ export function OstrumStudioFooter() {
                   FAQ
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/#contact"
-                  onClick={(e) => handleNavClick(e, '#contact')}
-                  className="transition-colors hover:text-white hover:underline underline-offset-4"
-                >
-                  Contact
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -214,25 +205,30 @@ export function OstrumStudioFooter() {
                 </Link>
               </li>
               <li className="pt-2">
-                  <a
-                    href="https://www.linkedin.com/company/ostrum/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="transition-colors hover:text-white inline-flex items-center gap-2 group text-[#D4D4D8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ostrum-footer-label-accent,#FF765E)] rounded"
-                    aria-label="OSTRUM on LinkedIn"
-                    data-testid="footer-linkedin-link"
+                <a
+                  href="https://www.linkedin.com/company/ostrum/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-3 text-[#D4D4D8] hover:text-white transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#64120F] rounded-lg p-1 -ml-1 min-h-[44px]"
+                  aria-label="OSTRUM on LinkedIn"
+                  data-testid="footer-linkedin-link"
+                >
+                  <div
+                    className="w-[38px] h-[38px] rounded-[10px] border border-white/20 bg-[#7a1815]/40 flex items-center justify-center transition-colors duration-200 group-hover:border-white/40 group-hover:bg-[#8f1e1a]/60 group-active:bg-[#681412]/80 shrink-0"
+                    aria-hidden="true"
                   >
                     <svg
-                      className="w-4 h-4 fill-current text-[var(--ostrum-footer-label-accent,#FF765E)] transition-transform group-hover:scale-110 shrink-0"
+                      className="w-[18px] h-[18px] fill-[#FBF7EE] text-[#FBF7EE]"
                       viewBox="0 0 24 24"
                       aria-hidden="true"
                     >
                       <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.3a1.64 1.64 0 1 0 0 3.28 1.64 1.64 0 0 0 0-3.28" />
                     </svg>
-                    <span className="group-hover:underline underline-offset-4">LinkedIn</span>
-                    <span aria-hidden="true" className="text-xs opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
-                  </a>
-                </li>
+                  </div>
+                  <span className="font-sans text-sm sm:text-base group-hover:underline underline-offset-4">LinkedIn</span>
+                  <span aria-hidden="true" className="text-xs opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
+                </a>
+              </li>
             </ul>
           </div>
 

@@ -907,21 +907,21 @@ export const OSTRUM_WORKS: WorksWheelItem[] = [
     title: "TMR AI Car Care",
     description:
       "A digital platform for automotive care studios, bringing service discovery, customer enquiries and bookings together.",
-    image: "/images/works/tmr-ai-car-care.jpg",
+    image: "/images/works/tmr-ai-car-care.webp",
     href: "https://tmraicarcare.com/",
   },
   {
     title: "Saraswati Driving School",
     description:
       "A booking and fleet-scheduling platform for student lessons, training schedules and vehicle coordination.",
-    image: "/images/works/saraswati-driving-school.jpg",
+    image: "/images/works/saraswati-driving-school.webp",
     href: "https://saraswati-driving-school.vercel.app/",
   },
   {
     title: "MNESA",
     description:
       "An OSTRUM venture exploring a simpler way to capture ideas, organise commitments and turn them into action.",
-    image: "/images/works/mnesa.jpg",
+    image: "/images/works/mnesa.webp",
     href: "https://github.com/Balashanmugam30/mnesa",
   },
   {

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-09T11:39:15.911Z",
+  "timestamp": "2026-11-09T17:33:36.192Z",
   "dashScan": {
     "homepage": {
       "emCount": 0,
@@ -32,7 +32,7 @@
     },
     "Liquid Sand CTA": {
       "selectable": true,
-      "sample": "HAVE A BUSINESS PROBLEM OR PRODUCT IDEA?\nLET’S BUI"
+      "sample": "LET’S BUILD WHAT’S NEXT."
     },
     "Engine Statement": {
       "selectable": true,
@@ -56,9 +56,9 @@
   "wordmarkContrast": {},
   "footerWordmarkJump": {
     "verified": true,
-    "initialY": 642.305908203125,
-    "hopY": 580.7304077148438,
-    "delta": 61.57550048828125
+    "initialY": 643.23681640625,
+    "hopY": 580.7095947265625,
+    "delta": 62.5272216796875
   },
   "curtainReveals": {
     "termsGap": 32,

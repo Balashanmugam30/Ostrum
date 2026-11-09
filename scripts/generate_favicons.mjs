@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
-const masterSource = 'C:/Users/balashanmugam/.gemini/antigravity/brain/e61a5bf4-ec20-4604-866c-28b2350ab0c5/ostrum_3d_symbol_master_1794222966509.jpg';
+const masterSource = 'C:/Users/balashanmugam/.gemini/antigravity/brain/e61a5bf4-ec20-4604-866c-28b2350ab0c5/ostrum_brand_master_icon_v3_1794244062718.jpg';
 const brandDir = path.resolve('public/brand');
 const publicDir = path.resolve('public');
 const appDir = path.resolve('app');

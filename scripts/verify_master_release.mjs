@@ -60,7 +60,7 @@ async function runMasterVerification() {
     ];
 
     for (const p of pagesToScan) {
-      await page.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}${p.path}`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(500);
 
       const dashes = await page.evaluate(() => {
@@ -91,7 +91,7 @@ async function runMasterVerification() {
     // 2. TEXT SELECTION & HIGHLIGHT ACROSS SECTIONS
     // =========================================================================
     console.log('\n--- 2. TEXT SELECTION & COPYABILITY ---');
-    await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     // Skip preloader if active
@@ -127,7 +127,7 @@ async function runMasterVerification() {
     }
 
     // Test selection on Terms page
-    await page.goto(`${BASE_URL}/terms-and-conditions`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/terms-and-conditions`, { waitUntil: 'domcontentloaded' });
     const termsSelected = await page.evaluate(() => {
       const p = document.querySelector('#acceptance p');
       if (!p) return null;
@@ -145,7 +145,7 @@ async function runMasterVerification() {
     // 3. HERO CONTROLS REMOVAL & PANEL VERIFICATION
     // =========================================================================
     console.log('\n--- 3. HERO REDIRECTION CONTROLS REMOVAL ---');
-    await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     const fullContent = await page.content();
@@ -201,7 +201,7 @@ async function runMasterVerification() {
     console.log('\n--- 5. THEATRE CURTAIN REVEALS & GEOMETRY ---');
 
     // Terms Curtain
-    await page.goto(`${BASE_URL}/terms-and-conditions`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/terms-and-conditions`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     const termsBeforeMetrics = await page.evaluate(() => {
@@ -232,7 +232,7 @@ async function runMasterVerification() {
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'terms-footer-final-desktop.png') });
 
     // Privacy Curtain
-    await page.goto(`${BASE_URL}/privacy-policy`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/privacy-policy`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'privacy-before-reveal-desktop.png') });
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -240,7 +240,7 @@ async function runMasterVerification() {
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'privacy-footer-final-desktop.png') });
 
     // Homepage CTA Reveal
-    await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
     const ctaY = await page.evaluate(() => {
       const cta = document.getElementById('cta');
@@ -279,7 +279,7 @@ async function runMasterVerification() {
     }
 
     // Capture 3D Selected Work carousel in viewport
-    await page.goto(`${BASE_URL}/#selected-work`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/#selected-work`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1200);
     await page.screenshot({ path: path.join(ARTIFACTS_DIR, 'selected-work-wheel-desktop.png') });
 
@@ -287,7 +287,7 @@ async function runMasterVerification() {
     // 7. CONTACT FORM VALIDATION & SECURITY
     // =========================================================================
     console.log('\n--- 7. CONTACT FORM VALIDATION & FIELD PRESERVATION ---');
-    await page.goto(`${BASE_URL}/#contact`, { waitUntil: 'networkidle' });
+    await page.goto(`${BASE_URL}/#contact`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
     // Test Empty Submit
@@ -321,7 +321,7 @@ async function runMasterVerification() {
     // =========================================================================
     console.log('\n--- 8. SEO, CANONICALS & STRUCTURED DATA ---');
     for (const p of pagesToScan) {
-      await page.goto(`${BASE_URL}${p.path}`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}${p.path}`, { waitUntil: 'domcontentloaded' });
       const meta = await page.evaluate(() => {
         const title = document.title;
         const desc = document.querySelector('meta[name="description"]')?.getAttribute('content');
@@ -347,7 +347,7 @@ async function runMasterVerification() {
     console.log('\n--- 9. 8-DEVICE HORIZONTAL OVERFLOW MATRIX ---');
     for (const vp of VIEWPORTS) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(500);
 
       const overflow = await page.evaluate((expectedWidth) => {
@@ -383,7 +383,7 @@ async function runMasterVerification() {
       colorScheme: 'dark',
     });
     await reducedPage.emulateMedia({ reducedMotion: 'reduce' });
-    await reducedPage.goto(`${BASE_URL}/terms-and-conditions`, { waitUntil: 'networkidle' });
+    await reducedPage.goto(`${BASE_URL}/terms-and-conditions`, { waitUntil: 'domcontentloaded' });
     await reducedPage.waitForTimeout(500);
 
     const isStaticFlow = await reducedPage.evaluate(() => {

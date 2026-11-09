@@ -205,7 +205,7 @@ export default function PrivacyPolicyPage() {
           Our public website does not employ third-party advertising cookies, cross-site behavioral tracking scripts, or commercial marketing pixels.
         </p>
         <p className="mt-3">
-          We utilize only minimal, essential browser storage mechanisms necessary for the core operation of the site, including ephemeral session flags (such as recording completion of the initial visual cinematic sequence during a single browsing session) and user interface accessibility preferences (such as respecting <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">prefers-reduced-motion</code>).
+          We utilize only minimal, essential browser storage mechanisms necessary for the core operation of the site, including ephemeral session flags in sessionStorage (such as recording completion of the initial visual cinematic sequence during a single browsing session) while querying browser media preferences such as <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">prefers-reduced-motion</code> without persisting them to disk.
         </p>
       </section>
 

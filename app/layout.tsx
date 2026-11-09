@@ -89,7 +89,7 @@ const jsonLd = {
       '@id': `${SITE_CONFIG.baseUrl}/#organization`,
       name: 'OSTRUM',
       url: SITE_CONFIG.baseUrl,
-      logo: `${SITE_CONFIG.baseUrl}/images/ostrum-logo.png`,
+      logo: `${SITE_CONFIG.baseUrl}/brand/ostrum-3d-symbol-master.png`,
       email: SITE_CONFIG.contactEmail,
       description:
         'Independent digital product engineering, custom software development, AI systems, and venture studio.',

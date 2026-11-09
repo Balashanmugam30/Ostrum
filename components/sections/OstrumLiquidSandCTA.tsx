@@ -50,38 +50,49 @@ export function OstrumLiquidSandCTA() {
         mobileDarkSrc="https://cdn.21st.dev/assets/mirror/9a/9a82cb59be1bfde59855b79d7a565e487155a89f4d52eac74dcc10e267b2b6d1.webp"
       >
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-6 sm:px-10 flex flex-col items-center text-center -translate-y-2 sm:-translate-y-4">
+          {/* Eyebrow */}
+          <p
+            data-testid="cta-eyebrow"
+            className="font-sans text-xs sm:text-sm font-semibold tracking-[0.24em] text-white/75 uppercase mb-3 sm:mb-4 select-text"
+            style={{
+              textShadow: '0 2px 4px rgba(0,0,0,0.85)',
+            }}
+          >
+            HAVE A PROJECT IN MIND?
+          </p>
+
           {/* Main Headline in Ostrum Condensed Font */}
           <h2
             data-testid="cta-heading"
             className="font-condensed font-bold uppercase text-[#FAF9FF] tracking-[-0.01em] select-text text-balance"
             style={{
-              fontSize: 'clamp(3.2rem, 8.5vw, 118px)',
-              lineHeight: '0.90',
-              maxWidth: '1050px',
+              fontSize: 'clamp(2.4rem, 6vw, 84px)',
+              lineHeight: '1.02',
+              maxWidth: '960px',
               textShadow: '0 2px 5px rgba(0,0,0,0.92), 0 4px 14px rgba(0,0,0,0.72), 0 0 24px rgba(0,0,0,0.38)',
             }}
           >
-            HAVE A BUSINESS PROBLEM OR PRODUCT IDEA?<br />LET’S BUILD WHAT’S NEXT.
+            LET’S BUILD WHAT’S NEXT.
           </h2>
 
           {/* Supporting Sentence */}
           <p
-            className="font-sans text-base sm:text-lg md:text-xl text-[#FAF9FF] font-medium leading-relaxed max-w-xl mt-5 sm:mt-6 text-pretty select-text"
+            className="font-sans text-base sm:text-lg md:text-xl text-[#FAF9FF] font-medium leading-relaxed max-w-xl mt-4 sm:mt-5 text-pretty select-text"
             style={{
               textShadow: '0 1px 3px rgba(0,0,0,0.95), 0 2px 9px rgba(0,0,0,0.62)',
             }}
           >
-            Custom software, AI systems and digital products, built around your goals.
+            Software, AI and digital products. Built for your business.
           </p>
 
           {/* Primary CTA Button pointing to /#contact */}
-          <div className="mt-8 sm:mt-9">
+          <div className="mt-7 sm:mt-8">
             <Link
               href="/#contact"
               data-testid="cta-primary-button"
               className="inline-flex items-center gap-2.5 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-white hover:bg-[#FAF9FF] text-[#050505] font-sans text-base sm:text-lg font-bold shadow-[0_4px_24px_rgba(255,255,255,0.12)] hover:shadow-[0_8px_32px_rgba(255,255,255,0.24)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 group cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
-              <span>Start a Project</span>
+              <span>Start a project</span>
               <svg
                 className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 viewBox="0 0 16 16"
