@@ -8,10 +8,29 @@ import { OstrumTestimonialsSection } from '@/components/sections/OstrumTestimoni
 import { OstrumFaqSection } from '@/components/sections/OstrumFaqSection';
 import { OstrumContactSection } from '@/components/sections/OstrumContactSection';
 import { OstrumFooterReveal } from '@/components/sections/OstrumFooterReveal';
+import { OSTRUM_FAQ_DATA } from '@/data/faq';
 
 export default function HomePage() {
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: OSTRUM_FAQ_DATA.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <div className="relative w-full flex flex-col items-center">
+      {/* Structured Data: FAQPage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       {/* SECTION 01: Monumental Hero Narrative & Parallax Logo */}
       <IntroHero />
 

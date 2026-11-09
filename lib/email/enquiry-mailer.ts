@@ -76,7 +76,7 @@ function checkMemoryRateLimit(ip: string, now: number): RateLimitResult {
 
 /**
  * Checks rate limit against distributed Redis store (Upstash / Vercel KV) if configured.
- * Uses atomic INCR + EXPIRE sliding window via Upstash REST API.
+ * Uses atomic fixed-window counter via Upstash REST API (INCR + EXPIRE NX + TTL).
  */
 async function checkDistributedRateLimit(
   ip: string,
@@ -284,11 +284,12 @@ export function extractTrustedClientIp(headers: Headers): TrustedClientIpInfo {
   }
 
   // Fallback: in non-production/test environments, default to 127.0.0.1 for local isolation.
-  // In production, avoid collapsing distinct unidentified clients into a single bucket.
+  // In production, unknown callers without trusted proxy headers share a single emergency bucket
+  // to ensure abuse protection cannot be bypassed by omitting headers.
   const isDevOrTest = process.env.NODE_ENV !== 'production';
   const fallbackIp = isDevOrTest
     ? '127.0.0.1'
-    : `unidentified_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 8)}`;
+    : 'unidentified_origin_client';
 
   return { ip: fallbackIp, source: 'fallback', isTrustedEdge: false };
 }

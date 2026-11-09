@@ -52,8 +52,9 @@ export function getMailtoLink(subject?: string): string {
  * - Hostnames that do not strictly end with .linkedin.com or match linkedin.com
  * - Missing company/profile pathname
  */
-export function hasValidLinkedIn(): boolean {
-  const urlStr = SITE_CONFIG.linkedInUrl?.trim();
+export function hasValidLinkedIn(customUrl?: string): boolean {
+  const rawUrl = customUrl !== undefined ? customUrl : (process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL || SITE_CONFIG.linkedInUrl);
+  const urlStr = rawUrl?.trim();
   if (!urlStr) return false;
   if (urlStr === LINKEDIN_PLACEHOLDER) return false;
   if (urlStr.includes('replace-with-real-ostrum-profile')) return false;
@@ -85,6 +86,7 @@ export function hasValidLinkedIn(): boolean {
 /**
  * Returns the verified LinkedIn URL if valid, or null if unconfigured/placeholder.
  */
-export function getVerifiedLinkedInUrl(): string | null {
-  return hasValidLinkedIn() ? SITE_CONFIG.linkedInUrl.trim() : null;
+export function getVerifiedLinkedInUrl(customUrl?: string): string | null {
+  const rawUrl = customUrl !== undefined ? customUrl : (process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL || SITE_CONFIG.linkedInUrl);
+  return hasValidLinkedIn(rawUrl) ? (rawUrl?.trim() || null) : null;
 }

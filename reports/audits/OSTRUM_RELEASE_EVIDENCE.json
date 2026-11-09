@@ -1,0 +1,115 @@
+{
+  "auditDate": "2026-11-09T10:28:52.000Z",
+  "repository": "Balashanmugam30/Ostrum",
+  "releaseBranch": "fix/predeployment-release-readiness",
+  "baseCommit": "74fba2adbe41118cbba544cdc7c37967b3da8c55",
+  "environment": {
+    "nodeVersion": "v22.20.0",
+    "npmVersion": "10.9.2",
+    "nextVersion": "15.5.29",
+    "reactVersion": "19.0.0",
+    "sharpVersion": "0.33.5"
+  },
+  "qualityGates": {
+    "npmAudit": {
+      "command": "npm audit --omit=dev",
+      "vulnerabilities": 0,
+      "status": "PASS"
+    },
+    "npmAuditAll": {
+      "command": "npm audit",
+      "vulnerabilities": 0,
+      "packages": 378,
+      "status": "PASS"
+    },
+    "typeCheck": {
+      "command": "npx tsc --noEmit",
+      "errors": 0,
+      "status": "PASS"
+    },
+    "eslint": {
+      "command": "npm run lint",
+      "errors": 0,
+      "warnings": 0,
+      "status": "PASS"
+    },
+    "unitAndIntegrationTests": {
+      "command": "npm test",
+      "totalTests": 24,
+      "passed": 24,
+      "failed": 0,
+      "suites": 7,
+      "status": "PASS"
+    },
+    "productionBuild": {
+      "command": "npm run build",
+      "routesCompiled": 10,
+      "status": "PASS"
+    }
+  },
+  "runtimeVerification": {
+    "securityHeaders": {
+      "strictTransportSecurity": "max-age=31536000; includeSubDomains",
+      "xContentTypeOptions": "nosniff",
+      "xFrameOptions": "DENY",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "permissionsPolicy": "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+      "contentSecurityPolicy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://vitals.vercel-insights.com; worker-src 'self' blob:; media-src 'self' data: blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+      "xPoweredBy": "DISABLED (Header omitted)"
+    },
+    "axeCoreAccessibility": {
+      "homepage": { "violations": 0, "passes": 35 },
+      "termsAndConditions": { "violations": 0, "passes": 24 },
+      "privacyPolicy": { "violations": 0, "passes": 24 }
+    },
+    "zeroDashScan": {
+      "homepage": { "emCount": 0, "enCount": 0 },
+      "termsAndConditions": { "emCount": 0, "enCount": 0 },
+      "privacyPolicy": { "emCount": 0, "enCount": 0 }
+    },
+    "horizontalOverflowMatrix": [
+      { "viewport": "large-desktop", "width": 1920, "height": 1080, "overflowPx": 0, "pass": true },
+      { "viewport": "desktop", "width": 1440, "height": 900, "overflowPx": 0, "pass": true },
+      { "viewport": "laptop", "width": 1280, "height": 800, "overflowPx": 0, "pass": true },
+      { "viewport": "small-desktop", "width": 1024, "height": 768, "overflowPx": 0, "pass": true },
+      { "viewport": "tablet-portrait", "width": 768, "height": 1024, "overflowPx": 0, "pass": true },
+      { "viewport": "mobile-large", "width": 430, "height": 932, "overflowPx": 0, "pass": true },
+      { "viewport": "mobile-medium", "width": 390, "height": 844, "overflowPx": 0, "pass": true },
+      { "viewport": "mobile-compact", "width": 360, "height": 800, "overflowPx": 0, "pass": true }
+    ],
+    "seoAndContentIntegrity": {
+      "faqServerRendered": {
+        "totalQuestions": 10,
+        "answersPresentInRawHtml": 10,
+        "missingInHtml": 0,
+        "pass": true
+      },
+      "faqPageSchema": {
+        "presentInHtml": true,
+        "type": "FAQPage"
+      },
+      "previewRouteProtection": {
+        "path": "/preview/ostrum-core",
+        "hasNoIndexNofollow": true,
+        "pass": true
+      },
+      "ogImage": {
+        "path": "/images/ostrum-og.png",
+        "dimensions": "1200x630",
+        "sizeBytes": 136000,
+        "sizeKb": 133,
+        "under300Kb": true,
+        "pass": true
+      },
+      "notFoundRoute": {
+        "path": "/this-route-does-not-exist",
+        "status": 404,
+        "pass": true
+      },
+      "footerLinkedIn": {
+        "pendingBadgePresent": false,
+        "pass": true
+      }
+    }
+  }
+}

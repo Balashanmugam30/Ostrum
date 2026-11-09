@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-09T08:15:44.549Z",
+  "timestamp": "2026-11-09T10:27:56.959Z",
   "dashScan": {
     "homepage": {
       "emCount": 0,
@@ -187,5 +187,44 @@
   "reducedMotion": {
     "staticLayout": true
   },
-  "consoleErrors": []
+  "consoleErrors": [],
+  "axeResults": {
+    "homepage": {
+      "violationsCount": 0,
+      "violations": [],
+      "passesCount": 35
+    },
+    "terms": {
+      "violationsCount": 0,
+      "violations": [],
+      "passesCount": 24
+    },
+    "privacy": {
+      "violationsCount": 0,
+      "violations": [],
+      "passesCount": 24
+    }
+  },
+  "faqSsrValidation": {
+    "totalItems": 10,
+    "missingItems": 0,
+    "allAnswersInSsrHtml": true
+  },
+  "faqSchemaValidation": {
+    "hasFaqPageSchema": true
+  },
+  "previewRouteProtection": {
+    "statusCode": 200,
+    "hasNoIndexMeta": true
+  },
+  "notFoundRouteValidation": {
+    "statusCode": 404,
+    "isTrue404": true
+  },
+  "ogImageValidation": {
+    "status": 200,
+    "sizeBytes": 136000,
+    "sizeKb": 133,
+    "under300Kb": true
+  }
 }

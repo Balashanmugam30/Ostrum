@@ -365,7 +365,7 @@ describe('6. Trusted Client IP Extraction & Validation', () => {
         'x-forwarded-for': 'malicious-spoof',
       });
       const res = extractTrustedClientIp(headersUnknown);
-      assert.match(res.ip, /^unidentified_/);
+      assert.strictEqual(res.ip, 'unidentified_origin_client');
       assert.strictEqual(res.source, 'fallback');
       assert.strictEqual(res.isTrustedEdge, false);
     } finally {
@@ -377,25 +377,33 @@ describe('6. Trusted Client IP Extraction & Validation', () => {
 describe('7. LinkedIn Strict Validation & Placeholder Handling', () => {
   test('rejects placeholder URL and deceptive URLs', () => {
     // Empty
-    assert.strictEqual(hasValidLinkedIn(), false);
+    assert.strictEqual(hasValidLinkedIn(''), false);
 
     // Placeholder
-    process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL =
-      'https://www.linkedin.com/company/replace-with-real-ostrum-profile/';
-    assert.strictEqual(hasValidLinkedIn(), false);
+    assert.strictEqual(
+      hasValidLinkedIn('https://www.linkedin.com/company/replace-with-real-ostrum-profile/'),
+      false
+    );
 
     // Deceptive subdomain/domain
-    process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL = 'https://linkedin.com.attacker.org/company/ostrum';
-    assert.strictEqual(hasValidLinkedIn(), false);
+    assert.strictEqual(
+      hasValidLinkedIn('https://linkedin.com.attacker.org/company/ostrum'),
+      false
+    );
 
     // Insecure HTTP
-    process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL = 'http://www.linkedin.com/company/ostrum';
-    assert.strictEqual(hasValidLinkedIn(), false);
+    assert.strictEqual(
+      hasValidLinkedIn('http://www.linkedin.com/company/ostrum'),
+      false
+    );
 
     // Bare root
-    process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL = 'https://www.linkedin.com/';
-    assert.strictEqual(hasValidLinkedIn(), false);
+    assert.strictEqual(hasValidLinkedIn('https://www.linkedin.com/'), false);
 
-    delete process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL;
+    // Owner-supplied verified canonical company URL
+    assert.strictEqual(
+      hasValidLinkedIn('https://www.linkedin.com/company/ostrum/'),
+      true
+    );
   });
 });

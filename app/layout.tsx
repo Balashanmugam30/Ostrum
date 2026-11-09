@@ -26,7 +26,7 @@ export const metadata: Metadata = {
       'Custom software, AI automation, digital products and connected systems engineered around real business needs.',
     url: SITE_CONFIG.baseUrl,
     siteName: 'OSTRUM',
-    locale: 'en_US',
+    locale: 'en_IN',
     type: 'website',
     images: [
       {
@@ -100,7 +100,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark bg-black">
+    <html lang="en-IN" className="dark bg-black">
       <head>
         <script
           type="application/ld+json"

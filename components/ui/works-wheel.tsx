@@ -10,6 +10,7 @@
 // - LEFT: Clean, prominent project information (title, description, and live destination link).
 // - Surrounding cards curve back into 3D perspective above and below.
 import * as React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export interface WorksWheelItem {
@@ -228,12 +229,14 @@ function InteractiveCardArtwork({
     <span
       className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(0,0,0,0.35)] border border-white/10 bg-black/20"
     >
-      <img
+      <Image
         src={src}
         alt={alt}
+        fill
         draggable={false}
         className="size-full object-cover"
-        loading={isFront ? "eager" : "lazy"}
+        sizes="(max-width: 768px) 100vw, 480px"
+        priority={isFront}
       />
       {/* Subtle live destination indicator on front card */}
       {href?.startsWith("http") && (
@@ -395,7 +398,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         drumShiftY,
         isDesktop,
       };
-    }, [stage, count]);
+    }, [stage]);
 
     // Demand-driven rAF loop: sleeps when settled, wakes when turning
     const isAnimating = React.useRef(false);
