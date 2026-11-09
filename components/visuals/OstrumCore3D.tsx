@@ -645,7 +645,15 @@ export const OstrumCore3D = forwardRef<OstrumCore3DHandle, OstrumCore3DProps>(
       const resizeObserver = new ResizeObserver(handleResize);
       resizeObserver.observe(container);
 
-      // 10. Single Unified Animation Loop with Offscreen Pause
+      // 10. Single Unified Animation Loop with Offscreen & Background Tab Pause
+      let isTabHidden = typeof document !== 'undefined' ? document.hidden : false;
+      const handleVisibilityChange = () => {
+        isTabHidden = document.hidden;
+      };
+      if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+      }
+
       let lastTime = performance.now();
 
       let isContextLost = false;
@@ -664,8 +672,8 @@ export const OstrumCore3D = forwardRef<OstrumCore3DHandle, OstrumCore3DProps>(
         if (isDisposed || isContextLost) return;
         animFrameRef.current = requestAnimationFrame(animate);
 
-        // Offscreen pause check: if container is not in viewport, skip rendering
-        if (!isVisibleRef.current) return;
+        // Offscreen or background tab pause check: skip rendering when container is offscreen or tab is hidden
+        if (!isVisibleRef.current || isTabHidden) return;
 
         const delta = Math.min((time - lastTime) / 1000, 0.1);
         lastTime = time;
@@ -773,6 +781,9 @@ export const OstrumCore3D = forwardRef<OstrumCore3DHandle, OstrumCore3DProps>(
         isDisposed = true;
         if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
         window.removeEventListener('mousemove', handlePointerMove);
+        if (typeof document !== 'undefined') {
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        }
         resizeObserver.disconnect();
         visibilityObserver.disconnect();
         renderer.domElement.removeEventListener('webglcontextlost', onContextLost);

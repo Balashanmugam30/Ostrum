@@ -205,11 +205,13 @@ function InteractiveCardArtwork({
   alt,
   href,
   isCapabilities,
+  isFront,
 }: {
   src: string;
   alt: string;
   href?: string;
   isCapabilities?: boolean;
+  isFront?: boolean;
 }) {
   if (isCapabilities) {
     return (
@@ -231,7 +233,7 @@ function InteractiveCardArtwork({
         alt={alt}
         draggable={false}
         className="size-full object-cover"
-        loading="eager"
+        loading={isFront ? "eager" : "lazy"}
       />
       {/* Subtle live destination indicator on front card */}
       {href?.startsWith("http") && (
@@ -816,6 +818,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                     alt={item.title}
                     href={item.href}
                     isCapabilities={item.isCapabilities}
+                    isFront={isCurrent}
                   />
                 </div>
               );

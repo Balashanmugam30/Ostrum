@@ -1,4 +1,4 @@
-import { test, describe } from 'node:test';
+import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   escapeHtml,
@@ -8,6 +8,11 @@ import {
   buildEnquiryText,
   sendEnquiryNotification,
   checkRateLimit,
+  checkRateLimitAsync,
+  _resetMemoryRateLimitStore,
+  extractTrustedClientIp,
+  isValidIp,
+  ALLOWED_PROJECT_TYPES,
 } from '../lib/email/enquiry-mailer.ts';
 import { hasValidLinkedIn } from '../lib/site-config.ts';
 
@@ -39,12 +44,12 @@ describe('1. Input Sanitization & HTML Escaping', () => {
 });
 
 describe('2. Payload Validation & Honeypot Protection', () => {
-  test('accepts valid full payload', () => {
+  test('accepts valid full payload with allowed project type', () => {
     const raw = {
       name: 'Ada Lovelace',
       email: 'ada@analytical.engine',
       company: 'Babbage Labs',
-      projectType: 'AI Systems & Agents',
+      projectType: 'AI Systems & Workflow Automation',
       phone: '+44 20 7946 0919',
       message: 'We are engineering an algorithmic calculating engine.',
     };
@@ -54,6 +59,59 @@ describe('2. Payload Validation & Honeypot Protection', () => {
     assert.strictEqual(result.data.name, 'Ada Lovelace');
     assert.strictEqual(result.data.email, 'ada@analytical.engine');
     assert.strictEqual(result.data.company, 'Babbage Labs');
+    assert.strictEqual(result.data.projectType, 'AI Systems & Workflow Automation');
+  });
+
+  test('rejects non-plain-object payloads', () => {
+    const arrayPayload = [{ name: 'Test', email: 'test@example.com' }];
+    assert.strictEqual(validateEnquiryPayload(arrayPayload).category, 'validation_error');
+
+    const nullPayload = null;
+    assert.strictEqual(validateEnquiryPayload(nullPayload).category, 'validation_error');
+
+    const stringPayload = '{"name": "test"}';
+    assert.strictEqual(validateEnquiryPayload(stringPayload).category, 'validation_error');
+
+    const numberPayload = 42;
+    assert.strictEqual(validateEnquiryPayload(numberPayload).category, 'validation_error');
+  });
+
+  test('rejects unapproved project types', () => {
+    const raw = {
+      name: 'Test User',
+      email: 'test@example.com',
+      projectType: 'Malicious / Crypto Mining',
+      message: 'Legitimate looking message with unauthorized project type.',
+    };
+
+    const result = validateEnquiryPayload(raw);
+    assert.strictEqual(result.category, 'validation_error');
+    assert.match(result.error, /Please select a valid project scope option/);
+  });
+
+  test('defaults omitted project type to "Other / Not Sure Yet"', () => {
+    const raw = {
+      name: 'Grace Hopper',
+      email: 'grace@navy.mil',
+      message: 'Exploring collaborative technical opportunities with studio.',
+    };
+
+    const result = validateEnquiryPayload(raw);
+    assert.ok(result.data);
+    assert.strictEqual(result.data.projectType, 'Other / Not Sure Yet');
+  });
+
+  test('accepts all 9 allowed project types case-insensitively', () => {
+    for (const opt of ALLOWED_PROJECT_TYPES) {
+      const res = validateEnquiryPayload({
+        name: 'Alan Turing',
+        email: 'alan@bletchley.ac.uk',
+        projectType: opt.toLowerCase(),
+        message: 'Exploring universal computational architectures.',
+      });
+      assert.ok(res.data, `Failed on project type: ${opt}`);
+      assert.strictEqual(res.data.projectType, opt);
+    }
   });
 
   test('rejects missing required fields', () => {
@@ -96,7 +154,7 @@ describe('3. Template Generation & Content Security', () => {
     name: 'Grace Hopper',
     email: 'grace@navy.mil',
     company: 'Cobol Pioneers <LLC>',
-    projectType: 'Software Architecture',
+    projectType: 'Custom Software & Business Platforms',
     phone: '+1 555 0199',
     message: 'Finding the first actual computer bug in a relay <moth>.',
   };
@@ -117,7 +175,7 @@ describe('3. Template Generation & Content Security', () => {
     assert.match(text, /Grace Hopper/);
     assert.match(text, /grace@navy\.mil/);
     assert.match(text, /Cobol Pioneers <LLC>/);
-    assert.match(text, /Software Architecture/);
+    assert.match(text, /Custom Software & Business Platforms/);
   });
 });
 
@@ -126,7 +184,7 @@ describe('4. Resend Mailer Dispatch & Mock Integration', () => {
     name: 'Linus Torvalds',
     email: 'linus@kernel.org',
     company: 'Linux Foundation',
-    projectType: 'Custom Architecture',
+    projectType: 'Custom Software & Business Platforms',
     phone: 'Not provided',
     message: 'Just for fun - discussing monolithic vs microkernel architecture.',
   };
@@ -217,9 +275,13 @@ describe('4. Resend Mailer Dispatch & Mock Integration', () => {
   });
 });
 
-describe('5. Rate Limiting Protection', () => {
-  test('allows up to 5 requests per IP then blocks subsequent requests', () => {
-    const testIp = '192.0.2.' + Math.floor(Math.random() * 250);
+describe('5. Rate Limiting Protection & Distributed Resilience', () => {
+  beforeEach(() => {
+    _resetMemoryRateLimitStore();
+  });
+
+  test('allows up to 5 requests per IP then blocks subsequent requests (sync)', () => {
+    const testIp = '192.0.2.42';
 
     for (let i = 0; i < 5; i++) {
       const allowed = checkRateLimit(testIp);
@@ -229,9 +291,73 @@ describe('5. Rate Limiting Protection', () => {
     const sixth = checkRateLimit(testIp);
     assert.strictEqual(sixth, false, '6th request within window should be rate-limited');
   });
+
+  test('allows up to 5 requests per IP then blocks subsequent requests (async)', async () => {
+    const testIp = '198.51.100.99';
+
+    for (let i = 0; i < 5; i++) {
+      const res = await checkRateLimitAsync(testIp);
+      assert.strictEqual(res.allowed, true, `Request ${i + 1} should be allowed`);
+      assert.strictEqual(res.remaining, 4 - i);
+    }
+
+    const sixth = await checkRateLimitAsync(testIp);
+    assert.strictEqual(sixth.allowed, false, '6th request should be blocked');
+    assert.strictEqual(sixth.remaining, 0);
+  });
 });
 
-describe('6. LinkedIn Strict Validation & Placeholder Handling', () => {
+describe('6. Trusted Client IP Extraction & Validation', () => {
+  test('isValidIp validates correct IPv4 addresses', () => {
+    assert.strictEqual(isValidIp('127.0.0.1'), true);
+    assert.strictEqual(isValidIp('192.168.1.1'), true);
+    assert.strictEqual(isValidIp('203.0.113.195'), true);
+    assert.strictEqual(isValidIp('256.0.0.1'), false);
+    assert.strictEqual(isValidIp('192.168.1'), false);
+    assert.strictEqual(isValidIp('not-an-ip'), false);
+  });
+
+  test('isValidIp validates IPv6 addresses', () => {
+    assert.strictEqual(isValidIp('2001:db8::1'), true);
+    assert.strictEqual(isValidIp('::1'), true);
+    assert.strictEqual(isValidIp('2001:0db8:85a3:0000:0000:8a2e:0370:7334'), true);
+  });
+
+  test('extractTrustedClientIp respects edge hierarchy', () => {
+    // Vercel edge takes precedence
+    const headers1 = new Headers({
+      'x-vercel-forwarded-for': '198.51.100.1',
+      'cf-connecting-ip': '198.51.100.2',
+      'x-real-ip': '198.51.100.3',
+    });
+    const res1 = extractTrustedClientIp(headers1);
+    assert.strictEqual(res1.ip, '198.51.100.1');
+    assert.strictEqual(res1.source, 'x-vercel-forwarded-for');
+    assert.strictEqual(res1.isTrustedEdge, true);
+
+    // Cloudflare edge takes precedence when Vercel is absent
+    const headers2 = new Headers({
+      'cf-connecting-ip': '198.51.100.2',
+      'x-real-ip': '198.51.100.3',
+    });
+    const res2 = extractTrustedClientIp(headers2);
+    assert.strictEqual(res2.ip, '198.51.100.2');
+    assert.strictEqual(res2.source, 'cf-connecting-ip');
+    assert.strictEqual(res2.isTrustedEdge, true);
+
+    // Fallback safely to 127.0.0.1 on spoofed / invalid IP
+    const headersSpoofed = new Headers({
+      'x-vercel-forwarded-for': 'malicious<script>',
+      'x-forwarded-for': 'injected, 192.168.1.1',
+    });
+    const resSpoofed = extractTrustedClientIp(headersSpoofed);
+    assert.strictEqual(resSpoofed.ip, '127.0.0.1');
+    assert.strictEqual(resSpoofed.source, 'fallback');
+    assert.strictEqual(resSpoofed.isTrustedEdge, false);
+  });
+});
+
+describe('7. LinkedIn Strict Validation & Placeholder Handling', () => {
   test('rejects placeholder URL and deceptive URLs', () => {
     // Empty
     assert.strictEqual(hasValidLinkedIn(), false);

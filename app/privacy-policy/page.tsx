@@ -161,7 +161,7 @@ export default function PrivacyPolicyPage() {
           We retain personal information submitted via project enquiries only for as long as necessary to fulfill the prospective business evaluation or satisfy statutory retention requirements.
         </p>
         <p className="mt-3">
-          Enquiry submissions that do not result in an active commercial engagement are securely deleted or anonymized within 24 months of our last communication. Where an enquiry progresses to a formal client engagement, records are maintained in accordance with the governing master agreement and applicable commercial accounting laws.
+          Enquiry submissions that do not result in an active commercial engagement are reviewed periodically and securely deleted or anonymized in accordance with our operational review cycle, typically within 24 months of our last communication, or sooner upon verified request. Where an enquiry progresses to a formal client engagement, records are maintained in accordance with the governing master agreement and applicable commercial accounting laws.
         </p>
       </section>
 
@@ -219,7 +219,7 @@ export default function PrivacyPolicyPage() {
           We implement robust technical and organizational security controls designed to protect personal information from unauthorized access, alteration, disclosure, or accidental destruction.
         </p>
         <p className="mt-3">
-          These controls include modern Transport Layer Security (TLS 1.3) encryption for all data in transit, strict least-privilege administrative access controls, containerized deployment pipelines, and automated security dependency auditing.
+          These controls include modern Transport Layer Security (TLS/HTTPS) encryption for all data in transit, strict least-privilege administrative access controls, automated security dependency auditing, and managed cloud runtime protections.
         </p>
       </section>
 
@@ -230,7 +230,7 @@ export default function PrivacyPolicyPage() {
           Your Data Protection Rights
         </h2>
         <p>
-          Under the DPDP Act 2023, the GDPR, and applicable privacy frameworks, you hold specific statutory rights regarding your personal data:
+          Under the Digital Personal Data Protection Act 2023 (subject to its phased statutory notification and enforcement schedule), the GDPR (for individuals located in the European Union and the United Kingdom), and applicable privacy frameworks, you hold specific statutory rights regarding your personal data:
         </p>
         <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#262626]">
           <li><strong>Right to Access:</strong> Request confirmation of whether we process your personal data and obtain a summary of such information;</li>

@@ -182,7 +182,9 @@ export function OstrumContactSection() {
 
                     {errorMessage && (
                       <div
+                        id="contact-form-error"
                         role="alert"
+                        aria-live="polite"
                         className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/25 text-red-800 text-xs sm:text-sm font-sans flex items-center gap-3"
                       >
                         <span className="text-red-600 font-bold shrink-0">!</span>
@@ -217,6 +219,8 @@ export function OstrumContactSection() {
                         name="name"
                         type="text"
                         required
+                        aria-invalid={!!errorMessage}
+                        aria-describedby={errorMessage ? "contact-form-error" : undefined}
                         autoComplete="name"
                         value={formData.name}
                         onChange={handleChange}
@@ -238,6 +242,8 @@ export function OstrumContactSection() {
                         name="email"
                         type="email"
                         required
+                        aria-invalid={!!errorMessage}
+                        aria-describedby={errorMessage ? "contact-form-error" : undefined}
                         autoComplete="email"
                         value={formData.email}
                         onChange={handleChange}
@@ -322,6 +328,8 @@ export function OstrumContactSection() {
                         id="contact-message"
                         name="message"
                         required
+                        aria-invalid={!!errorMessage}
+                        aria-describedby={errorMessage ? "contact-form-error" : undefined}
                         rows={4}
                         value={formData.message}
                         onChange={handleChange}

@@ -1,11 +1,192 @@
 import { Resend } from 'resend';
 
 /**
+ * Distributed & In-Memory Rate Limiter for OSTRUM Enquiry API
+ *
+ * Implements a sliding-window rate limit:
+ * - In production serverless environments with UPSTASH_REDIS_REST_URL/TOKEN or
+ *   KV_REST_API_URL/TOKEN, uses distributed atomic storage.
+ * - In local development or standalone instances without external store credentials,
+ *   falls back to an in-memory sliding-window limiter as a process-level circuit breaker.
+ *
+ * Rate Limit Window: 10 minutes (600,000 ms)
+ * Max Allowed Submissions: 5 requests per IP per window
+ */
+
+export interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetMs: number;
+  provider: 'distributed_redis' | 'local_memory';
+}
+
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+const RATE_LIMIT_MAX_REQUESTS = 5; // 5 requests per 10 minutes per IP
+
+interface MemoryEntry {
+  count: number;
+  firstRequestTime: number;
+}
+const localMemoryStore = new Map<string, MemoryEntry>();
+
+/**
+ * Checks in-memory sliding window rate limit.
+ */
+function checkMemoryRateLimit(ip: string, now: number): RateLimitResult {
+  // Housekeeping: purge entries older than window
+  if (localMemoryStore.size > 2000) {
+    for (const [key, val] of localMemoryStore.entries()) {
+      if (now - val.firstRequestTime > RATE_LIMIT_WINDOW_MS) {
+        localMemoryStore.delete(key);
+      }
+    }
+  }
+
+  const entry = localMemoryStore.get(ip);
+
+  if (!entry || now - entry.firstRequestTime > RATE_LIMIT_WINDOW_MS) {
+    localMemoryStore.set(ip, { count: 1, firstRequestTime: now });
+    return {
+      allowed: true,
+      remaining: RATE_LIMIT_MAX_REQUESTS - 1,
+      resetMs: RATE_LIMIT_WINDOW_MS,
+      provider: 'local_memory',
+    };
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX_REQUESTS) {
+    const elapsed = now - entry.firstRequestTime;
+    return {
+      allowed: false,
+      remaining: 0,
+      resetMs: Math.max(0, RATE_LIMIT_WINDOW_MS - elapsed),
+      provider: 'local_memory',
+    };
+  }
+
+  entry.count += 1;
+  const elapsed = now - entry.firstRequestTime;
+  return {
+    allowed: true,
+    remaining: RATE_LIMIT_MAX_REQUESTS - entry.count,
+    resetMs: Math.max(0, RATE_LIMIT_WINDOW_MS - elapsed),
+    provider: 'local_memory',
+  };
+}
+
+/**
+ * Checks rate limit against distributed Redis store (Upstash / Vercel KV) if configured.
+ * Uses atomic INCR + EXPIRE sliding window via Upstash REST API.
+ */
+async function checkDistributedRateLimit(
+  ip: string,
+  now: number,
+  apiUrl: string,
+  apiToken: string
+): Promise<RateLimitResult | null> {
+  try {
+    const key = `ostrum:rl:enquiry:${ip}`;
+    const windowSec = Math.ceil(RATE_LIMIT_WINDOW_MS / 1000);
+
+    const pipelineUrl = `${apiUrl.replace(/\/$/, '')}/pipeline`;
+    const res = await fetch(pipelineUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([
+        ['INCR', key],
+        ['EXPIRE', key, windowSec, 'NX'],
+        ['TTL', key],
+      ]),
+      signal: AbortSignal.timeout(3000),
+    });
+
+    if (!res.ok) {
+      console.warn('[Distributed Rate Limiter] Store returned non-200 HTTP status:', res.status);
+      return null;
+    }
+
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length < 3) {
+      return null;
+    }
+
+    const currentCount = Number(data[0]?.result);
+    const ttlSeconds = Number(data[2]?.result) || windowSec;
+
+    const remaining = Math.max(0, RATE_LIMIT_MAX_REQUESTS - currentCount);
+    const resetMs = ttlSeconds * 1000;
+
+    return {
+      allowed: currentCount <= RATE_LIMIT_MAX_REQUESTS,
+      remaining,
+      resetMs,
+      provider: 'distributed_redis',
+    };
+  } catch (err) {
+    console.warn('[Distributed Rate Limiter Warning] Upstash connection failed, falling back to local memory:', err);
+    return null;
+  }
+}
+
+/**
+ * Main export: checks rate limit using distributed store when configured,
+ * falling back gracefully to process-level memory circuit breaker.
+ */
+export async function checkRateLimitAsync(ip: string): Promise<RateLimitResult> {
+  const now = Date.now();
+
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+
+  if (redisUrl && redisToken) {
+    const distributedResult = await checkDistributedRateLimit(ip, now, redisUrl, redisToken);
+    if (distributedResult !== null) {
+      return distributedResult;
+    }
+  }
+
+  return checkMemoryRateLimit(ip, now);
+}
+
+/**
+ * Synchronous compatibility wrapper for unit tests and local execution.
+ */
+export function checkRateLimit(ip: string): boolean {
+  const res = checkMemoryRateLimit(ip, Date.now());
+  return res.allowed;
+}
+
+/**
+ * Reset memory store for test suite isolation.
+ */
+export function _resetMemoryRateLimitStore(): void {
+  localMemoryStore.clear();
+}
+
+/**
  * Server-only Enquiry Mailer and Validation Service for OSTRUM
  *
  * Implements Resend transactional email routing, HTML escaping,
- * rate limiting, honeypot protection, and privacy-preserving audit logging.
+ * distributed rate limiting, honeypot protection, project-type allowlisting,
+ * and zero-PII audit logging.
  */
+
+export const ALLOWED_PROJECT_TYPES = [
+  'Custom Software & Business Platforms',
+  'Website, Web App & E-commerce Development',
+  'AI Systems & Workflow Automation',
+  'Mobile App & SaaS Product Development',
+  'UI/UX & Digital Product Design',
+  'SEO & Digital Marketing',
+  'API, CRM & ERP Integrations',
+  'IoT, Embedded & Connected Technology',
+  'Other / Not Sure Yet',
+] as const;
+
+export type AllowedProjectType = (typeof ALLOWED_PROJECT_TYPES)[number];
 
 export interface RawEnquiryPayload {
   name?: unknown;
@@ -22,7 +203,7 @@ export interface ValidatedEnquiryData {
   name: string;
   email: string;
   company: string;
-  projectType: string;
+  projectType: AllowedProjectType;
   phone: string;
   message: string;
 }
@@ -32,49 +213,77 @@ export interface MailerResult {
   status: number;
   messageId?: string;
   error?: string;
-  errorCategory?: 'validation_error' | 'rate_limited' | 'honeypot_triggered' | 'missing_config' | 'provider_error';
+  errorCategory?:
+    | 'validation_error'
+    | 'rate_limited'
+    | 'honeypot_triggered'
+    | 'missing_config'
+    | 'provider_error';
 }
 
-// In-memory sliding window rate limiter
-// Note: In distributed multi-instance serverless deployments, each instance maintains its own window.
-// A distributed store (e.g., Upstash Redis, Vercel KV) is required for cross-instance coordination.
-interface RateLimitEntry {
-  count: number;
-  firstRequestTime: number;
+export interface TrustedClientIpInfo {
+  ip: string;
+  source:
+    | 'x-vercel-forwarded-for'
+    | 'cf-connecting-ip'
+    | 'x-real-ip'
+    | 'x-forwarded-for'
+    | 'fallback';
+  isTrustedEdge: boolean;
 }
-const rateLimitMap = new Map<string, RateLimitEntry>();
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
-const RATE_LIMIT_MAX_REQUESTS = 5; // 5 requests per 10 minutes per IP
 
-export function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
+/**
+ * Validates whether a string conforms to IPv4 or IPv6 syntax without spoofed characters.
+ */
+export function isValidIp(ip: string): boolean {
+  if (!ip || typeof ip !== 'string' || ip.length > 45) return false;
+  // Strict IPv4 check
+  if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip)) {
+    return ip.split('.').every((part) => {
+      const num = parseInt(part, 10);
+      return num >= 0 && num <= 255 && (part === '0' || !part.startsWith('0'));
+    });
+  }
+  // Standard IPv6 check
+  if (/^[0-9a-fA-F:]+$/.test(ip) && ip.includes(':') && !ip.includes(':::')) {
+    return true;
+  }
+  return false;
+}
 
-  // Clean up old entries periodically
-  if (rateLimitMap.size > 1000) {
-    for (const [key, value] of rateLimitMap.entries()) {
-      if (now - value.firstRequestTime > RATE_LIMIT_WINDOW_MS) {
-        rateLimitMap.delete(key);
-      }
+/**
+ * Extracts client IP evaluating edge reverse-proxy headers in order of cryptographic trust:
+ * 1. x-vercel-forwarded-for (Vercel edge trusted client IP)
+ * 2. cf-connecting-ip (Cloudflare edge trusted client IP)
+ * 3. x-real-ip (Standard reverse proxy client IP)
+ * 4. x-forwarded-for (First hop fallback, untrusted edge)
+ * 5. fallback: 127.0.0.1
+ */
+export function extractTrustedClientIp(headers: Headers): TrustedClientIpInfo {
+  const vercelIp = headers.get('x-vercel-forwarded-for')?.trim();
+  if (vercelIp && isValidIp(vercelIp)) {
+    return { ip: vercelIp, source: 'x-vercel-forwarded-for', isTrustedEdge: true };
+  }
+
+  const cfIp = headers.get('cf-connecting-ip')?.trim();
+  if (cfIp && isValidIp(cfIp)) {
+    return { ip: cfIp, source: 'cf-connecting-ip', isTrustedEdge: true };
+  }
+
+  const realIp = headers.get('x-real-ip')?.trim();
+  if (realIp && isValidIp(realIp)) {
+    return { ip: realIp, source: 'x-real-ip', isTrustedEdge: true };
+  }
+
+  const forwardedFor = headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const firstHop = forwardedFor.split(',')[0].trim();
+    if (isValidIp(firstHop)) {
+      return { ip: firstHop, source: 'x-forwarded-for', isTrustedEdge: false };
     }
   }
 
-  if (!entry) {
-    rateLimitMap.set(ip, { count: 1, firstRequestTime: now });
-    return true;
-  }
-
-  if (now - entry.firstRequestTime > RATE_LIMIT_WINDOW_MS) {
-    rateLimitMap.set(ip, { count: 1, firstRequestTime: now });
-    return true;
-  }
-
-  if (entry.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return false;
-  }
-
-  entry.count += 1;
-  return true;
+  return { ip: '127.0.0.1', source: 'fallback', isTrustedEdge: false };
 }
 
 /**
@@ -101,16 +310,28 @@ export function sanitizeSingleLine(str: string, maxLength: number): string {
 
 /**
  * Validates and normalizes raw enquiry payload.
+ * Enforces plain object structure, honeypot absence, email RFC compliance,
+ * and project type allowlisting.
  */
-export function validateEnquiryPayload(raw: RawEnquiryPayload): {
+export function validateEnquiryPayload(raw: unknown): {
   data?: ValidatedEnquiryData;
   error?: string;
   category?: 'validation_error' | 'honeypot_triggered';
 } {
+  // 0. Plain object validation (reject null, array, primitives)
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
+    return {
+      error: 'Invalid request payload format. Expected a JSON object.',
+      category: 'validation_error',
+    };
+  }
+
+  const typedRaw = raw as RawEnquiryPayload;
+
   // 1. Honeypot check (bots filling out hidden fields)
   if (
-    (typeof raw.website_url === 'string' && raw.website_url.trim().length > 0) ||
-    (typeof raw.hp_check === 'string' && raw.hp_check.trim().length > 0)
+    (typeof typedRaw.website_url === 'string' && typedRaw.website_url.trim().length > 0) ||
+    (typeof typedRaw.hp_check === 'string' && typedRaw.hp_check.trim().length > 0)
   ) {
     return {
       error: 'Invalid submission request.',
@@ -119,29 +340,30 @@ export function validateEnquiryPayload(raw: RawEnquiryPayload): {
   }
 
   // 2. Name validation
-  if (typeof raw.name !== 'string' || raw.name.trim().length === 0) {
+  if (typeof typedRaw.name !== 'string' || typedRaw.name.trim().length === 0) {
     return { error: 'Full name is required.', category: 'validation_error' };
   }
-  const cleanName = sanitizeSingleLine(raw.name, 100);
+  const cleanName = sanitizeSingleLine(typedRaw.name, 100);
   if (cleanName.length < 2) {
     return { error: 'Please enter a valid full name.', category: 'validation_error' };
   }
 
   // 3. Email validation (RFC 5322 check + max 254 chars)
-  if (typeof raw.email !== 'string' || raw.email.trim().length === 0) {
+  if (typeof typedRaw.email !== 'string' || typedRaw.email.trim().length === 0) {
     return { error: 'Email address is required.', category: 'validation_error' };
   }
-  const cleanEmail = sanitizeSingleLine(raw.email, 254);
-  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+  const cleanEmail = sanitizeSingleLine(typedRaw.email, 254);
+  const emailRegex =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
   if (!emailRegex.test(cleanEmail)) {
     return { error: 'Please provide a valid work email address.', category: 'validation_error' };
   }
 
   // 4. Message validation
-  if (typeof raw.message !== 'string' || raw.message.trim().length === 0) {
+  if (typeof typedRaw.message !== 'string' || typedRaw.message.trim().length === 0) {
     return { error: 'Project description or message is required.', category: 'validation_error' };
   }
-  const cleanMessage = raw.message.trim().slice(0, 5000);
+  const cleanMessage = typedRaw.message.trim().slice(0, 5000);
   if (cleanMessage.length < 10) {
     return {
       error: 'Please provide a brief project summary (at least 10 characters).',
@@ -149,17 +371,34 @@ export function validateEnquiryPayload(raw: RawEnquiryPayload): {
     };
   }
 
-  // 5. Optional fields
-  const cleanCompany = typeof raw.company === 'string' ? sanitizeSingleLine(raw.company, 120) : '';
-  const cleanProjectType = typeof raw.projectType === 'string' ? sanitizeSingleLine(raw.projectType, 120) : '';
-  const cleanPhone = typeof raw.phone === 'string' ? sanitizeSingleLine(raw.phone, 50) : '';
+  // 5. Project Type validation against strict allowlist
+  let cleanProjectType: AllowedProjectType = 'Other / Not Sure Yet';
+  if (typeof typedRaw.projectType === 'string' && typedRaw.projectType.trim().length > 0) {
+    const rawType = sanitizeSingleLine(typedRaw.projectType, 120);
+    const matchedType = ALLOWED_PROJECT_TYPES.find(
+      (opt) => opt.toLowerCase() === rawType.toLowerCase()
+    );
+    if (!matchedType) {
+      return {
+        error: 'Please select a valid project scope option.',
+        category: 'validation_error',
+      };
+    }
+    cleanProjectType = matchedType;
+  }
+
+  // 6. Optional company and phone fields
+  const cleanCompany =
+    typeof typedRaw.company === 'string' ? sanitizeSingleLine(typedRaw.company, 120) : '';
+  const cleanPhone =
+    typeof typedRaw.phone === 'string' ? sanitizeSingleLine(typedRaw.phone, 50) : '';
 
   return {
     data: {
       name: cleanName,
       email: cleanEmail,
       company: cleanCompany || 'Not specified',
-      projectType: cleanProjectType || 'General Project Scoping',
+      projectType: cleanProjectType,
       phone: cleanPhone || 'Not provided',
       message: cleanMessage,
     },
@@ -292,6 +531,7 @@ Delivered via OSTRUM Website Enquiry Gateway.
 
 /**
  * Dispatches the notification email through Resend.
+ * Zero-PII logging: no customer personal information is exposed to logs.
  */
 export async function sendEnquiryNotification(
   data: ValidatedEnquiryData,
@@ -303,12 +543,15 @@ export async function sendEnquiryNotification(
   const toAddress = process.env.OSTRUM_ENQUIRY_TO || 'hello@theostrum.com';
   const fromAddress = process.env.OSTRUM_ENQUIRY_FROM || 'OSTRUM Website <website@theostrum.com>';
 
-  const correlationId = 'ost_' + Math.random().toString(36).substring(2, 10);
+  const correlationId =
+    'ost_' +
+    (typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID().substring(0, 8)
+      : Math.random().toString(36).substring(2, 10));
   const timestamp = new Date().toISOString();
 
   // If mock mode is enabled for testing
   if (process.env.RESEND_MOCK === 'true' && !options?.customResend) {
-    // Prohibit simulated success in production deployments
     if (process.env.NODE_ENV === 'production') {
       console.error('[Enquiry Mailer Security Error]', {
         correlationId,
@@ -326,7 +569,7 @@ export async function sendEnquiryNotification(
     console.log('[Enquiry Mailer: Mocked Mode Accepted]', {
       correlationId,
       timestamp,
-      recipient: toAddress,
+      recipientDomain: toAddress.split('@')[1] || 'theostrum.com',
     });
     return {
       success: true,
@@ -336,7 +579,6 @@ export async function sendEnquiryNotification(
   }
 
   if (!apiKey && !options?.customResend) {
-    // Missing Resend configuration
     console.warn('[Enquiry Mailer Warning]', {
       correlationId,
       timestamp,
@@ -347,7 +589,8 @@ export async function sendEnquiryNotification(
       success: false,
       status: 503,
       errorCategory: 'missing_config',
-      error: 'Enquiry service is currently offline for scheduled maintenance. Please reach out directly to hello@theostrum.com.',
+      error:
+        'Enquiry service is currently offline for scheduled maintenance. Please reach out directly to hello@theostrum.com.',
     };
   }
 
@@ -375,7 +618,8 @@ export async function sendEnquiryNotification(
         success: false,
         status: 502,
         errorCategory: 'provider_error',
-        error: 'Unable to deliver notification at this time. Please try again shortly or reach us directly at hello@theostrum.com.',
+        error:
+          'Unable to deliver notification at this time. Please try again shortly or reach us directly at hello@theostrum.com.',
       };
     }
 
@@ -402,7 +646,8 @@ export async function sendEnquiryNotification(
       success: false,
       status: 500,
       errorCategory: 'provider_error',
-      error: 'Failed to process enquiry notification. Please reach out directly to hello@theostrum.com.',
+      error:
+        'Failed to process enquiry notification. Please reach out directly to hello@theostrum.com.',
     };
   }
 }

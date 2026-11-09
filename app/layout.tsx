@@ -75,7 +75,6 @@ const jsonLd = {
       '@type': 'Organization',
       '@id': `${SITE_CONFIG.baseUrl}/#organization`,
       name: 'OSTRUM',
-      legalName: 'Ostrum',
       url: SITE_CONFIG.baseUrl,
       logo: `${SITE_CONFIG.baseUrl}/images/ostrum-logo.png`,
       email: SITE_CONFIG.contactEmail,
