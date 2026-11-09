@@ -345,7 +345,7 @@ describe('6. Trusted Client IP Extraction & Validation', () => {
     assert.strictEqual(res2.source, 'cf-connecting-ip');
     assert.strictEqual(res2.isTrustedEdge, true);
 
-    // Fallback safely to 127.0.0.1 on spoofed / invalid IP
+    // Fallback safely to 127.0.0.1 in non-production environments
     const headersSpoofed = new Headers({
       'x-vercel-forwarded-for': 'malicious<script>',
       'x-forwarded-for': 'injected, 192.168.1.1',
@@ -354,6 +354,23 @@ describe('6. Trusted Client IP Extraction & Validation', () => {
     assert.strictEqual(resSpoofed.ip, '127.0.0.1');
     assert.strictEqual(resSpoofed.source, 'fallback');
     assert.strictEqual(resSpoofed.isTrustedEdge, false);
+  });
+
+  test('extractTrustedClientIp generates segregated identifier in production environment', () => {
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+
+    try {
+      const headersUnknown = new Headers({
+        'x-forwarded-for': 'malicious-spoof',
+      });
+      const res = extractTrustedClientIp(headersUnknown);
+      assert.match(res.ip, /^unidentified_/);
+      assert.strictEqual(res.source, 'fallback');
+      assert.strictEqual(res.isTrustedEdge, false);
+    } finally {
+      process.env.NODE_ENV = originalEnv;
+    }
   });
 });
 

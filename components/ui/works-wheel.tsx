@@ -801,6 +801,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                   id={`works-wheel-${i}`}
                   role="option"
                   aria-selected={isCurrent}
+                  aria-label={item.title}
                   ref={(node: HTMLElement | null) => {
                     cardRefs.current[i] = node;
                   }}

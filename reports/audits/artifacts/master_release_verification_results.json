@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-09T04:34:35.876Z",
+  "timestamp": "2026-11-09T08:15:44.549Z",
   "dashScan": {
     "homepage": {
       "emCount": 0,
@@ -62,9 +62,9 @@
   "wordmarkContrast": {},
   "footerWordmarkJump": {
     "verified": true,
-    "initialY": 641.7537841796875,
-    "hopY": 601.3423461914062,
-    "delta": 40.41143798828125
+    "initialY": 642.3348999023438,
+    "hopY": 614.9550170898438,
+    "delta": 27.3798828125
   },
   "curtainReveals": {
     "termsGap": 32,

@@ -294,7 +294,7 @@ export default function PrivacyPolicyPage() {
         </p>
         <div className="mt-4 p-5 rounded-2xl bg-[#F5F5F5] border border-[#E5E5E5] font-mono text-xs sm:text-sm text-[#050505]">
           <p>
-            <span className="text-[#70757E]">Studio Contact for Privacy Inquiries:</span>{' '}
+            <span className="text-[#525252]">Studio Contact for Privacy Inquiries:</span>{' '}
             <a
               href={`mailto:${SITE_CONFIG.contactEmail}?subject=Privacy%20Inquiry`}
               className="text-[#64120F] font-semibold hover:underline"
@@ -302,7 +302,7 @@ export default function PrivacyPolicyPage() {
               {SITE_CONFIG.contactEmail}
             </a>
           </p>
-          <p className="mt-1 text-[#70757E]">
+          <p className="mt-1 text-[#525252]">
             Studio Designation: OSTRUM Digital Engineering &amp; Technology Studio
           </p>
           

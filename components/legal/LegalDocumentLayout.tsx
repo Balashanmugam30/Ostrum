@@ -203,7 +203,7 @@ export function LegalDocumentLayout({
                         className={`font-mono text-[11px] shrink-0 ${
                           isCurrent
                             ? 'text-[#64120F] font-bold'
-                            : 'text-[#A3A3A3]'
+                            : 'text-[#525252]'
                         }`}
                       >
                         {sec.num}

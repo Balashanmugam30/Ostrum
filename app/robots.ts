@@ -9,6 +9,11 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: ['/api/'],
       },
+      {
+        userAgent: ['OAI-SearchBot', 'ChatGPT-User'],
+        allow: '/',
+        disallow: ['/api/'],
+      },
     ],
     sitemap: `${SITE_CONFIG.baseUrl}/sitemap.xml`,
   };

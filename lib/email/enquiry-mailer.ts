@@ -283,7 +283,14 @@ export function extractTrustedClientIp(headers: Headers): TrustedClientIpInfo {
     }
   }
 
-  return { ip: '127.0.0.1', source: 'fallback', isTrustedEdge: false };
+  // Fallback: in non-production/test environments, default to 127.0.0.1 for local isolation.
+  // In production, avoid collapsing distinct unidentified clients into a single bucket.
+  const isDevOrTest = process.env.NODE_ENV !== 'production';
+  const fallbackIp = isDevOrTest
+    ? '127.0.0.1'
+    : `unidentified_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 8)}`;
+
+  return { ip: fallbackIp, source: 'fallback', isTrustedEdge: false };
 }
 
 /**

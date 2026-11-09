@@ -339,7 +339,7 @@ export function OstrumContactSection() {
                     </div>
 
                     {/* 7. Send Enquiry Button */}
-                    <div className="pt-2">
+                    <div className="pt-2 flex flex-col gap-2.5">
                       <button
                         type="submit"
                         disabled={isSubmitting}
@@ -365,6 +365,15 @@ export function OstrumContactSection() {
                           </>
                         )}
                       </button>
+                      <p className="font-sans text-[11px] text-[#6B7280] leading-relaxed text-center sm:text-left">
+                        Submitted details are used solely to evaluate your requirements and respond to your inquiry. Read our{' '}
+                        <a
+                          href="/privacy-policy"
+                          className="text-[#111827] underline hover:text-[#D24B2C] transition-colors"
+                        >
+                          Privacy Policy
+                        </a>.
+                      </p>
                     </div>
                   </form>
                 )}

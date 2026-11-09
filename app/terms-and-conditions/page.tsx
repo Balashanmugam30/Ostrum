@@ -138,6 +138,9 @@ export default function TermsAndConditionsPage() {
         <p className="mt-3">
           No license, title, or interest in any studio intellectual property is granted to you by implication or otherwise. You may not reproduce, republish, redistribute, mirror, frame, decompile, or create derivative works from website materials without express advance written consent from an authorized principal of Ostrum.
         </p>
+        <p className="mt-3 text-xs sm:text-sm text-[#404040]">
+          Certain interactive components and visual models incorporate open-source and Creative Commons works under their respective licenses: the 3D M&ouml;bius art ribbon is adapted from &ldquo;Mony&eacute;dre 360 moebius art ribbon&rdquo; by Print3dburton under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="text-[#64120F] hover:underline font-medium">CC BY 4.0</a> (with custom real-time shaders, materials, and scroll-linked rotational choreography); UI liquid-glass and particle shader systems incorporate components by Sera UI, Guglielmo Giannattasio, and Kedhareswer under MIT licenses. Complete notices are maintained in the repository third-party register.
+        </p>
       </section>
 
       {/* Section 7 */}
@@ -280,7 +283,7 @@ export default function TermsAndConditionsPage() {
         </p>
         <div className="mt-4 p-5 rounded-2xl bg-[#F5F5F5] border border-[#E5E5E5] font-mono text-xs sm:text-sm text-[#050505]">
           <p>
-            <span className="text-[#70757E]">Direct Inquiries:</span>{' '}
+            <span className="text-[#525252]">Direct Inquiries:</span>{' '}
             <a
               href={`mailto:${SITE_CONFIG.contactEmail}`}
               className="text-[#64120F] font-semibold hover:underline"
@@ -288,7 +291,7 @@ export default function TermsAndConditionsPage() {
               {SITE_CONFIG.contactEmail}
             </a>
           </p>
-          <p className="mt-1 text-[#70757E]">
+          <p className="mt-1 text-[#525252]">
             Studio Designation: OSTRUM Digital Engineering &amp; Technology Studio
           </p>
         </div>
