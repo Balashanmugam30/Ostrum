@@ -121,13 +121,11 @@ export function OstrumContactSection() {
                 color: '#FFF8F3',
               }}
             >
-              Reach Out
-              <br />
-              To Us
+              Tell us what you’re building.
             </h2>
 
             <p className="font-sans text-base sm:text-lg text-[#FFF8F3]/90 leading-relaxed max-w-md mt-6 sm:mt-8 font-normal">
-              Tell us what you want to build, improve or grow, from custom software and web or mobile applications to AI automation, e-commerce and digital marketing. Share your goals and requirements. Our team will review your brief and respond with the appropriate next step.
+              Tell us what you need to build or improve. We’ll review your brief and reply with a clear next step.
             </p>
           </div>
 
@@ -224,7 +222,7 @@ export function OstrumContactSection() {
                         autoComplete="name"
                         value={formData.name}
                         onChange={handleChange}
-                        placeholder="e.g. Rahul Sharma"
+                        placeholder="Your name"
                         className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
@@ -247,7 +245,7 @@ export function OstrumContactSection() {
                         autoComplete="email"
                         value={formData.email}
                         onChange={handleChange}
-                        placeholder="rahul@company.com"
+                        placeholder="you@company.com"
                         className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
@@ -267,7 +265,7 @@ export function OstrumContactSection() {
                         autoComplete="organization"
                         value={formData.company}
                         onChange={handleChange}
-                        placeholder="e.g. Apex Enterprises"
+                        placeholder="Company name"
                         className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
@@ -311,7 +309,7 @@ export function OstrumContactSection() {
                         autoComplete="tel"
                         value={formData.phone}
                         onChange={handleChange}
-                        placeholder="e.g. +91 98420 12345"
+                        placeholder="+91 98420 12345"
                         className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm"
                       />
                     </div>
@@ -333,7 +331,7 @@ export function OstrumContactSection() {
                         rows={4}
                         value={formData.message}
                         onChange={handleChange}
-                        placeholder="Describe your project goals, scope, and technical timeline..."
+                        placeholder="What are you building, and when do you need it?"
                         className="w-full px-4 py-3 sm:py-3.5 rounded-xl bg-[#FFFFFF] hover:border-[#B8AEA6] focus:border-[#D24B2C] focus:ring-2 focus:ring-[#D24B2C]/20 text-[#111827] placeholder:text-[#6B7280] border border-[#DCD4CE] outline-none transition-all font-sans text-sm min-h-[120px] resize-y"
                       />
                     </div>
@@ -366,7 +364,7 @@ export function OstrumContactSection() {
                         )}
                       </button>
                       <p className="font-sans text-[11px] text-[#6B7280] leading-relaxed text-center sm:text-left">
-                        Submitted details are used solely to evaluate your requirements and respond to your inquiry. Read our{' '}
+                        We use your details to review your enquiry and protect this form. Read our{' '}
                         <a
                           href="/privacy-policy"
                           className="text-[#111827] underline hover:text-[#D24B2C] transition-colors"

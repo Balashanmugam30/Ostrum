@@ -22,7 +22,7 @@ export const SITE_CONFIG = {
   contactEmail: 'hello@theostrum.com',
 
   // Company LinkedIn URL (configured centrally; placeholder or unset until official page is created)
-  linkedInUrl: process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL || '',
+  linkedInUrl: process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL || 'https://www.linkedin.com/company/ostrum/',
 
   // Project repositories & ventures
   githubUrl: 'https://github.com/Balashanmugam30/Ostrum',

@@ -210,13 +210,12 @@ export function OstrumStudioFooter() {
                   onClick={(e) => handleNavClick(e, '#contact')}
                   className="transition-colors hover:text-white hover:underline underline-offset-4"
                 >
-                  Project Enquiries
+                  Start a project
                 </Link>
               </li>
-              {hasValidLinkedIn() && (
-                <li className="pt-2">
+              <li className="pt-2">
                   <a
-                    href={process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL || SITE_CONFIG.linkedInUrl || 'https://www.linkedin.com/company/ostrum/'}
+                    href="https://www.linkedin.com/company/ostrum/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="transition-colors hover:text-white inline-flex items-center gap-2 group text-[#D4D4D8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ostrum-footer-label-accent,#FF765E)] rounded"
@@ -234,7 +233,6 @@ export function OstrumStudioFooter() {
                     <span aria-hidden="true" className="text-xs opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
                   </a>
                 </li>
-              )}
             </ul>
           </div>
 
@@ -270,7 +268,7 @@ export function OstrumStudioFooter() {
                 OSTRUM
               </span>
               <p className="font-sans text-xs text-[#B9B0AF] mt-2 leading-relaxed">
-                Custom software, AI systems and original digital products, engineered by OSTRUM.
+                Custom software, AI systems and original digital products.
               </p>
             </div>
 

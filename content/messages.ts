@@ -49,9 +49,9 @@ export interface ContentMessages {
 export const messages: Record<Locale, ContentMessages> = {
   en: {
     hero: {
-      headline: "We engineer custom software and AI systems for ambitious businesses.\nWe build original digital products for problems worth solving",
-      philosophyLine1: "Custom business software, web and mobile applications, practical AI automation, and connected digital platforms.",
-      philosophyLine2: "Work directly with the engineers shaping your solution, with a second path for original products and ventures.",
+      headline: "We build custom software and AI systems for ambitious businesses.\nWe create original digital products for problems worth solving.",
+      philosophyLine1: "Custom systems for today. Original products for what’s next.",
+      philosophyLine2: "From AI automation to connected platforms, we turn complex needs into useful software.",
       cta: "",
       sublabel: "",
     },
@@ -60,18 +60,18 @@ export const messages: Record<Locale, ContentMessages> = {
       badge: "STUDIO · SYSTEMS · VENTURES",
       headlineLine1: "We build for today's business needs.",
       headlineLine2: "We build what's next.",
-      description: "OSTRUM works across two paths: we design and develop custom software and digital systems for businesses, and we create original products when an important problem needs a new solution.",
+      description: "Custom systems for today. Original products for what’s next.",
       forBusiness: {
         number: "01",
         tag: "FOR BUSINESS",
-        statement: "Custom systems engineered around how your business works.",
-        detail: "Custom business software, web applications, API integrations and AI workflow automation designed around your processes, teams and operational goals.",
+        statement: "Custom systems, built around your business.",
+        detail: "Software, integrations and AI automation shaped around your workflows.",
       },
       forNext: {
         number: "02",
         tag: "FOR WHAT'S NEXT",
-        statement: "Original products engineered around real problems.",
-        detail: "We explore unmet needs, validate product ideas, build working software and develop selected opportunities through OSTRUM Ventures. Venture partnerships and funding are considered selectively, not guaranteed.",
+        statement: "Original products for real problems.",
+        detail: "We validate ideas and build selected ventures through OSTRUM Ventures.",
       },
       backing: {
         statement: "Some ideas become products. Some products become ventures.",

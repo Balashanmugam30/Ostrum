@@ -117,7 +117,7 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
               Frequently Asked Questions
             </h2>
             <p className="font-sans text-base sm:text-lg text-[#242424] leading-relaxed max-w-sm mt-6 font-normal">
-              Clear insights into our engineering scope, collaborative process, and technical delivery.
+              A few answers about our work, process and delivery.
             </p>
           </div>
 

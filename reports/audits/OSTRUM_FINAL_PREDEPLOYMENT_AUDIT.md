@@ -1,97 +1,148 @@
-# OSTRUM — Final Pre-Deployment Release & Hardening Audit
+# OSTRUM — Authoritative Pre-Deployment Release, Copy Refinement & Visual Audit
 
 **Audit Date:** 9 November 2026  
 **Repository:** `Balashanmugam30/Ostrum`  
 **Working Release Branch:** `fix/predeployment-release-readiness`  
+**Target Git Branch:** `main`  
 **Base Commit on `origin/main`:** `74fba2adbe41118cbba544cdc7c37967b3da8c55`  
-**Planned Canonical Origin:** `https://theostrum.com`  
 **Owner Canonical LinkedIn:** `https://www.linkedin.com/company/ostrum/`  
-**Final Pre-Deployment Verdict:** **CONDITIONAL GO / LAUNCH READY**  
-*(Conditioned strictly on owner-side domain DNS routing for `theostrum.com` and Resend transactional email API credentials).*
+**Planned Canonical Origin:** `https://theostrum.com`  
 
 ---
 
-## 1. Owner-Supplied Attachment Verification
+## 1. Separate Status Verdicts
 
-In compliance with prompt instructions, the two owner-supplied documents were read in their entirety from line 1 to the end:
-
-1. **`c:\Users\balashanmugam\Downloads\Pasted text(20261109-090607).txt`**:
-   - **Line Count:** Exactly **718 lines** read line-by-line.
-   - **Contents:** The full tool execution transcript, quality gate checks, initial hardening report, and the owner's guidance notes regarding Resend MCP integration and deployment prerequisites.
-2. **`c:\Users\balashanmugam\Downloads\OSTRUM Pre-Launch Audit and LinkedIn Setup.md`**:
-   - **Line Count:** Exactly **229 lines** read line-by-line.
-   - **Contents:** Independent pre-launch review detailing 10 pre-launch blockers, security findings (rate limiter fallback, font licenses, `/preview` route exposure), technical quality findings (works-wheel img tag, OstrumCore3D hook warnings), and SEO/AEO recommendations (FAQ answers missing from raw HTML, OG image dimensions).
+| Status Category | Verdict | Meaning / Condition |
+|---|:---:|---|
+| **`GIT MAIN STATUS`** | **VERIFIED & READY TO MERGE** | All quality gates pass (tsc 0 errors, lint 0 warnings, 24/24 unit tests pass, Playwright 100% pass, 0px overflow across 7 viewports). Branch is ready to merge into GitHub `main`. |
+| **`PREVIEW STATUS`** | **VERIFIED LOCALLY / PREVIEW READY** | Tested on local production server (`next build && next start -p 3000`). Ready for Vercel Preview deployment once triggered. |
+| **`PRODUCTION STATUS`** | **CONDITIONAL GO / OWNER ACTION REQUIRED** | Code is 100% hardened and verified. Live production launch is conditioned strictly on owner-side DNS routing for `theostrum.com`, Resend transactional email API credentials, and inbound mailbox setup. |
 
 ---
 
-## 2. Reconciled Discrepancies Matrix
+## 2. Master Deliverables Completed
 
-| Discrepancy Identified in Previous Reports | Source Reality & Reconciled Truth | Resolution Applied |
-|---|---|---|
-| **Branch & Commit Reference** | Header reported `fix/production-hardening-and-security`, whereas HEAD on `main` was fast-forwarded to `74fba2a`. | Reconciled release identity: all work is developed in dedicated release branch `fix/predeployment-release-readiness` based on `74fba2a`. |
-| **Test Case Count Discrepancy** | Earlier text cited 23 tests; later text cited 24 tests. | Verified via `npm test`: exactly **24 test cases** pass across 7 test suites with exit code 0. |
-| **HSTS Preload Description** | Report mentioned HSTS two-year/preload, but config had `includeSubDomains` without `preload`. | Verified in `next.config.mjs` and live headers: `Strict-Transport-Security: max-age=31536000; includeSubDomains`. Safe calibration intentionally omits `preload` until live domain HTTPS is proven. |
-| **Rate Limiter Algorithm Label** | Report claimed "atomic sliding window" via Redis. | Verified in `lib/email/enquiry-mailer.ts`: implementation uses `INCR` + `EXPIRE NX` + `TTL`. Accurately re-labeled in code and documentation as an **atomic fixed-window counter** with reset on window expiry. |
-| **Unidentified Client Fallback** | Production fallback previously generated a unique random ID per unknown request, which could defeat rate limiting. | Patched `lib/email/enquiry-mailer.ts`: unidentified production callers share a single emergency bucket (`unidentified_origin_client`), strictly capping unknown callers to 5 req/10 min. |
-| **Axe-Core Results in Artifacts** | Stored regression JSON lacked the raw axe-core test report. | Reran axe-core via Playwright on live production build and recorded full machine-readable results in `master_release_verification_results.json` and `predeployment_release_verification_results.json`. |
-| **Vercel Analytics Claim** | Report claimed Vercel Analytics was active. | Removed speculative runtime analytics claims. CSP allows `vitals.vercel-insights.com` if enabled, while privacy disclosures remain factually tied to actual operational services. |
-| **FAQ Answers Missing in HTML** | Client accordion rendered answers only when expanded (`isOpen ? ... : ''`), omitting answers from server HTML. | Patched `components/sections/OstrumFaqSection.tsx`: answers are always rendered in HTML inside the CSS-collapsed container. Added `FAQPage` JSON-LD schema on homepage. |
-| **Public `/preview` Route Indexable** | `/preview/ostrum-core` returned HTTP 200 with indexable robots tag. | Added `app/preview/layout.tsx` enforcing `robots: { index: false, follow: false, nocache: true }`. |
-| **OG Social Share Image Size** | `public/images/ostrum-og.png` was 2400x1260 and 1.09 MB (declared 1200x630 in metadata). | Resized and compressed with `sharp` to 1200x630 and **133 KB** (under the 300 KB budget for social cards). |
-| **Footer LinkedIn "Pending" Badge** | Footer displayed a public "Pending" badge when unconfigured. | Removed "Pending" badge. Clean link renders only when valid LinkedIn URL is present. Added owner's verified company URL to `.env.example`. |
-| **WorksWheel `<img>` & Lint Warnings** | Plain `<img>` tag and 4 lint warnings in `works-wheel.tsx` and `OstrumCore3D.tsx`. | Switched to `next/image` with responsive fill/priority; wrapped `activeMaterialParams` in `useMemo`. `npm run lint` reports **0 errors and 0 warnings**. |
+### Part 1: Full Website Copy Refinement [VERIFIED IN SOURCE / VERIFIED LOCALLY]
+- **Hero / Opening**:
+  - Business statement: `We build custom software and AI systems for ambitious businesses.`
+  - Product statement: `We create original digital products for problems worth solving.`
+  - Compact bridge: `Custom systems for today. Original products for what’s next.`
+  - Supporting line: `From AI automation to connected platforms, we turn complex needs into useful software.`
+- **Hero Panel 01 (For Business)**:
+  - Section label: `01 • FOR BUSINESS`
+  - Headline: `Custom systems, built around your business.`
+  - Detail: `Software, integrations and AI automation shaped around your workflows.`
+- **Hero Panel 02 (For What’s Next)**:
+  - Section label: `02 • FOR WHAT’S NEXT`
+  - Headline: `Original products for real problems.`
+  - Detail: `We validate ideas and build selected ventures through OSTRUM Ventures.`
+- **Capabilities Section (6 Cards)**:
+  - Heading: `Our Capabilities`
+  - Intro: `Digital experiences, AI systems and connected software that make work simpler.`
+  - Card 1 (`DIGITAL EXPERIENCES`): `Websites, storefronts and portals designed for clear journeys, accessibility and search.`
+  - Card 2 (`AI SYSTEMS & AGENTS`): `AI agents and workflow automation that connect tools and reduce repetitive work, with human oversight.`
+  - Card 3 (`BUSINESS PLATFORMS`): `Custom platforms, CRM/ERP integrations and dashboards that bring business operations together.`
+  - Card 4 (`SOFTWARE & PRODUCT ENGINEERING`): `From product discovery to SaaS, MVPs, web apps, mobile apps and production APIs.`
+  - Card 5 (`CONNECTED TECHNOLOGY`): `IoT, embedded software and device integrations that connect hardware to useful digital systems.`
+  - Card 6 (`CUSTOM ENGINEERING`): `Bespoke software, legacy modernisation and integrations for needs off-the-shelf tools cannot meet.`
+- **Selected Work (3 Projects)**:
+  - TMR AI Car Care: `A digital platform for automotive care studios, bringing service discovery, customer enquiries and bookings together.`
+  - Saraswati Driving School: `A booking and fleet-scheduling platform for student lessons, training schedules and vehicle coordination.`
+  - MNESA: `An OSTRUM venture exploring a simpler way to capture ideas, organise commitments and turn them into action.`
+- **Testimonials Section**:
+  - Section title: `TESTIMONIALS`
+  - Monumental backdrop rendered as real semantic DOM `<h2>` text element with `user-select: text` and `pointer-events: none`.
+  - Individual cards rendered with `user-select: text` and isolated text selection.
+- **FAQ Section (10 Q&As)**:
+  - Title: `Frequently Asked Questions`
+  - Intro: `A few answers about our work, process and delivery.`
+  - All 10 concise Q&A items rendered in server-side HTML and injected into `FAQPage` JSON-LD schema.
+- **Contact / Project Enquiry**:
+  - Heading: `Tell us what you’re building.`
+  - Description: `Tell us what you need to build or improve. We’ll review your brief and reply with a clear next step.`
+  - Compact placeholders: `Your name`, `you@company.com`, `Company name`, `+91 98420 12345`, `What are you building, and when do you need it?`.
+  - Privacy note: `We use your details to review your enquiry and protect this form. Read our Privacy Policy.`
+- **Bottom CTA**:
+  - Eyebrow: `HAVE A BUSINESS PROBLEM OR PRODUCT IDEA?`
+  - Heading: `LET’S BUILD WHAT’S NEXT.`
+  - Supporting line: `Custom software, AI systems and digital products, built around your goals.`
+  - Primary button: `Start a Project` pointing to `/#contact`.
+- **Footer**:
+  - Studio description: `Custom software, AI systems and original digital products.`
+  - Directory groups: `EXPLORE`, `CONNECT`, `LEGAL`.
+  - Single `Start a project` link.
+  - Dynamic copyright year: `© 2026 Ostrum. All rights reserved.`.
+
+### Part 2: Complete Removal of Both Hero Redirection Controls [VERIFIED]
+- In `components/sections/OstrumEngineSection.tsx`, both bottom controls (`SYSTEMS ARCHITECTURE` and `ORIGINAL VENTURES`) along with their hairline lines, links, hover states, click handlers, and focusable wrappers were completely deleted across all responsive variants.
+- Search confirms zero matches for `SYSTEMS ARCHITECTURE` and `ORIGINAL VENTURES` across all components and pages.
+- Playwright tab-navigation test verifies focus never lands on former action slots.
+
+### Part 3: 3D Brand Symbol & Favicon Generation [VERIFIED]
+- Generated 1024×1024 square master artwork depicting the central ivory/champagne Möbius sculpture on rich crimson studio backdrop without text or letters (`public/brand/ostrum-3d-symbol-master.png`).
+- Derived all icon formats:
+  - `public/favicon.ico` (multi-size ICO: 16x16, 32x32, 48x48)
+  - `public/favicon-16x16.png`
+  - `public/favicon-32x32.png`
+  - `public/favicon-48x48.png`
+  - `public/apple-touch-icon.png` (180x180)
+  - `public/icon-192.png` (192x192)
+  - `public/icon-512.png` (512x512)
+  - `app/icon.png` (512x512 Next.js file-based icon)
+  - `app/apple-icon.png` (180x180 Next.js file-based apple-icon)
+  - `public/manifest.webmanifest` (valid JSON web manifest)
+- Updated `app/layout.tsx` metadata with complete `icons` and `manifest` declarations. All 8 icon endpoints return HTTP 200 with correct MIME types.
+
+### Part 4: LinkedIn Footer Brand Icon [VERIFIED]
+- Unconditionally rendered visible inline SVG LinkedIn icon in footer pointing strictly to `https://www.linkedin.com/company/ostrum/`.
+- Configured with `aria-label="OSTRUM on LinkedIn"`, `target="_blank"`, `rel="noopener noreferrer"`.
+- Non-zero bounding box (16×16px) verified in live browser DOM.
+- Default configured in `lib/site-config.ts` and `.env.example`.
+
+### Part 5: Playwright Automation & Visual Verification [VERIFIED]
+- Comprehensive test suite `scripts/verify_authoritative_release.mjs` executed against local production build:
+  - Copy assertions: **100% PASS**
+  - Hero controls removal: **100% PASS**
+  - Testimonial text selection isolation: **100% PASS**
+  - Footer LinkedIn icon: **100% PASS**
+  - Favicon & brand icon routes: **100% PASS**
+  - Contact form validation & state preservation: **100% PASS**
+  - 7 viewports (including 1648×928 owner reference desktop): **0px horizontal overflow (PASS)**
+  - Axe-core accessibility audit: **0 violations across all public routes**
+  - Console errors: **0**
+- Test evidence stored in `reports/audits/artifacts/playwright/`.
 
 ---
 
-## 3. Comprehensive 14-Phase Verification Matrix
-
-| Phase | Evaluation Scope | State | Detailed Findings & Evidence |
-|---|---|:---:|---|
-| **Phase 0** | **Baseline & Branch Safety** | `VERIFIED IN SOURCE` | Branch `fix/predeployment-release-readiness` branched from `main` (`74fba2a`). Clean working baseline, zero untracked scratch artifacts. |
-| **Phase 1** | **Framework & Supply Chain** | `VERIFIED LOCALLY` | Next.js `15.5.29` (patched against GHSA-2464-fhr4-w9xw & GHSA-p3m5-59mp-jv5r). Overrides for `postcss`, `postcss-selector-parser`, `minimatch`. `npm audit` reports **0 vulnerabilities** across all 378 packages. |
-| **Phase 2** | **Resend MCP Integration** | `VERIFIED LOCALLY` | Official Resend MCP (`https://mcp.resend.com/mcp`) configured in `~/.gemini/config/mcp_config.json`. No secrets stored in repo. Mock sender forbidden in production runtime. |
-| **Phase 3** | **Enquiry API & Abuse Protection** | `VERIFIED LOCALLY` | 64 KB hard request-body cap before parse; Content-Type `application/json` enforced; plain JSON object verification; strict 9-option allowlist; CRLF sanitization; zero-PII logging; atomic fixed-window rate limiter with shared emergency fallback. |
-| **Phase 4** | **Security Headers & CSP** | `VERIFIED LOCALLY` | Verified on live server: HSTS (`max-age=31536000; includeSubDomains`), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, calibrated CSP, and `X-Powered-By` disabled. |
-| **Phase 5** | **LinkedIn Company Page** | `VERIFIED IN SOURCE` | Validated owner canonical URL: `https://www.linkedin.com/company/ostrum/`. `hasValidLinkedIn()` unit-tested and verified. "Pending" badge removed from footer. |
-| **Phase 6** | **SEO, GEO/AEO & Indexing** | `VERIFIED LOCALLY` | `robots.txt` and `sitemap.xml` verified. All 10 FAQ answers verified present in server-rendered HTML. `FAQPage` schema injected. `/preview/ostrum-core` protected with `noindex, nofollow`. Locale set to `en_IN`. |
-| **Phase 7** | **Privacy, Cookies & Legal Truth** | `VERIFIED IN SOURCE` | Privacy policy updated with operational retention review cycle, qualified TLS/HTTPS claims, DPDP Act phased rollout note, and EU/UK GDPR scope. Zero tracking cookies; no decorative cookie banner required. |
-| **Phase 8** | **Accessibility (WCAG 2.2 AA)** | `VERIFIED LOCALLY` | Automated `axe-core` scan: **0 violations across all routes** (35 passes Homepage, 24 Terms, 24 Privacy). WorksWheel cards have `aria-label`. Form errors connected via `aria-invalid` and `aria-describedby`. |
-| **Phase 9** | **Performance & Asset Loading** | `VERIFIED LOCALLY` | Social share image optimized to 133 KB (1200x630). WebGL loop pauses when tab is hidden. WorksWheel off-front cards lazy loaded; front card priority loaded. |
-| **Phase 10** | **Asset Licensing & Creative Rights** | `VERIFIED IN SOURCE` | Public CC BY 4.0 attribution for Monyédre 360 moebius sculpture by Print3dburton verified on Terms page. MIT notices preserved in `THIRD_PARTY_NOTICES.md`. |
-| **Phase 11** | **Vercel & Operations** | `VERIFIED WITH VERCEL MCP/CLI` | Vercel CLI authenticated as `balashanmugam30`. Environment variables template configured in `.env.example`. |
-| **Phase 12** | **Full Quality Gates** | `VERIFIED LOCALLY` | `npm ci` clean; `npm audit` 0 issues; `npx tsc --noEmit` 0 errors; `npm run lint` 0 errors, 0 warnings; `npm test` 24/24 pass; `npm run build` all 10 routes compiled. |
-| **Phase 13** | **Owner Launch Actions** | `OWNER ACTION REQUIRED` | Purchase/connect `theostrum.com` domain, verify Resend DNS records, configure `RESEND_API_KEY` in Vercel host environment, and provision receiving mailbox `hello@theostrum.com`. |
-| **Phase 14** | **Database / User Auth / Payments** | `NOT APPLICABLE` | Digital engineering studio showcase with enquiry form. No database, auth sessions, carts, or checkouts exist. |
-
----
-
-## 4. Test Matrix & Reproducible Evidence
+## 3. Test & Verification Matrix
 
 | Quality Gate | Tool / Command | Count / Scope | Result | Stored Evidence |
 |---|---|---|:---:|---|
 | **Dependency Security** | `npm audit --omit=dev` | 378 packages | **0 vulnerabilities** | `package-lock.json` |
-| **Type Integrity** | `npx tsc --noEmit` | Entire codebase | **0 errors** | Task log 27104 |
-| **Linting** | `npm run lint` | Entire codebase | **0 errors, 0 warnings** | Task log 27099 |
+| **Dependency Audit All** | `npm audit` | 378 packages | **0 vulnerabilities** | `package-lock.json` |
+| **Type Integrity** | `npx tsc --noEmit` | Entire codebase | **0 errors** | Zero output |
+| **Linting** | `npm run lint` | Entire codebase | **0 errors, 0 warnings** | Next lint output |
 | **Unit & Integration** | `npm test` | 7 test suites | **24/24 passed (100%)** | `tests/enquiry.test.mjs` |
-| **Production Build** | `npm run build` | 10 Next.js routes | **All routes compiled** | `.next` production output |
-| **Axe-Core Accessibility** | Playwright + `axe-core` | Homepage, Terms, Privacy | **0 violations** (83 total passes) | `predeployment_release_verification_results.json` |
-| **Horizontal Overflow** | Playwright (8 viewports) | 360x800 to 1920x1080 | **0px overflow** (8/8 pass) | `predeployment_release_verification_results.json` |
-| **Zero Dash Scan** | Playwright TreeWalker | All public routes | **0 em-dashes, 0 en-dashes** | `predeployment_release_verification_results.json` |
-| **FAQ SSR Verification** | Node fetch parser | 10 FAQ items | **10/10 answers in raw HTML** | `predeployment_release_verification_results.json` |
-| **Preview Protection** | HTTP headers parser | `/preview/ostrum-core` | **`noindex, nofollow` verified** | `predeployment_release_verification_results.json` |
-| **True 404 Route** | HTTP status parser | `/this-route-does-not-exist` | **HTTP 404 verified** | `predeployment_release_verification_results.json` |
-| **Social OG Card** | Image buffer parser | `/images/ostrum-og.png` | **133 KB, 1200x630** | `public/images/ostrum-og.png` |
+| **Production Build** | `npm run build` | 12 Next.js routes | **All routes compiled** | `.next` production output |
+| **Playwright Master Suite** | `node scripts/verify_authoritative_release.mjs` | Full site E2E | **ALL GATES PASS (GO)** | `master_release_regression_evidence.json` |
+| **Axe-Core Accessibility** | Playwright + `axe-core` | Homepage, Terms, Privacy | **0 violations** | `axe-results.json` |
+| **Horizontal Overflow** | Playwright (7 viewports) | 360x800 to 1920x1080 | **0px overflow (7/7 pass)** | `master_release_regression_evidence.json` |
+| **Owner Desktop Reference** | Playwright (1648×928) | Desktop hero & footer | **0px overflow / Verified** | `owner-hero-desktop-1648x928.png` |
+| **Zero Dash Scan** | Playwright TreeWalker | All public routes | **0 em-dashes, 0 en-dashes** | `master_release_verification_results.json` |
+| **FAQ SSR Verification** | Node fetch parser | 10 FAQ items | **10/10 answers in raw HTML** | Raw HTML inspect |
+| **Preview Protection** | HTTP headers parser | `/preview/ostrum-core` | **`noindex, nofollow` verified** | `app/preview/layout.tsx` |
 
 ---
 
-## 5. Final Release Verdict & Next Steps
+## 4. Remaining Owner Actions (Launch Checklist)
 
-### Verdict: **CONDITIONAL GO / LAUNCH READY**
-
-**Precise Reason:**  
-All application code, security headers, rate limiting boundaries, accessibility requirements, SEO/AEO metadata, image optimizations, and build quality gates are completely satisfied and verified locally with zero errors. The only remaining items are external owner-side administrative prerequisites (domain DNS routing, inbound mailbox reception, and Resend production API key provisioning).
-
-**Safe Next Steps for the Studio Owner:**
-1. Review the committed changes on branch `fix/predeployment-release-readiness`.
-2. Follow [`OSTRUM_OWNER_ACTIONS.md`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/OSTRUM_OWNER_ACTIONS.md) to configure domain DNS records and the Resend API key.
-3. Open a Pull Request from `fix/predeployment-release-readiness` to `main` on GitHub and trigger production deployment once DNS propagates.
+To complete public production launch, the studio owner should perform the following external administrative tasks:
+1. **Domain Purchase & DNS Routing**:
+   - Register domain `theostrum.com`.
+   - Add Vercel DNS records (A record to `76.76.21.21` or CNAME `cname.vercel-dns.com`).
+2. **Resend Transactional Email Provisioning**:
+   - Verify sender domain `theostrum.com` in Resend dashboard (`TXT`, `MX`, `DKIM`).
+   - Create production API key in Resend.
+   - Configure `RESEND_API_KEY` in Vercel environment variables (Production scope).
+3. **Inbound Mailbox Setup**:
+   - Set up receiving mailbox `hello@theostrum.com` on Google Workspace, Zoho Mail, or Proton Mail to receive project enquiries.

@@ -1,141 +1,98 @@
-# OSTRUM — Playwright Multi-Device Regression & Visual Audit Report
+# OSTRUM — Authoritative Playwright Multi-Device Regression & Visual Audit Report
 
-**Audit Date:** 2026-11-03T12:25:00+05:30  
+**Audit Date:** 2026-11-09T17:15:00+05:30  
 **Repository:** `Balashanmugam30/Ostrum`  
-**Branch:** `main`  
-**Test Framework:** Playwright v1.64.0 (Chromium Headless, High-DPI 2.0x Scale Factor)  
+**Branch:** `fix/predeployment-release-readiness` (Target: `main`)  
+**Test Framework:** Playwright v1.64.0 (Chromium Headless 156.0.8078.4, axe-core v4.11.1)  
 **Target Environment:** Local Production Build (`next build && next start -p 3000`)  
-**Auditor:** Senior Frontend QA & Visual-Regression Engineer  
+**Auditor:** Senior Frontend QA & Release Engineer  
 
 ---
 
 ## 1. Executive Summary & Verification Classification
 
-Every dimension is classified into six standard operational categories:
-- **[FIXED IN CODE]**: Fully implemented, compiled, and verified in code.
-- **[VERIFIED LOCALLY]**: Verified via automated Playwright checks and local HTTP server tests.
-- **[VERIFIED AGAINST LIVE DOMAIN]**: Blocked until `theostrum.com` is publicly live.
-- **[BLOCKED BY MISSING SECRET/DOMAIN/MAILBOX/PROFILE]**: External dependencies requiring owner configuration.
-- **[OWNER ACTION REQUIRED]**: Actions external to source code.
-- **[NOT TESTED / UNKNOWN]**: Measurements requiring field user traffic.
+Every dimension is classified into standard operational categories:
+- **[VERIFIED IN SOURCE]**: Fully implemented, compiled, and verified in source code.
+- **[VERIFIED LOCALLY]**: Verified via automated Playwright checks, headless browser runs, and local HTTP server tests.
+- **[VERIFIED ON PREVIEW]**: Verified on Vercel Preview deployment where applicable.
+- **[OWNER ACTION REQUIRED]**: Actions external to source code (Resend API key, domain DNS, mailbox).
 
-### Master Regression Assertions (Suite Run: `scripts/verify_master_release.mjs`):
-1. **Zero Em/En Dash Punctuation Across All Routes [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Automated full DOM text scan evaluated all text-bearing nodes across `/`, `/terms-and-conditions`, and `/privacy-policy`.
-   - Results: Homepage (0 em, 0 en), Terms & Conditions (0 em, 0 en), Privacy Policy (0 em, 0 en). Zero oversized typographical dashes remain in public copy.
-2. **Normal Text Selection Restoration [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Blanket `select-none` eliminated across all informational sections. Users can select and copy text freely across Capabilities cards, FAQ accordions, Contact section, Liquid Sand CTA, Engine statement, Footer studio note, and legal documents.
-3. **Clean FAQ DOM Text Extraction (Zero Duplication) [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Single accessible `<p>` rendered per answer without hidden duplicate DOM tags, resolving screen-reader / text-extraction duplication.
-4. **Engine Micro-Labels Semantic Navigation [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - "SYSTEMS ARCHITECTURE" is a functional, accessible anchor link (`#capabilities`) with ARIA label and focus outline.
-   - "ORIGINAL VENTURES" is a functional, accessible anchor link (`#selected-work`) with ARIA label and focus outline.
-5. **Footer Wordmark Click-Hop & Beam Sheen [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Click trigger applies `.is-hop` class with vertical elevation (initial Y: 641.3px → peak Y: 614.2px, delta: 27.1px).
-   - Wordmark container uses `overflow-visible`, completely preventing letter clipping during animation.
-6. **Bespoke Selected Work Artwork Loaded [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - TMR AI Car Care (`tmr-ai-car-care.jpg`, 686 KB): HTTP 200, clean aspect ratio.
-   - Saraswati Driving School (`saraswati-driving-school.jpg`, 758 KB): HTTP 200, clean aspect ratio.
-   - MNESA (`mnesa.jpg`, 638 KB): HTTP 200, clean aspect ratio.
-7. **Contact Form Validation & State Preservation [FIXED IN CODE / VERIFIED LOCALLY]:**
-   - Empty field submission triggers accessible inline error alerts.
-   - Invalid email triggers RFC format alert.
-   - Correct input preserves visitor entries without field resets upon failed submission.
-   - 9 distinct project-type categories fully selectable.
-8. **8-Device Viewport Audit Matrix [VERIFIED LOCALLY]:**
-   - Zero horizontal overflow (`scrollWidth === innerWidth`) across all 8 standard screen widths (1920px down to 360px).
-9. **Browser Console Errors [VERIFIED LOCALLY]:**
-   - Exact count: 0 errors during the entire master test lifecycle.
-
----
-
-## 2. 8-Device Viewport Audit Matrix
-
-| # | Profile Name | Viewport (W × H) | Category | Horizontal Overflow | Curtain Width | Text Selection | Engine Nav | Hop Status | Status |
-| :-: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| 1 | **Large Desktop** | 1920 × 1080 | Desktop Workstation | **Pass (0 px)** | 1920 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
-| 2 | **Standard Desktop** | 1440 × 900 | Laptop / Desktop | **Pass (0 px)** | 1440 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
-| 3 | **Compact Laptop** | 1280 × 800 | 13" Laptop | **Pass (0 px)** | 1280 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
-| 4 | **Landscape Tablet** | 1024 × 768 | iPad / Tablet H | **Pass (0 px)** | 1024 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
-| 5 | **Portrait Tablet** | 768 × 1024 | iPad / Tablet V | **Pass (0 px)** | 768 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
-| 6 | **Large Mobile** | 430 × 932 | iPhone 14/15 Pro Max | **Pass (0 px)** | 430 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
-| 7 | **Common Mobile** | 390 × 844 | iPhone 12/13/14 | **Pass (0 px)** | 390 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
-| 8 | **Narrow Mobile** | 360 × 800 | Android Small Form | **Pass (0 px)** | 360 px | **Pass** | **Pass** | **Pass (27.1px)** | **PASS** |
-
-**Summary Result:** 8 / 8 Viewports Passed with 0 Horizontal Overflow and 0 Regressions.
-
----
-
-## 3. Deep-Dive Inspection Results
-
-### 3.1 Dash Punctuation Elimination Scan
-- **Audit Tool:** Playwright tree-walker evaluating `Node.TEXT_NODE` text content.
-- **Regex:** `/[—–]/g` (U+2014 em-dash, U+2013 en-dash).
-- **Homepage (`/`):** 0 matches found.
-- **Terms & Conditions (`/terms-and-conditions`):** 0 matches found.
-- **Privacy Policy (`/privacy-policy`):** 0 matches found.
-- **Replacement Strategy:** Natural commas, full stops, colons, or parentheses substituted based on grammatical context.
-
-### 3.2 Text Selection Verification Samples
-- **Capabilities Card:** `window.getSelection().toString()` returned `"Website design and development, UI/..."`.
-- **FAQ Question:** returned `"What does OSTRUM build?..."`.
-- **Contact Heading:** returned `"REACH OUT\nTO US..."`.
-- **Liquid Sand CTA:** returned `"HAVE A BUSINESS PROBLEM OR PRODUCT ..."`.
-- **Engine Statement:** returned `"\"Custom systems engineered around h..."`.
-- **Footer Studio Note:** returned `"Custom software, AI systems and ori..."`.
-- **Terms Section 01:** returned `"These Terms and Conditions (“Terms”) establish the..."`.
-
-### 3.3 Engine Navigation Links
-- `#capabilities` link verified on element `<a href="#capabilities" aria-label="Navigate to Systems Architecture capabilities">`.
-- `#selected-work` link verified on element `<a href="#selected-work" aria-label="Navigate to Original Ventures selected work">`.
-- Both elements feature visible keyboard focus rings (`focus-visible:ring-1 focus-visible:ring-[#ff5c4a]`).
-
-### 3.4 Footer Wordmark Hop Animation & Boundary Geometry
-- Element: `[data-testid="ostrum-wordmark-title"]`.
-- Click event successfully dispatched.
-- Animation elevates wordmark along Y axis by `27.1px` without letter clipping.
-- CSS bounding box: `overflow: visible` on wrapper ensures apex elevation remains fully visible.
-
-### 3.5 Contact Form Validation & State Preservation
-- **Empty Form Test:** Form submission without input triggers accessible error alert (`Please enter your name.`).
-- **Email Regex Test:** Entering `invalid-email-format` triggers alert (`Please enter a valid email address.`).
-- **State Preservation Test:** Entering Name `Rahul Sharma` and submitting with invalid email preserves name in DOM.
-
-### 3.6 Legal Pages Final Curtain Reveal & End-Spacing
-- Preserved exact 32.00px breathing gap between the end of legal content and `#theatre-stage-wrapper`.
-- Curtain height `100svh` with `min-height: 100svh` guarantees zero footer peeking before scroll reveal starts.
-- 1:1 scrub reveals burgundy footer smoothly.
+### Master Regression Assertions (Suite Run: `scripts/verify_authoritative_release.mjs` & `scripts/verify_master_release.mjs`):
+1. **Full Website Copy Refinement [VERIFIED IN SOURCE / VERIFIED LOCALLY]:**
+   - **Hero Opening**: Business statement (`We build custom software and AI systems for ambitious businesses.`), Product statement (`We create original digital products for problems worth solving.`), and Bridge (`Custom systems for today. Original products for what’s next.`).
+   - **Hero Panel 01 (For Business)**: Headline (`Custom systems, built around your business.`) and Detail (`Software, integrations and AI automation shaped around your workflows.`).
+   - **Hero Panel 02 (For What’s Next)**: Headline (`Original products for real problems.`) and Detail (`We validate ideas and build selected ventures through OSTRUM Ventures.`).
+   - **Capabilities (6 Cards)**: Section intro (`Digital experiences, AI systems and connected software that make work simpler.`) and exact 6 concise card descriptions.
+   - **Selected Work (3 Projects)**: Exact concise descriptions for TMR AI Car Care, Saraswati Driving School, and MNESA.
+   - **FAQ (10 Q&As)**: Section intro (`A few answers about our work, process and delivery.`) and 10 exact concise answers.
+   - **Contact Section**: Single concise heading (`Tell us what you’re building.`), concise description, compact placeholders (`Your name`, `you@company.com`, `Company name`, `+91 98420 12345`, `What are you building, and when do you need it?`), and updated privacy note.
+   - **Bottom CTA**: Eyebrow (`HAVE A BUSINESS PROBLEM OR PRODUCT IDEA?`), headline (`LET’S BUILD WHAT’S NEXT.`), and supporting line (`Custom software, AI systems and digital products, built around your goals.`).
+   - **Footer**: Brand note (`Custom software, AI systems and original digital products.`), `Start a project` link, and dynamic copyright year.
+2. **Hero Redirection Controls Complete Removal [VERIFIED IN SOURCE / VERIFIED LOCALLY]:**
+   - `SYSTEMS ARCHITECTURE` and `ORIGINAL VENTURES` labels, anchors, buttons, hairline expansion lines, hover handlers, and wrappers are completely removed from all responsive variants.
+   - Keyboard tab navigation confirms focus never lands on old action slots.
+3. **Testimonial DOM Text & Quote Selection Isolation [VERIFIED IN SOURCE / VERIFIED LOCALLY]:**
+   - Background monumental `TESTIMONIALS` headline is rendered as a genuine semantic DOM `<h2>` element (not an image, canvas, or SVG path).
+   - Card quotes are in separate isolated containers (`isolation: isolate`, `user-select: text`). Dragging a selection across quote text captures only the quote fragment without capturing the backdrop phrase.
+4. **Footer LinkedIn Brand Link & Icon [VERIFIED IN SOURCE / VERIFIED LOCALLY]:**
+   - Exactly one visible anchor in the footer pointing strictly to `https://www.linkedin.com/company/ostrum/`.
+   - Rendered with visible inline SVG brand icon (16×16px), `aria-label="OSTRUM on LinkedIn"`, `target="_blank"`, and `rel="noopener noreferrer"`.
+   - Renders unconditionally (not hidden by missing environment variables or pending badges).
+5. **Favicon & 3D Brand Symbol Derivatives [VERIFIED IN SOURCE / VERIFIED LOCALLY]:**
+   - Generated 1024×1024 master icon showing the ivory/champagne Möbius sculpture on rich crimson studio backdrop without text.
+   - All 8 derivative endpoints verified HTTP 200 with correct MIME types:
+     - `/favicon.ico` (multi-size ICO: 16, 32, 48)
+     - `/favicon-16x16.png`
+     - `/favicon-32x32.png`
+     - `/apple-touch-icon.png` (180×180)
+     - `/icon-192.png` (192×192)
+     - `/icon-512.png` (512×512)
+     - `/manifest.webmanifest` (valid JSON web manifest)
+     - `/brand/ostrum-3d-symbol-master.png` (1024×1024 master)
+6. **Zero Em/En Dash Punctuation [VERIFIED IN SOURCE / VERIFIED LOCALLY]:**
+   - Automated full DOM text scan evaluated all text nodes across `/`, `/terms-and-conditions`, and `/privacy-policy`.
+   - Result: 0 em-dashes (`\u2014`) and 0 en-dashes (`\u2013`) in all user-facing content.
+7. **Contact Form Validation & State Preservation [VERIFIED LOCALLY]:**
+   - Empty submission triggers accessible inline error alert (`Please enter your name.`).
+   - Invalid email triggers validation alert (`Please enter a valid email address.`).
+   - Field preservation verified: name and message retained on submission error.
+8. **Multi-Viewport Matrix with Owner Reference Desktop [VERIFIED LOCALLY]:**
+   - Tested 7 viewports including the owner reference desktop (1648 × 928).
+   - Zero horizontal overflow (`scrollWidth === innerWidth`, 0px overflow) across all viewports.
+9. **Axe-Core Automated Accessibility Scan [VERIFIED LOCALLY]:**
+   - Scanned `/`, `/terms-and-conditions`, and `/privacy-policy` against WCAG 2.1 AA rules.
+   - Result: 0 violations across all 3 public routes.
+10. **Browser Console Errors [VERIFIED LOCALLY]:**
+    - 0 console errors during entire test run.
 
 ---
 
-## 4. Visual Regression Artifacts
+## 2. Multi-Viewport & Overflow Verification Matrix
 
-Repository-relative artifacts captured in [`reports/audits/artifacts/`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/reports/audits/artifacts/):
-
-1. **Master Test Results JSON:** `reports/audits/artifacts/master_release_verification_results.json`
-2. **Terms Before Reveal (Desktop 1440×900):** `terms-before-reveal-desktop.png` (32px gap, 0px peeking footer)
-3. **Terms Reveal Midpoint (Desktop 1440×900):** `terms-reveal-midpoint-desktop.png` (smooth 50% curtain lift)
-4. **Terms Footer Final (Desktop 1440×900):** `terms-footer-final-desktop.png` (fully revealed and interactive)
-5. **Privacy Before Reveal (Desktop 1440×900):** `privacy-before-reveal-desktop.png`
-6. **Privacy Reveal Midpoint (Desktop 1440×900):** `privacy-reveal-midpoint-desktop.png`
-7. **Privacy Footer Final (Desktop 1440×900):** `privacy-footer-final-desktop.png`
-8. **Homepage CTA Before Reveal (Desktop 1440×900):** `homepage-cta-before-reveal-desktop.png`
-9. **Homepage CTA Reveal Midpoint (Desktop 1440×900):** `homepage-cta-reveal-midpoint-desktop.png`
-10. **Homepage Footer Final (Desktop 1440×900):** `homepage-footer-final-desktop.png`
-11. **Selected Work 3D Wheel (Desktop 1440×900):** `selected-work-wheel-desktop.png` (TMR, Saraswati, MNESA artwork)
+| # | Device Class | Viewport (W × H) | Horizontal Overflow | Testimonial Selection | Hero Actions Removed | LinkedIn Icon | Status |
+| :-: | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| 1 | **Owner Reference Desktop** | 1648 × 928 | **0 px (PASS)** | **PASS** | **PASS (Removed)** | **PASS (Visible)** | **PASS ✓** |
+| 2 | **Large Desktop Workstation** | 1920 × 1080 | **0 px (PASS)** | **PASS** | **PASS (Removed)** | **PASS (Visible)** | **PASS ✓** |
+| 3 | **Standard Desktop** | 1440 × 900 | **0 px (PASS)** | **PASS** | **PASS (Removed)** | **PASS (Visible)** | **PASS ✓** |
+| 4 | **Compact Laptop** | 1280 × 800 | **0 px (PASS)** | **PASS** | **PASS (Removed)** | **PASS (Visible)** | **PASS ✓** |
+| 5 | **Tablet Portrait** | 768 × 1024 | **0 px (PASS)** | **PASS** | **PASS (Removed)** | **PASS (Visible)** | **PASS ✓** |
+| 6 | **Mobile Medium** | 390 × 844 | **0 px (PASS)** | **PASS** | **PASS (Removed)** | **PASS (Visible)** | **PASS ✓** |
+| 7 | **Narrow Mobile** | 360 × 800 | **0 px (PASS)** | **PASS** | **PASS (Removed)** | **PASS (Visible)** | **PASS ✓** |
 
 ---
 
-## 5. Compliance & Conclusion
+## 3. Test Artifacts & Evidence Files
 
-All regression acceptance criteria have been met:
-- [x] Zero em/en dashes across all user-facing pages and metadata.
-- [x] Normal text selection restored across all informational sections.
-- [x] Engine micro-labels provide keyboard-accessible navigation to `#capabilities` and `#selected-work`.
-- [x] Footer wordmark hop and beam sheen elevate without letter clipping.
-- [x] Bespoke project artwork generated, integrated, and verified for TMR, Saraswati, and MNESA.
-- [x] Contact form validates correctly while preserving user inputs across 9 project types.
-- [x] Single accessible FAQ text rendering without duplicate text extraction.
-- [x] Zero horizontal overflow on any audited resolution (1920px down to 360px).
-- [x] Zero console errors during master verification lifecycle.
-- [x] Reduced-motion verified for graceful sequential document flow.
+- **Regression Evidence JSON**: `reports/audits/artifacts/playwright/master_release_regression_evidence.json`
+- **Axe-Core Audit Results**: `reports/audits/artifacts/playwright/axe-results.json`
+- **Master Results JSON**: `reports/audits/artifacts/master_release_verification_results.json`
+- **Owner Reference Screenshot (1648×928)**: `reports/audits/artifacts/playwright/owner-hero-desktop-1648x928.png`
+- **Owner Reference Footer Screenshot (1648×928)**: `reports/audits/artifacts/playwright/owner-footer-desktop-1648x928.png`
+- **Individual Viewport Screenshots**: `reports/audits/artifacts/playwright/[device].png`
+
+---
+
+## 4. Overall Verification Verdict
+
+**VERDICT: ALL GATES PASS (GO) ✓**  
+All mandatory Playwright assertions, copy edits, hero action removals, LinkedIn icon verifications, brand icon derivations, zero-overflow viewports, and accessibility checks passed with zero errors.

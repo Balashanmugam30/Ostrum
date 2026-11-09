@@ -25,7 +25,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '01 / 06',
     title: 'DIGITAL EXPERIENCES',
     description:
-      'Website design and development, UI/UX design, e-commerce experiences and customer portals built for usability, accessibility and search visibility. We also support digital growth through SEO, content strategy and performance marketing.',
+      'Websites, storefronts and portals designed for clear journeys, accessibility and search.',
     tags: ['Website & UI/UX Design', 'E-commerce Development', 'SEO & Digital Growth'],
     gradient:
       'linear-gradient(112deg, #D7B5FA 0%, #F2D4FF 48%, #CDE6FC 100%)',
@@ -36,7 +36,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '02 / 06',
     title: 'AI SYSTEMS & AGENTS',
     description:
-      'AI agents, intelligent assistants and workflow automation that connect business tools, handle repeatable tasks and support faster decisions, with human oversight defined for each use case.',
+      'AI agents and workflow automation that connect tools and reduce repetitive work, with human oversight.',
     tags: ['AI Agent Development', 'AI Workflow Automation', 'Business Integrations'],
     gradient:
       'linear-gradient(112deg, #86FFF8 0%, #D2F6F0 52%, #F4C5CF 100%)',
@@ -47,7 +47,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '03 / 06',
     title: 'BUSINESS PLATFORMS',
     description:
-      'Custom business platforms, CRM and ERP integrations, customer portals and operations dashboards that connect business data and make everyday workflows easier to manage.',
+      'Custom platforms, CRM/ERP integrations and dashboards that bring business operations together.',
     tags: ['Custom Business Software', 'CRM & ERP Integrations', 'Operations Dashboards'],
     gradient:
       'linear-gradient(112deg, #FAC274 0%, #F2A460 100%)',
@@ -58,7 +58,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '04 / 06',
     title: 'SOFTWARE & PRODUCT ENGINEERING',
     description:
-      'End-to-end custom software development, from product discovery and architecture to SaaS platforms, startup MVPs, web and mobile applications, and production APIs.',
+      'From product discovery to SaaS, MVPs, web apps, mobile apps and production APIs.',
     tags: ['Custom Software Development', 'SaaS & MVP Engineering', 'Web, Mobile & APIs'],
     gradient:
       'linear-gradient(112deg, #BBCBFF 0%, #DDE4FF 53%, #EAD9FF 100%)',
@@ -69,7 +69,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '05 / 06',
     title: 'CONNECTED TECHNOLOGY',
     description:
-      'IoT development, embedded software, sensor integrations and hardware-to-software interfaces for connected devices and practical real-world systems.',
+      'IoT, embedded software and device integrations that connect hardware to useful digital systems.',
     tags: ['IoT Development', 'Embedded Software', 'Hardware Integration'],
     gradient:
       'linear-gradient(112deg, #BDECCF 0%, #CFF7EF 55%, #C4E7F8 100%)',
@@ -80,7 +80,7 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
     index: '06 / 06',
     title: 'CUSTOM ENGINEERING',
     description:
-      'Bespoke software, legacy application modernization and complex system integrations for workflows that off-the-shelf products cannot support effectively.',
+      'Bespoke software, legacy modernisation and integrations for needs off-the-shelf tools cannot meet.',
     tags: ['Bespoke Software', 'Legacy Modernization', 'Systems Integration'],
     gradient:
       'linear-gradient(112deg, #E9C9F6 0%, #F5CDD8 52%, #FFD9B7 100%)',
@@ -482,7 +482,7 @@ export function OstrumCapabilitiesSection() {
               data-testid="capabilities-supporting-statement"
               className="font-sans text-sm sm:text-base md:text-base lg:text-lg text-[#0B0B10]/75 max-w-[46ch] sm:max-w-[50ch] md:max-w-[52ch] leading-relaxed"
             >
-              OSTRUM engineers custom software, intelligent AI systems, digital business platforms, and modern web applications that help ambitious businesses streamline operations and scale.
+              Digital experiences, AI systems and connected software that make work simpler.
             </p>
           </div>
         </header>

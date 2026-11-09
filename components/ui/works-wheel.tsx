@@ -885,6 +885,17 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
             </div>
           )}
         </div>
+
+        {/* Semantic accessibility & crawlable project directory */}
+        <ul className="sr-only" aria-label="Selected Work Projects">
+          {items.map((item, idx) => (
+            <li key={idx}>
+              <h4>{item.title}</h4>
+              <p>{item.description}</p>
+              {item.href && <a href={item.href}>Visit {item.title}</a>}
+            </li>
+          ))}
+        </ul>
       </section>
     );
   },
@@ -895,28 +906,28 @@ export const OSTRUM_WORKS: WorksWheelItem[] = [
   {
     title: "TMR AI Car Care",
     description:
-      "A premium digital experience for an automotive care studio, helping customers explore detailing and paint-protection services, understand the process and make enquiries or bookings.",
+      "A digital platform for automotive care studios, bringing service discovery, customer enquiries and bookings together.",
     image: "/images/works/tmr-ai-car-care.jpg",
     href: "https://tmraicarcare.com/",
   },
   {
     title: "Saraswati Driving School",
     description:
-      "Modern booking and fleet scheduling infrastructure engineered for certified driver training and lesson dispatch.",
+      "A booking and fleet-scheduling platform for student lessons, training schedules and vehicle coordination.",
     image: "/images/works/saraswati-driving-school.jpg",
     href: "https://saraswati-driving-school.vercel.app/",
   },
   {
     title: "MNESA",
     description:
-      "Intelligent opportunity capture platform exploring how people organize commitments and turn observations into structured follow-through workflows.",
+      "An OSTRUM venture exploring a simpler way to capture ideas, organise commitments and turn them into action.",
     image: "/images/works/mnesa.jpg",
     href: "https://github.com/Balashanmugam30/mnesa",
   },
   {
     title: "Our Capabilities",
     description:
-      "From custom software and practical AI systems to business platforms and connected tech, we engineer systems that scale businesses.",
+      "Digital experiences, AI systems and connected software that make work simpler.",
     image: "",
     isCapabilities: true,
   },
