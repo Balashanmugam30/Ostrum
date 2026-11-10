@@ -382,13 +382,32 @@ async function main() {
     }
     console.log('Generated light theme icon derivatives.');
 
-    // 4. Multi-resolution fallback favicon.ico
-    const b16 = await sharp(masterDark1024).resize(16, 16).png().toBuffer();
-    const b32 = await sharp(masterDark1024).resize(32, 32).png().toBuffer();
-    const b48 = await sharp(masterDark1024).resize(48, 48).png().toBuffer();
+    // 4. Generate Permanent Pure-Black Favicon (Ivory on Solid Black #000000)
+    const compositeBlack512 = await sharp({
+      create: {
+        width: 512,
+        height: 512,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 1 },
+      },
+    })
+      .composite([{
+        input: await sharp(masterDark1024).resize(512, 512, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).toBuffer(),
+        blend: 'over',
+      }])
+      .png()
+      .toBuffer();
+
+    fs.writeFileSync(path.join(publicDir, 'favicon-ostrum-black.png'), compositeBlack512);
+    console.log('Generated permanent pure-black favicon: favicon-ostrum-black.png (512x512).');
+
+    // 5. Multi-resolution fallback favicon.ico with solid black background
+    const b16 = await sharp(compositeBlack512).resize(16, 16).png().toBuffer();
+    const b32 = await sharp(compositeBlack512).resize(32, 32).png().toBuffer();
+    const b48 = await sharp(compositeBlack512).resize(48, 48).png().toBuffer();
     const icoBuf = createIco([b16, b32, b48], [16, 32, 48]);
     fs.writeFileSync(path.join(publicDir, 'favicon.ico'), icoBuf);
-    console.log('Generated favicon.ico (16, 32, 48).');
+    console.log('Generated favicon.ico (16, 32, 48) on solid black background.');
 
     // 5. Visual Proof Sheet: Side-by-side Dark & Light Chrome comparison
     console.log('Generating dual-theme visual proof sheet...');
