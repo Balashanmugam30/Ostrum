@@ -240,7 +240,10 @@ function InteractiveCardArtwork({
       />
       {/* Subtle live destination indicator on front card */}
       {href?.startsWith("http") && (
-        <span className="pointer-events-none absolute right-3.5 bottom-3.5 flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium opacity-0 backdrop-blur-md transition group-hover:opacity-100 shadow-sm bg-white/95 text-[#0b0b10] border border-black/10">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute right-3.5 bottom-3.5 flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium opacity-0 backdrop-blur-md transition group-hover:opacity-100 shadow-sm bg-white/95 text-[#0b0b10] border border-black/10"
+        >
           <svg
             viewBox="0 0 12 12"
             className="size-2.5 text-[#C9362B]"

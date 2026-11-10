@@ -499,6 +499,7 @@ export function OstrumEnergyNarrativeSection() {
     <section
       ref={sectionRef}
       id="energy-narrative"
+      data-selection-surface="dark"
       className="relative w-full overflow-visible z-[25] select-none"
       aria-label="Ostrum Energy Narrative"
     >

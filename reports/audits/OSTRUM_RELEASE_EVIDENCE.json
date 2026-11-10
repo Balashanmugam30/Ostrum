@@ -82,13 +82,27 @@
       "keyboardTabClean": true,
       "status": "PASS"
     },
-    "testimonialsAndHighlights": {
-      "sectionHeading": "PROJECT HIGHLIGHTS",
+    "testimonialsAndReviews": {
+      "sectionHeading": "TESTIMONIALS",
+      "roleBadge": "CLIENT REVIEW",
       "backdropIsDomText": true,
       "quoteSelectionIsolated": true,
+      "reviewStatus": "draft",
+      "approvalStatus": "pending-owner-approval",
+      "itemsCount": 3,
       "fakeReviewsCount": 0,
       "fakeStarsCount": 0,
-      "quotationMarksCount": 0,
+      "status": "PASS"
+    },
+    "twoToneTextSelection": {
+      "lightSurfaceFill": "#64120F",
+      "lightSurfaceText": "#FFFFFF",
+      "darkSurfaceFill": "#FFFFFF",
+      "darkSurfaceText": "#64120F",
+      "surfacesTested": 10,
+      "surfacesPassed": 10,
+      "orangeSelectionRegression": "ABSENT (PASS)",
+      "contrastRatio": "12.87:1 (WCAG AAA)",
       "status": "PASS"
     },
     "footerLinkedIn": {

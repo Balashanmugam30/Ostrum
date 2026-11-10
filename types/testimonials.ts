@@ -1,5 +1,7 @@
 export type TestimonialLogoType = 'image' | 'mnesa-mark' | 'wordmark';
-export type TestimonialContentType = 'testimonial' | 'project-note' | 'project-highlight';
+export type TestimonialContentType = 'client-review' | 'testimonial' | 'project-note' | 'project-highlight';
+export type TestimonialApprovalStatus = 'pending-owner-approval' | 'approved';
+export type TestimonialReviewStatus = 'draft' | 'approved';
 
 export interface Testimonial {
   id: string;
@@ -15,6 +17,9 @@ export interface Testimonial {
   logoAlt?: string;
   logoType?: TestimonialLogoType;
   contentType?: TestimonialContentType;
+  reviewStatus?: TestimonialReviewStatus;
+  approvalStatus?: TestimonialApprovalStatus;
+  rating?: number;
   approved: boolean;
   isPlaceholder: boolean;
 }

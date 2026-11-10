@@ -52,6 +52,17 @@ This report documents the visual and architectural refinements implemented in re
 | **Row Alignment** | Baseline shift on label | **Strict `inline-flex items-center gap-2.5`** with centered label & `↗` |
 | **Interactive Height** | `min-h-[44px]` | **`min-h-[44px]`** (WCAG 2.2 touch compliant) |
 
+### 2.4 Two-Tone Text Selection System
+- Light surfaces (white email tile, stone page sections, pastel capabilities cards, bright coral project cards): `#64120F` highlight, `#FFFFFF` text.
+- Dark surfaces (pure black CTA, 3D hero, deep burgundy footer base): `#FFFFFF` highlight, `#64120F` text.
+- Eliminates the previous orange selection highlight that blended into the coral project card.
+
+### 2.5 Testimonials Section Restoration
+- Restored original section title / monumental background text: `TESTIMONIALS` (`aria-label="Testimonials"`).
+- Replaced project summary text with three natural client-review drafts for TMR AI Car Care, Saraswati Driving School, and MNESA.
+- Role badges unified as `CLIENT REVIEW`.
+- Background heading text isolated with `select-none` so dragging across review text never captures background decorative typography.
+
 ---
 
 ## 3. Playwright & DevTools Automated Visual Verification

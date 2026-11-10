@@ -73,6 +73,7 @@ export function OstrumStudioFooter() {
           <a
             href="mailto:hello@theostrum.com"
             data-testid="footer-tile-email"
+            data-selection-surface="light"
             className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-white text-[#050505] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,255,255,0.14)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ostrum-footer-accent,#C9362B)]"
           >
             <div>
@@ -109,6 +110,7 @@ export function OstrumStudioFooter() {
           <Link
             href="/#contact"
             data-testid="footer-tile-project"
+            data-selection-surface="coral"
             onClick={(e) => handleNavClick(e, '#contact')}
             className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-[var(--ostrum-footer-accent,#FF4D30)] text-[#050505] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,77,48,0.32)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >

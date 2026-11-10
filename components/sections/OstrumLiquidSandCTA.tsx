@@ -8,6 +8,7 @@ export function OstrumLiquidSandCTA() {
   return (
     <section
       id="cta"
+      data-selection-surface="dark"
       data-testid="liquid-sand-cta-section"
       className="relative z-20 w-full min-h-[100svh] flex flex-col justify-center overflow-hidden select-text"
       style={{

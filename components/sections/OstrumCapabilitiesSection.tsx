@@ -432,6 +432,7 @@ export function OstrumCapabilitiesSection() {
       id="capabilities"
       ref={sectionRef}
       data-testid="capabilities-section"
+      data-selection-surface="light"
       className="relative z-[35] w-full min-h-screen select-text"
       style={{
         backgroundColor: 'transparent',

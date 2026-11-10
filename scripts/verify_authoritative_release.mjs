@@ -1,12 +1,46 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
+import http from 'http';
+import { spawn } from 'child_process';
 import axeSource from 'axe-core';
 
 const BASE_URL = 'http://localhost:3000';
 const ARTIFACTS_DIR = path.resolve('reports/audits/artifacts/playwright');
 if (!fs.existsSync(ARTIFACTS_DIR)) {
   fs.mkdirSync(ARTIFACTS_DIR, { recursive: true });
+}
+
+async function isPortOpen(port) {
+  return new Promise((resolve) => {
+    const req = http.get(`http://localhost:${port}/`, () => resolve(true));
+    req.on('error', () => resolve(false));
+    req.setTimeout(1000, () => {
+      req.destroy();
+      resolve(false);
+    });
+  });
+}
+
+async function startServer() {
+  const open = await isPortOpen(3000);
+  if (open) {
+    console.log('[Server] Port 3000 is already active.');
+    return null;
+  }
+  console.log('[Server] Starting Next.js production server on port 3000...');
+  const child = spawn('npx', ['next', 'start', '-p', '3000'], {
+    shell: true,
+    stdio: 'ignore',
+  });
+  for (let i = 0; i < 30; i++) {
+    await new Promise((r) => setTimeout(r, 1000));
+    if (await isPortOpen(3000)) {
+      console.log('[Server] Started successfully on port 3000.');
+      return child;
+    }
+  }
+  throw new Error('Server failed to start on port 3000');
 }
 
 const VIEWPORT_MATRIX = [
@@ -22,6 +56,7 @@ const VIEWPORT_MATRIX = [
 
 async function runAuthoritativeVerification() {
   console.log('🚀 Starting OSTRUM Master Playwright Regression Suite...');
+  const serverProc = await startServer();
   const browser = await chromium.launch({ headless: true });
   const results = {
     timestamp: new Date().toISOString(),
@@ -292,29 +327,32 @@ async function runAuthoritativeVerification() {
     // F. CONTACT FORM VALIDATION & INTERACTIONS
     // =========================================================================
     console.log('\n--- F. CONTACT FORM VALIDATION ---');
-    await page.goto(`${BASE_URL}/#contact`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(800);
+    await page.goto(`${BASE_URL}/#contact`, { waitUntil: 'networkidle' }).catch(() => {});
+    await page.waitForSelector('[data-testid="contact-enquiry-form"]');
+    await page.waitForTimeout(2000);
+    const formPanel = await page.$('[data-testid="contact-form-panel"]');
+    await formPanel?.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
 
     // Empty submit
-    const submitBtn = await page.$('button[type="submit"]');
-    await submitBtn?.click();
-    await page.waitForTimeout(300);
+    await page.click('button[type="submit"]');
+    await page.waitForTimeout(400);
     const alert1 = await page.$eval('[role="alert"]', (el) => el.innerText).catch(() => '');
-    const emptyValidationOk = alert1.includes('enter your name');
-    console.log(`[Form] Empty submit validation: "${alert1}" (${emptyValidationOk ? 'PASS ✓' : 'FAIL ✗'})`);
+    const emptyValidationOk = alert1.toLowerCase().includes('enter your name');
+    console.log(`[Form] Empty submit validation: "${alert1.trim()}" (${emptyValidationOk ? 'PASS ✓' : 'FAIL ✗'})`);
 
     // Invalid email & field preservation
     await page.fill('#contact-name', 'Balashanmugam');
     await page.fill('#contact-email', 'invalid-email');
     await page.fill('#contact-message', 'Custom software evaluation request.');
-    await submitBtn?.click();
-    await page.waitForTimeout(300);
+    await page.click('button[type="submit"]');
+    await page.waitForTimeout(400);
     const alert2 = await page.$eval('[role="alert"]', (el) => el.innerText).catch(() => '');
-    const emailValidationOk = alert2.includes('valid email');
+    const emailValidationOk = alert2.toLowerCase().includes('valid email');
     const preservedName = await page.$eval('#contact-name', (el) => el.value);
     const preservationOk = preservedName === 'Balashanmugam';
 
-    console.log(`[Form] Invalid email alert: "${alert2}" (${emailValidationOk ? 'PASS ✓' : 'FAIL ✗'})`);
+    console.log(`[Form] Invalid email alert: "${alert2.trim()}" (${emailValidationOk ? 'PASS ✓' : 'FAIL ✗'})`);
     console.log(`[Form] Field preservation: "${preservedName}" (${preservationOk ? 'PASS ✓' : 'FAIL ✗'})`);
 
     results.contactFormAndInteractions = {
@@ -417,6 +455,10 @@ async function runAuthoritativeVerification() {
     await page.close();
   } finally {
     await browser.close();
+    if (serverProc) {
+      serverProc.kill();
+      console.log('[Server] Terminated production server.');
+    }
   }
 
   // Final overall pass determination

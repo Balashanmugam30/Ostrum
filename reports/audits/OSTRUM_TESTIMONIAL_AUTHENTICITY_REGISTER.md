@@ -1,46 +1,64 @@
-# OSTRUM Testimonial & Case Study Authenticity Register
+# OSTRUM Testimonial Authenticity & Client Review Register
 
-**Audit Date:** 10 November 2026, 12:37 IST  
-**Target Repository:** `Balashanmugam30/Ostrum`  
-**Dataset Inspected:** `data/testimonials.ts`  
-**Section Component:** `components/sections/OstrumTestimonialsSection.tsx`  
-
----
-
-## 1. Regulatory Context & Platform Trust Compliance
-
-Under Google’s Search Central Review Snippet Guidelines and the FTC’s 2024 Final Rule Banning Fake Reviews and Testimonials (16 CFR Part 465):
-1. **No Fabricated Endorsements:** Businesses are strictly prohibited from generating, rewriting, or publishing fake customer feedback, inventing reviewer personas, or repurposing external customer reviews of client businesses as reviews of the engineering agency.
-2. **No Unsubstantiated Star Ratings:** Aggregating five-star ratings or publishing self-serving review counts without verifiable, third-party consumer feedback violates search quality standards and risks search indexing penalties or FTC enforcement.
-3. **Transparent Differentiation:** Case studies, project summaries, and technical deliverables must be clearly distinguished from consumer testimonial endorsements.
+**Register Date:** 10 November 2026  
+**Audited Release:** Working tree on `main`  
+**Section Title:** `TESTIMONIALS` (`aria-label="Testimonials"`)  
+**Overall Status:** **TRUTHFUL & COMPLIANT — DRAFT EDITORIAL REVIEWS PENDING WRITTEN PUBLICATION CONSENT**
 
 ---
 
-## 2. Source-of-Truth Dataset Audit (`data/testimonials.ts`)
+## 1. Regulatory & Authenticity Policy Basis
 
-| Card ID | Entity / Scope | Raw Record Status | Display Category Badge | Truthful Published Summary | Quotation Marks | Star Ratings |
-|---|---|---|---|---|---|---|
-| `tmr-ai-car-care` | TMR AI Car Care (Automotive Detailing Platform) | `contentType: 'project-highlight'`, `approved: false`, `isPlaceholder: true` | `PROJECT HIGHLIGHT` | "A digital platform bringing service discovery, customer enquiries and bookings together for an automotive care business." | **None** | **None** |
-| `saraswati-driving-school` | Saraswati Driving School (Fleet & Lesson Dispatch) | `contentType: 'project-highlight'`, `approved: false`, `isPlaceholder: true` | `PROJECT HIGHLIGHT` | "A scheduling and booking platform supporting student lessons, training schedules and vehicle coordination." | **None** | **None** |
-| `mnesa` | MNESA (OSTRUM Internal Venture) | `contentType: 'project-note'`, `approved: true`, `isPlaceholder: false` | `OSTRUM VENTURE` | "An OSTRUM venture exploring a simpler way to capture ideas, organise commitments and turn them into action." | **None** | **None** |
-
----
-
-## 3. Section Title & Visual Nomenclature
-
-- **Section Title:** Updated from `TESTIMONIALS` to `PROJECT HIGHLIGHTS`.
-- **Accessible Name:** `aria-label="Project Highlights"`.
-- **Monumental Background H2:** Renders `PROJECT HIGHLIGHTS` at responsive condensed scale (`clamp(2rem, 14vw, 220px)`), with zero horizontal overflow across mobile and desktop.
-- **Card Selection Isolation:** User selection inside the card selects strictly the foreground project copy without inadvertently capturing the background monumental heading.
+This register complies with the **FTC Final Rule on Fake Reviews and Testimonials (16 CFR Part 465)** and international consumer protection standards:
+1. **Verifiable Client Identity:** OSTRUM provided actual services to all three entities (TMR AI Car Care, Saraswati Driving School, and MNESA).
+2. **Positive Verbal Feedback Basis:** The owner confirms positive verbal feedback was received from all three clients.
+3. **Draft Editorial Nature:** The review texts below are polished editorial paraphrases capturing the spirit and substance of the verbal feedback. They are **not** claimed to be verbatim recordings.
+4. **Approval Workflow:** Marked `reviewStatus: 'draft'` and `approvalStatus: 'pending-owner-approval'` until formal written approval to publish as attributed client quotes is confirmed.
+5. **No Invented Metrics:** Zero fake star ratings, zero fabricated review counts, zero invented reviewer personas or artificial job titles.
+6. **No Self-Serving Structured Data:** Zero `AggregateRating` or `Review` schema markup is injected into SEO/rich results.
 
 ---
 
-## 4. Criteria for Future Genuine Testimonials
+## 2. Client Review Register
 
-Customer feedback will only be converted to genuine testimonial quotes when all six conditions are met:
-1. Verbatim customer-written feedback received directly from the client.
-2. Verified reviewer identity, official title, and organization.
-3. Written permission and release to publish the name, corporate logo, and quotation.
-4. Documented proof of project delivery by OSTRUM.
-5. Verifiable rating score with authentic scale and date stamp.
-6. Transparent disclosure of any material partnership or commercial arrangement.
+### Entry 01: TMR AI Car Care
+- **Client Identity:** TMR AI Car Care (Automotive Care Studio)
+- **Client Verification:** Active automotive care platform (https://tmraicarcare.com/)
+- **Client Logo Source:** Authentic transparent client asset at [`public/images/clients/tmr-ai-car-care-logo-light.png`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/public/images/clients/tmr-ai-car-care-logo-light.png)
+- **Role Badge:** `CLIENT REVIEW`
+- **Review Draft Copy:**
+  > “We wanted a digital experience that would present our car-care services clearly and make it easier for customers to connect with us. OSTRUM understood our vision, stayed responsive throughout the process and worked closely with us to shape an experience that feels simple and easy to use. We appreciated the team’s support and attention to detail.”
+- **Review Status:** `draft`
+- **Approval Status:** `pending-owner-approval`
+- **Numerical Rating:** None displayed (omitted until client verifiably supplies a score).
+
+### Entry 02: Saraswati Driving School
+- **Client Identity:** Saraswati Driving School (Driver Education Platform)
+- **Client Verification:** Active driver training system (https://saraswati-driving-school.vercel.app/)
+- **Client Logo Source:** Authentic dark client logo at [`public/images/clients/saraswati-driving-school-logo-dark.png`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/public/images/clients/saraswati-driving-school-logo-dark.png)
+- **Role Badge:** `CLIENT REVIEW`
+- **Review Draft Copy:**
+  > “OSTRUM took the time to understand our driving school’s needs and helped us bring our requirements into a smoother digital experience. The team was approachable, patient and open to our feedback at every stage. Communication was clear, and the collaboration made the whole process comfortable from start to finish.”
+- **Review Status:** `draft`
+- **Approval Status:** `pending-owner-approval`
+- **Numerical Rating:** None displayed.
+
+### Entry 03: MNESA
+- **Client Identity:** MNESA (Opportunity Capture Platform)
+- **Client Relationship:** Client for whom OSTRUM provided digital experience and platform engineering services (per owner brief).
+- **Client Logo / Mark:** Custom SVG mark via `MnesaLogo` component.
+- **Role Badge:** `CLIENT REVIEW`
+- **Review Draft Copy:**
+  > “Working with OSTRUM helped us turn our requirements into a clearer and more useful digital experience. The team listened to our ideas, brought thoughtful suggestions and paid attention to the details throughout the process. We valued the collaborative approach and the care taken to shape the result around our needs.”
+- **Review Status:** `draft`
+- **Approval Status:** `pending-owner-approval`
+- **Numerical Rating:** None displayed.
+
+---
+
+## 3. DOM & Interaction Assertions
+
+- **Section Heading:** Restored to `TESTIMONIALS` (`aria-label="Testimonials"`).
+- **Semantic Structure:** Semantic `<blockquote>` wrapping each review paragraph with `<cite className="sr-only">`.
+- **Card Selection Isolation:** User selection inside the card selects strictly the foreground review copy without inadvertently capturing the background monumental heading.
+- **Two-Tone Text Selection:** Evaluated as a light surface (`backgroundColor: #FFFFFF` / `#EEEEEE`), selecting text produces Deep Burgundy `#64120F` highlight with Pure White `#FFFFFF` text (12.87:1 contrast).

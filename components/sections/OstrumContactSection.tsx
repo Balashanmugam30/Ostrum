@@ -111,7 +111,7 @@ export function OstrumContactSection() {
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 pt-24 sm:pt-32 lg:pt-36 pb-32 sm:pb-44 lg:pb-52">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Left Column: Heading & Concise Technical Scope */}
-          <div className="lg:col-span-5 flex flex-col items-start lg:sticky lg:top-28">
+          <div data-selection-surface="dark" className="lg:col-span-5 flex flex-col items-start lg:sticky lg:top-28">
             <h2
               data-testid="contact-heading"
               className="font-condensed font-bold uppercase text-[#FFF8F3] tracking-[-0.01em] select-text"
@@ -133,6 +133,7 @@ export function OstrumContactSection() {
           <div className="lg:col-span-7 w-full flex justify-center lg:justify-end">
             <div
               data-testid="contact-form-panel"
+              data-selection-surface="light"
               className="w-full max-w-[580px] rounded-[28px] bg-[#FFF8F3] border border-[#DCD4CE] shadow-[0_24px_60px_-15px_rgba(20,10,10,0.08),0_8px_24px_-4px_rgba(20,10,10,0.04)] relative overflow-hidden"
             >
               <div

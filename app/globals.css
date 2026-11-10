@@ -551,77 +551,95 @@ body {
 }
 
 /* ==========================================================================
-   BACKGROUND-AWARE TEXT SELECTION STYLING
+   OSTRUM TWO-TONE TEXT SELECTION SYSTEM
+   Canonical Contrast System:
+   - Light surfaces (white, ivory, stone, pale grey, pastel capability cards, bright coral):
+     Selection fill: #64120F (Deep Burgundy)
+     Selected text: #FFFFFF (White)
+   - Dark surfaces (black, oxblood, deep burgundy, dark hero/footer panels):
+     Selection fill: #FFFFFF (White)
+     Selected text: #64120F (Deep Burgundy)
    ========================================================================== */
 
+:root {
+  --ostrum-selection-on-light-bg: #64120F;
+  --ostrum-selection-on-light-text: #FFFFFF;
+  --ostrum-selection-on-dark-bg: #FFFFFF;
+  --ostrum-selection-on-dark-text: #64120F;
+}
+
+/* Default Selection for all standard/light surfaces */
 ::selection {
-  background-color: #C9362B;
-  color: #FFFFFF;
+  background-color: var(--ostrum-selection-on-light-bg) !important;
+  color: var(--ostrum-selection-on-light-text) !important;
 }
 
 ::-moz-selection {
-  background-color: #C9362B;
-  color: #FFFFFF;
+  background-color: var(--ostrum-selection-on-light-bg) !important;
+  color: var(--ostrum-selection-on-light-text) !important;
 }
 
-/* Light Background Surfaces (Testimonials, Capabilities, White Cards) */
-.bg-white ::selection,
-[style*="background-color: #FFFFFF"] ::selection,
-[style*="background-color: #FAF7F2"] ::selection,
-[style*="background-color: #FFF8F3"] ::selection,
-[data-testid="contact-form-panel"] ::selection {
-  background-color: #D24B2C !important;
-  color: #FFFFFF !important;
+/* Explicit Dark Surfaces: white highlight on deep burgundy text */
+[data-selection-surface="dark"],
+.selection-surface-dark {
+  /* Scope marker */
 }
 
-.bg-white ::-moz-selection,
-[style*="background-color: #FFFFFF"] ::-moz-selection,
-[style*="background-color: #FAF7F2"] ::-moz-selection,
-[style*="background-color: #FFF8F3"] ::-moz-selection,
-[data-testid="contact-form-panel"] ::-moz-selection {
-  background-color: #D24B2C !important;
-  color: #FFFFFF !important;
+[data-selection-surface="dark"] ::selection,
+.selection-surface-dark ::selection,
+[data-selection-surface="dark"]::selection,
+.selection-surface-dark::selection {
+  background-color: var(--ostrum-selection-on-dark-bg) !important;
+  color: var(--ostrum-selection-on-dark-text) !important;
 }
 
-/* Legal Pages: Deep Oxblood with Warm Off-White Text */
-.legal-page ::selection {
-  background-color: #42100F !important;
-  color: #FFF8F3 !important;
+[data-selection-surface="dark"] ::-moz-selection,
+.selection-surface-dark ::-moz-selection,
+[data-selection-surface="dark"]::-moz-selection,
+.selection-surface-dark::-moz-selection {
+  background-color: var(--ostrum-selection-on-dark-bg) !important;
+  color: var(--ostrum-selection-on-dark-text) !important;
 }
 
-.legal-page ::-moz-selection {
-  background-color: #42100F !important;
-  color: #FFF8F3 !important;
+/* Explicit Light Surfaces & Coral Cards (including when nested inside dark containers) */
+[data-selection-surface="light"] ::selection,
+.selection-surface-light ::selection,
+[data-selection-surface="light"]::selection,
+.selection-surface-light::selection,
+[data-selection-surface="coral"] ::selection,
+.selection-surface-coral ::selection,
+[data-selection-surface="coral"]::selection,
+.selection-surface-coral::selection,
+[data-testid="contact-form-panel"] ::selection,
+[data-testid="contact-form-panel"]::selection,
+[data-selection-surface="dark"] [data-selection-surface="light"] ::selection,
+[data-selection-surface="dark"] [data-selection-surface="light"]::selection,
+[data-selection-surface="dark"] [data-selection-surface="coral"] ::selection,
+[data-selection-surface="dark"] [data-selection-surface="coral"]::selection,
+[data-selection-surface="dark"] [data-testid="contact-form-panel"] ::selection,
+[data-selection-surface="dark"] [data-testid="contact-form-panel"]::selection {
+  background-color: var(--ostrum-selection-on-light-bg) !important;
+  color: var(--ostrum-selection-on-light-text) !important;
 }
 
-/* Deep Crimson / Oxblood Surfaces (Footer, Resting Wheel) */
-[style*="#64120F"] ::selection,
-.theatre-stage ::selection,
-footer ::selection {
-  background-color: #FFF8F3 !important;
-  color: #050505 !important;
-}
-
-[style*="#64120F"] ::-moz-selection,
-.theatre-stage ::-moz-selection,
-footer ::-moz-selection {
-  background-color: #FFF8F3 !important;
-  color: #050505 !important;
-}
-
-/* Pure Black / Dark Surfaces (Hero, Energy Narrative, CTA) */
-.bg-black ::selection,
-.bg-\[\#050505\] ::selection,
-.theatre-curtain ::selection {
-  background-color: #C9362B !important;
-  color: #FFFFFF !important;
-}
-
-.bg-black ::-moz-selection,
-.bg-\[\#050505\] ::-moz-selection,
-.theatre-curtain ::-moz-selection {
-  background-color: #C9362B !important;
-  color: #FFFFFF !important;
+[data-selection-surface="light"] ::-moz-selection,
+.selection-surface-light ::-moz-selection,
+[data-selection-surface="light"]::-moz-selection,
+.selection-surface-light::-moz-selection,
+[data-selection-surface="coral"] ::-moz-selection,
+.selection-surface-coral ::-moz-selection,
+[data-selection-surface="coral"]::-moz-selection,
+.selection-surface-coral::-moz-selection,
+[data-testid="contact-form-panel"] ::-moz-selection,
+[data-testid="contact-form-panel"]::-moz-selection,
+[data-selection-surface="dark"] [data-selection-surface="light"] ::-moz-selection,
+[data-selection-surface="dark"] [data-selection-surface="light"]::-moz-selection,
+[data-selection-surface="dark"] [data-selection-surface="coral"] ::-moz-selection,
+[data-selection-surface="dark"] [data-selection-surface="coral"]::-moz-selection,
+[data-selection-surface="dark"] [data-testid="contact-form-panel"] ::-moz-selection,
+[data-selection-surface="dark"] [data-testid="contact-form-panel"]::-moz-selection {
+  background-color: var(--ostrum-selection-on-light-bg) !important;
+  color: var(--ostrum-selection-on-light-text) !important;
 }
 
 

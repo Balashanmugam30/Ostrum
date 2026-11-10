@@ -501,6 +501,7 @@ export default function BeamWordmarkFooter({
       ref={rootRef}
       id="studio-footer"
       data-testid="beam-wordmark-footer"
+      data-selection-surface="dark"
       className={'bwf ' + className}
       style={vars}
       data-in={seen || reduced ? 'true' : 'false'}

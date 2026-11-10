@@ -92,7 +92,10 @@ export function LegalDocumentLayout({
     sections.find((s) => s.id === activeSectionId)?.num || sections[0]?.num;
 
   return (
-    <div className="legal-page min-h-screen bg-white text-[#262626] antialiased selection:bg-[#64120F] selection:text-white">
+    <div
+      data-selection-surface="light"
+      className="legal-page min-h-screen bg-white text-[#262626] antialiased selection:bg-[#64120F] selection:text-white"
+    >
       {/* Top Editorial Flow (No Full-Width Sticky Bar) */}
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-8">
         {/* Restrained Standalone OSTRUM Wordmark linking to Home */}

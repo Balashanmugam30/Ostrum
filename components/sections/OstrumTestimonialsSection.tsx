@@ -203,10 +203,11 @@ export function OstrumTestimonialsSection({
     return (
       <section
         id="testimonials"
+      data-selection-surface="light"
         data-testid="testimonials-section"
         className="relative z-[26] w-full bg-white py-24 px-4 sm:px-8 select-text"
         style={{ backgroundColor: '#FFFFFF' }}
-        aria-label="Project Highlights"
+        aria-label="Testimonials"
       >
         <div className="max-w-5xl mx-auto flex flex-col items-center">
           <h2
@@ -217,7 +218,7 @@ export function OstrumTestimonialsSection({
               lineHeight: '0.85',
             }}
           >
-            PROJECT HIGHLIGHTS
+            TESTIMONIALS
           </h2>
 
           <div className="w-full max-w-[480px] flex flex-col gap-8">
@@ -241,16 +242,13 @@ export function OstrumTestimonialsSection({
                 {/* Logo Area */}
                 <div className="h-10 sm:h-12 flex items-center justify-center text-center select-text mb-5">
                   {testimonial.logoType === 'mnesa-mark' ? (
-                    <a
-                      href="https://github.com/Balashanmugam30/mnesa"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <div
                       data-testid="mnesa-blue-m-mark"
-                      className="inline-flex items-center justify-center transition-opacity hover:opacity-80 py-1"
-                      aria-label="MNESA repository on GitHub"
+                      className="inline-flex items-center justify-center py-1"
+                      aria-label="MNESA"
                     >
                       <MnesaLogo size={32} variant="full" />
-                    </a>
+                    </div>
                   ) : testimonial.logoSrc ? (
                     <Image
                       src={testimonial.logoSrc}
@@ -266,41 +264,19 @@ export function OstrumTestimonialsSection({
                   )}
                 </div>
 
-                {/* Quotation / Highlight Area */}
-                <div className="py-2 text-center px-1 sm:px-2 flex flex-col items-center justify-center">
-                  {testimonial.contentType === 'project-note' ? (
-                    <>
-                      <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#ff5c4a] font-semibold mb-2">
-                        OSTRUM VENTURE
-                      </span>
-                      <p
-                        data-testid="testimonial-quote-text"
-                        className="font-sans text-[15px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
-                      >
-                        {testimonial.quote}
-                      </p>
-                    </>
-                  ) : testimonial.contentType === 'project-highlight' || !testimonial.approved ? (
-                    <>
-                      <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-black/55 font-semibold mb-2">
-                        PROJECT HIGHLIGHT
-                      </span>
-                      <p
-                        data-testid="testimonial-quote-text"
-                        className="font-sans text-[15px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
-                      >
-                        {testimonial.quote}
-                      </p>
-                    </>
-                  ) : (
-                    <p
-                      data-testid="testimonial-quote-text"
-                      className="font-sans text-[16px] sm:text-[18px] md:text-[19.5px] lg:text-[20px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
-                    >
-                      &ldquo;{testimonial.quote}&rdquo;
-                    </p>
-                  )}
-                </div>
+                {/* Review Quotation Area */}
+                <blockquote className="py-2 text-center px-1 sm:px-2 flex flex-col items-center justify-center select-text">
+                  <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-black/55 font-semibold mb-2 select-text">
+                    {testimonial.role || 'CLIENT REVIEW'}
+                  </span>
+                  <p
+                    data-testid="testimonial-quote-text"
+                    className="font-sans text-[14px] sm:text-[15px] md:text-[15.5px] font-normal leading-[1.45] text-[#111111] tracking-[-0.012em] select-text"
+                  >
+                    &ldquo;{testimonial.quote}&rdquo;
+                  </p>
+                  <cite className="sr-only">{testimonial.clientName}</cite>
+                </blockquote>
               </div>
             ))}
           </div>
@@ -316,7 +292,7 @@ export function OstrumTestimonialsSection({
       data-testid="testimonials-section"
       className="relative z-[26] w-full bg-white select-text overflow-visible"
       style={{ backgroundColor: '#FFFFFF' }}
-      aria-label="Project Highlights"
+      aria-label="Testimonials"
     >
       {/* Pinned / Sticky Stage Container */}
       <div
@@ -333,21 +309,21 @@ export function OstrumTestimonialsSection({
           <h2
             ref={headingRef}
             data-testid="testimonials-heading"
-            className="font-condensed font-bold uppercase text-black text-center select-text w-full whitespace-nowrap tracking-[-0.01em]"
+            className="font-condensed font-bold uppercase text-black text-center select-none w-full whitespace-nowrap tracking-[-0.01em]"
             style={{
               fontSize: 'clamp(2rem, 14vw, 220px)',
               lineHeight: '0.85',
               color: '#000000',
             }}
           >
-            PROJECT HIGHLIGHTS
+            TESTIMONIALS
           </h2>
         </div>
 
         {/* Foreground Testimonial Card Stack (Layer: z-20 to z-30) */}
         <div
           data-testid="testimonials-card-stack"
-          className="relative z-20 w-full max-w-[440px] sm:max-w-[465px] md:max-w-[480px] flex items-center justify-center h-[310px] sm:h-[330px] md:h-[345px]"
+          className="relative z-20 w-full max-w-[440px] sm:max-w-[465px] md:max-w-[480px] flex items-center justify-center h-[325px] sm:h-[345px] md:h-[360px]"
         >
           {items.map((testimonial, index) => (
             <div
@@ -373,16 +349,13 @@ export function OstrumTestimonialsSection({
               {/* Element 1 (Top Area): Authentic Client Logo or MNESA Mark */}
               <div className="h-10 sm:h-12 flex items-center justify-center text-center select-text shrink-0">
                 {testimonial.logoType === 'mnesa-mark' ? (
-                  <a
-                    href="https://github.com/Balashanmugam30/mnesa"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-testid="mnesa-blue-m-mark"
-                    className="inline-flex items-center justify-center transition-opacity hover:opacity-80 py-1"
-                    aria-label="MNESA repository on GitHub"
-                  >
+                  <div
+                      data-testid="mnesa-blue-m-mark"
+                      className="inline-flex items-center justify-center py-1"
+                      aria-label="MNESA"
+                    >
                     <MnesaLogo size={32} variant="full" />
-                  </a>
+                  </div>
                 ) : testimonial.logoSrc ? (
                   <Image
                     src={testimonial.logoSrc}
@@ -399,41 +372,19 @@ export function OstrumTestimonialsSection({
                 )}
               </div>
 
-              {/* Element 2 (Main Area): Project Highlight or Testimonial */}
-              <div className="my-auto flex flex-col items-center justify-center py-1 sm:py-2 text-center px-1 sm:px-2">
-                {testimonial.contentType === 'project-note' ? (
-                  <>
-                    <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#ff5c4a] font-semibold mb-2">
-                      OSTRUM VENTURE
-                    </span>
-                    <p
-                      data-testid="testimonial-quote-text"
-                      className="font-sans text-[15px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
-                    >
-                      {testimonial.quote}
-                    </p>
-                  </>
-                ) : testimonial.contentType === 'project-highlight' || !testimonial.approved ? (
-                  <>
-                    <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-black/55 font-semibold mb-2">
-                      PROJECT HIGHLIGHT
-                    </span>
-                    <p
-                      data-testid="testimonial-quote-text"
-                      className="font-sans text-[15px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
-                    >
-                      {testimonial.quote}
-                    </p>
-                  </>
-                ) : (
-                  <p
-                    data-testid="testimonial-quote-text"
-                    className="font-sans text-[16px] sm:text-[18px] md:text-[19.5px] lg:text-[20px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em]"
-                  >
-                    &ldquo;{testimonial.quote}&rdquo;
-                  </p>
-                )}
-              </div>
+              {/* Element 2 (Main Area): Client Review Quote */}
+              <blockquote className="my-auto flex flex-col items-center justify-center py-1 sm:py-2 text-center px-1 sm:px-2 select-text">
+                <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-black/55 font-semibold mb-2 select-text">
+                  {testimonial.role || 'CLIENT REVIEW'}
+                </span>
+                <p
+                  data-testid="testimonial-quote-text"
+                  className="font-sans text-[14px] sm:text-[15px] md:text-[15.5px] font-normal leading-[1.45] text-[#111111] tracking-[-0.012em] select-text"
+                >
+                  &ldquo;{testimonial.quote}&rdquo;
+                </p>
+                <cite className="sr-only">{testimonial.clientName}</cite>
+              </blockquote>
 
               {/* Structural balance spacer: ensures quote remains beautifully centered vertically */}
               <div className="h-1 sm:h-2 shrink-0 pointer-events-none" aria-hidden="true" />

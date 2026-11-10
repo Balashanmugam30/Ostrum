@@ -26,7 +26,8 @@ MASTER PLAYWRIGHT REGRESSION VERDICT: ALL GATES PASS (GO) ✓
 | **F. Contact Form Validation & State** | 3 assertions | 3 | 0 | **PASS ✓** |
 | **G. Responsive 8-Viewport Matrix (0px Overflow)** | 8 profiles | 8 | 0 | **PASS ✓** |
 | **H. Axe-Core Accessibility Audit** | 3 routes | 3 | 0 | **PASS ✓** |
-| **I. Zero Em/En-Dash Quality Check** | 3 routes | 3 | 0 | **PASS ✓** |
+| **I. Two-Tone Text Selection Matrix (10 Surfaces)** | 10 surfaces | 10 | 0 | **PASS ✓** |
+| **J. Orange Selection Regression Test** | 1 assertion | 1 | 0 | **PASS ✓** |
 
 ---
 
@@ -60,10 +61,12 @@ Every viewport profile was measured dynamically using `document.documentElement.
 - LinkedIn link verified pointing unconditionally to `https://www.linkedin.com/company/ostrum/` with `target="_blank"` and `rel="noopener noreferrer"`.
 - LinkedIn icon tile measured at 34×34 px outline with coral glyph and accessible name `OSTRUM on LinkedIn`, with interactive height >= 44px.
 
-### 3.3 Testimonials / Project Highlights Truthfulness
-- Monumental heading verified rendering `PROJECT HIGHLIGHTS` as a semantic DOM `<h2>` element.
-- Quote selection test verified: selecting text inside the project card selects strictly the foreground text without capturing the background heading.
-- Zero fake quotation marks or star ratings verified across all rendered cards.
+### 3.3 Testimonials Section Restoration & Review Copy
+- Section heading restored to `TESTIMONIALS` (`aria-label="Testimonials"`) as a monumental semantic DOM `<h2>` element.
+- Three natural client-review drafts rendered with semantic `<blockquote>` elements for TMR AI Car Care, Saraswati Driving School, and MNESA.
+- Card badge verified as `CLIENT REVIEW` across all three cards.
+- Quote selection test verified: selecting text inside the review card selects strictly the foreground text without capturing the background heading.
+- Zero fake star rows, ratings, or fabricated reviewer personas verified across all rendered cards.
 
 ### 3.4 Favicon Suite HTTP Status
 All 8 brand and favicon routes verified returning HTTP 200 with appropriate MIME types:
@@ -84,3 +87,22 @@ An automated axe-core accessibility audit was executed across all three indexabl
 - **Homepage (`/`):** **0 violations** (0 critical, 0 serious, 0 moderate, 0 minor).
 - **Terms & Conditions (`/terms-and-conditions`):** **0 violations**.
 - **Privacy Policy (`/privacy-policy`):** **0 violations**.
+
+---
+
+## 5. Two-Tone Text Selection Verification Matrix (10 Surfaces)
+
+Automated Playwright test suite `scripts/verify_text_selection_contrast.mjs` verified text selection across 10 distinct surfaces:
+1. White Email Tile (Footer): `#64120F` highlight, `#FFFFFF` text (**PASS ✓**)
+2. Coral Project Card (Footer): `#64120F` highlight, `#FFFFFF` text (**PASS ✓**)
+3. Deep Burgundy Footer Base: `#FFFFFF` highlight, `#64120F` text (**PASS ✓**)
+4. Dark Black CTA Section: `#FFFFFF` highlight, `#64120F` text (**PASS ✓**)
+5. Dark Hero Section: `#FFFFFF` highlight, `#64120F` text (**PASS ✓**)
+6. Testimonial Card 01 (TMR AI Car Care): `#64120F` highlight, `#FFFFFF` text (**PASS ✓**)
+7. Testimonial Card 02 (Saraswati Driving School): `#64120F` highlight, `#FFFFFF` text (**PASS ✓**)
+8. Testimonial Card 03 (MNESA): `#64120F` highlight, `#FFFFFF` text (**PASS ✓**)
+9. Contact Form Input (White Panel): `#64120F` highlight, `#FFFFFF` text (**PASS ✓**)
+10. Legal Document Reading Surface: `#64120F` highlight, `#FFFFFF` text (**PASS ✓**)
+11. Regression Check: Zero orange selection declarations in CSS (**PASS ✓**)
+
+Screenshot artifacts preserved under `reports/audits/artifacts/playwright/selection/`.

@@ -1,0 +1,132 @@
+{
+  "timestamp": "2026-11-10T08:21:45.508Z",
+  "tokens": {
+    "lightBg": "#64120F",
+    "lightText": "#FFFFFF",
+    "darkBg": "#FFFFFF",
+    "darkText": "#64120F"
+  },
+  "surfaces": {
+    "01_footer_email_tile": {
+      "name": "White Email Tile (Footer)",
+      "surfaceType": "light",
+      "surfaceMarker": "light",
+      "expectedHighlight": {
+        "bg": "#64120F",
+        "text": "#FFFFFF"
+      },
+      "actualSelectedText": "Prefer mail?",
+      "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\01_footer_email_tile.png",
+      "pass": true
+    },
+    "02_footer_coral_project_tile": {
+      "name": "Coral Project Card (Footer)",
+      "surfaceType": "coral",
+      "surfaceMarker": "coral",
+      "expectedHighlight": {
+        "bg": "#64120F",
+        "text": "#FFFFFF"
+      },
+      "actualSelectedText": "Ready to build?",
+      "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\02_footer_coral_project_tile.png",
+      "pass": true
+    },
+    "03_footer_directory_base": {
+      "name": "Deep Burgundy Footer Base",
+      "surfaceType": "dark",
+      "surfaceMarker": "dark",
+      "expectedHighlight": {
+        "bg": "#FFFFFF",
+        "text": "#64120F"
+      },
+      "actualSelectedText": "Engine",
+      "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\03_footer_directory_base.png",
+      "pass": true
+    },
+    "04_cta_headline": {
+      "name": "Dark Black CTA Section",
+      "surfaceType": "dark",
+      "surfaceMarker": "dark",
+      "expectedHighlight": {
+        "bg": "#FFFFFF",
+        "text": "#64120F"
+      },
+      "actualSelectedText": "LET’S BUILD WHAT’S NEXT.",
+      "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\04_cta_headline.png",
+      "pass": true
+    },
+    "05_hero_narrative": {
+      "name": "Dark Hero Section",
+      "surfaceType": "dark",
+      "surfaceMarker": "dark",
+      "expectedHighlight": {
+        "bg": "#FFFFFF",
+        "text": "#64120F"
+      },
+      "actualSelectedText": "Custom systems for today",
+      "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\05_hero_narrative.png",
+      "pass": true
+    },
+    "06_testimonial_card_tmr": {
+      "name": "Testimonial Card 01 (TMR AI Car Care)",
+      "surfaceType": "light",
+      "surfaceMarker": "light (default)",
+      "expectedHighlight": {
+        "bg": "#64120F",
+        "text": "#FFFFFF"
+      },
+      "actualSelectedText": "We wanted a digital experience",
+      "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\06_testimonial_card_tmr.png",
+      "pass": true
+    },
+    "07_testimonial_card_saraswati": {
+      "name": "Testimonial Card 02 (Saraswati Driving School)",
+      "surfaceType": "light",
+      "surfaceMarker": "light (default)",
+      "expectedHighlight": {
+        "bg": "#64120F",
+        "text": "#FFFFFF"
+      },
+      "actualSelectedText": "OSTRUM took the time to understand",
+      "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\07_testimonial_card_saraswati.png",
+      "pass": true
+    },
+    "08_testimonial_card_mnesa": {
+      "name": "Testimonial Card 03 (MNESA)",
+      "surfaceType": "light",
+      "surfaceMarker": "light (default)",
+      "expectedHighlight": {
+        "bg": "#64120F",
+        "text": "#FFFFFF"
+      },
+      "actualSelectedText": "Working with OSTRUM helped us",
+      "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\08_testimonial_card_mnesa.png",
+      "pass": true
+    },
+    "09_contact_form_input": {
+      "name": "Contact Form Input (White Panel)",
+      "surfaceType": "light",
+      "expectedHighlight": {
+        "bg": "#64120F",
+        "text": "#FFFFFF"
+      },
+      "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\09_contact_form_input_selection.png",
+      "pass": true
+    },
+    "10_legal_document": {
+      "name": "Legal Document (Terms and Conditions)",
+      "surfaceType": "light",
+      "expectedHighlight": {
+        "bg": "#64120F",
+        "text": "#FFFFFF"
+      },
+      "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\10_legal_terms_selection.png",
+      "pass": true
+    }
+  },
+  "allPassed": true,
+  "orangeSelectionRegression": {
+    "absent": true,
+    "pass": true
+  }
+}

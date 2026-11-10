@@ -98,6 +98,7 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
     <section
       id="faq"
       data-testid="faq-section"
+      data-selection-surface="light"
       className="relative z-20 w-full overflow-hidden select-text text-black bg-transparent"
       aria-label="Frequently Asked Questions"
     >

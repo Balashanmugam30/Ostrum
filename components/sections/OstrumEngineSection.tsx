@@ -185,6 +185,7 @@ export function OstrumEngineSection() {
     <section
       ref={sectionRef}
       id="engine"
+      data-selection-surface="dark"
       className="ostrum-engine-section relative w-full pt-20 sm:pt-28 md:pt-36 lg:pt-40 pb-28 md:pb-48 px-6 md:px-[6vw] lg:px-[8vw] flex flex-col items-center overflow-x-clip bg-transparent text-center select-text"
     >
       {/* Living Connection Threads across Section 02 background */}

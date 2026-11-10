@@ -24,7 +24,8 @@ export function IntroHero() {
   }, []);
 
   return (
-    <section className="intro relative z-[10] w-full h-[100svh] min-h-[640px] flex flex-col items-center justify-center overflow-hidden px-4">
+    <section data-selection-surface="dark"
+      className="intro relative z-[10] w-full h-[100svh] min-h-[640px] flex flex-col items-center justify-center overflow-hidden px-4">
       {/* Living Connected Strand - Signature organic art element */}
       <div
         className={`transition-opacity duration-700 ease-out ${

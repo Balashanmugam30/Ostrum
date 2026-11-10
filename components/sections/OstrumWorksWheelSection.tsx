@@ -336,6 +336,7 @@ export function OstrumWorksWheelSection() {
       id="selected-work"
       ref={sectionRef}
       data-testid="selected-work-section"
+      data-selection-surface="dark"
       className="relative z-[30] w-full"
       style={{
         marginTop: '-100vh',

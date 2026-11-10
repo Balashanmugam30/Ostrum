@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-10T07:03:50.083Z",
+  "timestamp": "2026-11-10T08:29:09.861Z",
   "commit": "HEAD",
   "browserVersion": "156.0.8078.4",
   "copyAssertions": {
@@ -21,7 +21,7 @@
   "testimonialDomAndSelection": {
     "backdropIsDomText": true,
     "selectionIsolation": true,
-    "selectedSnippet": "A digital platform bringing service discovery, customer enqu",
+    "selectedSnippet": "“We wanted a digital experience that would present our car-c",
     "pass": true
   },
   "footerLinkedIn": {
