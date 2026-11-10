@@ -9,6 +9,7 @@ import {
   sendEnquiryNotification,
   checkRateLimit,
   checkRateLimitAsync,
+  getEnquirySalt,
   _resetMemoryRateLimitStore,
   extractTrustedClientIp,
   isValidIp,
@@ -304,6 +305,171 @@ describe('5. Rate Limiting Protection & Distributed Resilience', () => {
     const sixth = await checkRateLimitAsync(testIp);
     assert.strictEqual(sixth.allowed, false, '6th request should be blocked');
     assert.strictEqual(sixth.remaining, 0);
+  });
+
+  test('production fails closed with rate_limit_unavailable when ENQUIRY_SALT is missing', async () => {
+    const origEnv = process.env.NODE_ENV;
+    const origSalt = process.env.ENQUIRY_SALT;
+    const origUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const origToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+    try {
+      process.env.NODE_ENV = 'production';
+      delete process.env.ENQUIRY_SALT;
+      process.env.UPSTASH_REDIS_REST_URL = 'https://fake-redis.upstash.io';
+      process.env.UPSTASH_REDIS_REST_TOKEN = 'fake_token_123';
+
+      const res = await checkRateLimitAsync('203.0.113.1');
+      assert.strictEqual(res.allowed, false);
+      assert.strictEqual(res.errorCategory, 'rate_limit_unavailable');
+      assert.strictEqual(res.provider, 'distributed_redis');
+    } finally {
+      process.env.NODE_ENV = origEnv;
+      if (origSalt !== undefined) process.env.ENQUIRY_SALT = origSalt;
+      else delete process.env.ENQUIRY_SALT;
+      if (origUrl !== undefined) process.env.UPSTASH_REDIS_REST_URL = origUrl;
+      else delete process.env.UPSTASH_REDIS_REST_URL;
+      if (origToken !== undefined) process.env.UPSTASH_REDIS_REST_TOKEN = origToken;
+      else delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    }
+  });
+
+  test('production fails closed with rate_limit_unavailable when Upstash credentials are missing', async () => {
+    const origEnv = process.env.NODE_ENV;
+    const origSalt = process.env.ENQUIRY_SALT;
+    const origUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const origToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+    try {
+      process.env.NODE_ENV = 'production';
+      process.env.ENQUIRY_SALT = 'super-secret-salt-with-sufficient-entropy-1234';
+      delete process.env.UPSTASH_REDIS_REST_URL;
+      delete process.env.UPSTASH_REDIS_REST_TOKEN;
+
+      const res = await checkRateLimitAsync('203.0.113.2');
+      assert.strictEqual(res.allowed, false);
+      assert.strictEqual(res.errorCategory, 'rate_limit_unavailable');
+      assert.strictEqual(res.provider, 'distributed_redis');
+    } finally {
+      process.env.NODE_ENV = origEnv;
+      if (origSalt !== undefined) process.env.ENQUIRY_SALT = origSalt;
+      else delete process.env.ENQUIRY_SALT;
+      if (origUrl !== undefined) process.env.UPSTASH_REDIS_REST_URL = origUrl;
+      else delete process.env.UPSTASH_REDIS_REST_URL;
+      if (origToken !== undefined) process.env.UPSTASH_REDIS_REST_TOKEN = origToken;
+      else delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    }
+  });
+
+  test('production fails closed with rate_limit_unavailable when Upstash Redis store errors', async () => {
+    const origEnv = process.env.NODE_ENV;
+    const origSalt = process.env.ENQUIRY_SALT;
+    const origUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const origToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+    const origFetch = global.fetch;
+
+    try {
+      process.env.NODE_ENV = 'production';
+      process.env.ENQUIRY_SALT = 'super-secret-salt-with-sufficient-entropy-1234';
+      process.env.UPSTASH_REDIS_REST_URL = 'https://fake-redis.upstash.io';
+      process.env.UPSTASH_REDIS_REST_TOKEN = 'fake_token_123';
+
+      // Mock fetch to simulate Redis 500 server error
+      global.fetch = async () => new Response('Internal Server Error', { status: 500 });
+
+      const res = await checkRateLimitAsync('203.0.113.3');
+      assert.strictEqual(res.allowed, false);
+      assert.strictEqual(res.errorCategory, 'rate_limit_unavailable');
+      assert.strictEqual(res.provider, 'distributed_redis');
+    } finally {
+      process.env.NODE_ENV = origEnv;
+      global.fetch = origFetch;
+      if (origSalt !== undefined) process.env.ENQUIRY_SALT = origSalt;
+      else delete process.env.ENQUIRY_SALT;
+      if (origUrl !== undefined) process.env.UPSTASH_REDIS_REST_URL = origUrl;
+      else delete process.env.UPSTASH_REDIS_REST_URL;
+      if (origToken !== undefined) process.env.UPSTASH_REDIS_REST_TOKEN = origToken;
+      else delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    }
+  });
+
+  test('production operates distributed rate limiting with mock Upstash Redis store', async () => {
+    const origEnv = process.env.NODE_ENV;
+    const origSalt = process.env.ENQUIRY_SALT;
+    const origUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const origToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+    const origFetch = global.fetch;
+
+    let mockCounter = 0;
+
+    try {
+      process.env.NODE_ENV = 'production';
+      process.env.ENQUIRY_SALT = 'super-secret-salt-with-sufficient-entropy-1234';
+      process.env.UPSTASH_REDIS_REST_URL = 'https://fake-redis.upstash.io';
+      process.env.UPSTASH_REDIS_REST_TOKEN = 'fake_token_123';
+
+      let returnedCount = 0;
+      global.fetch = async () => {
+        returnedCount++;
+        return new Response(
+          JSON.stringify([
+            { result: returnedCount }, // INCR result
+            { result: 'OK' },          // EXPIRE result
+            { result: 580 },           // TTL result
+          ]),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      };
+
+      // 1st request -> returnedCount = 1 (remaining 4)
+      const res1 = await checkRateLimitAsync('203.0.113.4');
+      assert.strictEqual(res1.allowed, true);
+      assert.strictEqual(res1.provider, 'distributed_redis');
+      assert.strictEqual(res1.remaining, 4);
+
+      // Fast forward to 5th request -> returnedCount = 4 before call, so call becomes 5
+      returnedCount = 4;
+      const res5 = await checkRateLimitAsync('203.0.113.4');
+      assert.strictEqual(res5.allowed, true);
+      assert.strictEqual(res5.remaining, 0);
+
+      // 6th request -> returnedCount = 5 before call, call becomes 6 (exceeded)
+      const res6 = await checkRateLimitAsync('203.0.113.4');
+      assert.strictEqual(res6.allowed, false);
+      assert.strictEqual(res6.remaining, 0);
+      assert.strictEqual(res6.provider, 'distributed_redis');
+    } finally {
+      process.env.NODE_ENV = origEnv;
+      global.fetch = origFetch;
+      if (origSalt !== undefined) process.env.ENQUIRY_SALT = origSalt;
+      else delete process.env.ENQUIRY_SALT;
+      if (origUrl !== undefined) process.env.UPSTASH_REDIS_REST_URL = origUrl;
+      else delete process.env.UPSTASH_REDIS_REST_URL;
+      if (origToken !== undefined) process.env.UPSTASH_REDIS_REST_TOKEN = origToken;
+      else delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    }
+  });
+
+  test('getEnquirySalt returns null in production when missing or too short, returns value when valid', () => {
+    const origEnv = process.env.NODE_ENV;
+    const origSalt = process.env.ENQUIRY_SALT;
+
+    try {
+      process.env.NODE_ENV = 'production';
+
+      delete process.env.ENQUIRY_SALT;
+      assert.strictEqual(getEnquirySalt(), null);
+
+      process.env.ENQUIRY_SALT = 'short-salt'; // < 16 chars
+      assert.strictEqual(getEnquirySalt(), null);
+
+      process.env.ENQUIRY_SALT = 'sufficiently-long-production-salt-key-999';
+      assert.strictEqual(getEnquirySalt(), 'sufficiently-long-production-salt-key-999');
+    } finally {
+      process.env.NODE_ENV = origEnv;
+      if (origSalt !== undefined) process.env.ENQUIRY_SALT = origSalt;
+      else delete process.env.ENQUIRY_SALT;
+    }
   });
 });
 

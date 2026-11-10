@@ -320,6 +320,8 @@ async function runAuthoritativeVerification() {
     // =========================================================================
     console.log('\n--- E. FAVICON & BRAND ICONS ---');
     const iconRoutes = [
+      { url: '/favicon-dark-v3.png', expectedStatus: 200, mime: 'image/png' },
+      { url: '/favicon-light-v3.png', expectedStatus: 200, mime: 'image/png' },
       { url: '/favicon.ico', expectedStatus: 200, mime: 'image' },
       { url: '/favicon-dark.png', expectedStatus: 200, mime: 'image/png' },
       { url: '/favicon-light.png', expectedStatus: 200, mime: 'image/png' },
@@ -355,12 +357,15 @@ async function runAuthoritativeVerification() {
       }));
     });
     console.log('[Favicon Media Links in DOM]:', linkIconTags);
-    const hasDarkMediaIcon = linkIconTags.some(l => l.media?.includes('prefers-color-scheme: dark') && l.href?.includes('favicon-dark'));
-    const hasLightMediaIcon = linkIconTags.some(l => l.media?.includes('prefers-color-scheme: light') && l.href?.includes('favicon-light'));
-    console.log(`[Favicon Theme Links] Dark media icon present: ${hasDarkMediaIcon ? 'PASS ✓' : 'FAIL ✗'}`);
-    console.log(`[Favicon Theme Links] Light media icon present: ${hasLightMediaIcon ? 'PASS ✓' : 'FAIL ✗'}`);
+    const hasDarkMediaIcon = linkIconTags.some(l => l.media?.includes('prefers-color-scheme: dark') && l.href?.includes('favicon-dark-v3'));
+    const hasLightMediaIcon = linkIconTags.some(l => l.media?.includes('prefers-color-scheme: light') && l.href?.includes('favicon-light-v3'));
+    const unconditionalIcons = linkIconTags.filter(l => !l.media);
+    const zeroUnconditional = unconditionalIcons.length === 0;
+    console.log(`[Favicon Theme Links] Dark v3 media icon present: ${hasDarkMediaIcon ? 'PASS ✓' : 'FAIL ✗'}`);
+    console.log(`[Favicon Theme Links] Light v3 media icon present: ${hasLightMediaIcon ? 'PASS ✓' : 'FAIL ✗'}`);
+    console.log(`[Favicon Isolation] Zero unconditioned icon links in DOM: ${zeroUnconditional ? 'PASS ✓' : 'FAIL ✗'}`);
 
-    const allIconsPass = iconResults.every((i) => i.ok) && hasDarkMediaIcon && hasLightMediaIcon;
+    const allIconsPass = iconResults.every((i) => i.ok) && hasDarkMediaIcon && hasLightMediaIcon && zeroUnconditional;
     results.faviconAndBrandIcons = {
       routes: iconResults,
       themeLinks: linkIconTags,

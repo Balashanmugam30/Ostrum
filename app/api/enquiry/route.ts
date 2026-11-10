@@ -19,6 +19,28 @@ export async function POST(request: Request) {
   const rateLimitResult = await checkRateLimitAsync(clientIpInfo.ip);
 
   if (!rateLimitResult.allowed) {
+    if (rateLimitResult.errorCategory === 'rate_limit_unavailable') {
+      console.error('[Enquiry API Rate Limiter Infrastructure Failure]', {
+        correlationId,
+        timestamp,
+        error: rateLimitResult.errorMessage,
+      });
+
+      return Response.json(
+        {
+          success: false,
+          error:
+            'Enquiry service is temporarily unavailable. Please email us directly at hello@theostrum.com.',
+        },
+        {
+          status: 503,
+          headers: {
+            'Retry-After': '60',
+          },
+        }
+      );
+    }
+
     console.warn('[Enquiry API Rate Limit Exceeded]', {
       correlationId,
       timestamp,

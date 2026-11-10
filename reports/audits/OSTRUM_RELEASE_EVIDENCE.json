@@ -1,206 +1,47 @@
 {
-  "auditDate": "2026-11-10T09:25:00.000Z",
+  "timestamp": "2026-11-10T10:54:00Z",
   "repository": "Balashanmugam30/Ostrum",
-  "releaseBranch": "main",
-  "targetBranch": "main",
-  "baseCommit": "b2a7fbbc170f0fe08de7c0005ae219e14af22bd5",
-  "environment": {
-    "nodeVersion": "v22.20.0",
-    "npmVersion": "10.9.2",
-    "nextVersion": "15.5.29",
-    "reactVersion": "19.0.0",
-    "sharpVersion": "0.33.5",
-    "playwrightVersion": "1.64.0"
-  },
-  "qualityGates": {
-    "npmAudit": {
-      "command": "npm audit --omit=dev",
-      "vulnerabilities": 0,
-      "status": "PASS"
+  "branch": "main",
+  "baselineCommit": "a780610c194322d385e4946eb5c3fa699a531324",
+  "verdict": "CONDITIONAL PRODUCTION GO",
+  "gates": {
+    "eslint": { "pass": true, "errors": 0, "warnings": 0 },
+    "typescript": { "pass": true, "errors": 0 },
+    "npmTest": { "pass": true, "total": 29, "passed": 29, "failed": 0, "suites": 7 },
+    "npmAudit": { "pass": true, "vulnerabilities": 0 },
+    "nextBuild": { "pass": true, "routesCompiled": 12, "sharedFirstLoadKb": 103 },
+    "dualThemeFavicon": {
+      "pass": true,
+      "unconditionedIconsInHead": 0,
+      "lightScheme": { "asset": "/favicon-light-v3.png", "color": "rgb(83,13,16)", "pass": true },
+      "darkScheme": { "asset": "/favicon-dark-v3.png", "color": "rgb(204,194,186)", "pass": true }
     },
-    "npmAuditAll": {
-      "command": "npm audit",
-      "vulnerabilities": 0,
-      "packages": 378,
-      "status": "PASS"
+    "rateLimiterHardening": {
+      "pass": true,
+      "productionSaltRequired": true,
+      "productionRedisRequired": true,
+      "productionFailClosed503": true
     },
-    "typeCheck": {
-      "command": "npx tsc --noEmit",
-      "errors": 0,
-      "status": "PASS"
+    "viewportsZeroOverflow": {
+      "pass": true,
+      "viewportsTested": 8,
+      "maxOverflowPx": 0
     },
-    "eslint": {
-      "command": "npm run lint",
-      "errors": 0,
-      "warnings": 0,
-      "status": "PASS"
+    "axeCoreAccessibility": {
+      "pass": true,
+      "violations": 0,
+      "routesAudited": ["/", "/terms-and-conditions", "/privacy-policy"]
     },
-    "unitAndIntegrationTests": {
-      "command": "npm test",
-      "totalTests": 24,
-      "passed": 24,
-      "failed": 0,
-      "suites": 7,
-      "status": "PASS"
-    },
-    "productionBuild": {
-      "command": "npm run build",
-      "routesCompiled": 12,
-      "status": "PASS"
-    },
-    "playwrightMasterSuite": {
-      "command": "node scripts/verify_authoritative_release.mjs",
-      "status": "PASS"
-    },
-    "playwrightSelectionSuite": {
-      "command": "node scripts/verify_text_selection_contrast.mjs",
-      "status": "PASS"
+    "textSelectionContrast": {
+      "pass": true,
+      "surfacesTested": 10,
+      "passed": 10
     }
   },
-  "runtimeVerification": {
-    "copyRefinement": {
-      "heroOpening": "PASS",
-      "panels01And02": "PASS",
-      "capabilities6Cards": "PASS",
-      "selectedWork3Projects": "PASS",
-      "faq10QAs": "PASS",
-      "contactForm": "PASS",
-      "bottomCta": {
-        "eyebrowAbsent": true,
-        "headlineExact": true,
-        "supportExact": true,
-        "status": "PASS"
-      },
-      "footer": {
-        "coralTileRestored": true,
-        "whiteEmailTileRestored": true,
-        "spacingRestored": true,
-        "status": "PASS"
-      },
-      "status": "PASS"
-    },
-    "heroActionRemoval": {
-      "systemsArchitectureRemoved": true,
-      "originalVenturesRemoved": true,
-      "keyboardTabClean": true,
-      "status": "PASS"
-    },
-    "testimonialsAndReviews": {
-      "sectionHeading": "TESTIMONIALS",
-      "monumentalTitleScale": "clamp(3.2rem, 26vw, 395px)",
-      "cardStackDimensions": "h-[310px] sm:h-[330px] md:h-[345px]",
-      "roleBadge": "CLIENT REVIEW",
-      "backdropIsDomText": true,
-      "quoteSelectionIsolated": true,
-      "semanticEmphasisTags": [
-        "understood our vision",
-        "clear",
-        "clarity to our ideas"
-      ],
-      "reviewStatus": "draft",
-      "approvalStatus": "pending-owner-approval",
-      "itemsCount": 3,
-      "fakeReviewsCount": 0,
-      "fakeStarsCount": 0,
-      "status": "PASS"
-    },
-    "twoToneTextSelection": {
-      "lightSurfaceFill": "#64120F",
-      "lightSurfaceText": "#FFFFFF",
-      "darkSurfaceFill": "#FFFFFF",
-      "darkSurfaceText": "#64120F",
-      "contrastRatioSelectedTextVsFill": "12.87:1 (WCAG AAA)",
-      "contrastRatioFillVsCoral": "3.88:1",
-      "contrastRatioFillVsWhite": "12.87:1",
-      "contrastRatioFillVsBlack": "21.00:1",
-      "contrastRatioFillVsBurgundy": "12.87:1",
-      "surfacesVerified": 10,
-      "orangeSelectionDeclarationsFound": 0,
-      "status": "PASS"
-    },
-    "faviconAndBrandAsset": {
-      "sourceAsset": "public/models/monyedre-360.glb",
-      "canvasOccupancy": "96.0%",
-      "darkThemeVariant": "/favicon-dark.png (Bright Ivory for Dark Chrome)",
-      "lightThemeVariant": "/favicon-light.png (Deep Burgundy for Light Chrome)",
-      "fallbackIco": "/favicon.ico (Multi-resolution 16/32/48)",
-      "alphaTransparency": "100%",
-      "opaquePlateAbsent": true,
-      "textAbsent": true,
-      "nextMetadataMediaTagsVerified": true,
-      "status": "PASS"
-    },
-    "footerLinkedIn": {
-      "href": "https://www.linkedin.com/company/ostrum/",
-      "target": "_blank",
-      "rel": "noopener noreferrer",
-      "ariaLabel": "OSTRUM on LinkedIn",
-      "dimensions": "34x34px",
-      "colorToken": "border-white/25 text-[#FF765E]",
-      "status": "PASS"
-    },
-    "contactFormValidation": {
-      "emptySubmitIntercepted": true,
-      "invalidEmailIntercepted": true,
-      "formDataPreserved": true,
-      "honeypotProtection": true,
-      "rateLimiterProvider": "hybrid_redis_and_local_memory",
-      "ipHashingAlgorithm": "hmac_sha256",
-      "status": "PASS"
-    },
-    "githubCI": {
-      "workflowFile": ".github/workflows/ci.yml",
-      "triggers": ["push to main", "workflow_dispatch"],
-      "qualitySteps": ["npm ci", "npm audit", "lint", "typecheck", "npm test", "npm run build"],
-      "status": "CONFIGURED"
-    },
-    "viewportOverflowMatrix": {
-      "ownerReferenceDesktop_1648x928": 0,
-      "largeDesktop_1920x1080": 0,
-      "standardDesktop_1440x900": 0,
-      "laptop_1280x800": 0,
-      "tabletPortrait_768x1024": 0,
-      "mobile_390x844": 0,
-      "compactMobile_375x667": 0,
-      "narrowMobile_360x800": 0,
-      "status": "PASS"
-    },
-    "axeAccessibilityAudit": {
-      "homepageViolations": 0,
-      "termsViolations": 0,
-      "privacyViolations": 0,
-      "status": "PASS"
-    }
-  },
-  "assetSavings": {
-    "imagesConvertedToWebp": 11,
-    "originalPayloadBytes": 5824982,
-    "optimizedPayloadBytes": 655104,
-    "bytesSaved": 5169878,
-    "percentageSaved": "88.75%"
-  },
-  "gitFinalState": {
-    "branch": "main",
-    "unmergedBranches": [],
-    "cleanWorkingTree": true
-  },
-  "finalReleaseVerdict": "CONDITIONAL GO",
-  "outstandingOwnerPrerequisites": [
-    {
-      "dimension": "Vercel Project Setup",
-      "action": "Link GitHub repository Balashanmugam30/Ostrum on Vercel Dashboard with production branch 'main'."
-    },
-    {
-      "dimension": "Domain & DNS",
-      "action": "Add theostrum.com in Vercel project domains and configure DNS A/CNAME records with registrar."
-    },
-    {
-      "dimension": "Resend Sending & Receiving",
-      "action": "Verify sending domain on Resend, provision inbox at hello@theostrum.com, and add RESEND_API_KEY in Vercel environment variables."
-    },
-    {
-      "dimension": "Client Testimonials Approval",
-      "action": "Secure final written publication permission from TMR AI Car Care, Saraswati Driving School, and MNESA for the concise review wording."
-    }
+  "ownerPrerequisites": [
+    "Import repository into Vercel",
+    "Configure production environment variables in Vercel",
+    "Configure DNS for theostrum.com (Vercel & Resend DKIM)",
+    "Confirm client testimonial publication sign-off"
   ]
 }

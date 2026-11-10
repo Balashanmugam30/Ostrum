@@ -348,6 +348,7 @@ async function main() {
 
     // 2. Generate Dark Theme Derivatives (Ivory on Transparent)
     const darkTargets = [
+      { file: path.join(publicDir, 'favicon-dark-v3.png'), size: 48 },
       { file: path.join(publicDir, 'favicon-dark.png'), size: 32 },
       { file: path.join(publicDir, 'favicon-dark-16x16.png'), size: 16 },
       { file: path.join(publicDir, 'favicon-dark-32x32.png'), size: 32 },
@@ -359,8 +360,6 @@ async function main() {
       { file: path.join(publicDir, 'apple-touch-icon.png'), size: 180 },
       { file: path.join(publicDir, 'icon-192.png'), size: 192 },
       { file: path.join(publicDir, 'icon-512.png'), size: 512 },
-      { file: path.join(appDir, 'icon.png'), size: 512 },
-      { file: path.join(appDir, 'apple-icon.png'), size: 180 },
     ];
 
     for (const t of darkTargets) {
@@ -370,6 +369,7 @@ async function main() {
 
     // 3. Generate Light Theme Derivatives (Deep Burgundy on Transparent)
     const lightTargets = [
+      { file: path.join(publicDir, 'favicon-light-v3.png'), size: 48 },
       { file: path.join(publicDir, 'favicon-light.png'), size: 32 },
       { file: path.join(publicDir, 'favicon-light-16x16.png'), size: 16 },
       { file: path.join(publicDir, 'favicon-light-32x32.png'), size: 32 },

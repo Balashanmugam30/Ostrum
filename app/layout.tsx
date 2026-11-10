@@ -22,15 +22,25 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon-light.png', media: '(prefers-color-scheme: light)', type: 'image/png' },
-      { url: '/favicon-dark.png', media: '(prefers-color-scheme: dark)', type: 'image/png' },
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+      {
+        url: '/favicon-light-v3.png',
+        media: '(prefers-color-scheme: light)',
+        type: 'image/png',
+        sizes: '48x48',
+      },
+      {
+        url: '/favicon-dark-v3.png',
+        media: '(prefers-color-scheme: dark)',
+        type: 'image/png',
+        sizes: '48x48',
+      },
     ],
     apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      {
+        url: '/apple-touch-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
     ],
   },
   manifest: '/manifest.webmanifest',

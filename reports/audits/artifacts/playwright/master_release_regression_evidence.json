@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-10T09:22:40.873Z",
+  "timestamp": "2026-11-10T10:50:25.143Z",
   "commit": "HEAD",
   "browserVersion": "156.0.8078.4",
   "copyAssertions": {
@@ -42,6 +42,18 @@
   },
   "faviconAndBrandIcons": {
     "routes": [
+      {
+        "url": "/favicon-dark-v3.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/favicon-light-v3.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
       {
         "url": "/favicon.ico",
         "status": 200,
@@ -117,33 +129,13 @@
     ],
     "themeLinks": [
       {
-        "href": "/favicon-light.png",
+        "href": "/favicon-light-v3.png",
         "media": "(prefers-color-scheme: light)",
         "type": "image/png"
       },
       {
-        "href": "/favicon-dark.png",
+        "href": "/favicon-dark-v3.png",
         "media": "(prefers-color-scheme: dark)",
-        "type": "image/png"
-      },
-      {
-        "href": "/favicon.ico",
-        "media": null,
-        "type": null
-      },
-      {
-        "href": "/favicon-32x32.png",
-        "media": null,
-        "type": "image/png"
-      },
-      {
-        "href": "/icon-192.png",
-        "media": null,
-        "type": "image/png"
-      },
-      {
-        "href": "/icon-512.png",
-        "media": null,
         "type": "image/png"
       }
     ],

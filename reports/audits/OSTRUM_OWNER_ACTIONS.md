@@ -1,56 +1,55 @@
-# OSTRUM Mandatory Owner Launch Actions
+# OSTRUM Pre-Launch Owner Action Checklist
 
-**Audit Date:** 10 November 2026, 12:50 IST  
-**Target Domain:** `https://theostrum.com`  
-**Hosting Destination:** Vercel  
-**Status:** Codebase 100% Ready on `main` — Pending Owner-Side External Integrations  
-
----
-
-## 1. Domain Registration & Vercel Linking
-1. **Domain Purchase & DNS Ownership:**
-   - Confirm ownership and registration of `theostrum.com` with your domain registrar.
-2. **Link GitHub Repository in Vercel:**
-   - In the Vercel dashboard, click **Add New...** -> **Project**.
-   - Import `Balashanmugam30/Ostrum` with production branch set to `main`.
-3. **Assign Custom Domain in Vercel:**
-   - Go to **Project Settings** -> **Domains**.
-   - Add `theostrum.com` and `www.theostrum.com`.
-   - Configure DNS records (A record `@` to `76.76.21.21` and CNAME `www` to `cname.vercel-dns.com`).
+**Date:** 10 November 2026  
+**Target Repository:** `Balashanmugam30/Ostrum`  
+**Git Branch:** `main`  
+**Planned Canonical Domain:** `https://theostrum.com`  
+**Production Verdict:** **CONDITIONAL PRODUCTION GO**
 
 ---
 
-## 2. Inbound Contact Mailbox Setup
-*Resend delivers outgoing notification emails; you must provision a real mailbox to receive them.*
-1. Provision the primary studio inbox `hello@theostrum.com` on your chosen email host (Google Workspace, Zoho Mail, Fastmail, or Proton).
-2. Ensure inbound MX records for that email provider are active in DNS so external emails reach the mailbox.
-3. Verify that `hello@theostrum.com` can receive inbound messages by sending a test email from a personal account.
+All technical code changes, security hardening, dual-theme favicon conflict fixes, rate limiting, and Playwright automated tests have passed. To launch the site to public production traffic, the owner must complete the following 4 external configuration steps:
 
 ---
 
-## 3. Resend Sender Domain Verification & API Key
-1. Sign in to [Resend](https://resend.com) and add the sending domain `theostrum.com`.
-2. Add the generated DKIM, SPF, and return-path DNS records to your DNS provider without deleting existing MX records.
-3. Once verified, generate a restricted Sending API key (`re_...`).
-4. Add the following environment variables to your Vercel project (Production scope):
-   - `RESEND_API_KEY`: Your Resend API key (`re_...`)
-   - `OSTRUM_ENQUIRY_TO`: `hello@theostrum.com`
-   - `OSTRUM_ENQUIRY_FROM`: `OSTRUM Website <website@theostrum.com>`
-   - `NEXT_PUBLIC_SITE_URL`: `https://theostrum.com`
+### Action 1: Import Repository to Vercel
+1. Log into your account at [Vercel](https://vercel.com).
+2. Click **Add New...** -> **Project**.
+3. Select the GitHub repository: `Balashanmugam30/Ostrum`.
+4. Framework Preset: **Next.js** (auto-detected).
+5. Root Directory: `./`.
+6. Production Branch: `main`.
 
 ---
 
-## 4. Google Search Console Setup
-Once the domain is serving traffic over HTTPS:
-1. Open [Google Search Console](https://search.google.com/search-console).
-2. Add a **Domain Property** for `theostrum.com`.
-3. Verify ownership via the TXT DNS record provided by Google.
-4. Submit sitemap: `https://theostrum.com/sitemap.xml`.
-5. Under Search Console settings, review the **Search generative AI** control to confirm AI Overviews and AI Mode inclusion preference.
+### Action 2: Configure Production Environment Variables in Vercel
+In the Vercel project settings (**Settings** -> **Environment Variables**), add the following variables for the **Production** environment:
+
+| Variable Name | Required Value / Source |
+|---|---|
+| `NEXT_PUBLIC_BASE_URL` | `https://theostrum.com` |
+| `RESEND_API_KEY` | Your live production API key from [Resend](https://resend.com/api-keys) (starts with `re_...`). |
+| `OSTRUM_ENQUIRY_FROM` | `OSTRUM Notifications <notifications@theostrum.com>` (requires verified domain in Resend). |
+| `OSTRUM_ENQUIRY_TO` | `hello@theostrum.com` (or your studio inbox). |
+| `ENQUIRY_SALT` | A random high-entropy secret string at least 16 characters long (e.g. run `openssl rand -hex 24` or generate in password manager). |
+| `UPSTASH_REDIS_REST_URL` | Your Redis REST URL from [Upstash Console](https://console.upstash.com). |
+| `UPSTASH_REDIS_REST_TOKEN` | Your Redis REST token from [Upstash Console](https://console.upstash.com). |
+
+*(Note: In production, the enquiry API requires `ENQUIRY_SALT` and Upstash Redis. If unconfigured, the endpoint safely returns HTTP 503 rather than failing insecurely).*
 
 ---
 
-## 5. LinkedIn Company Page Verification
-1. Claim or administer the official company page at [`https://www.linkedin.com/company/ostrum/`](https://www.linkedin.com/company/ostrum/).
-2. Upload the new master brand icon (`public/brand/ostrum-3d-symbol-master.png`) as the official LinkedIn profile photo.
-3. Update the company tagline and website URL to `https://theostrum.com`.
+### Action 3: Configure Domain & DNS Records (`theostrum.com`)
+1. Purchase domain `theostrum.com` (if not already purchased).
+2. Add domain in Vercel (**Settings** -> **Domains**): `theostrum.com` and `www.theostrum.com`.
+3. In your DNS provider (e.g. Cloudflare, Namecheap, GoDaddy):
+   - **A Record:** `@` -> `76.76.21.21` (or Vercel apex IP).
+   - **CNAME Record:** `www` -> `cname.vercel-dns.com`.
+4. In Resend (**Domains** -> **Add Domain** -> `theostrum.com`):
+   - Add the DKIM TXT record, SPF TXT record, and MX record supplied by Resend to your DNS.
+   - Click **Verify Domain** in Resend.
+
+---
+
+### Action 4: Confirm Client Testimonial Publication
+- Confirm final approval with the 3 clients (TMR AI Car Care, Saraswati Driving School, and MNESA) for public display of the concise review quotes on the homepage.

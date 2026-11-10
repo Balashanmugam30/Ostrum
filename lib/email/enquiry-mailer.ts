@@ -2,9 +2,14 @@ import { randomUUID, createHash, createHmac } from 'node:crypto';
 import { Resend } from 'resend';
 
 let generatedSessionSalt: string | null = null;
-export function getEnquirySalt(): string {
-  if (process.env.ENQUIRY_SALT && process.env.ENQUIRY_SALT.trim() !== '') {
-    return process.env.ENQUIRY_SALT;
+export function getEnquirySalt(): string | null {
+  const envSalt = process.env.ENQUIRY_SALT?.trim();
+  if (envSalt && envSalt.length >= 16) {
+    return envSalt;
+  }
+  // In production, strictly prohibit falling back to random per-instance UUID
+  if (process.env.NODE_ENV === 'production') {
+    return null;
   }
   if (!generatedSessionSalt) {
     generatedSessionSalt = randomUUID();
@@ -17,8 +22,9 @@ export function getEnquirySalt(): string {
  *
  * Implements a hybrid rate limiter:
  * - Distributed production: atomic fixed-window counter via Upstash Redis REST API
- *   (INCR + EXPIRE NX + TTL) with client IP HMAC/hash masking to avoid storing raw IPs.
- * - Local development & offline fallback: in-memory sliding-window circuit breaker.
+ *   (INCR + EXPIRE NX + TTL) with client IP HMAC masking to avoid storing raw IPs.
+ *   Production fails closed with HTTP 503 if salt or Redis is unconfigured or unreachable.
+ * - Local development & offline test fallback: in-memory sliding-window circuit breaker.
  *
  * Rate Limit Window: 10 minutes (600,000 ms)
  * Max Allowed Submissions: 5 requests per IP per window
@@ -29,6 +35,8 @@ export interface RateLimitResult {
   remaining: number;
   resetMs: number;
   provider: 'distributed_redis' | 'local_memory';
+  errorCategory?: 'rate_limit_unavailable';
+  errorMessage?: string;
 }
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
@@ -93,10 +101,10 @@ async function checkDistributedRateLimit(
   ip: string,
   now: number,
   apiUrl: string,
-  apiToken: string
+  apiToken: string,
+  salt: string
 ): Promise<RateLimitResult | null> {
   try {
-    const salt = getEnquirySalt();
     const hashedIp = createHmac('sha256', salt)
       .update(ip)
       .digest('hex')
@@ -142,31 +150,83 @@ async function checkDistributedRateLimit(
       provider: 'distributed_redis',
     };
   } catch (err) {
-    console.warn('[Distributed Rate Limiter Warning] Upstash connection failed, falling back to local memory:', err);
+    console.warn('[Distributed Rate Limiter Warning] Upstash connection failed:', err);
     return null;
   }
 }
 
 /**
- * Main export: checks rate limit using distributed store when configured,
- * falling back gracefully to process-level memory circuit breaker.
+ * Main export: checks rate limit using distributed store in production.
+ * In production: fails closed with HTTP 503 if salt or Redis is unconfigured or unreachable.
+ * In development / test: falls back to in-memory sliding window circuit breaker.
  */
 export async function checkRateLimitAsync(ip: string): Promise<RateLimitResult> {
   const now = Date.now();
+  const isProduction = process.env.NODE_ENV === 'production';
 
   const redisUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
   const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+  const salt = getEnquirySalt();
 
-  if (redisUrl && redisToken) {
-    const distributedResult = await checkDistributedRateLimit(ip, now, redisUrl, redisToken);
+  if (isProduction) {
+    // 1. Strict Salt Enforcement in Production
+    if (!salt) {
+      console.error(
+        '[Rate Limiter Critical] ENQUIRY_SALT is missing or invalid in production environment (minimum 16 chars required). Failing closed.'
+      );
+      return {
+        allowed: false,
+        remaining: 0,
+        resetMs: 60000,
+        provider: 'distributed_redis',
+        errorCategory: 'rate_limit_unavailable',
+        errorMessage: 'Enquiry rate limiter security configuration is missing.',
+      };
+    }
+
+    // 2. Strict Redis Credentials Enforcement in Production
+    if (!redisUrl || !redisToken) {
+      console.error(
+        '[Rate Limiter Critical] UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN is unconfigured in production environment. Failing closed.'
+      );
+      return {
+        allowed: false,
+        remaining: 0,
+        resetMs: 60000,
+        provider: 'distributed_redis',
+        errorCategory: 'rate_limit_unavailable',
+        errorMessage: 'Enquiry rate limiting service is unconfigured.',
+      };
+    }
+
+    // 3. Strict Distributed Redis Execution in Production
+    const distributedResult = await checkDistributedRateLimit(ip, now, redisUrl, redisToken, salt);
+    if (!distributedResult) {
+      console.error(
+        '[Rate Limiter Critical] Distributed Redis rate limit store unreachable or returned non-200. Failing closed with 503.'
+      );
+      return {
+        allowed: false,
+        remaining: 0,
+        resetMs: 60000,
+        provider: 'distributed_redis',
+        errorCategory: 'rate_limit_unavailable',
+        errorMessage: 'Enquiry rate limiting service is temporarily unavailable.',
+      };
+    }
+
+    return distributedResult;
+  }
+
+  // Non-production (development, test):
+  if (redisUrl && redisToken && salt) {
+    const distributedResult = await checkDistributedRateLimit(ip, now, redisUrl, redisToken, salt);
     if (distributedResult !== null) {
       return distributedResult;
     }
-  } else if (process.env.NODE_ENV === 'production') {
-    // In production without Redis credentials, notify via server logs of in-memory fallback
-    console.warn('[Rate Limiter Notice] Distributed Redis is not configured in production; using local memory circuit breaker fallback.');
   }
 
+  // Fallback to in-memory rate limiter for dev / test
   return checkMemoryRateLimit(ip, now);
 }
 
