@@ -82,9 +82,9 @@ const server = http.createServer((req, res) => {
       fillLight.position.set(1.8, 1.2, 2.0);
       scene.add(fillLight);
 
-      // Deep Burgundy / Oxblood material
+      // Deep Crimson Burgundy (#64120F) material
       material = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color('#580f0c'),
+        color: new THREE.Color('#64120F'),
         roughness: 0.28,
         metalness: 0.14,
         clearcoat: 0.72,
@@ -318,6 +318,7 @@ async function renderVariant(browser, theme) {
 }
 
 async function main() {
+  const isLightOnly = process.argv.includes('--light-only');
   await new Promise((resolve) => server.listen(PORT, resolve));
   console.log(`Render server listening on http://localhost:${PORT}`);
 
@@ -327,10 +328,13 @@ async function main() {
       args: ['--use-gl=angle', '--use-angle=default', '--enable-webgl'],
     });
 
-    console.log('Rendering Dark Theme Variant (Bright Ivory for Dark Chrome)...');
-    const masterDark1024 = await renderVariant(browser, 'dark');
+    let masterDark1024;
+    if (!isLightOnly) {
+      console.log('Rendering Dark Theme Variant (Bright Ivory for Dark Chrome)...');
+      masterDark1024 = await renderVariant(browser, 'dark');
+    }
 
-    console.log('Rendering Light Theme Variant (Deep Burgundy for Light Chrome)...');
+    console.log('Rendering Light Theme Variant (Deep Crimson Burgundy #64120F for Light Chrome)...');
     const masterLight1024 = await renderVariant(browser, 'light');
 
     await browser.close();
@@ -341,33 +345,39 @@ async function main() {
     if (!fs.existsSync(brandDir)) fs.mkdirSync(brandDir, { recursive: true });
 
     // 1. Save master high-resolution renders
-    fs.writeFileSync(path.join(brandDir, 'ostrum-3d-symbol-master.png'), masterDark1024);
-    fs.writeFileSync(path.join(brandDir, 'ostrum-3d-symbol-dark.png'), masterDark1024);
-    fs.writeFileSync(path.join(brandDir, 'ostrum-3d-symbol-light.png'), masterLight1024);
-    console.log('Saved 1024x1024 master assets (master, dark, light).');
-
-    // 2. Generate Dark Theme Derivatives (Ivory on Transparent)
-    const darkTargets = [
-      { file: path.join(publicDir, 'favicon-dark-v3.png'), size: 48 },
-      { file: path.join(publicDir, 'favicon-dark.png'), size: 32 },
-      { file: path.join(publicDir, 'favicon-dark-16x16.png'), size: 16 },
-      { file: path.join(publicDir, 'favicon-dark-32x32.png'), size: 32 },
-      { file: path.join(publicDir, 'favicon-dark-48x48.png'), size: 48 },
-      // Standard public fallback paths
-      { file: path.join(publicDir, 'favicon-16x16.png'), size: 16 },
-      { file: path.join(publicDir, 'favicon-32x32.png'), size: 32 },
-      { file: path.join(publicDir, 'favicon-48x48.png'), size: 48 },
-      { file: path.join(publicDir, 'apple-touch-icon.png'), size: 180 },
-      { file: path.join(publicDir, 'icon-192.png'), size: 192 },
-      { file: path.join(publicDir, 'icon-512.png'), size: 512 },
-    ];
-
-    for (const t of darkTargets) {
-      await sharp(masterDark1024).resize(t.size, t.size).png().toFile(t.file);
+    if (!isLightOnly && masterDark1024) {
+      fs.writeFileSync(path.join(brandDir, 'ostrum-3d-symbol-master.png'), masterDark1024);
+      fs.writeFileSync(path.join(brandDir, 'ostrum-3d-symbol-dark.png'), masterDark1024);
     }
-    console.log('Generated dark theme & primary application icon derivatives.');
+    fs.writeFileSync(path.join(brandDir, 'ostrum-3d-symbol-light.png'), masterLight1024);
+    console.log('Saved master light asset.');
 
-    // 3. Generate Light Theme Derivatives (Deep Burgundy on Transparent)
+    // 2. Generate Dark Theme Derivatives (Ivory on Transparent) - ONLY when not light-only
+    if (!isLightOnly && masterDark1024) {
+      const darkTargets = [
+        { file: path.join(publicDir, 'favicon-dark-v3.png'), size: 48 },
+        { file: path.join(publicDir, 'favicon-dark.png'), size: 32 },
+        { file: path.join(publicDir, 'favicon-dark-16x16.png'), size: 16 },
+        { file: path.join(publicDir, 'favicon-dark-32x32.png'), size: 32 },
+        { file: path.join(publicDir, 'favicon-dark-48x48.png'), size: 48 },
+        // Standard public fallback paths
+        { file: path.join(publicDir, 'favicon-16x16.png'), size: 16 },
+        { file: path.join(publicDir, 'favicon-32x32.png'), size: 32 },
+        { file: path.join(publicDir, 'favicon-48x48.png'), size: 48 },
+        { file: path.join(publicDir, 'apple-touch-icon.png'), size: 180 },
+        { file: path.join(publicDir, 'icon-192.png'), size: 192 },
+        { file: path.join(publicDir, 'icon-512.png'), size: 512 },
+      ];
+
+      for (const t of darkTargets) {
+        await sharp(masterDark1024).resize(t.size, t.size).png().toFile(t.file);
+      }
+      console.log('Generated dark theme & primary application icon derivatives.');
+    } else {
+      console.log('[Strict Scope] Preserved public/favicon-dark-v3.png and dark assets completely unchanged.');
+    }
+
+    // 3. Generate Light Theme Derivatives (Deep Crimson Burgundy on Transparent)
     const lightTargets = [
       { file: path.join(publicDir, 'favicon-light-v3.png'), size: 48 },
       { file: path.join(publicDir, 'favicon-light.png'), size: 32 },
@@ -380,34 +390,17 @@ async function main() {
     for (const t of lightTargets) {
       await sharp(masterLight1024).resize(t.size, t.size).png().toFile(t.file);
     }
-    console.log('Generated light theme icon derivatives.');
+    console.log('Generated updated light theme icon derivatives (#64120F).');
 
-    // 4. Generate Permanent Pure-Black Favicon (Ivory on Solid Black #000000)
-    const compositeBlack512 = await sharp({
-      create: {
-        width: 512,
-        height: 512,
-        channels: 4,
-        background: { r: 0, g: 0, b: 0, alpha: 1 },
-      },
-    })
-      .composite([{
-        input: await sharp(masterDark1024).resize(512, 512, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).toBuffer(),
-        blend: 'over',
-      }])
-      .png()
-      .toBuffer();
-
-    fs.writeFileSync(path.join(publicDir, 'favicon-ostrum-black.png'), compositeBlack512);
-    console.log('Generated permanent pure-black favicon: favicon-ostrum-black.png (512x512).');
-
-    // 5. Multi-resolution fallback favicon.ico with solid black background
-    const b16 = await sharp(compositeBlack512).resize(16, 16).png().toBuffer();
-    const b32 = await sharp(compositeBlack512).resize(32, 32).png().toBuffer();
-    const b48 = await sharp(compositeBlack512).resize(48, 48).png().toBuffer();
-    const icoBuf = createIco([b16, b32, b48], [16, 32, 48]);
-    fs.writeFileSync(path.join(publicDir, 'favicon.ico'), icoBuf);
-    console.log('Generated favicon.ico (16, 32, 48) on solid black background.');
+    // 4. Multi-resolution fallback favicon.ico
+    if (!isLightOnly && masterDark1024) {
+      const b16 = await sharp(masterDark1024).resize(16, 16).png().toBuffer();
+      const b32 = await sharp(masterDark1024).resize(32, 32).png().toBuffer();
+      const b48 = await sharp(masterDark1024).resize(48, 48).png().toBuffer();
+      const icoBuf = createIco([b16, b32, b48], [16, 32, 48]);
+      fs.writeFileSync(path.join(publicDir, 'favicon.ico'), icoBuf);
+      console.log('Generated favicon.ico (16, 32, 48).');
+    }
 
     // 5. Visual Proof Sheet: Side-by-side Dark & Light Chrome comparison
     console.log('Generating dual-theme visual proof sheet...');
@@ -424,12 +417,13 @@ async function main() {
       create: { width: 960, height: 270, channels: 4, background: { r: 241, g: 243, b: 244, alpha: 1 } }
     }).png().toBuffer();
 
-    // Dark variants (Ivory)
-    const d16 = await sharp(masterDark1024).resize(16, 16).toBuffer();
-    const d32 = await sharp(masterDark1024).resize(32, 32).toBuffer();
-    const d48 = await sharp(masterDark1024).resize(48, 48).toBuffer();
-    const d96 = await sharp(masterDark1024).resize(96, 96).toBuffer();
-    const d180 = await sharp(masterDark1024).resize(180, 180).toBuffer();
+    // Dark variants (Ivory from existing authoritative dark asset)
+    const darkSource = masterDark1024 || fs.readFileSync(path.join(brandDir, 'ostrum-3d-symbol-dark.png'));
+    const d16 = await sharp(darkSource).resize(16, 16).toBuffer();
+    const d32 = await sharp(darkSource).resize(32, 32).toBuffer();
+    const d48 = await sharp(darkSource).resize(48, 48).toBuffer();
+    const d96 = await sharp(darkSource).resize(96, 96).toBuffer();
+    const d180 = await sharp(darkSource).resize(180, 180).toBuffer();
 
     // Light variants (Burgundy)
     const l16 = await sharp(masterLight1024).resize(16, 16).toBuffer();

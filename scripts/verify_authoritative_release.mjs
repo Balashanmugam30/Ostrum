@@ -320,8 +320,13 @@ async function runAuthoritativeVerification() {
     // =========================================================================
     console.log('\n--- E. FAVICON & BRAND ICONS ---');
     const iconRoutes = [
-      { url: '/favicon-ostrum-black.png', expectedStatus: 200, mime: 'image/png' },
+      { url: '/favicon-dark-v3.png', expectedStatus: 200, mime: 'image/png' },
+      { url: '/favicon-light-v3.png', expectedStatus: 200, mime: 'image/png' },
       { url: '/favicon.ico', expectedStatus: 200, mime: 'image' },
+      { url: '/favicon-dark.png', expectedStatus: 200, mime: 'image/png' },
+      { url: '/favicon-light.png', expectedStatus: 200, mime: 'image/png' },
+      { url: '/favicon-16x16.png', expectedStatus: 200, mime: 'image/png' },
+      { url: '/favicon-32x32.png', expectedStatus: 200, mime: 'image/png' },
       { url: '/apple-touch-icon.png', expectedStatus: 200, mime: 'image/png' },
       { url: '/icon-192.png', expectedStatus: 200, mime: 'image/png' },
       { url: '/icon-512.png', expectedStatus: 200, mime: 'image/png' },
@@ -341,7 +346,7 @@ async function runAuthoritativeVerification() {
       iconResults.push({ url: r.url, status, contentType, ok });
     }
 
-    // Permanent single favicon verification
+    // Theme-aware link rel="icon" verification
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     const linkIconTags = await page.evaluate(() => {
       const links = Array.from(document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]'));
@@ -351,21 +356,21 @@ async function runAuthoritativeVerification() {
         type: l.getAttribute('type'),
       }));
     });
-    console.log('[Favicon Links in DOM]:', linkIconTags);
-    const hasPermanentBlackIcon = linkIconTags.some(l => !l.media && l.href?.includes('favicon-ostrum-black.png'));
-    const isSingleFaviconTag = linkIconTags.length === 1;
-    const zeroMediaQueries = linkIconTags.every(l => !l.media);
-    console.log(`[Permanent Favicon] /favicon-ostrum-black.png present: ${hasPermanentBlackIcon ? 'PASS ✓' : 'FAIL ✗'}`);
-    console.log(`[Favicon Isolation] Exactly one favicon declaration in DOM: ${isSingleFaviconTag ? 'PASS ✓' : 'FAIL ✗'}`);
-    console.log(`[Favicon Isolation] Zero media-query switching: ${zeroMediaQueries ? 'PASS ✓' : 'FAIL ✗'}`);
+    console.log('[Favicon Media Links in DOM]:', linkIconTags);
+    const hasDarkMediaIcon = linkIconTags.some(l => l.media?.includes('prefers-color-scheme: dark') && l.href?.includes('favicon-dark-v3'));
+    const hasLightMediaIcon = linkIconTags.some(l => l.media?.includes('prefers-color-scheme: light') && l.href?.includes('favicon-light-v3'));
+    const unconditionalIcons = linkIconTags.filter(l => !l.media);
+    const zeroUnconditional = unconditionalIcons.length === 0;
+    console.log(`[Favicon Theme Links] Dark v3 media icon present: ${hasDarkMediaIcon ? 'PASS ✓' : 'FAIL ✗'}`);
+    console.log(`[Favicon Theme Links] Light v3 media icon present: ${hasLightMediaIcon ? 'PASS ✓' : 'FAIL ✗'}`);
+    console.log(`[Favicon Isolation] Zero unconditioned icon links in DOM: ${zeroUnconditional ? 'PASS ✓' : 'FAIL ✗'}`);
 
-    const allIconsPass = iconResults.every((i) => i.ok) && hasPermanentBlackIcon && isSingleFaviconTag && zeroMediaQueries;
+    const allIconsPass = iconResults.every((i) => i.ok) && hasDarkMediaIcon && hasLightMediaIcon && zeroUnconditional;
     results.faviconAndBrandIcons = {
       routes: iconResults,
       themeLinks: linkIconTags,
-      hasPermanentBlackIcon,
-      isSingleFaviconTag,
-      zeroMediaQueries,
+      hasDarkMediaIcon,
+      hasLightMediaIcon,
       pass: allIconsPass,
     };
 

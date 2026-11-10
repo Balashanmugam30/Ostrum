@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-10T12:06:33.524Z",
+  "timestamp": "2026-11-10T12:29:34.426Z",
   "commit": "HEAD",
   "browserVersion": "156.0.8078.4",
   "copyAssertions": {
@@ -43,7 +43,13 @@
   "faviconAndBrandIcons": {
     "routes": [
       {
-        "url": "/favicon-ostrum-black.png",
+        "url": "/favicon-dark-v3.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/favicon-light-v3.png",
         "status": 200,
         "contentType": "image/png",
         "ok": true
@@ -52,6 +58,30 @@
         "url": "/favicon.ico",
         "status": 200,
         "contentType": "image/x-icon",
+        "ok": true
+      },
+      {
+        "url": "/favicon-dark.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/favicon-light.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/favicon-16x16.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/favicon-32x32.png",
+        "status": 200,
+        "contentType": "image/png",
         "ok": true
       },
       {
@@ -99,14 +129,18 @@
     ],
     "themeLinks": [
       {
-        "href": "/favicon-ostrum-black.png",
-        "media": null,
+        "href": "/favicon-light-v3.png",
+        "media": "(prefers-color-scheme: light)",
+        "type": "image/png"
+      },
+      {
+        "href": "/favicon-dark-v3.png",
+        "media": "(prefers-color-scheme: dark)",
         "type": "image/png"
       }
     ],
-    "hasPermanentBlackIcon": true,
-    "isSingleFaviconTag": true,
-    "zeroMediaQueries": true,
+    "hasDarkMediaIcon": true,
+    "hasLightMediaIcon": true,
     "pass": true
   },
   "contactFormAndInteractions": {

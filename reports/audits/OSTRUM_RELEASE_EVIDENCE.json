@@ -1,26 +1,47 @@
 {
-  "timestamp": "2026-11-10T12:08:00Z",
+  "timestamp": "2026-11-10T10:54:00Z",
   "repository": "Balashanmugam30/Ostrum",
   "branch": "main",
+  "baselineCommit": "a780610c194322d385e4946eb5c3fa699a531324",
   "verdict": "CONDITIONAL PRODUCTION GO",
-  "permanentFavicon": {
-    "asset": "/favicon-ostrum-black.png",
-    "dimensions": "512x512",
-    "isSquare": true,
-    "opaque": true,
-    "background": "#000000",
-    "zeroMediaQueries": true,
-    "singleDeclaration": true,
-    "pass": true
-  },
   "gates": {
     "eslint": { "pass": true, "errors": 0, "warnings": 0 },
     "typescript": { "pass": true, "errors": 0 },
     "npmTest": { "pass": true, "total": 29, "passed": 29, "failed": 0, "suites": 7 },
     "npmAudit": { "pass": true, "vulnerabilities": 0 },
     "nextBuild": { "pass": true, "routesCompiled": 12, "sharedFirstLoadKb": 103 },
-    "viewportsZeroOverflow": { "pass": true, "viewportsTested": 8, "maxOverflowPx": 0 },
-    "axeCoreAccessibility": { "pass": true, "violations": 0 },
-    "textSelectionContrast": { "pass": true, "surfacesTested": 10, "passed": 10 }
-  }
+    "dualThemeFavicon": {
+      "pass": true,
+      "unconditionedIconsInHead": 0,
+      "lightScheme": { "asset": "/favicon-light-v3.png", "color": "rgb(96,13,17)", "pass": true },
+      "darkScheme": { "asset": "/favicon-dark-v3.png", "color": "rgb(204,194,186)", "pass": true }
+    },
+    "rateLimiterHardening": {
+      "pass": true,
+      "productionSaltRequired": true,
+      "productionRedisRequired": true,
+      "productionFailClosed503": true
+    },
+    "viewportsZeroOverflow": {
+      "pass": true,
+      "viewportsTested": 8,
+      "maxOverflowPx": 0
+    },
+    "axeCoreAccessibility": {
+      "pass": true,
+      "violations": 0,
+      "routesAudited": ["/", "/terms-and-conditions", "/privacy-policy"]
+    },
+    "textSelectionContrast": {
+      "pass": true,
+      "surfacesTested": 10,
+      "passed": 10
+    }
+  },
+  "ownerPrerequisites": [
+    "Import repository into Vercel",
+    "Configure production environment variables in Vercel",
+    "Configure DNS for theostrum.com (Vercel & Resend DKIM)",
+    "Confirm client testimonial publication sign-off"
+  ]
 }

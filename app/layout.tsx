@@ -23,9 +23,16 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: '/favicon-ostrum-black.png',
+        url: '/favicon-light-v3.png',
+        media: '(prefers-color-scheme: light)',
         type: 'image/png',
-        sizes: '512x512',
+        sizes: '48x48',
+      },
+      {
+        url: '/favicon-dark-v3.png',
+        media: '(prefers-color-scheme: dark)',
+        type: 'image/png',
+        sizes: '48x48',
       },
     ],
     apple: [
