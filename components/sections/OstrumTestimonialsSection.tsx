@@ -23,6 +23,20 @@ export interface OstrumTestimonialsSectionProps {
   items?: Testimonial[];
 }
 
+function renderQuoteWithEmphasis(quote: string, emphasis?: string) {
+  if (!emphasis || !quote.includes(emphasis)) {
+    return quote;
+  }
+  const parts = quote.split(emphasis);
+  return (
+    <>
+      {parts[0]}
+      <strong className="font-semibold text-black">{emphasis}</strong>
+      {parts.slice(1).join(emphasis)}
+    </>
+  );
+}
+
 export function OstrumTestimonialsSection({
   items = TESTIMONIALS_DATA,
 }: OstrumTestimonialsSectionProps) {
@@ -271,9 +285,9 @@ export function OstrumTestimonialsSection({
                   </span>
                   <p
                     data-testid="testimonial-quote-text"
-                    className="font-sans text-[14px] sm:text-[15px] md:text-[15.5px] font-normal leading-[1.45] text-[#111111] tracking-[-0.012em] select-text"
+                    className="font-sans text-[15px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em] select-text"
                   >
-                    &ldquo;{testimonial.quote}&rdquo;
+                    &ldquo;{renderQuoteWithEmphasis(testimonial.quote, testimonial.emphasis)}&rdquo;
                   </p>
                   <cite className="sr-only">{testimonial.clientName}</cite>
                 </blockquote>
@@ -311,7 +325,7 @@ export function OstrumTestimonialsSection({
             data-testid="testimonials-heading"
             className="font-condensed font-bold uppercase text-black text-center select-none w-full whitespace-nowrap tracking-[-0.01em]"
             style={{
-              fontSize: 'clamp(2rem, 14vw, 220px)',
+              fontSize: 'clamp(3.2rem, 26vw, 395px)',
               lineHeight: '0.85',
               color: '#000000',
             }}
@@ -323,7 +337,7 @@ export function OstrumTestimonialsSection({
         {/* Foreground Testimonial Card Stack (Layer: z-20 to z-30) */}
         <div
           data-testid="testimonials-card-stack"
-          className="relative z-20 w-full max-w-[440px] sm:max-w-[465px] md:max-w-[480px] flex items-center justify-center h-[325px] sm:h-[345px] md:h-[360px]"
+          className="relative z-20 w-full max-w-[440px] sm:max-w-[465px] md:max-w-[480px] flex items-center justify-center h-[310px] sm:h-[330px] md:h-[345px]"
         >
           {items.map((testimonial, index) => (
             <div
@@ -379,9 +393,9 @@ export function OstrumTestimonialsSection({
                 </span>
                 <p
                   data-testid="testimonial-quote-text"
-                  className="font-sans text-[14px] sm:text-[15px] md:text-[15.5px] font-normal leading-[1.45] text-[#111111] tracking-[-0.012em] select-text"
+                  className="font-sans text-[16px] sm:text-[17px] md:text-[18px] lg:text-[19px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em] select-text"
                 >
-                  &ldquo;{testimonial.quote}&rdquo;
+                  &ldquo;{renderQuoteWithEmphasis(testimonial.quote, testimonial.emphasis)}&rdquo;
                 </p>
                 <cite className="sr-only">{testimonial.clientName}</cite>
               </blockquote>

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-10T08:29:09.861Z",
+  "timestamp": "2026-11-10T09:22:40.873Z",
   "commit": "HEAD",
   "browserVersion": "156.0.8078.4",
   "copyAssertions": {
@@ -20,8 +20,14 @@
   },
   "testimonialDomAndSelection": {
     "backdropIsDomText": true,
+    "isLargeMonumentalH2": true,
+    "emphasisElements": [
+      "understood our vision",
+      "clear",
+      "clarity to our ideas"
+    ],
     "selectionIsolation": true,
-    "selectedSnippet": "“We wanted a digital experience that would present our car-c",
+    "selectedSnippet": "“We appreciated how OSTRUM understood our vision. The team w",
     "pass": true
   },
   "footerLinkedIn": {
@@ -40,6 +46,18 @@
         "url": "/favicon.ico",
         "status": 200,
         "contentType": "image/x-icon",
+        "ok": true
+      },
+      {
+        "url": "/favicon-dark.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/favicon-light.png",
+        "status": 200,
+        "contentType": "image/png",
         "ok": true
       },
       {
@@ -83,8 +101,54 @@
         "status": 200,
         "contentType": "image/png",
         "ok": true
+      },
+      {
+        "url": "/brand/ostrum-3d-symbol-dark.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
+      },
+      {
+        "url": "/brand/ostrum-3d-symbol-light.png",
+        "status": 200,
+        "contentType": "image/png",
+        "ok": true
       }
     ],
+    "themeLinks": [
+      {
+        "href": "/favicon-light.png",
+        "media": "(prefers-color-scheme: light)",
+        "type": "image/png"
+      },
+      {
+        "href": "/favicon-dark.png",
+        "media": "(prefers-color-scheme: dark)",
+        "type": "image/png"
+      },
+      {
+        "href": "/favicon.ico",
+        "media": null,
+        "type": null
+      },
+      {
+        "href": "/favicon-32x32.png",
+        "media": null,
+        "type": "image/png"
+      },
+      {
+        "href": "/icon-192.png",
+        "media": null,
+        "type": "image/png"
+      },
+      {
+        "href": "/icon-512.png",
+        "media": null,
+        "type": "image/png"
+      }
+    ],
+    "hasDarkMediaIcon": true,
+    "hasLightMediaIcon": true,
     "pass": true
   },
   "contactFormAndInteractions": {

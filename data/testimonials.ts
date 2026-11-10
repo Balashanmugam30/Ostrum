@@ -27,7 +27,8 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     role: 'CLIENT REVIEW',
     subtext: 'Automotive Digital Platform',
     quote:
-      'We wanted a digital experience that would present our car-care services clearly and make it easier for customers to connect with us. OSTRUM understood our vision, stayed responsive throughout the process and worked closely with us to shape an experience that feels simple and easy to use. We appreciated the team’s support and attention to detail.',
+      'We appreciated how OSTRUM understood our vision. The team was responsive, flexible and a pleasure to work with.',
+    emphasis: 'understood our vision',
     company: 'TMR AI Car Care',
     reviewStatus: 'draft',
     approvalStatus: 'pending-owner-approval',
@@ -46,7 +47,8 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     role: 'CLIENT REVIEW',
     subtext: 'Digital Scheduling & Dispatch',
     quote:
-      'OSTRUM took the time to understand our driving school’s needs and helped us bring our requirements into a smoother digital experience. The team was approachable, patient and open to our feedback at every stage. Communication was clear, and the collaboration made the whole process comfortable from start to finish.',
+      'They listened to our needs, kept communication clear and made the whole process feel smooth from start to finish.',
+    emphasis: 'clear',
     company: 'Saraswati Driving School',
     reviewStatus: 'draft',
     approvalStatus: 'pending-owner-approval',
@@ -63,7 +65,8 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     role: 'CLIENT REVIEW',
     subtext: 'Opportunity Capture & Follow-Through Platform',
     quote:
-      'Working with OSTRUM helped us turn our requirements into a clearer and more useful digital experience. The team listened to our ideas, brought thoughtful suggestions and paid attention to the details throughout the process. We valued the collaborative approach and the care taken to shape the result around our needs.',
+      'OSTRUM brought clarity to our ideas and offered thoughtful direction. Their attention to detail helped shape a practical product we feel good about.',
+    emphasis: 'clarity to our ideas',
     company: 'MNESA',
     reviewStatus: 'draft',
     approvalStatus: 'pending-owner-approval',

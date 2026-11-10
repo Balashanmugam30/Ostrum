@@ -219,9 +219,30 @@ async function runAuthoritativeVerification() {
     console.log('\n--- C. TESTIMONIAL DOM TEXT & SELECTION ---');
     const backdropIsDomText = await page.evaluate(() => {
       const h2 = document.querySelector('[data-testid="testimonials-heading"]');
-      return h2 && h2.tagName === 'H2' && (h2.textContent?.trim() === 'PROJECT HIGHLIGHTS' || h2.textContent?.trim() === 'TESTIMONIALS');
+      return h2 && h2.tagName === 'H2' && h2.textContent?.trim() === 'TESTIMONIALS';
     });
-    console.log(`[Testimonials] Backdrop is real DOM H2: ${backdropIsDomText ? 'PASS ✓' : 'FAIL ✗'}`);
+    console.log(`[Testimonials] Backdrop is real DOM H2 'TESTIMONIALS': ${backdropIsDomText ? 'PASS ✓' : 'FAIL ✗'}`);
+
+    const testimonialChecks = await page.evaluate(() => {
+      const h2 = document.querySelector('[data-testid="testimonials-heading"]');
+      const stack = document.querySelector('[data-testid="testimonials-card-stack"]');
+      const cards = document.querySelectorAll('[data-testid^="testimonial-card-"]');
+      
+      const strongs = Array.from(cards).map(c => {
+        const strong = c.querySelector('strong');
+        return strong ? strong.textContent?.trim() : null;
+      });
+
+      return {
+        h2Style: h2?.getAttribute('style') || '',
+        stackClass: stack?.className || '',
+        strongs,
+      };
+    });
+
+    const isLargeMonumentalH2 = testimonialChecks.h2Style.includes('395px');
+    console.log(`[Testimonials] Monumental 395px background heading restored: ${isLargeMonumentalH2 ? 'PASS ✓' : 'FAIL ✗'}`);
+    console.log(`[Testimonials] Card strong emphasis tags:`, testimonialChecks.strongs);
 
     // Selection test: select quote in card and assert selection contains ONLY quote, not backdrop
     const selectionCheck = await page.evaluate(() => {
@@ -246,9 +267,11 @@ async function runAuthoritativeVerification() {
 
     results.testimonialDomAndSelection = {
       backdropIsDomText,
+      isLargeMonumentalH2,
+      emphasisElements: testimonialChecks.strongs,
       selectionIsolation: selectionCheck.success,
       selectedSnippet: selectionCheck.selectedSnippet,
-      pass: backdropIsDomText && selectionCheck.success,
+      pass: backdropIsDomText && isLargeMonumentalH2 && selectionCheck.success,
     };
 
     // =========================================================================
@@ -298,6 +321,8 @@ async function runAuthoritativeVerification() {
     console.log('\n--- E. FAVICON & BRAND ICONS ---');
     const iconRoutes = [
       { url: '/favicon.ico', expectedStatus: 200, mime: 'image' },
+      { url: '/favicon-dark.png', expectedStatus: 200, mime: 'image/png' },
+      { url: '/favicon-light.png', expectedStatus: 200, mime: 'image/png' },
       { url: '/favicon-16x16.png', expectedStatus: 200, mime: 'image/png' },
       { url: '/favicon-32x32.png', expectedStatus: 200, mime: 'image/png' },
       { url: '/apple-touch-icon.png', expectedStatus: 200, mime: 'image/png' },
@@ -305,6 +330,8 @@ async function runAuthoritativeVerification() {
       { url: '/icon-512.png', expectedStatus: 200, mime: 'image/png' },
       { url: '/manifest.webmanifest', expectedStatus: 200, mime: 'application/manifest+json' },
       { url: '/brand/ostrum-3d-symbol-master.png', expectedStatus: 200, mime: 'image/png' },
+      { url: '/brand/ostrum-3d-symbol-dark.png', expectedStatus: 200, mime: 'image/png' },
+      { url: '/brand/ostrum-3d-symbol-light.png', expectedStatus: 200, mime: 'image/png' },
     ];
 
     const iconResults = [];
@@ -317,9 +344,28 @@ async function runAuthoritativeVerification() {
       iconResults.push({ url: r.url, status, contentType, ok });
     }
 
-    const allIconsPass = iconResults.every((i) => i.ok);
+    // Theme-aware link rel="icon" verification
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
+    const linkIconTags = await page.evaluate(() => {
+      const links = Array.from(document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]'));
+      return links.map(l => ({
+        href: l.getAttribute('href'),
+        media: l.getAttribute('media'),
+        type: l.getAttribute('type'),
+      }));
+    });
+    console.log('[Favicon Media Links in DOM]:', linkIconTags);
+    const hasDarkMediaIcon = linkIconTags.some(l => l.media?.includes('prefers-color-scheme: dark') && l.href?.includes('favicon-dark'));
+    const hasLightMediaIcon = linkIconTags.some(l => l.media?.includes('prefers-color-scheme: light') && l.href?.includes('favicon-light'));
+    console.log(`[Favicon Theme Links] Dark media icon present: ${hasDarkMediaIcon ? 'PASS ✓' : 'FAIL ✗'}`);
+    console.log(`[Favicon Theme Links] Light media icon present: ${hasLightMediaIcon ? 'PASS ✓' : 'FAIL ✗'}`);
+
+    const allIconsPass = iconResults.every((i) => i.ok) && hasDarkMediaIcon && hasLightMediaIcon;
     results.faviconAndBrandIcons = {
       routes: iconResults,
+      themeLinks: linkIconTags,
+      hasDarkMediaIcon,
+      hasLightMediaIcon,
       pass: allIconsPass,
     };
 

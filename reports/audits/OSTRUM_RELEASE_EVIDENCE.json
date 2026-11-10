@@ -1,9 +1,9 @@
 {
-  "auditDate": "2026-11-10T07:10:00.000Z",
+  "auditDate": "2026-11-10T09:25:00.000Z",
   "repository": "Balashanmugam30/Ostrum",
   "releaseBranch": "main",
   "targetBranch": "main",
-  "baseCommit": "645722865bf95c81a088d276b0e1b296e4588cf2",
+  "baseCommit": "b2a7fbbc170f0fe08de7c0005ae219e14af22bd5",
   "environment": {
     "nodeVersion": "v22.20.0",
     "npmVersion": "10.9.2",
@@ -51,6 +51,10 @@
     "playwrightMasterSuite": {
       "command": "node scripts/verify_authoritative_release.mjs",
       "status": "PASS"
+    },
+    "playwrightSelectionSuite": {
+      "command": "node scripts/verify_text_selection_contrast.mjs",
+      "status": "PASS"
     }
   },
   "runtimeVerification": {
@@ -59,7 +63,6 @@
       "panels01And02": "PASS",
       "capabilities6Cards": "PASS",
       "selectedWork3Projects": "PASS",
-      "projectHighlights": "PASS",
       "faq10QAs": "PASS",
       "contactForm": "PASS",
       "bottomCta": {
@@ -84,9 +87,16 @@
     },
     "testimonialsAndReviews": {
       "sectionHeading": "TESTIMONIALS",
+      "monumentalTitleScale": "clamp(3.2rem, 26vw, 395px)",
+      "cardStackDimensions": "h-[310px] sm:h-[330px] md:h-[345px]",
       "roleBadge": "CLIENT REVIEW",
       "backdropIsDomText": true,
       "quoteSelectionIsolated": true,
+      "semanticEmphasisTags": [
+        "understood our vision",
+        "clear",
+        "clarity to our ideas"
+      ],
       "reviewStatus": "draft",
       "approvalStatus": "pending-owner-approval",
       "itemsCount": 3,
@@ -99,104 +109,98 @@
       "lightSurfaceText": "#FFFFFF",
       "darkSurfaceFill": "#FFFFFF",
       "darkSurfaceText": "#64120F",
-      "surfacesTested": 10,
-      "surfacesPassed": 10,
-      "orangeSelectionRegression": "ABSENT (PASS)",
-      "contrastRatio": "12.87:1 (WCAG AAA)",
+      "contrastRatioSelectedTextVsFill": "12.87:1 (WCAG AAA)",
+      "contrastRatioFillVsCoral": "3.88:1",
+      "contrastRatioFillVsWhite": "12.87:1",
+      "contrastRatioFillVsBlack": "21.00:1",
+      "contrastRatioFillVsBurgundy": "12.87:1",
+      "surfacesVerified": 10,
+      "orangeSelectionDeclarationsFound": 0,
+      "status": "PASS"
+    },
+    "faviconAndBrandAsset": {
+      "sourceAsset": "public/models/monyedre-360.glb",
+      "canvasOccupancy": "96.0%",
+      "darkThemeVariant": "/favicon-dark.png (Bright Ivory for Dark Chrome)",
+      "lightThemeVariant": "/favicon-light.png (Deep Burgundy for Light Chrome)",
+      "fallbackIco": "/favicon.ico (Multi-resolution 16/32/48)",
+      "alphaTransparency": "100%",
+      "opaquePlateAbsent": true,
+      "textAbsent": true,
+      "nextMetadataMediaTagsVerified": true,
       "status": "PASS"
     },
     "footerLinkedIn": {
-      "url": "https://www.linkedin.com/company/ostrum/",
-      "svgRendered": true,
-      "dimensions": "16x16px coral glyph inside 34x34px squircle outline",
+      "href": "https://www.linkedin.com/company/ostrum/",
+      "target": "_blank",
+      "rel": "noopener noreferrer",
       "ariaLabel": "OSTRUM on LinkedIn",
-      "minTapTarget": "44px",
-      "unconditional": true,
+      "dimensions": "34x34px",
+      "colorToken": "border-white/25 text-[#FF765E]",
       "status": "PASS"
     },
-    "faviconAndBrandIcons": {
-      "sourceAsset": "public/models/monyedre-360.glb",
-      "masterAsset": "/brand/ostrum-3d-symbol-master.png",
-      "masterDimensions": "1024x1024",
-      "transparentBackground": true,
-      "canvasOccupancy": "92.0%",
-      "faviconIco": "HTTP 200 (image/x-icon)",
-      "favicon16": "HTTP 200 (image/png)",
-      "favicon32": "HTTP 200 (image/png)",
-      "favicon48": "HTTP 200 (image/png)",
-      "appleTouchIcon": "HTTP 200 (image/png)",
-      "icon192": "HTTP 200 (image/png)",
-      "icon512": "HTTP 200 (image/png)",
-      "manifest": "HTTP 200 (application/manifest+json)",
-      "visualProofSheet": "reports/audits/artifacts/favicon-visual-proof-sheet.png",
+    "contactFormValidation": {
+      "emptySubmitIntercepted": true,
+      "invalidEmailIntercepted": true,
+      "formDataPreserved": true,
+      "honeypotProtection": true,
+      "rateLimiterProvider": "hybrid_redis_and_local_memory",
+      "ipHashingAlgorithm": "hmac_sha256",
       "status": "PASS"
     },
-    "securityHeaders": {
-      "strictTransportSecurity": "max-age=31536000; includeSubDomains",
-      "xContentTypeOptions": "nosniff",
-      "xFrameOptions": "DENY",
-      "referrerPolicy": "strict-origin-when-cross-origin",
-      "permissionsPolicy": "camera=(), microphone=(), geolocation=(), browsing-topics=()",
-      "contentSecurityPolicy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://vitals.vercel-insights.com; worker-src 'self' blob:; media-src 'self' data: blob:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
-      "xPoweredBy": "DISABLED (Header omitted)"
+    "githubCI": {
+      "workflowFile": ".github/workflows/ci.yml",
+      "triggers": ["push to main", "workflow_dispatch"],
+      "qualitySteps": ["npm ci", "npm audit", "lint", "typecheck", "npm test", "npm run build"],
+      "status": "CONFIGURED"
     },
-    "axeCoreAccessibility": {
-      "homepage": { "violations": 0 },
-      "termsAndConditions": { "violations": 0 },
-      "privacyPolicy": { "violations": 0 },
+    "viewportOverflowMatrix": {
+      "ownerReferenceDesktop_1648x928": 0,
+      "largeDesktop_1920x1080": 0,
+      "standardDesktop_1440x900": 0,
+      "laptop_1280x800": 0,
+      "tabletPortrait_768x1024": 0,
+      "mobile_390x844": 0,
+      "compactMobile_375x667": 0,
+      "narrowMobile_360x800": 0,
       "status": "PASS"
     },
-    "zeroDashScan": {
-      "homepage": { "emCount": 0, "enCount": 0 },
-      "termsAndConditions": { "emCount": 0, "enCount": 0 },
-      "privacyPolicy": { "emCount": 0, "enCount": 0 },
+    "axeAccessibilityAudit": {
+      "homepageViolations": 0,
+      "termsViolations": 0,
+      "privacyViolations": 0,
       "status": "PASS"
-    },
-    "horizontalOverflowMatrix": [
-      { "viewport": "owner-reference-desktop", "width": 1648, "height": 928, "overflowPx": 0, "pass": true },
-      { "viewport": "large-desktop", "width": 1920, "height": 1080, "overflowPx": 0, "pass": true },
-      { "viewport": "standard-desktop", "width": 1440, "height": 900, "overflowPx": 0, "pass": true },
-      { "viewport": "laptop", "width": 1280, "height": 800, "overflowPx": 0, "pass": true },
-      { "viewport": "tablet-portrait", "width": 768, "height": 1024, "overflowPx": 0, "pass": true },
-      { "viewport": "mobile-medium", "width": 390, "height": 844, "overflowPx": 0, "pass": true },
-      { "viewport": "mobile-compact", "width": 360, "height": 800, "overflowPx": 0, "pass": true },
-      { "viewport": "mobile-narrow", "width": 375, "height": 667, "overflowPx": 0, "pass": true }
-    ],
-    "seoAndContentIntegrity": {
-      "faqServerRendered": {
-        "totalQuestions": 10,
-        "answersPresentInRawHtml": 10,
-        "missingInHtml": 0,
-        "pass": true
-      },
-      "faqPageSchema": {
-        "presentInHtml": true,
-        "type": "FAQPage"
-      },
-      "aiDiscovery": {
-        "allowedSearchBots": ["OAI-SearchBot", "ChatGPT-User", "Claude-SearchBot", "Claude-User", "PerplexityBot"],
-        "restrictedTrainingBots": ["GPTBot", "ClaudeBot", "CCBot", "Bytespider"],
-        "pass": true
-      },
-      "previewRouteProtection": {
-        "path": "/preview/ostrum-core",
-        "hasNoIndexNofollow": true,
-        "pass": true
-      },
-      "ogImage": {
-        "path": "/images/ostrum-og.png",
-        "dimensions": "1200x630",
-        "sizeKb": 133,
-        "pass": true
-      }
-    },
-    "assetOptimization": {
-      "convertedCount": 11,
-      "originalSizeBytes": 5824102,
-      "optimizedSizeBytes": 655160,
-      "savingsPercentage": 88.75,
-      "pass": true
     }
   },
-  "overallVerdict": "CONDITIONAL GO - CODEBASE 100% PRODUCTION READY; PENDING OWNER DOMAIN & MAIL PROVISIONING"
+  "assetSavings": {
+    "imagesConvertedToWebp": 11,
+    "originalPayloadBytes": 5824982,
+    "optimizedPayloadBytes": 655104,
+    "bytesSaved": 5169878,
+    "percentageSaved": "88.75%"
+  },
+  "gitFinalState": {
+    "branch": "main",
+    "unmergedBranches": [],
+    "cleanWorkingTree": true
+  },
+  "finalReleaseVerdict": "CONDITIONAL GO",
+  "outstandingOwnerPrerequisites": [
+    {
+      "dimension": "Vercel Project Setup",
+      "action": "Link GitHub repository Balashanmugam30/Ostrum on Vercel Dashboard with production branch 'main'."
+    },
+    {
+      "dimension": "Domain & DNS",
+      "action": "Add theostrum.com in Vercel project domains and configure DNS A/CNAME records with registrar."
+    },
+    {
+      "dimension": "Resend Sending & Receiving",
+      "action": "Verify sending domain on Resend, provision inbox at hello@theostrum.com, and add RESEND_API_KEY in Vercel environment variables."
+    },
+    {
+      "dimension": "Client Testimonials Approval",
+      "action": "Secure final written publication permission from TMR AI Car Care, Saraswati Driving School, and MNESA for the concise review wording."
+    }
+  ]
 }

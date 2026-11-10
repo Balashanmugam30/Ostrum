@@ -9,19 +9,21 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
-const PORT = 3344;
+const PORT = 3345;
 
-// Simple static server
+// Static server serving Three.js and GLB model
 const server = http.createServer((req, res) => {
-  let reqPath = req.url.split('?')[0];
-  console.log('HTTP REQ:', reqPath);
+  const [reqPath, queryString] = req.url.split('?');
+  const urlParams = new URLSearchParams(queryString || '');
+  const theme = urlParams.get('theme') || 'dark';
+
   if (reqPath === '/' || reqPath === '/index.html') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(`<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Favicon Render</title>
+  <title>Favicon Render - ${theme}</title>
   <script type="importmap">
   {
     "imports": {
@@ -41,6 +43,7 @@ const server = http.createServer((req, res) => {
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+    const theme = "${theme}";
     const canvas = document.getElementById('c');
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -53,49 +56,91 @@ const server = http.createServer((req, res) => {
     renderer.setPixelRatio(1);
     renderer.setClearColor(0x000000, 0); // 100% transparent background
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = theme === 'light' ? 1.25 : 1.15;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(34, 1.0, 0.1, 50);
 
-    // 4-point Studio Lighting matching Hero
-    const keyLight = new THREE.DirectionalLight('#fff7ee', 2.4);
-    keyLight.position.set(-2.5, 3.6, 3.2);
-    scene.add(keyLight);
+    let material;
 
-    const hemiLight = new THREE.HemisphereLight('#fdeddc', '#220404', 1.0);
-    hemiLight.position.set(0, 5, 0);
-    scene.add(hemiLight);
+    if (theme === 'light') {
+      // DEEP OSTRUM BURGUNDY / OXBLOOD FOR LIGHT BROWSER CHROME
+      // Lighting tailored to reveal deep burgundy sculptural contours on white/light tabs
+      const keyLight = new THREE.DirectionalLight('#fff5f2', 3.0);
+      keyLight.position.set(-2.4, 3.8, 3.4);
+      scene.add(keyLight);
 
-    const rimLight = new THREE.PointLight('#ff4d30', 2.0, 12, 1.2);
-    rimLight.position.set(3.4, -1.2, -2.6);
-    scene.add(rimLight);
+      const hemiLight = new THREE.HemisphereLight('#ffded8', '#2b0404', 1.2);
+      hemiLight.position.set(0, 5, 0);
+      scene.add(hemiLight);
 
-    const fillLight = new THREE.DirectionalLight('#ffebd8', 0.55);
-    fillLight.position.set(1.8, 1.2, 2.0);
-    scene.add(fillLight);
+      const rimLight = new THREE.PointLight('#ff765e', 2.8, 14, 1.1);
+      rimLight.position.set(3.4, -1.2, -2.6);
+      scene.add(rimLight);
 
-    // Exact porcelain material from OstrumContinuousJourney.tsx
-    const porcelainColor = new THREE.Color('#f7eee8');
-    const material = new THREE.MeshPhysicalMaterial({
-      color: porcelainColor,
-      roughness: 0.26,
-      metalness: 0.06,
-      clearcoat: 0.58,
-      clearcoatRoughness: 0.18,
-      transmission: 0,
-      ior: 1.50,
-      sheen: 0.65,
-      sheenColor: new THREE.Color('#ffdcd8'),
-      sheenRoughness: 0.35,
-      specularColor: new THREE.Color('#ffffff'),
-      specularIntensity: 0.95,
-      iridescence: 0.06,
-      iridescenceIOR: 1.32,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 1
-    });
+      const fillLight = new THREE.DirectionalLight('#e09088', 0.85);
+      fillLight.position.set(1.8, 1.2, 2.0);
+      scene.add(fillLight);
+
+      // Deep Burgundy / Oxblood material
+      material = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color('#580f0c'),
+        roughness: 0.28,
+        metalness: 0.14,
+        clearcoat: 0.72,
+        clearcoatRoughness: 0.16,
+        transmission: 0,
+        ior: 1.52,
+        sheen: 0.65,
+        sheenColor: new THREE.Color('#8a1e1a'),
+        sheenRoughness: 0.32,
+        specularColor: new THREE.Color('#ffffff'),
+        specularIntensity: 0.98,
+        iridescence: 0.08,
+        iridescenceIOR: 1.34,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 1
+      });
+    } else {
+      // BRIGHT IVORY / PORCELAIN FOR DARK BROWSER CHROME
+      const keyLight = new THREE.DirectionalLight('#fff7ee', 2.5);
+      keyLight.position.set(-2.5, 3.6, 3.2);
+      scene.add(keyLight);
+
+      const hemiLight = new THREE.HemisphereLight('#fdeddc', '#220404', 1.0);
+      hemiLight.position.set(0, 5, 0);
+      scene.add(hemiLight);
+
+      const rimLight = new THREE.PointLight('#ff4d30', 2.0, 12, 1.2);
+      rimLight.position.set(3.4, -1.2, -2.6);
+      scene.add(rimLight);
+
+      const fillLight = new THREE.DirectionalLight('#ffebd8', 0.55);
+      fillLight.position.set(1.8, 1.2, 2.0);
+      scene.add(fillLight);
+
+      // Ivory / Porcelain material
+      material = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color('#f7eee8'),
+        roughness: 0.24,
+        metalness: 0.06,
+        clearcoat: 0.60,
+        clearcoatRoughness: 0.18,
+        transmission: 0,
+        ior: 1.50,
+        sheen: 0.65,
+        sheenColor: new THREE.Color('#ffdcd8'),
+        sheenRoughness: 0.35,
+        specularColor: new THREE.Color('#ffffff'),
+        specularIntensity: 0.95,
+        iridescence: 0.06,
+        iridescenceIOR: 1.32,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 1
+      });
+    }
 
     const loader = new GLTFLoader();
     loader.load('/models/monyedre-360.glb', (gltf) => {
@@ -131,19 +176,17 @@ const server = http.createServer((req, res) => {
       pivotGroup.rotation.y = 0; // Exact resting rotation in Hero 'O'
       scene.add(pivotGroup);
 
-      // Frame camera tightly so model fills ~92% of 1024x1024 square
+      // Frame camera tightly so model fills 96% of 1024x1024 square
       pivotGroup.updateMatrixWorld(true);
       const rotatedBox = new THREE.Box3().setFromObject(pivotGroup);
       const rotSize = new THREE.Vector3();
       rotatedBox.getSize(rotSize);
       const maxDim = Math.max(rotSize.x, rotSize.y);
 
-      // In PerspectiveCamera with fov=34 deg, half-height = tan(17 deg) * dist
-      // For height to match maxDim / 0.92:
+      // Camera distance calculation for 96% occupancy
       const fovRad = (34 * Math.PI) / 360;
-      const targetHalfView = (maxDim / 0.92) / 2;
+      const targetHalfView = (maxDim / 0.96) / 2;
       const dist = targetHalfView / Math.tan(fovRad);
-      console.log('Scaled model maxDim:', maxDim, 'camera dist:', dist);
 
       camera.position.set(0, 0, dist);
       camera.lookAt(0, 0, 0);
@@ -220,48 +263,31 @@ function createIco(pngBuffers, sizes) {
   return Buffer.concat([header, ...dirEntries, ...pngBuffers]);
 }
 
-async function main() {
-  await new Promise((resolve) => server.listen(PORT, resolve));
-  console.log(`Render server listening on http://localhost:${PORT}`);
-
+async function renderVariant(browser, theme) {
+  const page = await browser.newPage({ viewport: { width: 1024, height: 1024 } });
   try {
-    const browser = await chromium.launch({
-      headless: true,
-      args: ['--use-gl=angle', '--use-angle=default', '--enable-webgl'],
-    });
-    const page = await browser.newPage({ viewport: { width: 1024, height: 1024 } });
-    page.on('console', (msg) => console.log('PAGE LOG:', msg.type(), msg.text()));
-    page.on('pageerror', (err) => console.log('PAGE ERROR:', err.message));
-
-    await page.goto(`http://localhost:${PORT}`);
+    await page.goto(`http://localhost:${PORT}/?theme=${theme}`);
     await page.waitForFunction(() => window.__RENDER_DONE || window.__RENDER_ERROR, { timeout: 30000 });
 
     const err = await page.evaluate(() => window.__RENDER_ERROR);
-    if (err) {
-      throw new Error(`Renderer error in browser: ${err}`);
-    }
+    if (err) throw new Error(`Renderer error for ${theme}: ${err}`);
 
-    // Capture transparent dataURL
     const dataUrl = await page.evaluate(() => {
       const c = document.getElementById('c');
       return c.toDataURL('image/png');
     });
 
-    await browser.close();
-
     const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
     const rawPngBuffer = Buffer.from(base64Data, 'base64');
 
-    // Tight trim & pad to exactly 90% occupancy
-    console.log('Processing raw render through Sharp...');
+    // Tight trim & pad to exactly 96% occupancy
     const trimmed = await sharp(rawPngBuffer).trim().toBuffer();
     const meta = await sharp(trimmed).metadata();
-    console.log(`Trimmed object dimensions: ${meta.width}x${meta.height}`);
+    console.log(`[${theme}] Trimmed object dimensions: ${meta.width}x${meta.height}`);
 
     const maxDim = Math.max(meta.width, meta.height);
-    // Fit into 1024x1024 with 92% occupancy (margin = ~4% on each side)
     const targetDim = 1024;
-    const contentDim = Math.round(targetDim * 0.92);
+    const contentDim = Math.round(targetDim * 0.96); // 96% occupancy!
     const scale = contentDim / maxDim;
     const scaledWidth = Math.round(meta.width * scale);
     const scaledHeight = Math.round(meta.height * scale);
@@ -285,18 +311,48 @@ async function main() {
       .png()
       .toBuffer();
 
-    // 1. Save master asset
-    const brandDir = path.join(rootDir, 'public/brand');
-    if (!fs.existsSync(brandDir)) fs.mkdirSync(brandDir, { recursive: true });
-    const masterPath = path.join(brandDir, 'ostrum-3d-symbol-master.png');
-    fs.writeFileSync(masterPath, master1024);
-    console.log('Saved transparent master symbol:', masterPath);
+    return master1024;
+  } finally {
+    await page.close();
+  }
+}
 
-    // 2. Generate derivative sizes
+async function main() {
+  await new Promise((resolve) => server.listen(PORT, resolve));
+  console.log(`Render server listening on http://localhost:${PORT}`);
+
+  try {
+    const browser = await chromium.launch({
+      headless: true,
+      args: ['--use-gl=angle', '--use-angle=default', '--enable-webgl'],
+    });
+
+    console.log('Rendering Dark Theme Variant (Bright Ivory for Dark Chrome)...');
+    const masterDark1024 = await renderVariant(browser, 'dark');
+
+    console.log('Rendering Light Theme Variant (Deep Burgundy for Light Chrome)...');
+    const masterLight1024 = await renderVariant(browser, 'light');
+
+    await browser.close();
+
+    const brandDir = path.join(rootDir, 'public/brand');
     const publicDir = path.join(rootDir, 'public');
     const appDir = path.join(rootDir, 'app');
+    if (!fs.existsSync(brandDir)) fs.mkdirSync(brandDir, { recursive: true });
 
-    const targets = [
+    // 1. Save master high-resolution renders
+    fs.writeFileSync(path.join(brandDir, 'ostrum-3d-symbol-master.png'), masterDark1024);
+    fs.writeFileSync(path.join(brandDir, 'ostrum-3d-symbol-dark.png'), masterDark1024);
+    fs.writeFileSync(path.join(brandDir, 'ostrum-3d-symbol-light.png'), masterLight1024);
+    console.log('Saved 1024x1024 master assets (master, dark, light).');
+
+    // 2. Generate Dark Theme Derivatives (Ivory on Transparent)
+    const darkTargets = [
+      { file: path.join(publicDir, 'favicon-dark.png'), size: 32 },
+      { file: path.join(publicDir, 'favicon-dark-16x16.png'), size: 16 },
+      { file: path.join(publicDir, 'favicon-dark-32x32.png'), size: 32 },
+      { file: path.join(publicDir, 'favicon-dark-48x48.png'), size: 48 },
+      // Standard public fallback paths
       { file: path.join(publicDir, 'favicon-16x16.png'), size: 16 },
       { file: path.join(publicDir, 'favicon-32x32.png'), size: 32 },
       { file: path.join(publicDir, 'favicon-48x48.png'), size: 48 },
@@ -307,66 +363,90 @@ async function main() {
       { file: path.join(appDir, 'apple-icon.png'), size: 180 },
     ];
 
-    for (const t of targets) {
-      await sharp(master1024).resize(t.size, t.size).png().toFile(t.file);
-      console.log(`Generated: ${t.file} (${t.size}x${t.size})`);
+    for (const t of darkTargets) {
+      await sharp(masterDark1024).resize(t.size, t.size).png().toFile(t.file);
     }
+    console.log('Generated dark theme & primary application icon derivatives.');
 
-    // 3. Multi-resolution favicon.ico
-    const b16 = await sharp(master1024).resize(16, 16).png().toBuffer();
-    const b32 = await sharp(master1024).resize(32, 32).png().toBuffer();
-    const b48 = await sharp(master1024).resize(48, 48).png().toBuffer();
+    // 3. Generate Light Theme Derivatives (Deep Burgundy on Transparent)
+    const lightTargets = [
+      { file: path.join(publicDir, 'favicon-light.png'), size: 32 },
+      { file: path.join(publicDir, 'favicon-light-16x16.png'), size: 16 },
+      { file: path.join(publicDir, 'favicon-light-32x32.png'), size: 32 },
+      { file: path.join(publicDir, 'favicon-light-48x48.png'), size: 48 },
+      { file: path.join(publicDir, 'favicon-light-96x96.png'), size: 96 },
+    ];
+
+    for (const t of lightTargets) {
+      await sharp(masterLight1024).resize(t.size, t.size).png().toFile(t.file);
+    }
+    console.log('Generated light theme icon derivatives.');
+
+    // 4. Multi-resolution fallback favicon.ico
+    const b16 = await sharp(masterDark1024).resize(16, 16).png().toBuffer();
+    const b32 = await sharp(masterDark1024).resize(32, 32).png().toBuffer();
+    const b48 = await sharp(masterDark1024).resize(48, 48).png().toBuffer();
     const icoBuf = createIco([b16, b32, b48], [16, 32, 48]);
-    const icoPath = path.join(publicDir, 'favicon.ico');
-    fs.writeFileSync(icoPath, icoBuf);
-    console.log('Generated favicon.ico (16, 32, 48):', icoPath);
+    fs.writeFileSync(path.join(publicDir, 'favicon.ico'), icoBuf);
+    console.log('Generated favicon.ico (16, 32, 48).');
 
-    // 4. Generate Visual Proof Sheet comparing 16, 32, 48, 180, 192, 512
-    // on both Dark (#141414) and Light (#FFFFFF) backdrops
-    console.log('Generating favicon visual proof sheet...');
-    const proofWidth = 900;
-    const proofHeight = 520;
-    
-    // We will render:
-    // Row 1: Dark background (#181414) with sizes: 16 (scaled 2x for preview), 32, 48, 180
-    // Row 2: Light background (#FAFAFA) with sizes: 16 (scaled 2x for preview), 32, 48, 180
+    // 5. Visual Proof Sheet: Side-by-side Dark & Light Chrome comparison
+    console.log('Generating dual-theme visual proof sheet...');
+    const proofWidth = 1000;
+    const proofHeight = 620;
+
+    // Dark tab bar strip (#1F1F1F)
     const darkBox = await sharp({
-      create: { width: 860, height: 230, channels: 4, background: { r: 24, g: 20, b: 20, alpha: 1 } }
+      create: { width: 960, height: 270, channels: 4, background: { r: 31, g: 31, b: 31, alpha: 1 } }
     }).png().toBuffer();
 
+    // Light tab bar strip (#F1F3F4 - standard Chrome light tab bar)
     const lightBox = await sharp({
-      create: { width: 860, height: 230, channels: 4, background: { r: 250, g: 250, b: 250, alpha: 1 } }
+      create: { width: 960, height: 270, channels: 4, background: { r: 241, g: 243, b: 244, alpha: 1 } }
     }).png().toBuffer();
 
-    const p16 = await sharp(master1024).resize(16, 16).toBuffer();
-    const p32 = await sharp(master1024).resize(32, 32).toBuffer();
-    const p48 = await sharp(master1024).resize(48, 48).toBuffer();
-    const p180 = await sharp(master1024).resize(180, 180).toBuffer();
+    // Dark variants (Ivory)
+    const d16 = await sharp(masterDark1024).resize(16, 16).toBuffer();
+    const d32 = await sharp(masterDark1024).resize(32, 32).toBuffer();
+    const d48 = await sharp(masterDark1024).resize(48, 48).toBuffer();
+    const d96 = await sharp(masterDark1024).resize(96, 96).toBuffer();
+    const d180 = await sharp(masterDark1024).resize(180, 180).toBuffer();
+
+    // Light variants (Burgundy)
+    const l16 = await sharp(masterLight1024).resize(16, 16).toBuffer();
+    const l32 = await sharp(masterLight1024).resize(32, 32).toBuffer();
+    const l48 = await sharp(masterLight1024).resize(48, 48).toBuffer();
+    const l96 = await sharp(masterLight1024).resize(96, 96).toBuffer();
+    const l180 = await sharp(masterLight1024).resize(180, 180).toBuffer();
 
     const compositeDark = await sharp(darkBox).composite([
-      { input: p16, left: 40, top: 107 },
-      { input: p32, left: 120, top: 99 },
-      { input: p48, left: 220, top: 91 },
-      { input: p180, left: 340, top: 25 },
+      { input: d16, left: 60, top: 127 },
+      { input: d32, left: 140, top: 119 },
+      { input: d48, left: 240, top: 111 },
+      { input: d96, left: 360, top: 87 },
+      { input: d180, left: 520, top: 45 },
     ]).png().toBuffer();
 
     const compositeLight = await sharp(lightBox).composite([
-      { input: p16, left: 40, top: 107 },
-      { input: p32, left: 120, top: 99 },
-      { input: p48, left: 220, top: 91 },
-      { input: p180, left: 340, top: 25 },
+      { input: l16, left: 60, top: 127 },
+      { input: l32, left: 140, top: 119 },
+      { input: l48, left: 240, top: 111 },
+      { input: l96, left: 360, top: 87 },
+      { input: l180, left: 520, top: 45 },
     ]).png().toBuffer();
 
     const proofSheet = await sharp({
-      create: { width: proofWidth, height: proofHeight, channels: 4, background: { r: 10, g: 10, b: 10, alpha: 1 } }
+      create: { width: proofWidth, height: proofHeight, channels: 4, background: { r: 12, g: 12, b: 12, alpha: 1 } }
     }).composite([
       { input: compositeDark, left: 20, top: 20 },
-      { input: compositeLight, left: 20, top: 270 }
+      { input: compositeLight, left: 20, top: 320 }
     ]).png().toBuffer();
 
-    const proofPath = path.join(rootDir, 'reports/audits/artifacts/favicon-visual-proof-sheet.png');
-    fs.writeFileSync(proofPath, proofSheet);
-    console.log('Saved Favicon Visual Proof Sheet:', proofPath);
+    const proofPath1 = path.join(rootDir, 'reports/audits/artifacts/favicon-visual-proof-sheet.png');
+    const proofPath2 = path.join(rootDir, 'reports/audits/artifacts/playwright/favicon-dual-theme-proof.png');
+    fs.writeFileSync(proofPath1, proofSheet);
+    fs.writeFileSync(proofPath2, proofSheet);
+    console.log('Saved Dual-Theme Favicon Proof Sheet to:', proofPath1, 'and', proofPath2);
 
   } finally {
     server.close();

@@ -1,5 +1,16 @@
-import { randomUUID, createHash } from 'node:crypto';
+import { randomUUID, createHash, createHmac } from 'node:crypto';
 import { Resend } from 'resend';
+
+let generatedSessionSalt: string | null = null;
+export function getEnquirySalt(): string {
+  if (process.env.ENQUIRY_SALT && process.env.ENQUIRY_SALT.trim() !== '') {
+    return process.env.ENQUIRY_SALT;
+  }
+  if (!generatedSessionSalt) {
+    generatedSessionSalt = randomUUID();
+  }
+  return generatedSessionSalt;
+}
 
 /**
  * Distributed & In-Memory Rate Limiter for OSTRUM Enquiry API
@@ -85,8 +96,9 @@ async function checkDistributedRateLimit(
   apiToken: string
 ): Promise<RateLimitResult | null> {
   try {
-    const hashedIp = createHash('sha256')
-      .update(ip + (process.env.ENQUIRY_SALT || 'ostrum_enquiry_salt_2026'))
+    const salt = getEnquirySalt();
+    const hashedIp = createHmac('sha256', salt)
+      .update(ip)
       .digest('hex')
       .substring(0, 16);
     const key = `ostrum:rl:enquiry:${hashedIp}`;
@@ -150,6 +162,9 @@ export async function checkRateLimitAsync(ip: string): Promise<RateLimitResult> 
     if (distributedResult !== null) {
       return distributedResult;
     }
+  } else if (process.env.NODE_ENV === 'production') {
+    // In production without Redis credentials, notify via server logs of in-memory fallback
+    console.warn('[Rate Limiter Notice] Distributed Redis is not configured in production; using local memory circuit breaker fallback.');
   }
 
   return checkMemoryRateLimit(ip, now);
@@ -552,8 +567,14 @@ export async function sendEnquiryNotification(
   }
 ): Promise<MailerResult> {
   const apiKey = process.env.RESEND_API_KEY;
-  const toAddress = process.env.OSTRUM_ENQUIRY_TO || 'hello@theostrum.com';
-  const fromAddress = process.env.OSTRUM_ENQUIRY_FROM || 'OSTRUM Website <website@theostrum.com>';
+  const toAddress =
+    process.env.OSTRUM_ENQUIRY_TO ||
+    process.env.CONTACT_NOTIFICATION_EMAIL ||
+    'hello@theostrum.com';
+  const fromAddress =
+    process.env.OSTRUM_ENQUIRY_FROM ||
+    process.env.RESEND_FROM_EMAIL ||
+    'OSTRUM Website <website@theostrum.com>';
 
   const correlationId = `ost_${randomUUID().substring(0, 8)}`;
   const timestamp = new Date().toISOString();

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-10T08:21:45.508Z",
+  "timestamp": "2026-11-10T09:14:06.089Z",
   "tokens": {
     "lightBg": "#64120F",
     "lightText": "#FFFFFF",
@@ -75,7 +75,7 @@
         "bg": "#64120F",
         "text": "#FFFFFF"
       },
-      "actualSelectedText": "We wanted a digital experience",
+      "actualSelectedText": "We appreciated how OSTRUM",
       "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\06_testimonial_card_tmr.png",
       "pass": true
     },
@@ -87,7 +87,7 @@
         "bg": "#64120F",
         "text": "#FFFFFF"
       },
-      "actualSelectedText": "OSTRUM took the time to understand",
+      "actualSelectedText": "They listened to our needs",
       "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\07_testimonial_card_saraswati.png",
       "pass": true
     },
@@ -99,7 +99,7 @@
         "bg": "#64120F",
         "text": "#FFFFFF"
       },
-      "actualSelectedText": "Working with OSTRUM helped us",
+      "actualSelectedText": "“OSTRUM brought clarity to our ideas and offered thoughtful direction. Their attention to detail helped shape a practical product we feel good about.”",
       "screenshot": "reports\\audits\\artifacts\\playwright\\selection\\08_testimonial_card_mnesa.png",
       "pass": true
     },

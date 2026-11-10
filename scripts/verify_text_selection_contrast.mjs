@@ -215,7 +215,7 @@ async function runSelectionAudit() {
       '06_testimonial_card_tmr',
       'Testimonial Card 01 (TMR AI Car Care)',
       '[data-testid="testimonial-card-0"] [data-testid="testimonial-quote-text"]',
-      'We wanted a digital experience',
+      'We appreciated how OSTRUM',
       'light',
       '#64120F',
       '#FFFFFF'
@@ -226,7 +226,7 @@ async function runSelectionAudit() {
       '07_testimonial_card_saraswati',
       'Testimonial Card 02 (Saraswati Driving School)',
       '[data-testid="testimonial-card-1"] [data-testid="testimonial-quote-text"]',
-      'OSTRUM took the time to understand',
+      'They listened to our needs',
       'light',
       '#64120F',
       '#FFFFFF'
@@ -237,7 +237,7 @@ async function runSelectionAudit() {
       '08_testimonial_card_mnesa',
       'Testimonial Card 03 (MNESA)',
       '[data-testid="testimonial-card-2"] [data-testid="testimonial-quote-text"]',
-      'Working with OSTRUM helped us',
+      'OSTRUM brought clarity to our ideas',
       'light',
       '#64120F',
       '#FFFFFF'

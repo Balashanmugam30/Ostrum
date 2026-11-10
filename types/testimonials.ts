@@ -8,6 +8,7 @@ export interface Testimonial {
   clientName: string;
   brandName?: string;
   quote: string;
+  emphasis?: string;
   content?: string;
   role?: string;
   company?: string;
