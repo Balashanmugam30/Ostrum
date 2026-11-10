@@ -206,7 +206,7 @@ export function OstrumTestimonialsSection({
         data-testid="testimonials-section"
         className="relative z-[26] w-full bg-white py-24 px-4 sm:px-8 select-text"
         style={{ backgroundColor: '#FFFFFF' }}
-        aria-label="Testimonials"
+        aria-label="Project Highlights"
       >
         <div className="max-w-5xl mx-auto flex flex-col items-center">
           <h2
@@ -217,7 +217,7 @@ export function OstrumTestimonialsSection({
               lineHeight: '0.85',
             }}
           >
-            TESTIMONIALS
+            PROJECT HIGHLIGHTS
           </h2>
 
           <div className="w-full max-w-[480px] flex flex-col gap-8">
@@ -271,7 +271,7 @@ export function OstrumTestimonialsSection({
                   {testimonial.contentType === 'project-note' ? (
                     <>
                       <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#ff5c4a] font-semibold mb-2">
-                        VENTURE NOTE
+                        OSTRUM VENTURE
                       </span>
                       <p
                         data-testid="testimonial-quote-text"
@@ -316,7 +316,7 @@ export function OstrumTestimonialsSection({
       data-testid="testimonials-section"
       className="relative z-[26] w-full bg-white select-text overflow-visible"
       style={{ backgroundColor: '#FFFFFF' }}
-      aria-label="Testimonials"
+      aria-label="Project Highlights"
     >
       {/* Pinned / Sticky Stage Container */}
       <div
@@ -335,12 +335,12 @@ export function OstrumTestimonialsSection({
             data-testid="testimonials-heading"
             className="font-condensed font-bold uppercase text-black text-center select-text w-full whitespace-nowrap tracking-[-0.01em]"
             style={{
-              fontSize: 'clamp(3.2rem, 26vw, 395px)',
+              fontSize: 'clamp(2rem, 14vw, 220px)',
               lineHeight: '0.85',
               color: '#000000',
             }}
           >
-            TESTIMONIALS
+            PROJECT HIGHLIGHTS
           </h2>
         </div>
 
@@ -404,7 +404,7 @@ export function OstrumTestimonialsSection({
                 {testimonial.contentType === 'project-note' ? (
                   <>
                     <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#ff5c4a] font-semibold mb-2">
-                      VENTURE NOTE
+                      OSTRUM VENTURE
                     </span>
                     <p
                       data-testid="testimonial-quote-text"

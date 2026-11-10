@@ -1,13 +1,13 @@
+import { randomUUID, createHash } from 'node:crypto';
 import { Resend } from 'resend';
 
 /**
  * Distributed & In-Memory Rate Limiter for OSTRUM Enquiry API
  *
- * Implements a sliding-window rate limit:
- * - In production serverless environments with UPSTASH_REDIS_REST_URL/TOKEN or
- *   KV_REST_API_URL/TOKEN, uses distributed atomic storage.
- * - In local development or standalone instances without external store credentials,
- *   falls back to an in-memory sliding-window limiter as a process-level circuit breaker.
+ * Implements a hybrid rate limiter:
+ * - Distributed production: atomic fixed-window counter via Upstash Redis REST API
+ *   (INCR + EXPIRE NX + TTL) with client IP HMAC/hash masking to avoid storing raw IPs.
+ * - Local development & offline fallback: in-memory sliding-window circuit breaker.
  *
  * Rate Limit Window: 10 minutes (600,000 ms)
  * Max Allowed Submissions: 5 requests per IP per window
@@ -85,7 +85,11 @@ async function checkDistributedRateLimit(
   apiToken: string
 ): Promise<RateLimitResult | null> {
   try {
-    const key = `ostrum:rl:enquiry:${ip}`;
+    const hashedIp = createHash('sha256')
+      .update(ip + (process.env.ENQUIRY_SALT || 'ostrum_enquiry_salt_2026'))
+      .digest('hex')
+      .substring(0, 16);
+    const key = `ostrum:rl:enquiry:${hashedIp}`;
     const windowSec = Math.ceil(RATE_LIMIT_WINDOW_MS / 1000);
 
     const pipelineUrl = `${apiUrl.replace(/\/$/, '')}/pipeline`;
@@ -551,11 +555,7 @@ export async function sendEnquiryNotification(
   const toAddress = process.env.OSTRUM_ENQUIRY_TO || 'hello@theostrum.com';
   const fromAddress = process.env.OSTRUM_ENQUIRY_FROM || 'OSTRUM Website <website@theostrum.com>';
 
-  const correlationId =
-    'ost_' +
-    (typeof crypto !== 'undefined' && crypto.randomUUID
-      ? crypto.randomUUID().substring(0, 8)
-      : Math.random().toString(36).substring(2, 10));
+  const correlationId = `ost_${randomUUID().substring(0, 8)}`;
   const timestamp = new Date().toISOString();
 
   // If mock mode is enabled for testing

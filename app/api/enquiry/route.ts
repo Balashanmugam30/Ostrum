@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import {
   extractTrustedClientIp,
   checkRateLimitAsync,
@@ -11,11 +12,7 @@ const MAX_BODY_BYTES = 64 * 1024; // 64 KB hard request limit
 
 export async function POST(request: Request) {
   const timestamp = new Date().toISOString();
-  const correlationId =
-    'req_' +
-    (typeof crypto !== 'undefined' && crypto.randomUUID
-      ? crypto.randomUUID().substring(0, 8)
-      : Math.random().toString(36).substring(2, 10));
+  const correlationId = `req_${randomUUID().substring(0, 8)}`;
 
   // 1. Trusted Client IP extraction & Distributed Rate Limiting
   const clientIpInfo = extractTrustedClientIp(request.headers);

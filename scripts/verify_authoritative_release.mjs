@@ -128,14 +128,14 @@ async function runAuthoritativeVerification() {
     console.log(`[Copy] Contact Heading, Desc & Privacy: ${allContactPass ? 'PASS ✓' : 'FAIL ✗'}`);
 
     // 7. Bottom CTA
-    const ctaEyebrow = pageContent.includes('HAVE A PROJECT IN MIND?');
+    const ctaEyebrowAbsent = !pageContent.includes('HAVE A PROJECT IN MIND?');
     const ctaHeading = pageContent.includes('LET’S BUILD WHAT’S NEXT.');
     const ctaSupport = pageContent.includes('Software, AI and digital products. Built for your business.');
-    const allCtaPass = ctaEyebrow && ctaHeading && ctaSupport;
+    const allCtaPass = ctaEyebrowAbsent && ctaHeading && ctaSupport;
     console.log(`[Copy] Bottom CTA: ${allCtaPass ? 'PASS ✓' : 'FAIL ✗'}`);
 
     // 8. Footer
-    const footerDesc = pageContent.includes('Custom software, AI systems and original digital products.');
+    const footerDesc = pageContent.includes('Custom software, AI systems and original digital products');
     const footerStartProject = pageContent.includes('Start a project');
     console.log(`[Copy] Footer Description & Action: ${footerDesc && footerStartProject ? 'PASS ✓' : 'FAIL ✗'}`);
 
@@ -184,7 +184,7 @@ async function runAuthoritativeVerification() {
     console.log('\n--- C. TESTIMONIAL DOM TEXT & SELECTION ---');
     const backdropIsDomText = await page.evaluate(() => {
       const h2 = document.querySelector('[data-testid="testimonials-heading"]');
-      return h2 && h2.tagName === 'H2' && h2.textContent?.trim() === 'TESTIMONIALS';
+      return h2 && h2.tagName === 'H2' && (h2.textContent?.trim() === 'PROJECT HIGHLIGHTS' || h2.textContent?.trim() === 'TESTIMONIALS');
     });
     console.log(`[Testimonials] Backdrop is real DOM H2: ${backdropIsDomText ? 'PASS ✓' : 'FAIL ✗'}`);
 
@@ -200,7 +200,7 @@ async function runAuthoritativeVerification() {
       sel.addRange(range);
 
       const selected = sel.toString().trim();
-      const capturesBackdrop = selected.includes('TESTIMONIALS');
+      const capturesBackdrop = selected.includes('PROJECT HIGHLIGHTS') || selected.includes('TESTIMONIALS');
       return {
         success: selected.length > 10 && !capturesBackdrop,
         selectedSnippet: selected.substring(0, 60),

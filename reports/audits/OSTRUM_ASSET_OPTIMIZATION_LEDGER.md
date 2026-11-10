@@ -1,11 +1,13 @@
 # OSTRUM Asset Optimization Ledger
-**Audit & Conversion Date:** 9 November 2026  
+
+**Audit & Conversion Date:** 10 November 2026, 12:44 IST  
 **Scope:** Public raster graphics, showcase thumbnails, brand symbols, and favicons  
-**Tools:** `sharp` v0.33+ (libvips), Next.js Image Pipeline
+**Tools:** `sharp` v0.33+ (libvips), Next.js Image Pipeline  
 
 ---
 
 ## 1. Executive Summary
+
 In accordance with owner instructions (Section 9.2), all photographic and showcase raster assets have been converted from legacy JPEG to high-efficiency WebP with high-effort compression (`effort: 6`, `quality: 85`), while vector logos (SVGs) and multi-resolution PNG icons have been strictly preserved.
 
 - **Total Selected Work Image Size (Before):** 5,551.7 KB
@@ -33,21 +35,21 @@ In accordance with owner instructions (Section 9.2), all photographic and showca
 
 ---
 
-## 3. Brand Identity & Favicon Icon Set Ledger
+## 3. Brand Identity & Transparent Favicon Icon Set Ledger
 
-Derived directly from the master 1024×1024 3D Möbius symbol matching the hero reference (`public/brand/ostrum-3d-symbol-master.png`):
+Derived directly from the master 1024×1024 3D Möbius symbol rendered from `public/models/monyedre-360.glb` with 100% alpha transparency and 92% canvas occupancy (`public/brand/ostrum-3d-symbol-master.png`):
 
 | File Path | Dimensions | Format | Size | Purpose | HTTP Status |
 |---|---|---|---|---|---|
-| `public/brand/ostrum-3d-symbol-master.png` | 1024 × 1024 | PNG | 462.0 KB | Authoritative Master Symbol (Ivory Möbius on Burgundy) | 200 OK |
-| `public/favicon.ico` | Multi (16, 32, 48) | ICO | 8.7 KB | Legacy & modern browser tab icon | 200 OK |
+| `public/brand/ostrum-3d-symbol-master.png` | 1024 × 1024 | PNG | 262.3 KB | Authoritative Master Symbol (Pure Transparent Ivory Möbius) | 200 OK |
+| `public/favicon.ico` | Multi (16, 32, 48) | ICO | 7.6 KB | Legacy & modern browser tab icon | 200 OK |
 | `public/favicon-16x16.png` | 16 × 16 | PNG | 768 B | High-density browser tab | 200 OK |
 | `public/favicon-32x32.png` | 32 × 32 | PNG | 2.5 KB | Standard browser tab | 200 OK |
 | `public/favicon-48x48.png` | 48 × 48 | PNG | 5.3 KB | Desktop shortcut / bookmark icon | 200 OK |
 | `public/apple-touch-icon.png` | 180 × 180 | PNG | 62.1 KB | iOS Home Screen bookmark icon | 200 OK |
 | `public/icon-192.png` | 192 × 192 | PNG | 70.0 KB | PWA standard Android icon | 200 OK |
-| `public/icon-512.png` | 512 × 512 | PNG | 432.8 KB | PWA splash / hi-res store icon | 200 OK |
-| `app/icon.png` | 512 × 512 | PNG | 432.8 KB | Next.js App Router icon convention | 200 OK |
+| `public/icon-512.png` | 512 × 512 | PNG | 262.3 KB | PWA splash / hi-res store icon | 200 OK |
+| `app/icon.png` | 512 × 512 | PNG | 262.3 KB | Next.js App Router icon convention | 200 OK |
 | `app/apple-icon.png` | 180 × 180 | PNG | 62.1 KB | Next.js App Router apple icon convention | 200 OK |
 | `public/manifest.webmanifest` | N/A | JSON | 420 B | PWA Web App Manifest | 200 OK |
 

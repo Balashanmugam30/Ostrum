@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
-const masterSource = 'C:/Users/balashanmugam/.gemini/antigravity/brain/e61a5bf4-ec20-4604-866c-28b2350ab0c5/ostrum_brand_master_icon_v3_1794244062718.jpg';
+const masterSource = path.resolve('public/brand/ostrum-3d-symbol-master.png');
 const brandDir = path.resolve('public/brand');
 const publicDir = path.resolve('public');
 const appDir = path.resolve('app');
@@ -48,8 +48,10 @@ async function run() {
 
   // 1. Master PNG
   const masterPngPath = path.join(brandDir, 'ostrum-3d-symbol-master.png');
-  await sharp(masterBuf).png({ quality: 100 }).toFile(masterPngPath);
-  console.log('Saved master PNG:', masterPngPath);
+  if (masterSource !== masterPngPath) {
+    await sharp(masterBuf).png({ quality: 100 }).toFile(masterPngPath);
+  }
+  console.log('Using master PNG:', masterPngPath);
 
   // 2. Individual icon files
   const targets = [

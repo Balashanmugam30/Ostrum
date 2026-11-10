@@ -1,9 +1,9 @@
 {
-  "auditDate": "2026-11-09T17:40:00.000Z",
+  "auditDate": "2026-11-10T07:10:00.000Z",
   "repository": "Balashanmugam30/Ostrum",
   "releaseBranch": "main",
   "targetBranch": "main",
-  "baseCommit": "74fba2adbe41118cbba544cdc7c37967b3da8c55",
+  "baseCommit": "645722865bf95c81a088d276b0e1b296e4588cf2",
   "environment": {
     "nodeVersion": "v22.20.0",
     "npmVersion": "10.9.2",
@@ -59,10 +59,21 @@
       "panels01And02": "PASS",
       "capabilities6Cards": "PASS",
       "selectedWork3Projects": "PASS",
+      "projectHighlights": "PASS",
       "faq10QAs": "PASS",
       "contactForm": "PASS",
-      "bottomCta": "PASS",
-      "footer": "PASS",
+      "bottomCta": {
+        "eyebrowAbsent": true,
+        "headlineExact": true,
+        "supportExact": true,
+        "status": "PASS"
+      },
+      "footer": {
+        "coralTileRestored": true,
+        "whiteEmailTileRestored": true,
+        "spacingRestored": true,
+        "status": "PASS"
+      },
       "status": "PASS"
     },
     "heroActionRemoval": {
@@ -71,22 +82,30 @@
       "keyboardTabClean": true,
       "status": "PASS"
     },
-    "testimonials": {
+    "testimonialsAndHighlights": {
+      "sectionHeading": "PROJECT HIGHLIGHTS",
       "backdropIsDomText": true,
       "quoteSelectionIsolated": true,
+      "fakeReviewsCount": 0,
+      "fakeStarsCount": 0,
+      "quotationMarksCount": 0,
       "status": "PASS"
     },
     "footerLinkedIn": {
       "url": "https://www.linkedin.com/company/ostrum/",
       "svgRendered": true,
-      "dimensions": "18x18px inline SVG inside 38x38px squircle",
+      "dimensions": "16x16px coral glyph inside 34x34px squircle outline",
       "ariaLabel": "OSTRUM on LinkedIn",
+      "minTapTarget": "44px",
       "unconditional": true,
       "status": "PASS"
     },
     "faviconAndBrandIcons": {
+      "sourceAsset": "public/models/monyedre-360.glb",
       "masterAsset": "/brand/ostrum-3d-symbol-master.png",
       "masterDimensions": "1024x1024",
+      "transparentBackground": true,
+      "canvasOccupancy": "92.0%",
       "faviconIco": "HTTP 200 (image/x-icon)",
       "favicon16": "HTTP 200 (image/png)",
       "favicon32": "HTTP 200 (image/png)",
@@ -95,6 +114,7 @@
       "icon192": "HTTP 200 (image/png)",
       "icon512": "HTTP 200 (image/png)",
       "manifest": "HTTP 200 (application/manifest+json)",
+      "visualProofSheet": "reports/audits/artifacts/favicon-visual-proof-sheet.png",
       "status": "PASS"
     },
     "securityHeaders": {

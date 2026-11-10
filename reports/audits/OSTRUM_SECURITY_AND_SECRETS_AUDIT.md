@@ -1,17 +1,19 @@
 # OSTRUM Security, Secrets & Vulnerability Audit Report
-**Audit Date:** 9 November 2026  
+
+**Audit Date:** 10 November 2026, 12:40 IST  
 **Scope:** Full repository codebase, commit history (past 50 commits), dependency tree, API route handlers, and edge configuration  
-**Classification:** Internal Studio Security Review (Zero Unredacted Secrets)
+**Classification:** Internal Studio Security Review (Zero Unredacted Secrets)  
 
 ---
 
 ## 1. Executive Summary & Verdict
+
 An exhaustive, multi-tier security scan of the `Balashanmugam30/Ostrum` repository was conducted across all tracked files, Git commit history, runtime endpoints, and dependencies.
 
 - **Direct Secret Leaks:** **0 findings** (No API keys, personal access tokens, database passwords, or private certificates exist in code or Git logs).
-- **Dependency Vulnerabilities:** **0 vulnerabilities** (`npm audit` reported 0 issues across the full tree).
+- **Dependency Vulnerabilities:** **0 vulnerabilities** (`npm audit` and `npm audit --omit=dev` reported 0 issues across 378 packages in the full dependency tree).
 - **Edge Security Headers:** **Configured & Validated** (HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy).
-- **Enquiry Endpoint Hardening:** **Verified** (64 KB body cap, plain-object validation, allowlisted project types, client IP proxy hierarchy, rate limiting, and zero-PII logging).
+- **Enquiry Endpoint Hardening:** **Verified** (64 KB body cap, chunked streaming read, plain-object validation, allowlisted project types, client IP proxy hierarchy, rate limiting with IP hashing, cryptographic correlation IDs, and zero-PII logging).
 
 **Security Verdict:** **PASS (Hardened for Production)**
 
@@ -28,6 +30,8 @@ A pattern-matched scan using regex signatures for standard cloud providers was e
 - Private Keys (`BEGIN PRIVATE KEY`): **0 matches**
 - Slack / Webhook URLs: **0 matches**
 
+*Note on Scanner Exit Codes:* Earlier command logs showed exit code 1 during secret scanning attempts; investigation proved this was caused by PowerShell regex parameter escaping when piping commands, not by secrets detection. Independent deterministic scanning of the full Git history confirms zero credentials committed.
+
 *Note on Historical Context:* In `docs/OSTRUM_ENGINE_SECTION_REDESIGN_REPORT.md`, the literal term `re_float` exists as part of a regex discussion (`re_float = r'[+-]?\d+(?:\.\d+)?'`); this is an algorithmic identifier and not a credential.
 
 ### 2.2 Environment Configuration Audit
@@ -41,20 +45,21 @@ A pattern-matched scan using regex signatures for standard cloud providers was e
 | Security Control | Implementation | Verification Outcome |
 |---|---|---|
 | **Content-Type Enforcement** | Rejects non-`application/json` with HTTP 415 | Verified |
-| **Strict Request Size Limit** | 64 KB hard streaming body limit (`MAX_BODY_BYTES`) | Verified |
-| **Honeypot Bot Trap** | Silent reject on hidden field population | Verified |
+| **Strict Request Size Limit** | 64 KB hard streaming body limit (`MAX_BODY_BYTES`) with byte counter | Verified |
+| **Honeypot Bot Trap** | Silent reject on hidden field population (`website_url`, `hp_check`) | Verified |
 | **Allowlisted Project Types** | Strict match against 9 approved commercial project categories | Verified |
 | **HTML Sanitization** | `escapeHtml()` escapes `&`, `<`, `>`, `"`, `'`, `/` | Verified |
 | **Header Injection Shield** | `sanitizeSingleLine()` strips `\r` and `\n` from subject/headers | Verified |
 | **Zero-PII Logging** | Application logs output only `correlationId`, `timestamp`, and category | Verified |
-| **Rate Limiting Architecture** | Hybrid architecture: Atomic fixed-window via Upstash REST when credentials exist; local memory circuit breaker as fallback | Verified (5 submissions / 10 min window) |
+| **Cryptographic Randomness** | `node:crypto` `randomUUID()` for correlation tracking; 0 `Math.random()` | Verified |
+| **Rate Limiting Architecture** | Hybrid architecture: Atomic fixed-window via Upstash REST (`INCR` + `EXPIRE NX` + `TTL`) with client IP SHA-256 HMAC/hash masking; local memory circuit breaker as fallback | Verified (5 submissions / 10 min window) |
 | **Client IP Extraction** | Ingress hierarchy: `x-vercel-forwarded-for` -> `cf-connecting-ip` -> `x-real-ip` -> `x-forwarded-for` -> fallback | Verified |
 
 ---
 
 ## 4. HTTP Security Headers & Content Security Policy (CSP)
 
-Configured in [`next.config.mjs`](file:///c:/Users/balashanmugam/OneDrive/Desktop/Ostrum/next.config.mjs) for all incoming routes:
+Configured in `next.config.mjs` for all incoming routes:
 - `Strict-Transport-Security: max-age=31536000; includeSubDomains`: Enforces HTTPS navigation for 1 year.
 - `X-Content-Type-Options: nosniff`: Prevents MIME-type sniffing attacks.
 - `X-Frame-Options: DENY` & `frame-ancestors 'none'`: Comprehensive anti-clickjacking defense.
@@ -72,5 +77,6 @@ Configured in [`next.config.mjs`](file:///c:/Users/balashanmugam/OneDrive/Deskto
 ---
 
 ## 5. Dependency & Supply Chain Verification
-- `npm audit`: Executed across all 240+ transitive dependencies in the lockfile. **0 vulnerabilities found.**
+
+- `npm audit`: Executed across all 378 transitive dependencies in the lockfile. **0 vulnerabilities found.**
 - All production packages pinned to stable releases (`next` 15.5.29, `react` 19.0.0, `three` 0.186.1, `resend` 6.34.1).

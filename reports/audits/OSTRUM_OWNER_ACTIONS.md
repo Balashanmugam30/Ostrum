@@ -1,20 +1,22 @@
 # OSTRUM Mandatory Owner Launch Actions
+
+**Audit Date:** 10 November 2026, 12:50 IST  
 **Target Domain:** `https://theostrum.com`  
 **Hosting Destination:** Vercel  
-**Status:** Codebase Ready on `main` — Pending Owner-Side External Integrations
+**Status:** Codebase 100% Ready on `main` — Pending Owner-Side External Integrations  
 
 ---
 
 ## 1. Domain Registration & Vercel Linking
 1. **Domain Purchase & DNS Ownership:**
-   - Confirm ownership and registration of `theostrum.com`.
+   - Confirm ownership and registration of `theostrum.com` with your domain registrar.
 2. **Link GitHub Repository in Vercel:**
    - In the Vercel dashboard, click **Add New...** -> **Project**.
    - Import `Balashanmugam30/Ostrum` with production branch set to `main`.
 3. **Assign Custom Domain in Vercel:**
    - Go to **Project Settings** -> **Domains**.
    - Add `theostrum.com` and `www.theostrum.com`.
-   - Configure DNS records (A record to `76.76.21.21` and CNAME `www` to `cname.vercel-dns.com`).
+   - Configure DNS records (A record `@` to `76.76.21.21` and CNAME `www` to `cname.vercel-dns.com`).
 
 ---
 
@@ -22,17 +24,18 @@
 *Resend delivers outgoing notification emails; you must provision a real mailbox to receive them.*
 1. Provision the primary studio inbox `hello@theostrum.com` on your chosen email host (Google Workspace, Zoho Mail, Fastmail, or Proton).
 2. Ensure inbound MX records for that email provider are active in DNS so external emails reach the mailbox.
+3. Verify that `hello@theostrum.com` can receive inbound messages by sending a test email from a personal account.
 
 ---
 
 ## 3. Resend Sender Domain Verification & API Key
 1. Sign in to [Resend](https://resend.com) and add the sending domain `theostrum.com`.
-2. Add the generated DKIM and SPF DNS records to your DNS provider.
-3. Once verified, generate an API key with sending permissions.
-4. Add the following environment variables to your Vercel project:
+2. Add the generated DKIM, SPF, and return-path DNS records to your DNS provider without deleting existing MX records.
+3. Once verified, generate a restricted Sending API key (`re_...`).
+4. Add the following environment variables to your Vercel project (Production scope):
    - `RESEND_API_KEY`: Your Resend API key (`re_...`)
    - `OSTRUM_ENQUIRY_TO`: `hello@theostrum.com`
-   - `OSTRUM_ENQUIRY_FROM`: `OSTRUM Studio <notifications@theostrum.com>`
+   - `OSTRUM_ENQUIRY_FROM`: `OSTRUM Website <website@theostrum.com>`
    - `NEXT_PUBLIC_SITE_URL`: `https://theostrum.com`
 
 ---

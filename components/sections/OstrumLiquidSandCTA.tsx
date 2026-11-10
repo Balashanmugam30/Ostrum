@@ -50,17 +50,6 @@ export function OstrumLiquidSandCTA() {
         mobileDarkSrc="https://cdn.21st.dev/assets/mirror/9a/9a82cb59be1bfde59855b79d7a565e487155a89f4d52eac74dcc10e267b2b6d1.webp"
       >
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-6 sm:px-10 flex flex-col items-center text-center -translate-y-2 sm:-translate-y-4">
-          {/* Eyebrow */}
-          <p
-            data-testid="cta-eyebrow"
-            className="font-sans text-xs sm:text-sm font-semibold tracking-[0.24em] text-white/75 uppercase mb-3 sm:mb-4 select-text"
-            style={{
-              textShadow: '0 2px 4px rgba(0,0,0,0.85)',
-            }}
-          >
-            HAVE A PROJECT IN MIND?
-          </p>
-
           {/* Main Headline in Ostrum Condensed Font */}
           <h2
             data-testid="cta-heading"

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-09T17:23:20.327Z",
+  "timestamp": "2026-11-10T07:03:50.083Z",
   "commit": "HEAD",
   "browserVersion": "156.0.8078.4",
   "copyAssertions": {
@@ -21,7 +21,7 @@
   "testimonialDomAndSelection": {
     "backdropIsDomText": true,
     "selectionIsolation": true,
-    "selectedSnippet": "Custom digital platform for automotive detailing and ceramic",
+    "selectedSnippet": "A digital platform bringing service discovery, customer enqu",
     "pass": true
   },
   "footerLinkedIn": {
@@ -29,8 +29,8 @@
     "href": "https://www.linkedin.com/company/ostrum/",
     "ariaLabel": "OSTRUM on LinkedIn",
     "visible": true,
-    "svgWidth": 18,
-    "svgHeight": 18,
+    "svgWidth": 16,
+    "svgHeight": 16,
     "noViewAsMember": true,
     "pass": true
   },

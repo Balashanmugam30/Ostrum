@@ -1,7 +1,7 @@
 import { Testimonial } from '@/types/testimonials';
 
 /**
- * Authoritative Testimonials & Project Showcase Dataset
+ * Authoritative Project Highlights & Studio Showcase Dataset
  *
  * SAFETY & TRUTHFULNESS COMPLIANCE:
  * 1. Entry 01: TMR AI Car Care (Client website: https://tmraicarcare.com/)
@@ -13,7 +13,7 @@ import { Testimonial } from '@/types/testimonials';
  * 3. Entry 03: MNESA (OSTRUM Internal Venture / Opportunity Capture)
  *    Custom geometric blue capital 'M' mark. Truthful product architecture note.
  *    Marked contentType: 'project-note', approved: true, isPlaceholder: false.
- *    Ensures zero unapproved or fabricated external client endorsements.
+ *    Ensures zero unapproved or fabricated external client endorsements, zero fake ratings or reviews.
  */
 export const TESTIMONIALS_DATA: Testimonial[] = [
   {
@@ -27,7 +27,7 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     contentType: 'project-highlight',
     subtext: 'Automotive Digital Platform',
     quote:
-      'Custom digital platform for automotive detailing and ceramic protection studios, connecting customer intake, service exploration, and online booking workflows.',
+      'A digital platform bringing service discovery, customer enquiries and bookings together for an automotive care business.',
     company: 'TMR AI Car Care',
     role: 'Client System Showcase',
     approved: false,
@@ -44,7 +44,7 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     contentType: 'project-highlight',
     subtext: 'Digital Scheduling & Dispatch',
     quote:
-      'Digital booking and fleet lesson scheduling system engineered to coordinate student training schedules, vehicle dispatch, and RTO licensing instruction.',
+      'A scheduling and booking platform supporting student lessons, training schedules and vehicle coordination.',
     company: 'Saraswati Driving School',
     role: 'Client System Showcase',
     approved: false,
@@ -59,7 +59,7 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     contentType: 'project-note',
     subtext: 'Opportunity Capture & Follow-Through Platform',
     quote:
-      'MNESA is an OSTRUM venture exploring how people can capture opportunities, organize commitments and turn useful observations into structured follow-through workflows.',
+      'An OSTRUM venture exploring a simpler way to capture ideas, organise commitments and turn them into action.',
     company: 'Ostrum Ventures',
     role: 'Internal Venture Platform',
     approved: true,
