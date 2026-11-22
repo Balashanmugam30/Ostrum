@@ -215,10 +215,10 @@ cp .env.example .env.local
 
 | Variable | Description | Default / Production Guidance |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_BASE_URL` | Canonical base domain | `https://theostrum.com` |
+| `NEXT_PUBLIC_BASE_URL` | Canonical base domain | `https://www.theostrum.tech` |
 | `RESEND_API_KEY` | Resend API credential | Required for live email delivery via `api.resend.com` |
-| `OSTRUM_ENQUIRY_TO` | Recipient inbox for project briefs | Planned studio mailbox: `hello@theostrum.com` |
-| `OSTRUM_ENQUIRY_FROM` | Verified sender email address | Verified domain address (e.g. `website@theostrum.com`) |
+| `OSTRUM_ENQUIRY_TO` | Recipient inbox for project briefs | Studio mailbox: `hello@theostrum.tech` |
+| `OSTRUM_ENQUIRY_FROM` | Verified sender email address | Verified domain address (e.g. `website@theostrum.tech`) |
 | `NEXT_PUBLIC_OSTRUM_LINKEDIN_URL` | Official LinkedIn company profile | Set when company page is officially created |
 
 > **Security Note:** Secrets must never be committed to Git. In production deployments (Vercel, Render, etc.), configure these variables directly in your platform environment settings.
@@ -237,8 +237,8 @@ cp .env.example .env.local
 ## 10. Contact & Verification
 
 - **Repository:** [`https://github.com/Balashanmugam30/Ostrum`](https://github.com/Balashanmugam30/Ostrum)
-- **Planned Website:** `https://theostrum.com` *(Domain planned for registration)*
-- **Studio Inbox:** `hello@theostrum.com` *(Triage queue operational upon DNS setup)*
+- **Website:** `https://www.theostrum.tech` *(Canonical domain)*
+- **Studio Inbox:** `hello@theostrum.tech` *(Active studio mailbox)*
 - **Selected Work Client Sites:**
   - [TMR AI Car Care](https://tmraicarcare.com/)
   - [Saraswati Driving School](https://saraswati-driving-school.vercel.app/)

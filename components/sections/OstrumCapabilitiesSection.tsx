@@ -443,7 +443,7 @@ export function OstrumCapabilitiesSection() {
       <div
         ref={pinContainerRef}
         data-testid="capabilities-pin-container"
-        className="capabilities-stage sticky top-0 w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-12 sm:pt-14 md:pt-16 pb-3 sm:pb-5 bg-[#FFFFFF]"
+        className="capabilities-stage sticky top-0 w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-10 sm:pt-14 md:pt-16 pb-3 sm:pb-5 bg-[#FFFFFF]"
         style={{
           backgroundColor: '#FFFFFF',
         }}
@@ -500,7 +500,7 @@ export function OstrumCapabilitiesSection() {
                 key={card.index}
                 data-testid={`capability-card-${card.variant}`}
                 tabIndex={0}
-                className="capability-card group relative shrink-0 w-[310px] sm:w-[340px] md:w-[365px] lg:w-[388px] h-[450px] sm:h-[475px] md:h-[490px] rounded-[24px] p-5 sm:p-6 md:p-6 flex flex-col justify-between shadow-[0_16px_36px_-12px_rgba(11,11,16,0.08)] border border-black/[0.06] transition-[transform,box-shadow] duration-200 ease-out outline-none"
+                className="capability-card group relative shrink-0 w-[calc(100vw-3.5rem)] max-w-[310px] sm:w-[340px] md:w-[365px] lg:w-[388px] h-[400px] sm:h-[450px] md:h-[490px] rounded-[24px] p-5 sm:p-6 md:p-6 flex flex-col justify-between shadow-[0_16px_36px_-12px_rgba(11,11,16,0.08)] border border-black/[0.06] transition-[transform,box-shadow] duration-200 ease-out outline-none"
                 style={{
                   background: card.gradient,
                 }}
@@ -517,7 +517,7 @@ export function OstrumCapabilitiesSection() {
                 </div>
 
                 {/* 3D Dimensional Accent Viewport (Consistent Upper-Middle Frame) */}
-                <div className="capability-art-frame relative w-full h-[160px] sm:h-[172px] md:h-[180px] shrink-0 my-1 flex items-center justify-center overflow-hidden">
+                <div className="capability-art-frame relative w-full h-[125px] sm:h-[160px] md:h-[180px] shrink-0 my-1 flex items-center justify-center overflow-hidden">
                   <Card3DAccent
                     variant={card.variant}
                     data-testid={`capability-artwork-${card.variant}`}

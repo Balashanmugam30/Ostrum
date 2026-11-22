@@ -229,7 +229,7 @@ export function OstrumEngineSection() {
             ============================================================== */}
         <div
           ref={compositionWrapperRef}
-          className="w-full mt-12 md:mt-16 lg:mt-20 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-6 relative z-[22] bg-transparent"
+          className="w-full mt-8 sm:mt-14 md:mt-16 lg:mt-20 flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8 lg:gap-6 relative z-[22] bg-transparent"
         >
           {/* ============================================================
               LEFT IDENTITY ANCHOR: 01 / FOR BUSINESS
@@ -286,7 +286,7 @@ export function OstrumEngineSection() {
             <div
               id="section02-sculpture-slot"
               data-testid="ostrum-core-3d-container"
-              className="relative w-full aspect-square max-w-[340px] sm:max-w-[420px] md:max-w-[480px] lg:max-w-[520px] min-h-[340px] sm:min-h-[420px] md:min-h-[480px] lg:min-h-[520px] flex items-center justify-center pointer-events-auto bg-transparent"
+              className="relative w-full aspect-square max-w-[220px] sm:max-w-[420px] md:max-w-[480px] lg:max-w-[520px] min-h-[200px] sm:min-h-[420px] md:min-h-[480px] lg:min-h-[520px] flex items-center justify-center pointer-events-auto bg-transparent"
             />
           </div>
 

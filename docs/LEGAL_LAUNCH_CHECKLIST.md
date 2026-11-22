@@ -9,35 +9,35 @@
 
 ## 1. Domain Acquisition & DNS Readiness
 
-- [ ] **Domain Registration (`theostrum.com`):**
-  - Verify formal acquisition/purchase of `theostrum.com` via chosen registrar (e.g. Cloudflare Registrar, Namecheap, Google Domains/Squarespace).
+- [x] **Domain Registration (`theostrum.tech`):**
+  - Verify formal acquisition/purchase of `theostrum.tech` via chosen registrar (completed).
   - Enable WHOIS privacy protection and registrar lock.
   - Enable Multi-Factor Authentication (MFA) on registrar account.
-- [ ] **DNS Records Provisioning:**
-  - `A` / `AAAA` records configured for apex domain (`theostrum.com`).
-  - `CNAME` record configured for `www.theostrum.com`.
-  - Canonical redirect established: `theostrum.com` $\to$ `www.theostrum.com` (or vice-versa).
+- [x] **DNS Records Provisioning:**
+  - `A` / `AAAA` records configured for apex domain (`theostrum.tech`).
+  - `CNAME` record configured for `www.theostrum.tech`.
+  - Canonical redirect established: `theostrum.tech` $\to$ `www.theostrum.tech` (HTTP 308).
   - Vercel/Hosting domain verification completed.
-- [ ] **SSL / TLS Certificate:**
+- [x] **SSL / TLS Certificate:**
   - Automated TLS 1.3 certificate generated and auto-renewing.
   - HSTS (HTTP Strict Transport Security) header enabled.
-- [ ] **Environment Configuration:**
-  - Update production environment variable: `NEXT_PUBLIC_SITE_URL="https://theostrum.com"`.
+- [x] **Environment Configuration:**
+  - Update production environment variable: `NEXT_PUBLIC_SITE_URL="https://www.theostrum.tech"`.
   - Update `SITE_CONFIG.isDomainVerified = true` in `lib/site-config.ts`.
 
 ---
 
 ## 2. Mailbox & Email Authentication Readiness
 
-- [ ] **Business Mailbox Setup (`hello@theostrum.com`):**
-  - Provision Google Workspace, Fastmail, or Proton for Business account for `theostrum.com`.
-  - Verify receipt of test emails to `hello@theostrum.com`.
+- [x] **Business Mailbox Setup (`hello@theostrum.tech`):**
+  - Custom business mailbox configured for `theostrum.tech` (completed).
+  - Verify receipt of test emails to `hello@theostrum.tech`.
   - Configure forwarding / triage distribution list to studio principals.
 - [ ] **Mail Server DNS Records (SPF, DKIM, DMARC):**
   - **MX Records:** Primary and backup MX records configured with registrar.
   - **SPF:** TXT record matching provider (e.g. `v=spf1 include:_spf.google.com ~all`).
   - **DKIM:** 2048-bit DKIM key generated in email console and published via TXT DNS record.
-  - **DMARC:** TXT record published at `_dmarc.theostrum.com` with enforcement policy (`v=DMARC1; p=reject; rua=mailto:dmarc-reports@theostrum.com`).
+  - **DMARC:** TXT record published at `_dmarc.theostrum.tech` with enforcement policy (`v=DMARC1; p=reject; rua=mailto:dmarc-reports@theostrum.tech`).
 - [ ] **Inquiry Route (`/api/enquiry`):**
   - Configure production transactional mail provider (e.g. Resend, Postmark, AWS SES) API key in environment variables:
     - `RESEND_API_KEY` or `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`.

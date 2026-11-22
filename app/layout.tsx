@@ -7,16 +7,17 @@ import { OstrumContinuousJourney } from '@/components/visuals/OstrumContinuousJo
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
 import { SmoothScroll } from '@/components/providers/SmoothScroll';
+import { AnalyticsConsent } from '@/components/providers/AnalyticsConsent';
 import { SITE_CONFIG, hasValidLinkedIn, getVerifiedLinkedInUrl } from '@/lib/site-config';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_CONFIG.baseUrl),
   title: {
-    default: 'OSTRUM | Custom Software, AI Systems & Digital Product Engineering',
-    template: '%s | OSTRUM',
+    default: 'Ostrum Tech | Custom Software, AI Systems & Digital Product Engineering',
+    template: '%s | Ostrum Tech',
   },
   description:
-    'OSTRUM is an India-focused digital product engineering studio building custom business software, AI systems, web and mobile applications, and original digital products for ambitious businesses and founders.',
+    'Ostrum Tech (OSTRUM) is an India-focused digital product engineering studio building custom business software, AI systems, web and mobile applications, and original digital products for ambitious businesses and founders.',
   alternates: {
     canonical: '/',
   },
@@ -45,11 +46,11 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.webmanifest',
   openGraph: {
-    title: 'OSTRUM | Custom Software & AI Product Engineering',
+    title: 'Ostrum Tech | Custom Software & AI Product Engineering',
     description:
       'Custom software, AI automation, digital products and connected systems engineered around real business needs.',
     url: SITE_CONFIG.baseUrl,
-    siteName: 'OSTRUM',
+    siteName: 'Ostrum Tech',
     locale: 'en_IN',
     type: 'website',
     images: [
@@ -63,7 +64,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OSTRUM | Custom Software & AI Product Engineering',
+    title: 'Ostrum Tech | Custom Software & AI Product Engineering',
     description:
       'Custom software, AI automation, digital products and connected systems engineered around real business needs.',
     images: ['/images/ostrum-og.png'],
@@ -78,6 +79,9 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
+  },
+  verification: {
+    google: 'Cto_uunwjqVSnOUCc6aGf9kRAM3GH8r2BwAQO_MPpWA',
   },
 };
 
@@ -98,7 +102,8 @@ const jsonLd = {
     {
       '@type': 'Organization',
       '@id': `${SITE_CONFIG.baseUrl}/#organization`,
-      name: 'OSTRUM',
+      name: 'Ostrum Tech',
+      alternateName: ['OSTRUM', 'The Ostrum Tech'],
       url: SITE_CONFIG.baseUrl,
       logo: `${SITE_CONFIG.baseUrl}/brand/ostrum-3d-symbol-master.png`,
       email: SITE_CONFIG.contactEmail,
@@ -109,8 +114,9 @@ const jsonLd = {
     {
       '@type': 'WebSite',
       '@id': `${SITE_CONFIG.baseUrl}/#website`,
-      url: SITE_CONFIG.baseUrl,
-      name: 'OSTRUM',
+      url: `${SITE_CONFIG.baseUrl}/`,
+      name: 'Ostrum Tech',
+      alternateName: ['OSTRUM', 'The Ostrum Tech'],
       publisher: {
         '@id': `${SITE_CONFIG.baseUrl}/#organization`,
       },
@@ -133,6 +139,7 @@ export default function RootLayout({
       </head>
       <body className="bg-black text-white antialiased">
         <LanguageProvider>
+          <AnalyticsConsent />
           <PreloaderProvider>
             <SmoothScroll>
               {/* Fixed Luminous Caustics WebGL Background */}

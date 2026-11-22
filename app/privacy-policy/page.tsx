@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { SITE_CONFIG } from '@/lib/site-config';
+import { AnalyticsPreferencesButton } from '@/components/providers/AnalyticsConsent';
 import {
   LegalDocumentLayout,
   type LegalSectionItem,
@@ -41,7 +42,7 @@ const SECTIONS: LegalSectionItem[] = [
 ];
 
 export default function PrivacyPolicyPage() {
-  const lastUpdated = '23 October 2026';
+  const lastUpdated = '22 November 2026';
 
   return (
     <LegalDocumentLayout
@@ -176,7 +177,7 @@ export default function PrivacyPolicyPage() {
         </p>
         <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#262626]">
           <li><strong>Edge Hosting &amp; Serverless Infrastructure:</strong> High-performance content delivery networks (CDNs) for static asset distribution and serverless API execution;</li>
-          <li><strong>Email Delivery Infrastructure (Resend):</strong> Transactional email service provider utilized to route submitted project enquiries securely to studio notification mailboxes (<code className="px-1 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">hello@theostrum.com</code>);</li>
+          <li><strong>Email Delivery Infrastructure (Resend):</strong> Transactional email service provider utilized to route submitted project enquiries securely to studio notification mailboxes (<code className="px-1 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">{SITE_CONFIG.contactEmail}</code>);</li>
           <li><strong>Security &amp; DDoS Shielding:</strong> Edge firewalls that monitor inbound request patterns to prevent distributed denial-of-service attacks.</li>
         </ul>
       </section>
@@ -191,7 +192,7 @@ export default function PrivacyPolicyPage() {
           As an engineering studio collaborating with clients and technical partners globally, information collected by our cloud infrastructure may be processed on secure servers located outside your jurisdiction.
         </p>
         <p className="mt-3">
-          Whenever personal data is transferred across borders, we ensure that appropriate safeguards are established in accordance with applicable laws, including Standard Contractual Clauses (SCCs), robust technical encryption protocols, and verified compliance certifications.
+          Google Analytics data may be processed by Google in countries where Google or its service providers operate. For information about Google&apos;s handling of data, see the Google privacy links in the Cookies &amp; Local Storage section above. We apply appropriate safeguards to transfers where required by applicable law.
         </p>
       </section>
 
@@ -202,10 +203,21 @@ export default function PrivacyPolicyPage() {
           Cookies &amp; Local Storage
         </h2>
         <p>
-          Our public website does not employ third-party advertising cookies, cross-site behavioral tracking scripts, or commercial marketing pixels.
+          If you accept analytics in our privacy prompt, we use Google Analytics 4 to measure website visits and interactions such as page views and scrolls. Google Analytics uses cookies or similar identifiers to distinguish visits and generate aggregated reports. We do not use Google Analytics advertising features or send contact-form contents, names, email addresses, or other form fields to Analytics. Analytics remains disabled unless you choose “Accept analytics”; you can reject it or change your choice at any time using the control below.
         </p>
         <p className="mt-3">
-          We utilize only minimal, essential browser storage mechanisms necessary for the core operation of the site, including ephemeral session flags in sessionStorage (such as recording completion of the initial visual cinematic sequence during a single browsing session) while querying browser media preferences such as <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">prefers-reduced-motion</code> without persisting them to disk.
+          Google may process analytics data on its systems and use it to provide the service. Learn more in{' '}
+          <a className="text-[#64120F] underline" href="https://policies.google.com/technologies/partner-sites" rel="noreferrer" target="_blank">
+            How Google uses information from sites or apps that use its services
+          </a>{' '}
+          and the{' '}
+          <a className="text-[#64120F] underline" href="https://policies.google.com/privacy" rel="noreferrer" target="_blank">
+            Google Privacy Policy
+          </a>.
+        </p>
+        <AnalyticsPreferencesButton />
+        <p className="mt-3">
+          We store your analytics choice in localStorage so the site can remember whether you accepted or rejected optional measurement. When analytics is accepted, Google Analytics may store cookies or similar identifiers on your device. The site also uses short-lived sessionStorage flags for core presentation behavior, such as remembering that the opening animation has completed during the current session.
         </p>
       </section>
 
@@ -265,7 +277,7 @@ export default function PrivacyPolicyPage() {
           Do Not Track &amp; Browser Privacy Controls
         </h2>
         <p>
-          Our public showcase website does not deploy third-party advertising cookies, commercial tracking pixels, or cross-site behavioral profiling tools. Standard website browsing does not initiate behavioral data capture mechanisms addressed by &ldquo;Do Not Track&rdquo; (DNT) or Global Privacy Control (GPC) signals.
+          Analytics measurement is optional and is disabled until you grant consent. You can withdraw consent at any time from the Cookies &amp; Local Storage section of this policy. We do not use advertising features or cross-site behavioral profiling. We honor browser Global Privacy Control and Do Not Track signals by keeping Analytics disabled.
         </p>
       </section>
 

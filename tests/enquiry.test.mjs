@@ -228,7 +228,7 @@ describe('4. Resend Mailer Dispatch & Mock Integration', () => {
 
     // Assert to is array with server configured address
     assert.ok(Array.isArray(capturedPayload.to));
-    assert.strictEqual(capturedPayload.to[0], process.env.OSTRUM_ENQUIRY_TO || 'hello@theostrum.com');
+    assert.strictEqual(capturedPayload.to[0], process.env.OSTRUM_ENQUIRY_TO || 'hello@theostrum.tech');
     // Assert replyTo is visitor's validated address
     assert.strictEqual(capturedPayload.replyTo, 'linus@kernel.org');
   });

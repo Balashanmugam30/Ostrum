@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         {
           success: false,
           error:
-            'Enquiry service is temporarily unavailable. Please email us directly at hello@theostrum.com.',
+            'Enquiry service is temporarily unavailable. Please email us directly at hello@theostrum.tech.',
         },
         {
           status: 503,
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       {
         success: false,
         error:
-          'Too many enquiry submissions from this connection. Please wait a few moments or email hello@theostrum.com directly.',
+          'Too many enquiry submissions from this connection. Please wait a few moments or email hello@theostrum.tech directly.',
       },
       {
         status: 429,

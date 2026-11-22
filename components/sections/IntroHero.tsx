@@ -25,7 +25,7 @@ export function IntroHero() {
 
   return (
     <section data-selection-surface="dark"
-      className="intro relative z-[10] w-full h-[100svh] min-h-[640px] flex flex-col items-center justify-center overflow-hidden px-4">
+      className="intro relative z-[10] w-full h-[100svh] min-h-[480px] sm:min-h-[640px] flex flex-col items-center justify-center overflow-hidden px-4">
       {/* Living Connected Strand - Signature organic art element */}
       <div
         className={`transition-opacity duration-700 ease-out ${
@@ -50,7 +50,7 @@ export function IntroHero() {
 
       {/* Main Statement & Dual Positioning */}
       <div
-        className={`mt-8 md:mt-12 text-center max-w-[760px] px-6 z-10 flex flex-col items-center transition-all duration-700 ease-out ${
+        className={`mt-5 sm:mt-8 md:mt-12 text-center max-w-[760px] px-6 z-10 flex flex-col items-center transition-all duration-700 ease-out ${
           isRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
         }`}
       >

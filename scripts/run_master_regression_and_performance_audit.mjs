@@ -531,8 +531,8 @@ async function runMasterAudit() {
       frenchRobots: frenchSeo.robots,
       logoAssetStatus: logoStatus,
       ogAssetStatus: ogStatus,
-      robotsValid: robotsText.includes('Sitemap: https://theostrum.com/sitemap.xml'),
-      sitemapValid: sitemapText.includes('https://theostrum.com/terms-and-conditions'),
+      robotsValid: robotsText.includes('Sitemap: https://www.theostrum.tech/sitemap.xml'),
+      sitemapValid: sitemapText.includes('https://www.theostrum.tech/terms-and-conditions'),
       jsonLdVerified: homeSeo.hasJsonLd,
     };
 

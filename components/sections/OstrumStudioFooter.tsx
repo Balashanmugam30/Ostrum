@@ -71,7 +71,7 @@ export function OstrumStudioFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-7">
           {/* Tile 1: White Surface / Email Inquiry */}
           <a
-            href="mailto:hello@theostrum.com"
+            href={`mailto:${SITE_CONFIG.contactEmail}`}
             data-testid="footer-tile-email"
             data-selection-surface="light"
             className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-white text-[#050505] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,255,255,0.14)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ostrum-footer-accent,#C9362B)]"
@@ -87,7 +87,7 @@ export function OstrumStudioFooter() {
 
             <div className="flex items-center justify-between pt-6 border-t border-black/10">
               <span className="font-sans text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-[#050505] group-hover:text-[var(--ostrum-footer-accent,#C9362B)] transition-colors">
-                hello@theostrum.com
+                {SITE_CONFIG.contactEmail}
               </span>
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-black/15 flex items-center justify-center transition-all duration-300 group-hover:border-[var(--ostrum-footer-accent,#FF4D30)] group-hover:bg-[var(--ostrum-footer-accent,#FF4D30)] group-hover:text-white">
                 <svg

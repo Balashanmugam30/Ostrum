@@ -564,7 +564,7 @@ export function OstrumEnergyNarrativeSection() {
       {/* Pinned Viewport Stage Container */}
       <div
         ref={pinContainerRef}
-        className="w-full h-screen min-h-[640px] flex items-center justify-center relative overflow-hidden pointer-events-auto"
+        className="w-full h-screen min-h-[500px] sm:min-h-[640px] flex items-center justify-center relative overflow-hidden pointer-events-auto"
       >
         {/* Center Slot for Continuous 3D Sculpture Alignment */}
         <div

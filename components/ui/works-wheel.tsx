@@ -346,18 +346,19 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
       // Drum mode thumbnail size:
       // Desktop: 42-46% viewport width, 48-56% viewport height
       // Tablet: 48-54% viewport width
-      // Mobile: 82-86% viewport width
+      // Mobile: 75-78% viewport width (calibrated to stack cleanly above text)
       const cardW = isDesktop
         ? Math.min(w * 0.44, h * 0.54 * CARD_RATIO)
         : isTablet
         ? Math.min(w * 0.52, h * 0.46 * CARD_RATIO)
-        : Math.min(w * 0.84, 340);
+        : Math.min(w * 0.78, 290);
 
       const cardH = cardW / CARD_RATIO;
 
-      // In drum mode, shift the drum to the right on desktop/tablet to create the 2-column layout
+      // In drum mode, shift the drum to the right on desktop/tablet to create the 2-column layout.
+      // On mobile, keep horizontally centered (drumShiftX = 0) and shift into upper zone to prevent text overlap.
       const drumShiftX = isDesktop ? w * 0.22 : isTablet ? w * 0.20 : 0;
-      const drumShiftY = isMobile ? -h * 0.12 : 0;
+      const drumShiftY = isMobile ? -Math.max(h * 0.17, 105) : 0;
 
       // In oval mode (m = 0):
       // Desktop target footprint: 82-88% width, 58-66% height
@@ -847,34 +848,34 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
           </span>
         </div>
 
-        {/* Left Column: Active Project Information in Drum Mode */}
+        {/* Left Column (Desktop) / Lower Region (Mobile): Active Project Information in Drum Mode */}
         <div
           ref={leftPanelRef}
           data-testid="works-wheel-left-panel"
-          className="pointer-events-auto absolute top-1/2 left-[6%] sm:left-[8%] lg:left-[9%] -translate-y-1/2 max-w-[85vw] sm:max-w-[42vw] lg:max-w-[36vw] z-20 select-text"
+          className="pointer-events-auto absolute z-20 select-text w-full max-w-[90vw] left-1/2 -translate-x-1/2 text-center top-[56%] sm:top-1/2 sm:-translate-y-1/2 sm:left-[8%] lg:left-[9%] sm:translate-x-0 sm:text-left sm:max-w-[42vw] lg:max-w-[36vw]"
           style={{ opacity: 0 }}
         >
           <h3
             data-testid="works-wheel-project-title"
-            className="font-sans font-bold tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.08] mb-4 transition-colors duration-300 ease-out"
+            className="font-sans font-bold tracking-tight text-2xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.08] mb-2 sm:mb-4 transition-colors duration-300 ease-out"
             style={{ color: activeTheme.textColor }}
           >
             {items[active]?.title}
           </h3>
           <p
             data-testid="works-wheel-project-description"
-            className="font-sans text-sm sm:text-base lg:text-lg leading-relaxed mb-6 max-w-[32ch] sm:max-w-[38ch] transition-colors duration-300 ease-out"
+            className="font-sans text-xs sm:text-base lg:text-lg leading-relaxed mb-3 sm:mb-6 max-w-[34ch] sm:max-w-[38ch] mx-auto sm:mx-0 transition-colors duration-300 ease-out"
             style={{ color: activeTheme.textMuted }}
           >
             {items[active]?.description}
           </p>
           {items[active]?.href?.startsWith("http") && (
-            <div className="pointer-events-auto">
+            <div className="pointer-events-auto flex justify-center sm:justify-start">
               <a
                 href={items[active]?.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm sm:text-base font-semibold transition-colors duration-300 ease-out group"
+                className="inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-base font-semibold transition-colors duration-300 ease-out group"
                 style={{ color: activeTheme.linkColor }}
               >
                 <span>Visit Platform</span>

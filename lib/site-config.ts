@@ -1,10 +1,9 @@
 /**
  * Centralized OSTRUM Site & Brand Configuration
  *
- * NOTE ON PLANNED DOMAIN & EMAIL:
- * The owner has stated that the domain `theostrum.com` is planned for purchase.
- * Do not assert that it is registered, deployed, or that mailbox delivery is operational
- * until verified by the owner.
+ * OFFICIAL DOMAIN & BUSINESS MAILBOX:
+ * Official canonical domain: https://www.theostrum.tech/ (apex theostrum.tech redirects 308 to www.theostrum.tech)
+ * Official primary contact mailbox: hello@theostrum.tech
  */
 
 export const LINKEDIN_PLACEHOLDER =
@@ -15,11 +14,14 @@ export const SITE_CONFIG = {
   brandLegalName: 'Ostrum',
   brandTagline: 'Digital Product Engineering & Custom Software Studio',
 
-  // Planned production base URL (unverified / planned for purchase)
-  baseUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://theostrum.com',
+  // Official production base URL (canonical www.theostrum.tech)
+  baseUrl:
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    'https://www.theostrum.tech',
 
-  // Planned primary contact mailbox (unverified / planned)
-  contactEmail: 'hello@theostrum.com',
+  // Official primary contact mailbox
+  contactEmail: 'hello@theostrum.tech',
 
   // Company LinkedIn URL (configured centrally; placeholder or unset until official page is created)
   linkedInUrl: process.env.NEXT_PUBLIC_OSTRUM_LINKEDIN_URL || 'https://www.linkedin.com/company/ostrum/',
@@ -29,7 +31,8 @@ export const SITE_CONFIG = {
   mnesaGithubUrl: 'https://github.com/Balashanmugam30/mnesa',
 
   // Launch verification flags
-  isDomainVerified: false,
+  isDomainVerified: true,
+  // Kept false until transactional sender DNS verification (DKIM/SPF) is formally verified with Resend
   isMailboxVerified: false,
 } as const;
 

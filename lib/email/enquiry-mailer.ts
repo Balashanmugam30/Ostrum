@@ -630,11 +630,11 @@ export async function sendEnquiryNotification(
   const toAddress =
     process.env.OSTRUM_ENQUIRY_TO ||
     process.env.CONTACT_NOTIFICATION_EMAIL ||
-    'hello@theostrum.com';
+    'hello@theostrum.tech';
   const fromAddress =
     process.env.OSTRUM_ENQUIRY_FROM ||
     process.env.RESEND_FROM_EMAIL ||
-    'OSTRUM Website <website@theostrum.com>';
+    'OSTRUM Website <website@theostrum.tech>';
 
   const correlationId = `ost_${randomUUID().substring(0, 8)}`;
   const timestamp = new Date().toISOString();
@@ -658,7 +658,7 @@ export async function sendEnquiryNotification(
     console.log('[Enquiry Mailer: Mocked Mode Accepted]', {
       correlationId,
       timestamp,
-      recipientDomain: toAddress.split('@')[1] || 'theostrum.com',
+      recipientDomain: toAddress.split('@')[1] || 'theostrum.tech',
     });
     return {
       success: true,
@@ -679,7 +679,7 @@ export async function sendEnquiryNotification(
       status: 503,
       errorCategory: 'missing_config',
       error:
-        'Enquiry service is currently offline for scheduled maintenance. Please reach out directly to hello@theostrum.com.',
+        'Enquiry service is currently offline for scheduled maintenance. Please reach out directly to hello@theostrum.tech.',
     };
   }
 
@@ -708,7 +708,7 @@ export async function sendEnquiryNotification(
         status: 502,
         errorCategory: 'provider_error',
         error:
-          'Unable to deliver notification at this time. Please try again shortly or reach us directly at hello@theostrum.com.',
+          'Unable to deliver notification at this time. Please try again shortly or reach us directly at hello@theostrum.tech.',
       };
     }
 
@@ -736,7 +736,7 @@ export async function sendEnquiryNotification(
       status: 500,
       errorCategory: 'provider_error',
       error:
-        'Failed to process enquiry notification. Please reach out directly to hello@theostrum.com.',
+        'Failed to process enquiry notification. Please reach out directly to hello@theostrum.tech.',
     };
   }
 }

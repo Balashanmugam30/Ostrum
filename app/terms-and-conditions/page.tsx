@@ -70,13 +70,13 @@ export default function TermsAndConditionsPage() {
       <section id="identity" className="scroll-mt-24 pb-10 border-b border-[#E5E5E5]">
         <h2 className="text-xl sm:text-2xl font-bold text-[#050505] mb-3 flex items-baseline gap-3">
           <span className="font-mono text-sm text-[#64120F] font-semibold">02</span>
-          Studio Identity &amp; Planned Brand Domain
+          Studio Identity &amp; Official Website
         </h2>
         <p>
-          OSTRUM operates as an independent digital product engineering, technology architecture, and venture design studio. The studio is in the active process of acquiring and provisioning its primary branded domain, planned as <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>, with associated studio communications planned at <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">{SITE_CONFIG.contactEmail}</code>.
+          OSTRUM operates as an independent digital product engineering, technology architecture, and venture design studio. Its official website is <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>. Contact the studio at <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">{SITE_CONFIG.contactEmail}</code>.
         </p>
         <p className="mt-3">
-          The publication of planned domain endpoints, studio designations, and future infrastructure within this website reflects current architectural planning and does not assert that third-party domain registrar transfers, external mail server MX records, or related public infrastructure have concluded final administrative provisioning.
+          The website is served through managed hosting. Transactional email and other services that depend on external providers are subject to those providers&apos; availability and configuration.
         </p>
       </section>
 
