@@ -184,17 +184,16 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
 
       const reveal = gsap.fromTo(
         stage,
-        { autoAlpha: 0.78, y: 28 },
+        { autoAlpha: 0.68, y: 72 },
         {
           autoAlpha: 1,
           y: 0,
-          duration: 1,
-          ease: 'power2.out',
+          ease: 'none',
           scrollTrigger: {
             trigger: stage,
             start: 'top 94%',
-            end: 'top 62%',
-            scrub: 0.45,
+            end: 'top 64%',
+            scrub: 0.35,
             invalidateOnRefresh: true,
             id: showCTA ? 'mobile-footer-reveal-cta' : 'mobile-footer-reveal-legal',
           },

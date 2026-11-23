@@ -252,7 +252,7 @@ export function OstrumTestimonialsSection({
             TESTIMONIALS
           </h2>
 
-          <div className="w-full max-w-[480px] flex flex-col gap-8">
+          <div className="w-full max-w-[360px] sm:max-w-[480px] flex flex-col gap-6 sm:gap-8">
             {items.map((testimonial, index) => (
               <div
                 key={testimonial.id}
@@ -261,7 +261,7 @@ export function OstrumTestimonialsSection({
                 data-client={testimonial.clientName}
                 data-placeholder={testimonial.isPlaceholder}
                 data-approved={testimonial.approved}
-                className="w-full rounded-[4px] p-6 sm:p-8 text-black"
+                className="w-full rounded-[4px] p-4 sm:p-8 text-black"
                 style={{
                   backgroundColor: index % 2 === 1 ? '#EEEEEE' : '#FFFFFF',
                   boxShadow:
@@ -271,7 +271,7 @@ export function OstrumTestimonialsSection({
                 }}
               >
                 {/* Logo Area */}
-                <div className="h-10 sm:h-12 flex items-center justify-center text-center select-text mb-5">
+                <div className="h-8 sm:h-12 flex items-center justify-center text-center select-text mb-3 sm:mb-5">
                   {testimonial.logoType === 'mnesa-mark' ? (
                     <div
                       data-testid="mnesa-blue-m-mark"
@@ -302,7 +302,7 @@ export function OstrumTestimonialsSection({
                   </span>
                   <p
                     data-testid="testimonial-quote-text"
-                    className="font-sans text-[15px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em] select-text"
+                    className="font-sans text-[14px] sm:text-[17px] md:text-[18px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em] select-text"
                   >
                     &ldquo;{renderQuoteWithEmphasis(testimonial.quote, testimonial.emphasis)}&rdquo;
                   </p>
@@ -354,7 +354,7 @@ export function OstrumTestimonialsSection({
         {/* Foreground Testimonial Card Stack (Layer: z-20 to z-30) */}
         <div
           data-testid="testimonials-card-stack"
-          className="relative z-20 w-full max-w-[440px] sm:max-w-[465px] md:max-w-[480px] flex items-center justify-center h-[310px] sm:h-[330px] md:h-[345px]"
+          className="relative z-20 w-full max-w-[360px] sm:max-w-[465px] md:max-w-[480px] flex items-center justify-center h-[260px] sm:h-[288px] md:h-[345px]"
         >
           {items.map((testimonial, index) => (
             <div
@@ -367,7 +367,7 @@ export function OstrumTestimonialsSection({
               data-client={testimonial.clientName}
               data-placeholder={testimonial.isPlaceholder}
               data-approved={testimonial.approved}
-              className="absolute inset-0 flex flex-col justify-between rounded-[4px] p-6 sm:p-7 md:p-8 text-black select-text cursor-default will-change-transform"
+              className="absolute inset-0 flex flex-col justify-between rounded-[4px] p-4 sm:p-6 md:p-8 text-black select-text cursor-default will-change-transform"
               style={{
                 backgroundColor: index % 2 === 1 ? '#EEEEEE' : '#FFFFFF',
                 boxShadow:
@@ -378,7 +378,7 @@ export function OstrumTestimonialsSection({
               }}
             >
               {/* Element 1 (Top Area): Authentic Client Logo or MNESA Mark */}
-              <div className="h-10 sm:h-12 flex items-center justify-center text-center select-text shrink-0">
+              <div className="h-8 sm:h-12 flex items-center justify-center text-center select-text shrink-0">
                 {testimonial.logoType === 'mnesa-mark' ? (
                   <div
                       data-testid="mnesa-blue-m-mark"
@@ -410,7 +410,7 @@ export function OstrumTestimonialsSection({
                 </span>
                 <p
                   data-testid="testimonial-quote-text"
-                  className="font-sans text-[16px] sm:text-[17px] md:text-[18px] lg:text-[19px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em] select-text"
+                  className="font-sans text-[14px] sm:text-[17px] md:text-[18px] lg:text-[19px] font-normal leading-[1.42] text-[#111111] tracking-[-0.015em] select-text"
                 >
                   &ldquo;{renderQuoteWithEmphasis(testimonial.quote, testimonial.emphasis)}&rdquo;
                 </p>

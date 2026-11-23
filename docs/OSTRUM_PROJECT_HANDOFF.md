@@ -69,3 +69,14 @@ Responsive regression sizes used on the repair: `320×568`, `360×640`, `375×66
 ## Known limitation to carry forward
 
 The mobile layout/repetition defect is fixed and the mobile payload was reduced substantially, but Lighthouse performance remains weak in the local production audit. The 2026-11-23 local runs scored 43–44/100 performance (Accessibility, Best Practices and basic SEO each scored 100). The largest remaining costs are first-load JavaScript execution and a long main-thread block. In one audit Lighthouse selected the analytics-consent description as the LCP element, making LCP noisy; do not compare one run’s score as a stable benchmark. A follow-up also fixed mobile Capabilities reveal/artwork and touch-scroll handoff; the new release has not yet been measured with Lighthouse. Keep performance as an open workstream and profile JavaScript/3D startup before broad visual rewrites.
+
+## Latest mobile-only follow-up (2026-11-23)
+
+- Scope: mobile scrolling/reflow, mobile CTA-to-footer reveal, mobile testimonial sizing, and mobile Selected Work text placement. Desktop breakpoint behavior was explicitly checked and preserved.
+- `app/globals.css` keeps `#capabilities` and the CTA/footer wrapper in normal phone document flow and applies `overscroll-behavior-y: none` below 768px. This prevents a stale pinned section from visually reappearing beyond the footer.
+- Mobile footer reveal now travels 72px and uses a linear scrub range; desktop keeps its existing pinned curtain.
+- Mobile testimonial cards use a 260px stack, maximum 360px width, tighter padding, and 14px quotes. The desktop card stack remains 345px.
+- Mobile Selected Work descriptions begin at 60% of the stage; desktop remains at 50% (`sm:top-1/2`).
+- Local production-build checks passed: lint, typecheck, 29 tests, production dependency audit, build, all 13 responsive sizes, capability reveal/3D, footer scrub, and eight mobile scroll cycles. No page/console/network errors were observed.
+- The 13-size test includes desktop widths as regression checks; all had zero horizontal overflow. A Playwright desktop check confirmed the pinned desktop footer and unchanged desktop testimonial stack.
+- No physical Android browser, new Lighthouse run, or blank-page reproduction was available during this follow-up.

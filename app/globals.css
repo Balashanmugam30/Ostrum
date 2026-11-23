@@ -10,6 +10,35 @@
 }
 
 @media (max-width: 767px) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+
+  /* Keep the Capabilities and final footer sections in document flow on
+     phones, even if a prior scrubbed transition leaves inline pin styles. */
+  #capabilities {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    margin-bottom: 0 !important;
+  }
+
+  #capabilities [data-testid='capabilities-pin-container'] {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
+  }
+
+  #theatre-stage-wrapper {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    transform: none !important;
+  }
+
   [data-show-cta='true'] [data-testid='theatre-curtain-panel'],
   [data-show-cta='true'] [data-testid='theatre-stage-panel'] {
     position: relative !important;

@@ -852,7 +852,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
         <div
           ref={leftPanelRef}
           data-testid="works-wheel-left-panel"
-          className="pointer-events-auto absolute z-20 select-text w-full max-w-[90vw] left-1/2 -translate-x-1/2 text-center top-[56%] sm:top-1/2 sm:-translate-y-1/2 sm:left-[8%] lg:left-[9%] sm:translate-x-0 sm:text-left sm:max-w-[42vw] lg:max-w-[36vw]"
+          className="pointer-events-auto absolute z-20 select-text w-full max-w-[90vw] left-1/2 -translate-x-1/2 text-center top-[60%] sm:top-1/2 sm:-translate-y-1/2 sm:left-[8%] lg:left-[9%] sm:translate-x-0 sm:text-left sm:max-w-[42vw] lg:max-w-[36vw]"
           style={{ opacity: 0 }}
         >
           <h3

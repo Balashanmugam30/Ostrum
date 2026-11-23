@@ -193,3 +193,26 @@ The viewport and scroll checks verify layout, DOM counts, animation state and co
 - Live mobile 3D check: a near-screen capability rendered a nonzero-size Three.js canvas; at most two of six artwork canvases were mounted during the probe; footer reveal showed nonzero scroll progress; zero horizontal overflow and no page errors.
 - Live public route checks: homepage, `/sitemap.xml`, and `/robots.txt` each returned HTTP 200. The canonical tag points to `https://www.theostrum.tech`; sitemap contains three canonical-domain URLs; robots.txt references the sitemap.
 - Browser validation used Playwright mobile emulation, not a physical Android handset. No new Lighthouse run was performed; the prior Lighthouse scores remain the baseline and mobile performance remains an open workstream.
+
+## Mobile-only regression follow-up — 2026-11-23
+
+### Scope and findings
+
+- The reported repeated Capabilities content after the footer was not reproduced as duplicate DOM content: all local browser samples contain exactly one `#capabilities` section, six capability cards, one CTA, and one footer. The document height and bottom scroll position stayed stable through repeated end-of-page checks.
+- Added a phone-only CSS guard that keeps Capabilities and the CTA/footer wrapper in normal document flow even if stale scroll-pinning inline styles are present. Added native overscroll containment on phones to avoid scrolling beyond the final document edge.
+- Increased the mobile CTA-to-footer reveal travel and tied its transform/opacity to scroll progress. Confirmed visible movement at 50% progress.
+- Reduced the testimonial stack from 310px to 260px at phone widths, narrowed the card stack to 360px, tightened padding/logo spacing, and set quote type to 14px. The 288px intermediate breakpoint and 345px desktop stack remain intact.
+- Moved Selected Work's mobile description panel from 56% to 60% of its stage height. The desktop `sm:top-1/2` positioning remains intact.
+
+### Verification
+
+- `npm run lint`: PASS (no warnings/errors; Next.js emitted its existing `next lint` deprecation notice).
+- `npm run typecheck`: PASS.
+- `npm test`: PASS, 29/29.
+- `npm audit --omit=dev`: PASS, zero production vulnerabilities.
+- `npm run build`: PASS; all 10 routes generated.
+- Playwright production-build viewport matrix: all 13 sizes from 320×568 through 1648×928 had zero horizontal overflow, one Capabilities section, six cards, and no page errors.
+- Mobile Playwright interaction check at 390×844: Capabilities reveal activated; first visible card mounted a nonzero Three.js canvas; at most two of six artwork canvases were mounted; footer reveal progressed to about 0.50 and visibly translated; scrolling returned to y=0; no page or console errors.
+- Mobile scroll stress at 390×844: eight alternating top/footer passes; stable document height (21,418px), stable maximum scroll (20,574px), one Capabilities section and one footer, no failed requests or page errors.
+- Desktop regression check at 1440×900: testimonial stack remains 345px; desktop Selected Work retains `sm:top-1/2`; desktop CTA/footer curtain ScrollTrigger remains pinned; no page errors.
+- This was browser emulation, not a physical Android handset test. The supplied blank-page screenshot was not reproduced in this run. No new Lighthouse measurement was taken.
