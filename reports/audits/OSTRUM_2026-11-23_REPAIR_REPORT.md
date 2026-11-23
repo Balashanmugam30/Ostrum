@@ -184,4 +184,12 @@ This follow-up has been verified locally and is deployed to production; the live
 - Mobile scroll stress: eight alternating top-to-bottom and bottom-to-top page passes reached the real document bottom and returned to scroll position 0. The DOM still contained one Capabilities section, one CTA and one footer; background scroll offset/darkening reset at the top; no page or console errors. This automation used abrupt browser scroll commands, not a physical handset fling.
 - Desktop 1440×900 Capabilities pin check: the horizontal track moved during the pinned interval and released afterward; six desktop WebGL canvases remained, with no page errors.
 
-The viewport and scroll checks verify layout, DOM counts, animation state and console behavior. They do not reproduce every Android browser/OS combination or measure a new Lighthouse score. No production form was submitted. The latest local changes are not yet included in the prior production deployment; release status will be recorded after authorized publication and live verification.
+The viewport and scroll checks verify layout, DOM counts, animation state and console behavior. They do not reproduce every Android browser/OS combination or measure a new Lighthouse score. No production form was submitted.
+
+### Production verification — mobile follow-up — 2026-11-23
+
+- Commit `aec62f68c1eda0fe45cc1139d01caa8cca2fed43` was pushed to `main` and deployed by Vercel as production deployment `dpl_FirQad3g4MM9RwNbRyYVprvDBwfd` (`READY`). The deployment aliases include `www.theostrum.tech` and `theostrum.tech`.
+- Live Playwright mobile scroll stress at `https://www.theostrum.tech/`: eight up/down page passes reached the footer and returned to the top; one Capabilities section, one CTA and one footer; no page/console errors.
+- Live mobile 3D check: a near-screen capability rendered a nonzero-size Three.js canvas; at most two of six artwork canvases were mounted during the probe; footer reveal showed nonzero scroll progress; zero horizontal overflow and no page errors.
+- Live public route checks: homepage, `/sitemap.xml`, and `/robots.txt` each returned HTTP 200. The canonical tag points to `https://www.theostrum.tech`; sitemap contains three canonical-domain URLs; robots.txt references the sitemap.
+- Browser validation used Playwright mobile emulation, not a physical Android handset. No new Lighthouse run was performed; the prior Lighthouse scores remain the baseline and mobile performance remains an open workstream.
