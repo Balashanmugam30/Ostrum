@@ -108,3 +108,16 @@ No production form was submitted during testing. Environment secret values were 
 2. Re-run Lighthouse on the deployed URL after publication on stable hardware/network settings, several times, and compare median metrics.
 3. Authenticated Google Search Console inspection and structured-data Rich Results validation are not available from this session; verify those separately when the Google account connector is available.
 4. Confirm inbound `hello@theostrum.tech` delivery with a real mailbox test before setting `isMailboxVerified: true`.
+
+## Release verification addendum — 2026-11-23
+
+- Repair commit `26c65cea5c4f14419687f6a5d7fd1d87f3b35e97` is on `main`; GitHub CI Quality Gate completed successfully.
+- Vercel production deployment `dpl_76P5HHccLpJc513nDLCsadwSYHS4` is `READY`, targets `main` at that exact commit, and is aliased to `www.theostrum.tech` and `theostrum.tech`.
+- Production browser verification completed at `https://www.theostrum.tech/` for 13 viewport sizes (320×568 through 1648×928): 0 horizontal overflow at every size; exactly one Capabilities section and six cards at each size. A mobile scroll reached the bottom with six unique project card labels. Header contrast switched to dark text over light sections and ivory text over dark sections. No browser console errors.
+- The rapid-scroll browser run recorded three lazy-loaded project images as `net::ERR_ABORTED` while moving between sections. These are browser navigation/scroll aborts in the test, not uncaught page errors; do not treat this as proof of a clean zero-failed-request run. Recheck image delivery under a controlled scroll if investigating further.
+- Public production checks: homepage HTTP 200 with canonical `https://www.theostrum.tech/`, Google site-verification metadata and Organization/WebSite structured data; `/sitemap.xml` HTTP 200 with three canonical `.tech` URLs; `/robots.txt` HTTP 200 with the sitemap URL; apex `https://theostrum.tech/` redirects with HTTP 308 to the `www` canonical.
+- Lighthouse remains the main unresolved quality gap. The recorded local mobile/desktop runs scored in the low 40s and desktop ~59, driven mostly by long JavaScript/main-thread work. Changes reduced the mobile model/background asset weight and improved mobile layout, but do not claim a performance score target has been met. Run repeated Lighthouse tests on the live URL under fixed settings before calling performance resolved.
+- Google Search Console property and sitemap submission were previously reported as configured, but authenticated Search Console state and indexing are not available to verify with the current connector set. Public sitemap availability does not prove indexing or ranking.
+- Analytics remains consent-gated; do not bypass consent to send telemetry. Verify GA4 events after an explicit consent acceptance in a real browser/account.
+- The enquiry database is used for rate limiting only; the form payload is not stored in Redis. No production enquiry was sent during browser testing. Resend verifies outbound sender authentication, not inbound Zoho mailbox delivery; keep `isMailboxVerified` false until a real inbox receipt is confirmed.
+- No environment secret values were read or printed. No DNS changes were made during this release verification.
