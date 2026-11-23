@@ -216,3 +216,11 @@ The viewport and scroll checks verify layout, DOM counts, animation state and co
 - Mobile scroll stress at 390×844: eight alternating top/footer passes; stable document height (21,418px), stable maximum scroll (20,574px), one Capabilities section and one footer, no failed requests or page errors.
 - Desktop regression check at 1440×900: testimonial stack remains 345px; desktop Selected Work retains `sm:top-1/2`; desktop CTA/footer curtain ScrollTrigger remains pinned; no page errors.
 - This was browser emulation, not a physical Android handset test. The supplied blank-page screenshot was not reproduced in this run. No new Lighthouse measurement was taken.
+### Production verification — mobile-only follow-up — 2026-11-23
+
+- Code commit `76c2a99c68fa0d1fb6c404680d81bf7690df5d87` deployed as Vercel production deployment `dpl_6sxvucVWrXm36Hokp4PrdnFwfyJ9`, state `READY`, with aliases `www.theostrum.tech` and `theostrum.tech`.
+- Live Playwright 13-viewport matrix: 320×568 through 1648×928; zero horizontal overflow, exactly one Capabilities section and six cards at every size; no page errors.
+- Live mobile interaction at 390×844: capability reveal activated; a visible 3D canvas rendered at 385×156 pixels; two of six card canvases were mounted at the sampled time; footer reveal progress was 0.502 with a visible 35.9px vertical transform; no page/console errors.
+- Live mobile stress: eight alternating top/footer passes; stable page height and bottom position; one Capabilities section, one CTA and one footer; zero failed requests and page errors.
+- Live desktop at 1440×900: testimonial stack remains 345px, the existing desktop Selected Work `sm:top-1/2` rule remains present, the desktop CTA/curtain ScrollTrigger remains pinned, and no page errors were logged.
+- The supplied blank-page screenshot was not reproduced during these checks. Browser emulation cannot guarantee behavior on every physical Android device. No new Lighthouse score was measured.

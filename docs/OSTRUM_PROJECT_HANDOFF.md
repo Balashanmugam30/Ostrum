@@ -80,3 +80,7 @@ The mobile layout/repetition defect is fixed and the mobile payload was reduced 
 - Local production-build checks passed: lint, typecheck, 29 tests, production dependency audit, build, all 13 responsive sizes, capability reveal/3D, footer scrub, and eight mobile scroll cycles. No page/console/network errors were observed.
 - The 13-size test includes desktop widths as regression checks; all had zero horizontal overflow. A Playwright desktop check confirmed the pinned desktop footer and unchanged desktop testimonial stack.
 - No physical Android browser, new Lighthouse run, or blank-page reproduction was available during this follow-up.
+
+### Production release evidence
+
+Commit `76c2a99c68fa0d1fb6c404680d81bf7690df5d87` is deployed as Vercel production deployment `dpl_6sxvucVWrXm36Hokp4PrdnFwfyJ9` (`READY`) with `www.theostrum.tech` and `theostrum.tech` aliases. Live mobile Playwright tests passed the 13 viewport sizes, repeated scroll stress, capability reveal/3D, and footer reveal. Live desktop regression confirms 345px testimonial stack and the pinned desktop curtain. See `reports/audits/OSTRUM_2026-11-23_REPAIR_REPORT.md` for exact metrics and limitations.
