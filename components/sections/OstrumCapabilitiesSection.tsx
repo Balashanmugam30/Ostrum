@@ -218,6 +218,7 @@ export function OstrumCapabilitiesSection() {
     const pinContainer = pinContainerRef.current;
     if (sectionRef.current) {
       sectionRef.current.style.backgroundColor = hide ? 'transparent' : '#FFFFFF';
+      delete sectionRef.current.dataset.transitionActive;
     }
     if (!pinContainer) return;
 
@@ -259,20 +260,26 @@ export function OstrumCapabilitiesSection() {
     }) => {
       if (!pinContainer) return;
 
-      // On phones the catalogue is a normal vertical section. Let the wheel's
-      // transition finish, then hand off to document flow instead of pinning a
-      // viewport-sized overlay across the whole card list.
-      if (window.matchMedia('(max-width: 767px)').matches) {
-        clearTransitionStyles(false);
-        return;
-      }
-
       if (!active) {
         clearTransitionStyles(true);
         return;
       }
 
       const normProgress = Math.min(1, Math.max(0, progress));
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+
+      // The wheel-to-capabilities reveal is shared across breakpoints. On
+      // phones, release the temporary viewport overlay as soon as it reaches
+      // full size so the six-card catalogue continues in normal document flow.
+      if (isMobile && normProgress >= 1) {
+        clearTransitionStyles(false);
+        return;
+      }
+
+      if (isMobile) {
+        sectionRef.current?.setAttribute('data-transition-active', 'true');
+      }
+
       if (normProgress >= 1) {
         if (sectionRef.current) {
           const rect = sectionRef.current.getBoundingClientRect();

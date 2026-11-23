@@ -632,6 +632,10 @@ export function OstrumContinuousJourney() {
         if (container.style.opacity !== '0') {
           container.style.opacity = '0';
         }
+        // The phone canvas pauses outside the storytelling range. Recompute
+        // its scroll-derived pose on wake so a fast reverse fling cannot leave
+        // the model interpolating from its old, offscreen exit position.
+        if (isMobile) isInitialized = false;
         return;
       } else {
         if (container.style.opacity !== '1') {
@@ -892,6 +896,19 @@ export function OstrumContinuousJourney() {
         currentEnergy += (targetEnergyLevel - currentEnergy) * 0.10;
       }
 
+      // A fast mobile reverse fling can stop at the hero before the paused
+      // canvas has caught up with the scroll-derived pose. Lock the sculpture
+      // back into the O at the top so it cannot remain rotated or offscreen;
+      // the normal scroll-linked interpolation resumes as soon as the user
+      // scrolls away from the hero.
+      if (isMobile && scrollY <= 12 && currentPhase === 'complete') {
+        currentX = targetWorld.x;
+        currentY = targetWorld.y;
+        currentScale = targetScale;
+        currentRotationY = targetRotY;
+        currentEnergy = targetEnergyLevel;
+      }
+
       // Zero-G subtle organic breathing float: active during journey (Hero & travel)
       const isTraveling = scrollY < dockStart && currentPhase === 'complete';
       const floatOffset = isTraveling ? Math.sin(time * 0.0016) * 0.04 * currentScale : 0;
@@ -984,6 +1001,7 @@ export function OstrumContinuousJourney() {
         if (container.style.opacity !== '0') container.style.opacity = '0';
         cancelAnimationFrame(animId);
         animId = 0;
+        if (isMobile) isInitialized = false;
         return;
       }
 

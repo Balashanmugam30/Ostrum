@@ -1,6 +1,6 @@
 # Ostrum project handoff
 
-**Updated:** 2026-11-23
+**Updated:** 2026-11-24
 **Purpose:** Durable starting point for future engineers and coding agents.
 
 ## Product and production identity
@@ -101,3 +101,18 @@ Commit `76c2a99c68fa0d1fb6c404680d81bf7690df5d87` is deployed as Vercel producti
 - Mobile source commit `1c07dbfc4f6580c1db793a7582aecde975ccecb3` is deployed on Vercel as `dpl_Fv7417qiwRLhL8daYuwncde3sHkz` (`READY`) with `www.theostrum.tech` and `theostrum.tech` aliases.
 - Live mobile Playwright smoke confirms HTTP 200, hydrated sections, one Capabilities section/footer, and touch FAQ expansion. The complete reverse-scroll stress and CTA particle/reveal measurements passed on the local production build; the extended combined live WebGL/scroll run exceeded its test window and is not reported as passed.
 - The exact blank-screen screenshot was not reproduced; a physical Android device check and new Lighthouse measurement remain outstanding.
+
+## Mobile scroll-effect parity follow-up (2026-11-24)
+
+- The supplied desktop/mobile recordings were compared at the desktop beats around 00:04 (sculpture spin and dark stage), 00:11 (Selected Work wheel expanding into Capabilities), and 00:21 (CTA curtain lifting into the footer). The mobile capture also showed the sculpture missing after fast reverse scroll.
+- Root causes: the mobile Capabilities handler skipped the shared wheel-to-section transition; mobile CSS forced the transition container back into normal flow; the phone CTA used a simple footer fade instead of the existing curtain; the mobile dark overlay remained a red radial gradient; and the hero letter parallax could retain a large stale offset after a fast touch fling while the 3D canvas was paused offscreen.
+- `components/sections/OstrumCapabilitiesSection.tsx` now allows the existing wheel shared-element expansion on phones and releases it at full size, then returns to the six-card vertical list. `app/globals.css` scopes the normal-flow override so it does not suppress the temporary reveal.
+- `components/sections/OstrumFooterReveal.tsx` now uses the existing CTA curtain on phones in a scroll-scrubbed lift interval without pinning the wrapper. Reverse scrolling restores it; the desktop pinned curtain path is unchanged.
+- The phone background darkening layer now reaches solid `#050505` at full opacity.
+- `components/ui/OstrumLogo.tsx` samples live mobile scroll position, uses time-based smoothing while moving, and clears letter parallax at the top. `components/visuals/OstrumContinuousJourney.tsx` invalidates the paused mobile pose and snaps the model back into the hero O at the top; scroll-driven motion resumes after leaving the hero. The desktop parallax and sculpture interpolation remain unchanged.
+- Optimized local production build checks passed: lint, TypeScript, all 29 unit tests, `npm audit` (0 vulnerabilities), and Next.js build.
+- Playwright production browser matrix: the 13 documented viewport sizes had zero horizontal overflow, exactly one Capabilities section and six cards, with zero page errors or failed requests.
+- Touch emulation on the production build completed 36 upward swipes from the footer to the hero and 36 downward swipes back to the footer. At the hero the model was visible, rotation was `0`, the O letter transform was `translate3d(0px, 0px, 0px)`, and the page retained one Capabilities section/six cards/footer. No page errors or failed requests were observed.
+- The mobile wheel reveal was observed at normalized transition progress `0.580` with the temporary container fixed, then released to normal flow at completion. The CTA curtain had a mobile, unpinned ScrollTrigger and lifted about 375px at midpoint on a 390×844 viewport. Full mobile darkening was `#050505` at opacity `1`.
+- Desktop regression at 1440×900 retained the sticky Capabilities stage and the pinned `theatre-curtain-reveal-cta` trigger. The desktop curtain was translated about 429px at midpoint. No desktop overflow or browser errors were observed.
+- Evidence and commands are in `reports/audits/OSTRUM_MOBILE_SCROLL_EFFECT_PARITY_2026-11-24.md`. The supplied exact blank-page screenshot was not reproduced, and no physical Android device or new Lighthouse run was available in this pass. The previously measured low Lighthouse performance remains a separate open performance task.

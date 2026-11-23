@@ -24,7 +24,7 @@
     margin-bottom: 0 !important;
   }
 
-  #capabilities [data-testid='capabilities-pin-container'] {
+  #capabilities:not([data-transition-active='true']) [data-testid='capabilities-pin-container'] {
     position: relative !important;
     inset: auto !important;
     width: 100% !important;
@@ -39,8 +39,8 @@
     transform: none !important;
   }
 
-  [data-show-cta='true'] [data-testid='theatre-curtain-panel'],
-  [data-show-cta='true'] [data-testid='theatre-stage-panel'] {
+  [data-show-cta='true']:not([data-mobile-curtain-active='true']) [data-testid='theatre-curtain-panel'],
+  [data-show-cta='true']:not([data-mobile-curtain-active='true']) [data-testid='theatre-stage-panel'] {
     position: relative !important;
   }
 
@@ -70,12 +70,7 @@
     inset: 0;
     pointer-events: none;
     opacity: var(--bg-darken, 0);
-    background: radial-gradient(
-      ellipse at 50% 48%,
-      rgba(91, 12, 18, 0.55) 0%,
-      rgba(12, 5, 8, 0.88) 58%,
-      rgba(3, 2, 4, 0.98) 100%
-    );
+    background: #050505;
     transition: opacity 100ms linear;
   }
 }

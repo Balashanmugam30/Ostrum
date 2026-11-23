@@ -34,11 +34,13 @@ export function OstrumLogo({
     if (mediaQuery.matches) return;
 
     let animId: number;
-    let targetScrollY = window.scrollY;
-    let currentScrollY = window.scrollY;
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    let targetScrollY = Math.max(0, window.scrollY);
+    let currentScrollY = targetScrollY;
+    let previousFrameTime = performance.now();
 
     const onScroll = () => {
-      targetScrollY = window.scrollY;
+      targetScrollY = Math.max(0, window.scrollY);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -49,10 +51,25 @@ export function OstrumLogo({
     // Center letters elevate with greater lift, creating a dignified parabolic ascension.
     const factors = [-0.22, -0.30, -0.38, -0.38, -0.30, -0.22];
 
-    const tick = () => {
+    const tick = (time: number) => {
       animId = requestAnimationFrame(tick);
-      // Smooth damped interpolation
-      currentScrollY += (targetScrollY - currentScrollY) * 0.12;
+      // The passive scroll event may be coalesced during touch flings. Sample
+      // the live offset on phones so the hero letters cannot keep a stale
+      // transform after the browser has already returned to the top.
+      if (isMobile) targetScrollY = Math.max(0, window.scrollY);
+      // Keep the existing desktop response. On phones, use time-based
+      // smoothing and reset at the top so a fast reverse fling cannot leave
+      // the per-letter parallax translated far outside the hero.
+      if (isMobile && targetScrollY <= 2) {
+        currentScrollY = 0;
+      } else if (isMobile) {
+        const elapsed = Math.min(64, time - previousFrameTime);
+        const alpha = 1 - Math.exp(-elapsed / 80);
+        currentScrollY += (targetScrollY - currentScrollY) * alpha;
+      } else {
+        currentScrollY += (targetScrollY - currentScrollY) * 0.12;
+      }
+      previousFrameTime = time;
 
       for (let i = 0; i < factors.length; i++) {
         const el = groupRefs.current[i];
@@ -63,7 +80,7 @@ export function OstrumLogo({
       }
     };
 
-    tick();
+    tick(performance.now());
 
     return () => {
       cancelAnimationFrame(animId);

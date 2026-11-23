@@ -118,6 +118,66 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
     });
 
     mm.add('(max-width: 767px)', () => {
+      if (showCTA) {
+        // Reuse the desktop curtain itself on phones, but keep the wrapper in
+        // document flow instead of adding a pin spacer. The curtain tracks the
+        // CTA-to-footer scroll interval and fully resets on reverse scroll.
+        container.dataset.mobileCurtainActive = 'true';
+        const getLiftDistance = () => curtain.offsetHeight || window.innerHeight;
+
+        gsap.set(curtain, {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100svh',
+          zIndex: 20,
+          y: 0,
+          autoAlpha: 1,
+          visibility: 'visible',
+          pointerEvents: 'auto',
+        });
+        gsap.set(stage, { position: 'relative', zIndex: 10, width: '100%' });
+
+        const tl = gsap.timeline({ paused: true });
+        tl.to(curtain, { y: () => -getLiftDistance(), ease: 'none' });
+
+        const trigger = ScrollTrigger.create({
+          trigger: container,
+          start: 'top bottom',
+          end: () => `+=${getLiftDistance()}`,
+          scrub: 0.6,
+          anticipatePin: 1,
+          id: 'mobile-curtain-reveal-cta',
+          invalidateOnRefresh: true,
+          animation: tl,
+          onUpdate: (self) => {
+            curtain.style.pointerEvents = self.progress >= 0.95 ? 'none' : 'auto';
+          },
+          onLeave: () => {
+            curtain.style.pointerEvents = 'none';
+            curtain.style.visibility = 'hidden';
+          },
+          onEnterBack: (self) => {
+            curtain.style.visibility = 'visible';
+            curtain.style.pointerEvents = self.progress >= 0.95 ? 'none' : 'auto';
+          },
+          onLeaveBack: () => {
+            curtain.style.visibility = 'visible';
+            curtain.style.pointerEvents = 'auto';
+          },
+        });
+
+        const refreshTimeout = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+        return () => {
+          window.clearTimeout(refreshTimeout);
+          trigger.kill();
+          tl.kill();
+          delete container.dataset.mobileCurtainActive;
+          gsap.set([curtain, stage], { clearProps: 'all' });
+        };
+      }
+
       if (!showCTA) {
         // Keep the legal-page white curtain behavior unchanged on touch screens.
         gsap.set(curtain, {
