@@ -18,19 +18,30 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     // their handoffs and expose empty surfaces.
     ScrollTrigger.config({ ignoreMobileResize: true });
 
+    // Android's native compositor can repaint past GSAP pin boundaries before
+    // the main thread updates the pinned sections. Normalize only touch phones
+    // so reverse scrolling stays synchronized without changing desktop input.
+    const mobileTouch = window.matchMedia(
+      '(max-width: 767px) and (pointer: coarse)'
+    ).matches;
+    const mobileNormalizer = mobileTouch
+      ? ScrollTrigger.normalizeScroll({ allowNestedScroll: true })
+      : null;
+    const cleanupNormalizer = () => mobileNormalizer?.kill();
+
     // Keep touch scrolling native on phones and tablets. Lenis can compete with
     // browser momentum and pinned ScrollTriggers during fast touch scrolls.
     const desktopPointer = window.matchMedia(
       '(min-width: 768px) and (hover: hover) and (pointer: fine)'
     );
-    if (!desktopPointer.matches) return;
+    if (!desktopPointer.matches) return cleanupNormalizer;
 
     // Check user preference for reduced motion
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
 
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) return cleanupNormalizer;
 
     // Initialize root Lenis smooth scrolling instance
     const lenis = new Lenis({
@@ -68,6 +79,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       delete (window as any).lenis;
       gsap.ticker.remove(updateTicker);
       lenis.destroy();
+      cleanupNormalizer();
     };
   }, []);
 

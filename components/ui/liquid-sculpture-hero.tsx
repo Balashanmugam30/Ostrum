@@ -1402,7 +1402,6 @@ export default function SculptureHero(props: SculptureHeroProps) {
     const onMove = (e: PointerEvent) => {
       const [x, y] = pos(e)
       const touch = e.pointerType === "touch"
-      if (touch && e.buttons === 0 && e.pressure === 0) return
       engine?.pointer("move", x, y, touch)
       markTouched()
     }

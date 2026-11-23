@@ -30,7 +30,7 @@
 - Mobile prioritizes normal vertical scrolling, readable alignment and one-pass content. Do not reintroduce a pinned horizontal Capabilities loop on phones.
 - The intro cinematic remains on larger screens. On viewports below 768px it fast-reveals the content to avoid hiding the page behind a long 3D count.
 - Header text is ivory on dark areas and near-black on light sections.
-- Favicon and app icons use an opaque burgundy background so the mark remains visible on mobile launchers and browser chrome.
+- Browser favicons use the existing transparent light/dark assets selected by system color scheme; Apple touch and PWA icons keep their platform-specific artwork.
 - Third-party model credit: Print3dburton / Monyédre 360 Möbius Art Ribbon, CC BY 4.0; see `THIRD_PARTY_NOTICES.md` and `docs/OSTRUM_THIRD_PARTY_ASSETS.md`.
 
 ## Cloud/service state last verified
@@ -74,13 +74,24 @@ The mobile layout/repetition defect is fixed and the mobile payload was reduced 
 
 - Scope: mobile scrolling/reflow, mobile CTA-to-footer reveal, mobile testimonial sizing, and mobile Selected Work text placement. Desktop breakpoint behavior was explicitly checked and preserved.
 - `app/globals.css` keeps `#capabilities` and the CTA/footer wrapper in normal phone document flow and applies `overscroll-behavior-y: none` below 768px. This prevents a stale pinned section from visually reappearing beyond the footer.
-- Mobile footer reveal now travels 72px and uses a linear scrub range; desktop keeps its existing pinned curtain.
+- Mobile footer reveal travels up to 38vh (capped at 320px) with scroll-linked opacity; the desktop pinned curtain is unchanged.
 - Mobile testimonial cards use a 260px stack, maximum 360px width, tighter padding, and 14px quotes. The desktop card stack remains 345px.
 - Mobile Selected Work descriptions begin at 60% of the stage; desktop remains at 50% (`sm:top-1/2`).
-- Local production-build checks passed: lint, typecheck, 29 tests, production dependency audit, build, all 13 responsive sizes, capability reveal/3D, footer scrub, and eight mobile scroll cycles. No page/console/network errors were observed.
+- Local production-build checks passed: lint, typecheck, 29 tests, production dependency audit, build, all 13 responsive sizes, capability reveal/3D, footer scrub, and mobile scroll cycles. The latest reverse-scroll follow-up is recorded below.
 - The 13-size test includes desktop widths as regression checks; all had zero horizontal overflow. A Playwright desktop check confirmed the pinned desktop footer and unchanged desktop testimonial stack.
 - No physical Android browser, new Lighthouse run, or blank-page reproduction was available during this follow-up.
 
 ### Production release evidence
 
 Commit `76c2a99c68fa0d1fb6c404680d81bf7690df5d87` is deployed as Vercel production deployment `dpl_6sxvucVWrXm36Hokp4PrdnFwfyJ9` (`READY`) with `www.theostrum.tech` and `theostrum.tech` aliases. Live mobile Playwright tests passed the 13 viewport sizes, repeated scroll stress, capability reveal/3D, and footer reveal. Live desktop regression confirms 345px testimonial stack and the pinned desktop curtain. See `reports/audits/OSTRUM_2026-11-23_REPAIR_REPORT.md` for exact metrics and limitations.
+
+## Latest mobile touch and reverse-scroll follow-up (2026-11-23)
+
+- `components/providers/SmoothScroll.tsx` normalizes GSAP ScrollTrigger scroll only on coarse-pointer phones; Lenis remains disabled for touch, and desktop smooth scrolling is unchanged.
+- `components/sections/OstrumFaqSection.tsx` ignores hover-preview events from touch devices so a tap expands the FAQ instead of being toggled closed by the synthetic enter event.
+- `components/sections/OstrumFooterReveal.tsx` gives the mobile CTA/footer stage a visible scroll-linked reveal (up to 38vh, capped at 320px). The desktop pinned curtain remains unchanged.
+- `components/ui/liquid-sculpture-hero.tsx` forwards touch pointer-move events to the particle canvas even when the browser reports zero pressure/buttons.
+- Local Playwright passed: lint, typecheck, 29 tests, production build; FAQ touch expansion; CTA canvas touch movement; mobile reveal progress 0/0.5/1; desktop 1440px regression (345px testimonial stack and pinned curtain).
+- Full reverse touch scroll started at the settled footer and reached the hero in 23 swipes, with monotonic scroll, stable 21,418px document height, one Capabilities section, one footer, and no page/request errors.
+- The supplied white blank-screen image was not reproduced in browser emulation. A physical Android run is still needed to confirm behavior on the exact device/browser. No new Lighthouse run was taken; mobile performance remains an open follow-up.
+- See `reports/audits/OSTRUM_2026-11-23_REPAIR_REPORT.md` for measurements and the release record.

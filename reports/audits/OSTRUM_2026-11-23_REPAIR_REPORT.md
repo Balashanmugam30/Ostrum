@@ -224,3 +224,27 @@ The viewport and scroll checks verify layout, DOM counts, animation state and co
 - Live mobile stress: eight alternating top/footer passes; stable page height and bottom position; one Capabilities section, one CTA and one footer; zero failed requests and page errors.
 - Live desktop at 1440×900: testimonial stack remains 345px, the existing desktop Selected Work `sm:top-1/2` rule remains present, the desktop CTA/curtain ScrollTrigger remains pinned, and no page errors were logged.
 - The supplied blank-page screenshot was not reproduced during these checks. Browser emulation cannot guarantee behavior on every physical Android device. No new Lighthouse score was measured.
+
+## Mobile reverse-scroll and interaction follow-up — 2026-11-23
+
+### Changes
+
+- Enabled GSAP `ScrollTrigger.normalizeScroll()` only for coarse-pointer phone viewports. Lenis remains off on touch devices; desktop Lenis and desktop pin/reveal behavior are unchanged. This keeps touch scroll and GSAP-pinned sections synchronized during fast reverse scrolls.
+- Fixed FAQ touch activation: mobile pointer/mouse-enter events no longer open and immediately re-toggle a question before its click handler. Desktop mouse-hover preview remains intact.
+- Updated the mobile CTA-to-footer scrub range so the existing footer stage visibly moves upward and fades in over the scroll interval. The desktop curtain remains pinned.
+- Removed the guard that discarded touch pointer-move events with zero pressure/buttons, so dragging over the CTA canvas can move its particle object.
+
+### Verification
+
+- `npm run lint`, `npm run typecheck`, `npm test` (29/29), and `npm run build` passed after the code changes.
+- Mobile Playwright at 390×844: tapping the second FAQ question set `aria-expanded=true` and opened a 53px answer panel.
+- Mobile CTA touch drag reached the canvas (`data-touched=1`, WebGL canvas present).
+- Mobile footer reveal was measured at ScrollTrigger progress 0 / 0.5 / 1. The stage translated 320px / 160px / 0px and opacity moved 0.42 / 0.71 / 1.00.
+- Desktop 1440×900 regression: testimonial stack remained 345px, desktop CTA curtain trigger remained pinned, and no page errors occurred. The mobile-only CSS sizing remained 260px at 390px.
+- Full mobile reverse-scroll from the settled footer (`scrollY=20,574`) to the hero completed in 23 touch swipes. Scroll position was monotonic; settled document height stayed at 21,418px; exactly one Capabilities section and one footer existed; no page errors or failed requests were observed.
+- The supplied blank white-screen screenshot did not reproduce in browser emulation. Automated emulation is not a physical Android test, so that exact device/browser failure remains unconfirmed.
+- No new Lighthouse run was made. Prior Lighthouse performance remains an open optimization issue and should be re-measured after this release.
+
+### Release status
+
+This local verification is complete. Production deployment evidence will be added after the authorized commit is pushed and Vercel reports the deployment ready.

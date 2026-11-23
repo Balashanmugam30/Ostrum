@@ -76,6 +76,14 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
     }
   };
 
+  // Touch devices emit pointerenter/mouseenter as a finger first lands. Keep
+  // the existing hover-to-preview behavior for desktop mice, but let a phone
+  // tap reach the button's click toggle exactly once.
+  const openQuestionFromMouse = (id: string) => {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    openQuestion(id);
+  };
+
   // If reduced motion is activated while open, immediately show full text
   useEffect(() => {
     if (prefersReducedMotion && openId) {
@@ -130,15 +138,13 @@ export function OstrumFaqSection({ items = OSTRUM_FAQ_DATA }: OstrumFaqSectionPr
                 <div
                   key={item.id}
                   data-testid={`faq-item-${index}`}
-                  onMouseEnter={() => openQuestion(item.id)}
-                  onPointerEnter={() => openQuestion(item.id)}
+                  onMouseEnter={() => openQuestionFromMouse(item.id)}
                   className="border-b border-black/15 transition-colors"
                 >
                   <button
                     type="button"
                     onClick={() => toggleQuestion(item.id)}
-                    onMouseEnter={() => openQuestion(item.id)}
-                    onPointerEnter={() => openQuestion(item.id)}
+                    onMouseEnter={() => openQuestionFromMouse(item.id)}
                     onFocus={(e) => {
                       if (typeof e.target.matches === 'function' && e.target.matches(':focus-visible')) {
                         openQuestion(item.id);
