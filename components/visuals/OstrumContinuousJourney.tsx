@@ -331,7 +331,7 @@ export function OstrumContinuousJourney() {
     } else {
       const loader = new GLTFLoader();
       loader.load(
-        '/models/monyedre-360.glb',
+        isMobile ? '/models/monyedre-360-mobile.glb' : '/models/monyedre-360.glb',
         (gltf) => {
           if (isDisposed) return;
           cachedModelScene = gltf.scene;

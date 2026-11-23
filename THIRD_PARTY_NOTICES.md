@@ -30,6 +30,14 @@ SOFTWARE.
 
 ---
 
+## Monyédre 360 Moebius Art Ribbon
+
+"Monyédre 360 moebius art ribbon" by [Print3dburton](https://sketchfab.com/426a5a11ed26437897119f6fb34dda) is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The model is adapted and modified for the Ostrum digital experience using a custom Three.js material and scroll-linked choreography.
+
+Source: https://sketchfab.com/3d-models/monyedre-360-moebius-art-ribbon-49d201dd302e4792b0b61bf19ba4f4a4
+
+---
+
 Liquid Sculpture Hero (Particle Simulation & Shaders)
 
 Portions of the Ostrum liquid-sand closing CTA particle simulation and WebGL2 GPGPU engine are adapted from Liquid Sculpture Hero by Guglielmo Giannattasio:

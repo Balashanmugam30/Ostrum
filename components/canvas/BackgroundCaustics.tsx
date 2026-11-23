@@ -514,12 +514,6 @@ export function BackgroundCaustics() {
     <div
       ref={containerRef}
       className="background-webgl fixed inset-0 pointer-events-none z-0 bg-black overflow-hidden"
-      style={{
-        backgroundImage: 'url(/images/bg.webp)',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center top',
-        backgroundSize: 'cover',
-      }}
     />
   );
 }

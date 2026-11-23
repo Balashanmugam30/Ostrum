@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+.background-webgl {
+  background-image: url('/images/bg.webp');
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: cover;
+}
+
+@media (max-width: 767px) {
+  .background-webgl {
+    background-image: url('/images/bg-mobile.webp');
+  }
+}
+
 @font-face {
   font-display: swap;
   font-family: 'Neue Montreal';

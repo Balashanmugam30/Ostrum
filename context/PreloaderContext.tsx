@@ -96,6 +96,13 @@ export function PreloaderProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // Keep the cinematic count on larger screens. On phones the full-screen
+    // 3D count delays usable content on slower CPUs and mobile networks.
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      completeIntro();
+      return;
+    }
+
     // Check prefers-reduced-motion: Instant clean skip
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       completeIntro();

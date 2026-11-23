@@ -34,13 +34,17 @@ export function Header() {
 
   const checkContrast = useCallback(() => {
     if (typeof document === 'undefined') return false;
-    const headerPointY = 40;
-    const headerPointX = 60;
-    const targetEl = document.elementFromPoint(headerPointX, headerPointY);
+    // Sample the page beneath the floating header. Sampling x=60 can hit the
+    // header's own back-to-top button, which prevents light sections from ever
+    // being detected once that button becomes visible.
+    const headerPointY = Math.min(40, window.innerHeight - 1);
+    const targetEl = document
+      .elementsFromPoint(window.innerWidth / 2, headerPointY)
+      .find((element) => !element.closest('.header'));
     if (!targetEl) return false;
 
     const lightAncestor = targetEl.closest(
-      '#testimonials, #capabilities, [data-theme="light"], .bg-white, [style*="background-color: #FFFFFF"], [style*="background-color: rgb(255, 255, 255)"], [style*="#F7F5F2"], [style*="#FAF7F2"]'
+      '#testimonials, #capabilities, [data-selection-surface="light"], [data-theme="light"], .bg-white, [style*="background-color: #FFFFFF"], [style*="background-color: rgb(255, 255, 255)"], [style*="#F7F5F2"], [style*="#FAF7F2"]'
     );
     return !!lightAncestor;
   }, []);

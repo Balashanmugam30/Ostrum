@@ -1,9 +1,15 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Card3DAccent } from '@/components/ui/Card3DAccent';
+
+const Card3DAccent = dynamic(
+  () => import('@/components/ui/Card3DAccent').then((module) => module.Card3DAccent),
+  { ssr: false },
+);
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -90,10 +96,19 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
 ];
 
 export function OstrumCapabilitiesSection() {
+  const [showDesktopArtwork, setShowDesktopArtwork] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const transitionOriginRef = useRef<DOMRect | null>(null);
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 768px)');
+    const syncArtwork = () => setShowDesktopArtwork(desktop.matches);
+    syncArtwork();
+    desktop.addEventListener('change', syncArtwork);
+    return () => desktop.removeEventListener('change', syncArtwork);
+  }, []);
 
   const clearTransitionStyles = (hide: boolean) => {
     const pinContainer = pinContainerRef.current;
@@ -139,6 +154,14 @@ export function OstrumCapabilitiesSection() {
       opacity?: number;
     }) => {
       if (!pinContainer) return;
+
+      // On phones the catalogue is a normal vertical section. Let the wheel's
+      // transition finish, then hand off to document flow instead of pinning a
+      // viewport-sized overlay across the whole card list.
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        clearTransitionStyles(false);
+        return;
+      }
 
       if (!active) {
         clearTransitionStyles(true);
@@ -305,6 +328,24 @@ export function OstrumCapabilitiesSection() {
     const track = trackRef.current;
     if (!section || !pinContainer || !track) return;
 
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    if (isMobile) {
+      section.style.height = '';
+      section.style.marginBottom = '0px';
+      section.style.backgroundColor = '#FFFFFF';
+      track.style.transform = 'none';
+      track.style.overflowX = 'visible';
+      clearTransitionStyles(false);
+      return () => {
+        section.style.height = '';
+        section.style.marginBottom = '';
+        section.style.backgroundColor = '';
+        track.style.transform = '';
+        track.style.overflowX = '';
+        clearTransitionStyles(false);
+      };
+    }
+
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
@@ -321,7 +362,6 @@ export function OstrumCapabilitiesSection() {
       );
       const cardCount = track.children.length;
       const steps = Math.max(1, cardCount - 1);
-      const isMobile = window.innerWidth < 768;
       const firstCard = track.querySelector<HTMLElement>('[data-testid^="capability-card-"]');
       const cardHeight = firstCard?.getBoundingClientRect().height ?? 0;
       const horizontalStep = horizontalTravel / steps;
@@ -433,7 +473,7 @@ export function OstrumCapabilitiesSection() {
       ref={sectionRef}
       data-testid="capabilities-section"
       data-selection-surface="light"
-      className="relative z-[35] w-full min-h-screen select-text"
+      className="relative z-[35] w-full min-h-0 md:min-h-screen select-text"
       style={{
         backgroundColor: 'transparent',
       }}
@@ -443,7 +483,7 @@ export function OstrumCapabilitiesSection() {
       <div
         ref={pinContainerRef}
         data-testid="capabilities-pin-container"
-        className="capabilities-stage sticky top-0 w-full h-screen h-[100svh] min-h-screen min-h-[100svh] relative flex flex-col justify-between overflow-hidden pt-10 sm:pt-14 md:pt-16 pb-3 sm:pb-5 bg-[#FFFFFF]"
+        className="capabilities-stage relative md:sticky md:top-0 w-full min-h-0 md:h-screen md:h-[100svh] md:min-h-screen md:min-h-[100svh] flex flex-col justify-start md:justify-between overflow-visible md:overflow-hidden pt-10 sm:pt-14 md:pt-16 pb-8 md:pb-3 bg-[#FFFFFF]"
         style={{
           backgroundColor: '#FFFFFF',
         }}
@@ -451,7 +491,7 @@ export function OstrumCapabilitiesSection() {
         {/* Soft edge fades on both left and right edges */}
         <div
           data-testid="capabilities-edge-fade-left"
-          className="pointer-events-none absolute top-0 bottom-0 left-0 w-12 sm:w-24 md:w-36 z-30"
+          className="pointer-events-none absolute top-0 bottom-0 left-0 hidden md:block w-12 sm:w-24 md:w-36 z-30"
           style={{
             background:
               'linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%)',
@@ -460,7 +500,7 @@ export function OstrumCapabilitiesSection() {
         />
         <div
           data-testid="capabilities-edge-fade-right"
-          className="pointer-events-none absolute top-0 bottom-0 right-0 w-12 sm:w-24 md:w-36 z-30"
+          className="pointer-events-none absolute top-0 bottom-0 right-0 hidden md:block w-12 sm:w-24 md:w-36 z-30"
           style={{
             background:
               'linear-gradient(to left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%)',
@@ -489,18 +529,18 @@ export function OstrumCapabilitiesSection() {
         </header>
 
         {/* Horizontal Scroll Catalogue Track (Canonical 6 service cards) */}
-        <div className="relative w-full z-10 flex items-center overflow-visible my-auto py-1">
+        <div className="relative w-full z-10 flex items-center overflow-visible mt-7 md:my-auto py-1">
           <div
             ref={trackRef}
             data-testid="capabilities-track"
-            className="flex items-stretch gap-6 sm:gap-7 md:gap-8 pl-6 sm:pl-12 md:pl-16 lg:pl-20 pr-12 sm:pr-20 md:pr-28 will-change-transform"
+            className="flex flex-col md:flex-row items-stretch gap-5 sm:gap-6 md:gap-8 w-full px-5 sm:px-8 md:pl-12 lg:pl-20 md:pr-20 will-change-transform"
           >
             {CAPABILITIES_DATA.map((card) => (
               <article
                 key={card.index}
                 data-testid={`capability-card-${card.variant}`}
                 tabIndex={0}
-                className="capability-card group relative shrink-0 w-[calc(100vw-3.5rem)] max-w-[310px] sm:w-[340px] md:w-[365px] lg:w-[388px] h-[400px] sm:h-[450px] md:h-[490px] rounded-[24px] p-5 sm:p-6 md:p-6 flex flex-col justify-between shadow-[0_16px_36px_-12px_rgba(11,11,16,0.08)] border border-black/[0.06] transition-[transform,box-shadow] duration-200 ease-out outline-none"
+                className="capability-card group relative shrink-0 w-full max-w-[520px] md:max-w-none md:w-[365px] lg:w-[388px] min-h-[390px] md:min-h-0 h-auto md:h-[490px] rounded-[24px] p-5 sm:p-6 md:p-6 flex flex-col justify-between shadow-[0_16px_36px_-12px_rgba(11,11,16,0.08)] border border-black/[0.06] transition-[transform,box-shadow] duration-200 ease-out outline-none"
                 style={{
                   background: card.gradient,
                 }}
@@ -517,12 +557,23 @@ export function OstrumCapabilitiesSection() {
                 </div>
 
                 {/* 3D Dimensional Accent Viewport (Consistent Upper-Middle Frame) */}
-                <div className="capability-art-frame relative w-full h-[125px] sm:h-[160px] md:h-[180px] shrink-0 my-1 flex items-center justify-center overflow-hidden">
-                  <Card3DAccent
-                    variant={card.variant}
-                    data-testid={`capability-artwork-${card.variant}`}
-                    className="capability-artwork size-full"
-                  />
+                <div className="capability-art-frame relative w-full h-[125px] sm:h-[145px] md:h-[180px] shrink-0 my-1 flex items-center justify-center overflow-hidden">
+                  {showDesktopArtwork ? (
+                    <Card3DAccent
+                      variant={card.variant}
+                      data-testid={`capability-artwork-${card.variant}`}
+                      className="capability-artwork size-full"
+                    />
+                  ) : (
+                    <Image
+                      src={card.artwork}
+                      alt=""
+                      aria-hidden="true"
+                      fill
+                      sizes="(min-width: 768px) 365px, 80vw"
+                      className="object-contain"
+                    />
+                  )}
                 </div>
 
                 {/* Card Content: Title, Description, Tags (Consistent Anchor) */}
@@ -561,7 +612,8 @@ export function OstrumCapabilitiesSection() {
               data-testid="capabilities-scroll-cue"
               className="tracking-widest uppercase font-semibold text-[#36312F]"
             >
-              SCROLL TO EXPLORE →
+              <span className="md:hidden">SCROLL TO EXPLORE ↓</span>
+              <span className="hidden md:inline">SCROLL TO EXPLORE →</span>
             </span>
           </div>
         </div>

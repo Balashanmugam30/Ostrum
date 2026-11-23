@@ -32,3 +32,9 @@ rebuild-capture/
 scratch/
 tmp/
 
+# Agent skills are installed locally from their upstream catalogs; keep the large
+# vendored payloads out of the application repository. Keep skills-lock.json.
+.agents/skills/**
+!.agents/skills/README.md
+.claude/skills/**
+
