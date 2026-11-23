@@ -95,3 +95,9 @@ Commit `76c2a99c68fa0d1fb6c404680d81bf7690df5d87` is deployed as Vercel producti
 - Full reverse touch scroll started at the settled footer and reached the hero in 23 swipes, with monotonic scroll, stable 21,418px document height, one Capabilities section, one footer, and no page/request errors.
 - The supplied white blank-screen image was not reproduced in browser emulation. A physical Android run is still needed to confirm behavior on the exact device/browser. No new Lighthouse run was taken; mobile performance remains an open follow-up.
 - See `reports/audits/OSTRUM_2026-11-23_REPAIR_REPORT.md` for measurements and the release record.
+
+### Latest production release
+
+- Mobile source commit `1c07dbfc4f6580c1db793a7582aecde975ccecb3` is deployed on Vercel as `dpl_Fv7417qiwRLhL8daYuwncde3sHkz` (`READY`) with `www.theostrum.tech` and `theostrum.tech` aliases.
+- Live mobile Playwright smoke confirms HTTP 200, hydrated sections, one Capabilities section/footer, and touch FAQ expansion. The complete reverse-scroll stress and CTA particle/reveal measurements passed on the local production build; the extended combined live WebGL/scroll run exceeded its test window and is not reported as passed.
+- The exact blank-screen screenshot was not reproduced; a physical Android device check and new Lighthouse measurement remain outstanding.

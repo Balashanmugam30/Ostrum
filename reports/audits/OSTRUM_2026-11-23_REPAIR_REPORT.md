@@ -247,4 +247,11 @@ The viewport and scroll checks verify layout, DOM counts, animation state and co
 
 ### Release status
 
-This local verification is complete. Production deployment evidence will be added after the authorized commit is pushed and Vercel reports the deployment ready.
+The verified source changes were committed and pushed. Production deployment and live smoke evidence are recorded below.
+
+### Production verification — mobile interaction follow-up — 2026-11-23
+
+- Commit `1c07dbfc4f6580c1db793a7582aecde975ccecb3` deployed as Vercel deployment `dpl_Fv7417qiwRLhL8daYuwncde3sHkz`, target `production`, state `READY`, aliases `www.theostrum.tech`, `theostrum.tech`, and `ostrum-delta.vercel.app`.
+- Live mobile Playwright smoke at 390×844: HTTP 200, page hydrated, one Capabilities section, one footer, CTA root present, and tapping the second FAQ expanded it (`aria-expanded=true`). No page errors or failed requests were logged.
+- Full reverse-scroll (23 touch swipes from the actual settled footer to the hero), CTA touch movement, CTA/footer animation progress, and desktop 1440×900 regression all passed against the local production build. A longer live headless run combining WebGL input and touch-scroll was stopped when it exceeded the available test window; those extended live interactions are not claimed as verified.
+- The supplied blank-screen image was not reproduced. Physical Android behavior remains unconfirmed; no new Lighthouse score was run.
