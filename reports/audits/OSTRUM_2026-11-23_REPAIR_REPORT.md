@@ -147,4 +147,11 @@ No production form was submitted during testing. Environment secret values were 
 - Browser metadata links select `/favicon-light.png` for light system appearance and `/favicon-dark.png` for dark appearance. Both source assets are 32×32 PNGs with alpha transparency.
 - The original artwork attribution remains in the third-party notices as required by its CC BY 4.0 license.
 
-This follow-up has been verified locally. Git push and production deployment status will be added after publishing.
+This follow-up has been verified locally and is deployed to production; the live deployment evidence is recorded below.
+
+### Production verification — 2026-11-23
+
+- Commit `46e8e96c2dec17b2ad3fc9488fc195096721f281` deployed as Vercel production deployment `dpl_FAD2yeQaZdhcGg5RBQ4L3vqCZCEt` with state `READY` and aliases `www.theostrum.tech` and `theostrum.tech`.
+- Re-ran Playwright on the live site: mobile eight-cycle hero/footer scroll stress completed; no page errors or console errors; the mobile page reached its footer; background movement and darkening reset correctly at top.
+- Live desktop browser check confirmed one WebGL background canvas, desktop CTA/footer ScrollTrigger pinned at progress 0.22, the restored light/dark favicon metadata links, and no page errors.
+- Production browser checks were performed after publication; no production form submission or analytics consent acceptance was made.
