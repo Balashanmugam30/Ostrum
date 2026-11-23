@@ -307,27 +307,6 @@ export function OstrumStudioFooter() {
               <p className="font-sans text-xs text-[#B9B0AF] mt-2 leading-relaxed">
                 Custom software, AI systems and original digital products, engineered by OSTRUM.
               </p>
-              <p className="font-sans text-xs text-[#B9B0AF] mt-3 leading-relaxed">
-                3D sculpture by{' '}
-                <a
-                  href="https://sketchfab.com/426a5a11ed26437897119f6fb34dda"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline underline-offset-4 hover:text-white"
-                >
-                  Print3dburton
-                </a>{' '}
-                under{' '}
-                <a
-                  href="https://creativecommons.org/licenses/by/4.0/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline underline-offset-4 hover:text-white"
-                >
-                  CC BY 4.0
-                </a>
-                .
-              </p>
             </div>
 
             <div className="mt-8 font-mono text-xs text-[#B9B0AF]">

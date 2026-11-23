@@ -139,29 +139,29 @@ export function AnalyticsConsent() {
   return (
     <aside
       aria-label="Analytics cookie preferences"
-      className="fixed inset-x-4 bottom-4 z-[100] mx-auto max-w-3xl rounded-xl border border-white/15 bg-[#111] p-5 text-white shadow-2xl sm:inset-x-6 sm:p-6"
+      className="fixed inset-x-3 bottom-3 z-[100] mx-auto max-w-2xl rounded-lg border border-[#C9362B]/45 bg-[#120D0D]/95 p-4 font-sans text-[#F7F1EB] shadow-[0_12px_42px_rgba(0,0,0,0.38)] backdrop-blur-sm sm:inset-x-6 sm:bottom-6 sm:p-5"
       role="dialog"
       aria-modal="false"
       aria-describedby="analytics-consent-description"
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="max-w-xl">
-          <h2 className="text-base font-semibold">Your privacy choices</h2>
-          <p id="analytics-consent-description" className="mt-1 text-sm leading-6 text-white/75">
+          <h2 className="text-sm font-semibold tracking-wide">Your privacy choices</h2>
+          <p id="analytics-consent-description" className="mt-1 text-xs leading-5 text-[#D6CBC5] sm:text-sm">
             With your permission, Ostrum Tech uses Google Analytics to understand visits and improve the website. Analytics is off unless you accept. Read our{' '}
             <a className="underline underline-offset-2" href="/privacy-policy#cookies">Privacy Policy</a>.
           </p>
         </div>
-        <div className="flex shrink-0 flex-wrap gap-2">
+        <div className="flex shrink-0 gap-2">
           <button
-            className="min-h-11 rounded-lg border border-white/30 px-4 text-sm font-medium hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="min-h-10 rounded-md border border-[#8B7770] px-3 text-xs font-medium text-[#F7F1EB] transition-colors hover:border-[#F7F1EB] hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F7F1EB] sm:px-4 sm:text-sm"
             onClick={() => saveChoice('rejected')}
             type="button"
           >
             Reject analytics
           </button>
           <button
-            className="min-h-11 rounded-lg bg-white px-4 text-sm font-semibold text-black hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="min-h-10 rounded-md bg-[#C9362B] px-3 text-xs font-semibold text-white transition-colors hover:bg-[#D94A3D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F7F1EB] sm:px-4 sm:text-sm"
             onClick={() => saveChoice('accepted')}
             type="button"
           >

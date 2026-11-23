@@ -121,3 +121,30 @@ No production form was submitted during testing. Environment secret values were 
 - Analytics remains consent-gated; do not bypass consent to send telemetry. Verify GA4 events after an explicit consent acceptance in a real browser/account.
 - The enquiry database is used for rate limiting only; the form payload is not stored in Redis. No production enquiry was sent during browser testing. Resend verifies outbound sender authentication, not inbound Zoho mailbox delivery; keep `isMailboxVerified` false until a real inbox receipt is confirmed.
 - No environment secret values were read or printed. No DNS changes were made during this release verification.
+
+## Mobile interaction and branding follow-up — 2026-11-23
+
+### Changes
+
+- Removed the visible Print3dburton / CC BY 4.0 credit from the footer. Retained required asset attribution in `THIRD_PARTY_NOTICES.md`.
+- Restored the existing transparent `/favicon-light.png` and `/favicon-dark.png` assets with `prefers-color-scheme` media rules. Kept the existing `.ico`, size-specific icons, Apple touch icon, and PWA icons intact.
+- Added a mobile-only scroll-linked background fallback: the optimized background artwork moves on a compositor transform while scrolling and transitions to the dark burgundy/obsidian treatment through the energy narrative. Desktop continues using the existing WebGL shader.
+- Disabled Lenis smooth scrolling for coarse/touch devices so native touch momentum does not compete with pinned GSAP sections.
+- Changed the homepage CTA/footer transition on phones to normal document flow with a small reversible footer reveal, avoiding a mobile pin spacer. Desktop retains the pinned curtain animation. Legal-page curtain behavior remains pinned.
+- Restyled analytics consent in the site's charcoal, ivory, and restrained coral palette with smaller type and touch-sized buttons.
+
+### Verification
+
+- `npm run lint`: passed (Next.js reports that `next lint` is deprecated for a future major version).
+- `npx tsc --noEmit`: passed.
+- `npm test`: 29/29 passed across 7 suites.
+- `npm run build`: passed; all 10 routes generated.
+- `npm audit --omit=dev`: 0 vulnerabilities.
+- Playwright production build at 13 viewports (320×568 through 1648×928): zero horizontal overflow at every viewport; one Capabilities section and six cards.
+- Mobile rapid-scroll stress: eight alternating hero-to-footer and footer-to-hero cycles completed; page returned to top and bottom; background offset reset to `0px` and darkening reset to `0.000` at the top; exactly one footer and CTA; no page errors, console errors, or failed requests.
+- Mobile footer was in normal flow (no pin spacer) and visible at the bottom. The consent banner at 390px viewport width measured 366×170px with no horizontal overflow.
+- Desktop browser check at 1440×900: one WebGL background canvas, no page errors, and the footer curtain ScrollTrigger remained active and pinned during its reveal.
+- Browser metadata links select `/favicon-light.png` for light system appearance and `/favicon-dark.png` for dark appearance. Both source assets are 32×32 PNGs with alpha transparency.
+- The original artwork attribution remains in the third-party notices as required by its CC BY 4.0 license.
+
+This follow-up has been verified locally. Git push and production deployment status will be added after publishing.

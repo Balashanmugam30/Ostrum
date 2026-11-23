@@ -12,6 +12,64 @@ export function BackgroundCaustics() {
     pathname?.startsWith('/terms-and-conditions') ||
     pathname?.startsWith('/privacy-policy');
 
+  // The mobile fallback uses the same tall art as the desktop shader, but moves
+  // the image and darkens it with document scroll instead of rendering WebGL.
+  useEffect(() => {
+    if (isLegalPage) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const mobileQuery = window.matchMedia('(max-width: 767px)');
+    let frame = 0;
+
+    const update = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const isMobile = mobileQuery.matches;
+        container.dataset.mobileBackground = String(isMobile);
+        if (!isMobile) return;
+
+        const maxScroll = Math.max(
+          1,
+          document.documentElement.scrollHeight - window.innerHeight
+        );
+        const progress = Math.max(0, Math.min(1, window.scrollY / maxScroll));
+        container.style.setProperty(
+          '--bg-scroll-offset',
+          `${-progress * window.innerHeight * 0.8}px`
+        );
+
+        const energy = document.getElementById('energy-narrative');
+        const transitionDistance = Math.min(window.innerHeight * 0.8, 600);
+        let darken = 0;
+        if (energy) {
+          const top = energy.getBoundingClientRect().top;
+          if (top <= transitionDistance) {
+            darken = Math.max(0, Math.min(1, (transitionDistance - top) / transitionDistance));
+          }
+        }
+        container.style.setProperty('--bg-darken', darken.toFixed(3));
+      });
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    mobileQuery.addEventListener('change', update);
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+      mobileQuery.removeEventListener('change', update);
+      delete container.dataset.mobileBackground;
+      container.style.removeProperty('--bg-scroll-position');
+      container.style.removeProperty('--bg-darken');
+    };
+  }, [isLegalPage]);
+
   useEffect(() => {
     if (isLegalPage) return;
 
@@ -513,6 +571,7 @@ export function BackgroundCaustics() {
   return (
     <div
       ref={containerRef}
+      data-mobile-background="true"
       className="background-webgl fixed inset-0 pointer-events-none z-0 bg-black overflow-hidden"
     />
   );

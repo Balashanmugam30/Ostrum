@@ -12,6 +12,13 @@ if (typeof window !== 'undefined') {
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    // Keep touch scrolling native on phones and tablets. Lenis can compete with
+    // browser momentum and pinned ScrollTriggers during fast touch scrolls.
+    const desktopPointer = window.matchMedia(
+      '(min-width: 768px) and (hover: hover) and (pointer: fine)'
+    );
+    if (!desktopPointer.matches) return;
+
     // Check user preference for reduced motion
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
