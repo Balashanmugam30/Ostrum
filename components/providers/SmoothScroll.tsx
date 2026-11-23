@@ -12,6 +12,12 @@ if (typeof window !== 'undefined') {
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
+    // Configure after the client plugin has initialized and identified touch
+    // input. Mobile browser chrome can change viewport height while scrolling;
+    // remeasuring long pinned scenes on every toolbar transition can shift
+    // their handoffs and expose empty surfaces.
+    ScrollTrigger.config({ ignoreMobileResize: true });
+
     // Keep touch scrolling native on phones and tablets. Lenis can compete with
     // browser momentum and pinned ScrollTriggers during fast touch scrolls.
     const desktopPointer = window.matchMedia(

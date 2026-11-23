@@ -72,12 +72,24 @@ export function OstrumTestimonialsSection({
     const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
     if (cards.length === 0) return;
 
-    // Scroll travel: 520px per card transition + 550px for final resolved state
-    const cardStepDistance = window.innerWidth < 768 ? 400 : 520;
-    const finalHoldDistance = window.innerWidth < 768 ? 450 : 550;
-    const scrollDistance = (cards.length - 1) * cardStepDistance + finalHoldDistance;
-
-    section.style.height = `${window.innerHeight + scrollDistance}px`;
+    // Scroll travel: 400px per card transition on phones, 520px on desktop,
+    // plus a short final hold. Use the stable small viewport unit on touch
+    // devices so Chrome's address-bar collapse does not resize this long
+    // scrubbed section or manually refresh every pinned scene on the page.
+    const getScrollDistance = () => {
+      const cardStepDistance = window.innerWidth < 768 ? 400 : 520;
+      const finalHoldDistance = window.innerWidth < 768 ? 450 : 550;
+      return (cards.length - 1) * cardStepDistance + finalHoldDistance;
+    };
+    let scrollDistance = getScrollDistance();
+    let lastWidth = window.innerWidth;
+    const setSectionHeight = () => {
+      const isMobile = window.innerWidth < 768;
+      section.style.height = isMobile && ScrollTrigger.isTouch === 1
+        ? `calc(100svh + ${scrollDistance}px)`
+        : `${window.innerHeight + scrollDistance}px`;
+    };
+    setSectionHeight();
 
     const ctx = gsap.context(() => {
       // Set initial card states
@@ -197,10 +209,15 @@ export function OstrumTestimonialsSection({
     ScrollTrigger.refresh();
 
     const handleResize = () => {
-      const updatedDistance =
-        (cards.length - 1) * (window.innerWidth < 768 ? 400 : 520) +
-        (window.innerWidth < 768 ? 450 : 550);
-      section.style.height = `${window.innerHeight + updatedDistance}px`;
+      const widthChanged = window.innerWidth !== lastWidth;
+      // Ignore touch-only height changes from browser chrome. They are not a
+      // new layout size; reacting to them shifts the testimonial end and the
+      // downstream Capabilities handoff while the user is scrolling.
+      if (ScrollTrigger.isTouch === 1 && !widthChanged) return;
+
+      lastWidth = window.innerWidth;
+      scrollDistance = getScrollDistance();
+      setSectionHeight();
       ScrollTrigger.refresh();
     };
 

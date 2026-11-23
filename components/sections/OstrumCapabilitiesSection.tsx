@@ -95,8 +95,65 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
   },
 ];
 
+function CapabilityArtwork({
+  card,
+  showLiveArtwork,
+}: {
+  card: CapabilityCardData;
+  showLiveArtwork: boolean;
+}) {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [isNearViewport, setIsNearViewport] = useState(false);
+
+  useEffect(() => {
+    if (showLiveArtwork) {
+      setIsNearViewport(true);
+      return;
+    }
+
+    setIsNearViewport(false);
+    const frame = frameRef.current;
+    if (!frame) return;
+    if (!("IntersectionObserver" in window)) {
+      setIsNearViewport(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsNearViewport(entry?.isIntersecting ?? false),
+      { rootMargin: "140px 0px", threshold: 0.01 },
+    );
+    observer.observe(frame);
+    return () => observer.disconnect();
+  }, [showLiveArtwork]);
+
+  return (
+    <div
+      ref={frameRef}
+      className="capability-art-frame relative w-full h-[125px] sm:h-[145px] md:h-[180px] shrink-0 my-1 flex items-center justify-center overflow-hidden"
+    >
+      {showLiveArtwork || isNearViewport ? (
+        <Card3DAccent
+          variant={card.variant}
+          data-testid={`capability-artwork-${card.variant}`}
+          className="capability-artwork size-full"
+        />
+      ) : (
+        <Image
+          src={card.artwork}
+          alt=""
+          aria-hidden="true"
+          fill
+          sizes="(min-width: 768px) 365px, 80vw"
+          className="object-contain"
+        />
+      )}
+    </div>
+  );
+}
+
 export function OstrumCapabilitiesSection() {
-  const [showDesktopArtwork, setShowDesktopArtwork] = useState(false);
+  const [showLiveArtwork, setShowLiveArtwork] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -104,10 +161,57 @@ export function OstrumCapabilitiesSection() {
 
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 768px)');
-    const syncArtwork = () => setShowDesktopArtwork(desktop.matches);
+    const syncArtwork = () => setShowLiveArtwork(desktop.matches);
     syncArtwork();
     desktop.addEventListener('change', syncArtwork);
     return () => desktop.removeEventListener('change', syncArtwork);
+  }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || window.matchMedia('(min-width: 768px)').matches) return;
+
+    const targets = Array.from(
+      section.querySelectorAll<HTMLElement>(
+        '[data-testid="capabilities-heading"], [data-testid="capabilities-supporting-statement"], [data-testid^="capability-card-"]',
+      ),
+    );
+    if (!targets.length) return;
+
+    section.dataset.mobileMotionReady = 'true';
+    const reducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    if (reducedMotion || !('IntersectionObserver' in window)) {
+      targets.forEach((target) => {
+        target.dataset.mobileVisible = 'true';
+      });
+      return () => {
+        delete section.dataset.mobileMotionReady;
+        targets.forEach((target) => delete target.dataset.mobileVisible);
+      };
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const target = entry.target as HTMLElement;
+          if (entry.isIntersecting) {
+            target.dataset.mobileVisible = 'true';
+          } else {
+            delete target.dataset.mobileVisible;
+          }
+        });
+      },
+      { threshold: 0.14, rootMargin: '0px 0px -8% 0px' },
+    );
+
+    targets.forEach((target) => observer.observe(target));
+    return () => {
+      observer.disconnect();
+      delete section.dataset.mobileMotionReady;
+      targets.forEach((target) => delete target.dataset.mobileVisible);
+    };
   }, []);
 
   const clearTransitionStyles = (hide: boolean) => {
@@ -557,24 +661,7 @@ export function OstrumCapabilitiesSection() {
                 </div>
 
                 {/* 3D Dimensional Accent Viewport (Consistent Upper-Middle Frame) */}
-                <div className="capability-art-frame relative w-full h-[125px] sm:h-[145px] md:h-[180px] shrink-0 my-1 flex items-center justify-center overflow-hidden">
-                  {showDesktopArtwork ? (
-                    <Card3DAccent
-                      variant={card.variant}
-                      data-testid={`capability-artwork-${card.variant}`}
-                      className="capability-artwork size-full"
-                    />
-                  ) : (
-                    <Image
-                      src={card.artwork}
-                      alt=""
-                      aria-hidden="true"
-                      fill
-                      sizes="(min-width: 768px) 365px, 80vw"
-                      className="object-contain"
-                    />
-                  )}
-                </div>
+                <CapabilityArtwork card={card} showLiveArtwork={showLiveArtwork} />
 
                 {/* Card Content: Title, Description, Tags (Consistent Anchor) */}
                 <div className="flex-1 flex flex-col justify-between min-h-0 pt-1">

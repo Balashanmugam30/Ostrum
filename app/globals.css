@@ -579,6 +579,49 @@ body {
   }
 }
 
+/* Phone cards enter the reading flow one at a time. Near-screen cards mount
+   the animated 3D scene; image fallbacks keep a restrained float offscreen. */
+@media (max-width: 767px) {
+  #capabilities[data-mobile-motion-ready="true"]
+    [data-testid="capabilities-heading"],
+  #capabilities[data-mobile-motion-ready="true"]
+    [data-testid="capabilities-supporting-statement"],
+  #capabilities[data-mobile-motion-ready="true"]
+    [data-testid^="capability-card-"] {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+    transition:
+      opacity 460ms ease,
+      transform 620ms cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+
+  #capabilities[data-mobile-motion-ready="true"]
+    [data-mobile-visible="true"] {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  #capabilities[data-mobile-motion-ready="true"]
+    .capability-art-frame img {
+    transform: perspective(720px) rotateX(5deg) rotateY(-8deg) translate3d(0, 4px, 0);
+    transform-style: preserve-3d;
+  }
+
+  #capabilities[data-mobile-motion-ready="true"]
+    .capability-card[data-mobile-visible="true"] .capability-art-frame img {
+    animation: capability-artwork-float 5.8s ease-in-out infinite;
+  }
+}
+
+@keyframes capability-artwork-float {
+  0%, 100% {
+    transform: perspective(720px) rotateX(5deg) rotateY(-8deg) translate3d(0, 4px, 0);
+  }
+  50% {
+    transform: perspective(720px) rotateX(-2deg) rotateY(7deg) translate3d(0, -5px, 0);
+  }
+}
+
 
 @media (prefers-reduced-motion: reduce) {
   .ostrum-signature-sculpture,

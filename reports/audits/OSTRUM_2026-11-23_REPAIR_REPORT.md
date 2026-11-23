@@ -155,3 +155,33 @@ This follow-up has been verified locally and is deployed to production; the live
 - Re-ran Playwright on the live site: mobile eight-cycle hero/footer scroll stress completed; no page errors or console errors; the mobile page reached its footer; background movement and darkening reset correctly at top.
 - Live desktop browser check confirmed one WebGL background canvas, desktop CTA/footer ScrollTrigger pinned at progress 0.22, the restored light/dark favicon metadata links, and no page errors.
 - Production browser checks were performed after publication; no production form submission or analytics consent acceptance was made.
+
+## Mobile scroll and Capabilities follow-up — 2026-11-23
+
+### Findings from the user's latest mobile recording
+
+- The page contains one `#capabilities` section with six cards. The recording shows that same section again while scrolling back upward; it is not a duplicated second section.
+- On mobile the six cards were using static artwork instead of the animated Three.js sculptures. The reveal animation was also absent.
+- The testimonials section resized its long scrubbed scene and explicitly refreshed all ScrollTriggers on every resize event. Mobile browser chrome height changes can trigger those events while scrolling, which can move downstream pinned-section boundaries and expose blank gaps.
+
+### Changes
+
+- Kept Capabilities in ordinary vertical document flow on phones. Mobile now loads each real Three.js sculpture only as its art frame approaches the viewport; offscreen cards retain optimized image fallbacks. The artwork component already pauses its render loop outside view and respects reduced motion. This avoids six always-mounted mobile WebGL renderers.
+- Added a mobile-only IntersectionObserver reveal for the Capabilities heading, supporting copy and cards. It has a visible-content fallback for reduced-motion preferences and browsers without IntersectionObserver.
+- Stabilized the touch-device Testimonials section height with `100svh` and ignore height-only resize events in its own listener, refreshing when the viewport width changes (such as rotation).
+- Configured GSAP ScrollTrigger to ignore small touch-device browser-chrome resizes. Kept desktop pinned artwork and horizontal scrolling unchanged.
+- Made the mobile CTA/footer reveal more visible and tied it to scroll progress while preserving normal document flow.
+
+### Local verification after the follow-up
+
+- `npm run lint`: PASS; no warnings or errors (Next.js still prints its future `next lint` deprecation notice).
+- `npm run typecheck`: PASS.
+- `npm test`: PASS; 29/29 tests.
+- `npm audit --omit=dev`: PASS; zero production vulnerabilities.
+- `npm run build`: PASS; all 10 routes generated.
+- Fresh Playwright production matrix at all 13 requested viewport sizes (320×568 through 1648×928): exact emulated viewport dimensions, zero horizontal overflow, one Capabilities section and six cards at every size; no page errors.
+- Mobile interaction probe at 390×844: the revealed card mounted a nonzero-size Three.js canvas; only two canvases were mounted with six cards in the DOM, the remaining art frames used image fallbacks; the footer ScrollTrigger advanced at mid-progress; no page/console errors.
+- Mobile scroll stress: eight alternating top-to-bottom and bottom-to-top page passes reached the real document bottom and returned to scroll position 0. The DOM still contained one Capabilities section, one CTA and one footer; background scroll offset/darkening reset at the top; no page or console errors. This automation used abrupt browser scroll commands, not a physical handset fling.
+- Desktop 1440×900 Capabilities pin check: the horizontal track moved during the pinned interval and released afterward; six desktop WebGL canvases remained, with no page errors.
+
+The viewport and scroll checks verify layout, DOM counts, animation state and console behavior. They do not reproduce every Android browser/OS combination or measure a new Lighthouse score. No production form was submitted. The latest local changes are not yet included in the prior production deployment; release status will be recorded after authorized publication and live verification.
