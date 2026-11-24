@@ -119,13 +119,13 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
 
     mm.add('(max-width: 767px)', () => {
       if (showCTA) {
-        // Pinned theatre curtain reveal on mobile matching desktop choreography:
-        // The CTA section scrolls into view in normal document flow. Once it
-        // reaches the top of the viewport ('top top'), the wrapper pins and
-        // the curtain lifts cleanly upward over 100svh of scroll travel,
-        // revealing the underlying studio footer stage. Stacking precedence
-        // (z-30 on #theatre-stage-wrapper vs z-20 on #faq-contact-field) ensures
-        // the CTA never slips beneath the contact form.
+        // Unpinned theatre curtain reveal on mobile matching desktop choreography in normal document flow:
+        // The CTA section scrolls into view in normal document flow. Once it reaches
+        // the top of the viewport ('top top'), the curtain lifts cleanly upward over
+        // the natural scroll travel of the stage wrapper, revealing the underlying
+        // studio footer stage without pinning the wrapper or creating any trailing
+        // pin-spacer void. Stacking precedence (z-30 on #theatre-stage-wrapper vs
+        // z-20 on #faq-contact-field) ensures the CTA never slips beneath the contact form.
         container.dataset.mobileCurtainActive = 'true';
         const getLiftDistance = () => curtain.offsetHeight || window.innerHeight;
 
@@ -149,11 +149,8 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         const trigger = ScrollTrigger.create({
           trigger: container,
           start: 'top top',
-          end: () => `+=${getLiftDistance()}`,
-          pin: container,
-          pinSpacing: true,
+          end: 'bottom bottom',
           scrub: 0.6,
-          anticipatePin: 1,
           id: 'mobile-curtain-reveal-cta',
           invalidateOnRefresh: true,
           animation: tl,
@@ -184,55 +181,11 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         };
       }
 
-      if (!showCTA) {
-        // Keep the legal-page white curtain behavior unchanged on touch screens.
-        gsap.set(curtain, {
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100svh',
-          zIndex: 20,
-          y: 0,
-          autoAlpha: 1,
-          visibility: 'visible',
-          pointerEvents: 'auto',
-        });
-        gsap.set(stage, { position: 'relative', zIndex: 10, width: '100%' });
-
-        const tl = gsap.timeline({ paused: true });
-        tl.to(curtain, { y: () => -window.innerHeight, ease: 'none' });
-        const trigger = ScrollTrigger.create({
-          trigger: container,
-          start: 'top top',
-          end: () => `+=${window.innerHeight}`,
-          pin: container,
-          pinSpacing: true,
-          scrub: 0.5,
-          anticipatePin: 1,
-          id: 'theatre-curtain-reveal-legal-mobile',
-          invalidateOnRefresh: true,
-          animation: tl,
-          onLeave: () => {
-            curtain.style.pointerEvents = 'none';
-            curtain.style.visibility = 'hidden';
-          },
-          onEnterBack: (self) => {
-            curtain.style.visibility = 'visible';
-            curtain.style.pointerEvents = self.progress >= 0.95 ? 'none' : 'auto';
-          },
-        });
-        return () => {
-          trigger.kill();
-          tl.kill();
-          gsap.set([curtain, stage], { clearProps: 'all' });
-        };
-      }
-
+      // Legal pages (!showCTA): keep white curtain behavior
       gsap.set(curtain, {
-        position: 'relative',
-        top: 'auto',
-        left: 'auto',
+        position: 'absolute',
+        top: 0,
+        left: 0,
         width: '100%',
         height: '100svh',
         zIndex: 20,
@@ -241,36 +194,33 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         visibility: 'visible',
         pointerEvents: 'auto',
       });
+      gsap.set(stage, { position: 'relative', zIndex: 10, width: '100%' });
 
-      gsap.set(stage, {
-        position: 'relative',
-        zIndex: 10,
-        width: '100%',
+      const tl = gsap.timeline({ paused: true });
+      tl.to(curtain, { y: () => -window.innerHeight, ease: 'none' });
+      const trigger = ScrollTrigger.create({
+        trigger: container,
+        start: 'top top',
+        end: () => `+=${window.innerHeight}`,
+        pin: container,
+        pinSpacing: true,
+        scrub: 0.5,
+        anticipatePin: 1,
+        id: 'theatre-curtain-reveal-legal-mobile',
+        invalidateOnRefresh: true,
+        animation: tl,
+        onLeave: () => {
+          curtain.style.pointerEvents = 'none';
+          curtain.style.visibility = 'hidden';
+        },
+        onEnterBack: (self) => {
+          curtain.style.visibility = 'visible';
+          curtain.style.pointerEvents = self.progress >= 0.95 ? 'none' : 'auto';
+        },
       });
-
-      const reveal = gsap.fromTo(
-        stage,
-        { autoAlpha: 0.42, y: () => Math.min(window.innerHeight * 0.38, 320) },
-        {
-          autoAlpha: 1,
-          y: 0,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: stage,
-            start: 'top 100%',
-            end: 'top 42%',
-            scrub: 0.3,
-            invalidateOnRefresh: true,
-            id: showCTA ? 'mobile-footer-reveal-cta' : 'mobile-footer-reveal-legal',
-          },
-        }
-      );
-
-      const refreshTimeout = window.setTimeout(() => ScrollTrigger.refresh(), 100);
       return () => {
-        window.clearTimeout(refreshTimeout);
-        reveal.scrollTrigger?.kill();
-        reveal.kill();
+        trigger.kill();
+        tl.kill();
         gsap.set([curtain, stage], { clearProps: 'all' });
       };
     });

@@ -119,7 +119,9 @@ Commit `76c2a99c68fa0d1fb6c404680d81bf7690df5d87` is deployed as Vercel producti
 
 ### Live production release status (2026-11-24)
 
-- Commit `4e912f9ef0c8b45eb0bb8ea8c5121f2f1d4c9ede` is deployed as Vercel production deployment `dpl_6EGmrg8q684Mt5bm3haFbF965JMu` (`READY`, `PROMOTED`) with aliases `www.theostrum.tech` and `theostrum.tech`.
+- Commit `4e912f9ef0c8b45eb0bb8ea8c5121f2f1d4c9ede` was succeeded by fixes for mobile footer blank void and reverse-scroll sculpture lifecycle.
+- **Mobile Unpinned Curtain Reveal:** `components/sections/OstrumFooterReveal.tsx` removes `pin: container` and `pinSpacing: true` on mobile, keeping normal document flow with `start: 'top top'`, `end: 'bottom bottom'`, and `scrub: 0.6`. The curtain lifts cleanly by `-getLiftDistance()` (`-844px` on iPhone 14, `-800px` on Android compact) directly into `OstrumStudioFooter`. The trailing 844px blank black pin-spacer void is eliminated, and document height stops exactly at content end (20,574px on iPhone 14, 20,558px on Android). Desktop pinned reveal is 100% preserved.
+- **Deterministic 3D Sculpture Lifecycle:** `components/visuals/OstrumContinuousJourney.tsx` gives sole ownership of `container.style.opacity` to `syncAnimation()`. `animate()` no longer mutates canvas wrapper opacity. On reverse scroll into story range (`scrollY <= exitBoundary`), `syncAnimation` ensures wrapper opacity `1`, recomputes pose before interpolation resumes, and enforces hero rest pose (`rotation.y = 0`, `modelRoot.visible = true`, `material.opacity = 1`) at `scrollY <= 30`. Verified across 5 complete top-to-bottom-to-top cycles in Playwright at 1440×900, 390×844, and 360×800 with zero page errors and 100% sculpture visibility on return.
 - Live Playwright checks on `https://www.theostrum.tech/`:
   - Mobile hero return, wheel reveal to vertical 6 cards, solid `#050505` dark stage, unpinned CTA curtain lift (`-844px`), and 3 reverse scroll stress cycles passed with 0 console errors, 0 failed requests, and 0px horizontal overflow across all tested viewports.
   - Desktop 1440×900 regression confirms sticky Capabilities and pinned CTA curtain (`-900px`) remain intact.

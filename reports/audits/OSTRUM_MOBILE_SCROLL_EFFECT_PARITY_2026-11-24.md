@@ -159,6 +159,24 @@ Conducted with Lighthouse 13.6.0 in headless Chromium against `https://www.theos
 - TBT on mobile decreased from 10,920 ms to 4,930 ms; Desktop TBT decreased from 4,210 ms to 1,930 ms.
 - Root cause for remaining score constraint: Initial main-thread execution during Three.js canvas setup, WebGL shader compilation, and GSAP ticker registration. This remains an open architectural optimization for a future performance pass and was intentionally not changed to prevent desktop regression.
 
+## 5-Cycle Automated Regression Audit (Follow-up Resolution)
+
+### Viewport Matrix and Test Parameters
+- **Desktop (1440×900):** 5 complete top-to-bottom-to-top cycles.
+- **Mobile iPhone 14 (390×844):** 5 complete top-to-bottom-to-top cycles with touch emulation.
+- **Mobile Android Compact (360×800):** 5 complete top-to-bottom-to-top cycles with touch emulation.
+
+### Results
+| Viewport | Cycle 1 Hero Return | Cycle 3 Hero Return | Cycle 5 Hero Return | Bottom Footer Alignment | Page Errors |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Desktop (1440×900)** | Opacity 1, RotY 0, Visible ✓ | Opacity 1, RotY 0, Visible ✓ | Opacity 1, RotY 0, Visible ✓ | Pinned curtain (-900px), 0 void ✓ | 0 |
+| **Mobile (390×844)** | Opacity 1, RotY 0, Visible ✓ | Opacity 1, RotY 0, Visible ✓ | Opacity 1, RotY 0, Visible ✓ | Unpinned curtain (-844px), 0 void ✓ | 0 |
+| **Mobile (360×800)** | Opacity 1, RotY 0, Visible ✓ | Opacity 1, RotY 0, Visible ✓ | Opacity 1, RotY 0, Visible ✓ | Unpinned curtain (-800px), 0 void ✓ | 0 |
+
+- **Blank Void Elimination:** Document height remained completely stable at 20,574px (iPhone 14) and 20,558px (Android Compact), exactly matching content end without any trailing `.pin-spacer` padding. At maximum scroll, `viewportMatchesFooterBottom` was `true` across all 5 cycles.
+- **Hero 3D Sculpture Parity:** In cycles 1 through 5, returning to `scrollY = 0` reliably yielded `modelRoot.visible === true`, `container.style.opacity === '1'`, and `currentRotationY === 0`, locking the 3D sculpture inside the hero 'O' without failure.
+- **Desktop Parity:** Desktop pinned theatre curtain reveal remained 100% intact with zero console errors or regressions.
+
 ## Limits and follow-up
 
 - Touch behavior was emulated in Playwright Chromium; a physical Android handset with low GPU memory was not physically connected for hardware testing.

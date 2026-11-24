@@ -629,18 +629,10 @@ export function OstrumContinuousJourney() {
       const isPastExit = scrollY > exitBoundary;
 
       if (isPastExit) {
-        if (container.style.opacity !== '0') {
-          container.style.opacity = '0';
-        }
-        // The phone canvas pauses outside the storytelling range. Recompute
-        // its scroll-derived pose on wake so a fast reverse fling cannot leave
-        // the model interpolating from its old, offscreen exit position.
+        // Outside storytelling range: pause loop without mutating container.style.opacity
+        // (syncAnimation maintains sole ownership of canvas wrapper opacity).
         if (isMobile) isInitialized = false;
         return;
-      } else {
-        if (container.style.opacity !== '1') {
-          container.style.opacity = '1';
-        }
       }
 
       // Real-time synchronization with preloader phases
@@ -901,12 +893,15 @@ export function OstrumContinuousJourney() {
       // back into the O at the top (scrollY <= 30) so it cannot remain rotated or offscreen;
       // the normal scroll-linked interpolation resumes as soon as the user
       // scrolls away from the hero.
-      if (isMobile && scrollY <= 30 && currentPhase === 'complete') {
+      if (scrollY <= 30 && currentPhase === 'complete') {
         currentX = targetWorld.x;
         currentY = targetWorld.y;
         currentScale = targetScale;
-        currentRotationY = targetRotY;
-        currentEnergy = targetEnergyLevel;
+        currentRotationY = 0;
+        currentEnergy = 0;
+        modelRoot.visible = true;
+        material.opacity = 1;
+        ribbonGroup.visible = false;
       }
 
       // Zero-G subtle organic breathing float: active during journey (Hero & travel)
@@ -1010,15 +1005,22 @@ export function OstrumContinuousJourney() {
         return;
       }
 
+      // Reverse scroll into story range: ensure wrapper is visible before restarting RAF
       if (container.style.opacity !== '1') {
         container.style.opacity = '1';
       }
 
-      // If returning to hero at the top on phone, clear stale lerp state
-      if (isMobile && scrollY <= 30) {
+      // Recompute pose before interpolation resumes on phone
+      if (isMobile) {
         isInitialized = false;
       }
 
+      // Clear stale lerp state when returning to hero
+      if (scrollY <= 30) {
+        if (isMobile) isInitialized = false;
+      }
+
+      // Make RAF cancel/restart idempotent
       if (animId === 0) {
         animId = requestAnimationFrame(animate);
       }
