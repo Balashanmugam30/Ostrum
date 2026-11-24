@@ -55,9 +55,9 @@ The Playwright runner used the project-installed package with headless Chromium 
 ## Live production verification and service audit (2026-11-24)
 
 ### Production deployment
-- **Vercel deployment ID:** `dpl_6EGmrg8q684Mt5bm3haFbF965JMu`
+- **Vercel deployment ID:** `dpl_FXPr6NtekFgpzGnrcbotFgdgcHRx`
 - **State:** `READY` (Promoted to Production)
-- **Git Commit:** `4e912f9ef0c8b45eb0bb8ea8c5121f2f1d4c9ede`
+- **Git Commit:** `e9a98fe06bd600b121aebb6b3a60813125102ad0` (`fix(mobile): resolve CTA stacking and hero 3D sculpture reverse scroll lifecycle`)
 - **Aliases:** `www.theostrum.tech`, `theostrum.tech`, `ostrum-delta.vercel.app`
 - **Public URL:** `https://www.theostrum.tech/`
 

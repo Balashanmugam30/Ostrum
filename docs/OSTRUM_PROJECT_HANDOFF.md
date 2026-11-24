@@ -147,3 +147,8 @@ Commit `76c2a99c68fa0d1fb6c404680d81bf7690df5d87` is deployed as Vercel producti
   - Expanded mobile hero reset zone to `scrollY <= 30` (matching `IntroHero` `isScrolled` boundary) and `OstrumLogo` reset to `targetScrollY <= 8` so that rapid reverse flings reliably lock the sculpture into the O counter with 0 rotation and proper scale.
   - Verified across 3 rapid full-page reverse scroll cycles on `390×844`: sculpture renders with `opacity: 1`, `rotY: 0`, and coordinates `(56.76, 325.02)` centered in the O, with subsequent downward scroll resuming animation smoothly.
 - **Desktop regression passed:** Pinned Capabilities stage, desktop hero 3D sculpture, and pinned CTA curtain reveal verified with 0 console errors and 0px horizontal overflow.
+- **Production release details:**
+  - Git Commit: `e9a98fe06bd600b121aebb6b3a60813125102ad0` (`fix(mobile): resolve CTA stacking and hero 3D sculpture reverse scroll lifecycle`).
+  - Vercel Deployment ID: `dpl_FXPr6NtekFgpzGnrcbotFgdgcHRx` (`READY`, `production`).
+  - Aliases: `www.theostrum.tech`, `theostrum.tech`, `ostrum-delta.vercel.app`.
+  - Live Playwright verification on `https://www.theostrum.tech/`: All 3 mobile viewports (`320×568`, `390×844`, `428×926`) and desktop (`1440×900`) verified passing live with zero defects.
