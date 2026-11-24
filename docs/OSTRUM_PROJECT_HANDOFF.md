@@ -154,3 +154,25 @@ Commit `76c2a99c68fa0d1fb6c404680d81bf7690df5d87` is deployed as Vercel producti
   - Vercel Deployment ID: `dpl_FXPr6NtekFgpzGnrcbotFgdgcHRx` (`READY`, `production`).
   - Aliases: `www.theostrum.tech`, `theostrum.tech`, `ostrum-delta.vercel.app`.
   - Live Playwright verification on `https://www.theostrum.tech/`: All 3 mobile viewports (`320×568`, `390×844`, `428×926`) and desktop (`1440×900`) verified passing live with zero defects.
+
+## Mobile hero return, steady CTA reveal, and persistent header logo (2026-11-24)
+
+- **Hero 3D Sculpture Reverse-Scroll Return:**
+  - In `components/visuals/OstrumContinuousJourney.tsx`, removed active-path `isInitialized = false` from `syncAnimation()` so touch events do not constantly invalidate the pose while scrolling.
+  - Pausing outside storytelling range (`scrollY > exitBoundary`) sets `container.style.opacity = '0'`, cancels RAF, and sets `isInitialized = false`.
+  - Re-entering storytelling range (`scrollY <= exitBoundary`) immediately restores wrapper opacity `1` before scheduling a new RAF loop.
+  - At hero (`scrollY <= 30 && currentPhase === 'complete'`), enforces wrapper opacity `1`, `rotation.y = 0`, `modelRoot.visible = true`, `material.opacity = 1`, and `ribbonGroup.visible = false`.
+  - Verified across 5 consecutive top-to-bottom-to-top cycles on `390×844`: 100% sculpture return with zero pose drift.
+- **Steady 1:1 Mobile CTA Curtain Reveal:**
+  - In `components/sections/OstrumFooterReveal.tsx`, kept unpinned in normal document flow (no `pin: container`).
+  - Set dynamic `end: () => "+=" + getLiftDistance()` and `scrub: 0.6`.
+  - Calculated `extraTravel = Math.max(0, getLiftDistance() - naturalTravel)` dynamically on `onRefreshInit` and applied as `marginTop` to stage.
+  - Verified at `390×844` (844px lift over 844px travel) and `360×800` (800px lift over 800px travel): at bottom, `stProgress === 1.0`, curtain visibility is `hidden`, pointer events are `none`, footer links are clickable, and void after footer is `0px`.
+- **Persistent & Contrast-Safe Header Logo:**
+  - In `components/navigation/Header.tsx`, kept `<header>` visible after intro reveal (`!isRevealed ? 'opacity-0' : 'opacity-100'`), preventing disappearance during cinematic sections or in footer.
+  - Logo button has permanent `opacity-100 translate-y-0 pointer-events-auto`.
+  - Only navigation controls (`mobile-menu-toggle`) disappear in footer or cinematic sections.
+  - Replaced inline-style string matching in `checkContrast()` with explicit `data-selection-surface` and `data-theme` contract, sampling beneath logo anchor and center.
+  - Logo text is dark `#161514` on light surfaces and warm white `#FFF8F3` on dark surfaces.
+  - Added explicit surface markers to `OstrumTestimonialsSection.tsx`, `OstrumCapabilitiesSection.tsx`, and `OstrumContactSection.tsx`. Mobile drawer logo uses `#FFF8F3`.
+  - Full report: `reports/audits/OSTRUM_MOBILE_HERO_CTA_LOGO_REPAIR_2026-11-24.md`.

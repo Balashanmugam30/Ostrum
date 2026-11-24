@@ -34,19 +34,42 @@ export function Header() {
 
   const checkContrast = useCallback(() => {
     if (typeof document === 'undefined') return false;
-    // Sample the page beneath the floating header. Sampling x=60 can hit the
-    // header's own back-to-top button, which prevents light sections from ever
-    // being detected once that button becomes visible.
-    const headerPointY = Math.min(40, window.innerHeight - 1);
-    const targetEl = document
-      .elementsFromPoint(window.innerWidth / 2, headerPointY)
-      .find((element) => !element.closest('.header'));
-    if (!targetEl) return false;
 
-    const lightAncestor = targetEl.closest(
-      '#testimonials, #capabilities, [data-selection-surface="light"], [data-theme="light"], .bg-white, [style*="background-color: #FFFFFF"], [style*="background-color: rgb(255, 255, 255)"], [style*="#F7F5F2"], [style*="#FAF7F2"]'
-    );
-    return !!lightAncestor;
+    const sampleY = Math.min(36, window.innerHeight - 1);
+    const samplePoints = [
+      Math.min(60, Math.max(24, window.innerWidth * 0.08)), // logo anchor area
+      window.innerWidth / 2,                                // center header area
+    ];
+
+    for (const sampleX of samplePoints) {
+      const elements = document.elementsFromPoint(sampleX, sampleY);
+      const targetEl = elements.find(
+        (el) => !el.closest('.header') && !el.closest('#mobile-nav-drawer')
+      );
+      if (!targetEl) continue;
+
+      const surfaceEl = targetEl.closest(
+        '[data-selection-surface], [data-theme], #capabilities, #testimonials, #faq'
+      );
+      if (surfaceEl) {
+        const surface = surfaceEl.getAttribute('data-selection-surface');
+        const theme = surfaceEl.getAttribute('data-theme');
+        if (
+          surface === 'light' ||
+          theme === 'light' ||
+          surfaceEl.id === 'capabilities' ||
+          surfaceEl.id === 'testimonials' ||
+          surfaceEl.id === 'faq'
+        ) {
+          return true;
+        }
+        if (surface === 'dark' || surface === 'coral' || theme === 'dark') {
+          return false;
+        }
+      }
+    }
+
+    return false;
   }, []);
 
   useEffect(() => {
@@ -80,12 +103,14 @@ export function Header() {
 
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
     window.addEventListener('ostrum:bg-darken', handleDarken);
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
       window.removeEventListener('ostrum:bg-darken', handleDarken);
     };
-  }, [isLegalPage, checkContrast]);
+  }, [isLegalPage, checkContrast, isRevealed]);
 
   // Lock body scroll and listen for Escape key when mobile menu is open
   useEffect(() => {
@@ -148,7 +173,7 @@ export function Header() {
     <>
       <header
         className={`header fixed top-4 sm:top-6 right-4 sm:right-6 left-4 sm:left-6 z-40 flex items-center justify-between transition-colors duration-300 ease-out pointer-events-none ${textColorClass} ${
-          !isRevealed || inFooter || isCinematic
+          !isRevealed
             ? 'opacity-0 pointer-events-none'
             : 'opacity-100'
         }`}
@@ -156,11 +181,7 @@ export function Header() {
         {/* Mini logo revealed on scroll */}
         <button
           onClick={scrollToTop}
-          className={`pointer-events-auto transition-all duration-500 cursor-pointer ${textColorClass} ${
-            scrolled
-              ? 'opacity-100 translate-y-0'
-              : 'opacity-0 -translate-y-2 pointer-events-none'
-          }`}
+          className={`pointer-events-auto transition-all duration-500 cursor-pointer ${textColorClass} opacity-100 translate-y-0`}
           aria-label="Back to top"
         >
           <div className="w-[90px] sm:w-[100px] h-auto">
@@ -171,11 +192,15 @@ export function Header() {
         {/* Mobile Navigation Toggle (Visible on mobile viewports < 768px) */}
         <button
           onClick={() => setIsMenuOpen((prev) => !prev)}
-          className={`pointer-events-auto md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full p-2.5 transition-all duration-300 cursor-pointer ${
+          className={`md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full p-2.5 transition-all duration-300 cursor-pointer ${
             isLightSection
               ? 'text-[#161514] bg-black/5 hover:bg-black/10'
               : 'text-[#FFF8F3] bg-white/10 hover:bg-white/15'
-          } ${scrolled ? 'opacity-100' : 'opacity-90'}`}
+          } ${
+            inFooter || isCinematic
+              ? 'opacity-0 pointer-events-none'
+              : (scrolled ? 'opacity-100 pointer-events-auto' : 'opacity-90 pointer-events-auto')
+          }`}
           aria-label="Toggle Navigation Menu"
           aria-expanded={isMenuOpen}
           aria-controls="mobile-nav-drawer"
@@ -223,7 +248,7 @@ export function Header() {
             aria-label="Ostrum Home"
             className="w-[105px] h-auto cursor-pointer"
           >
-            <OstrumLogo className="text-white" />
+            <OstrumLogo className="text-[#FFF8F3]" />
           </button>
           <button
             onClick={() => setIsMenuOpen(false)}

@@ -594,6 +594,7 @@ export function OstrumCapabilitiesSection() {
       <div
         ref={pinContainerRef}
         data-testid="capabilities-pin-container"
+        data-selection-surface="light"
         className="capabilities-stage relative md:sticky md:top-0 w-full min-h-0 md:h-screen md:h-[100svh] md:min-h-screen md:min-h-[100svh] flex flex-col justify-start md:justify-between overflow-visible md:overflow-hidden pt-10 sm:pt-14 md:pt-16 pb-8 md:pb-3 bg-[#FFFFFF]"
         style={{
           backgroundColor: '#FFFFFF',

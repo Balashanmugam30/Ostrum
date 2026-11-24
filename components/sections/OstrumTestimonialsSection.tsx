@@ -234,8 +234,8 @@ export function OstrumTestimonialsSection({
     return (
       <section
         id="testimonials"
-      data-selection-surface="light"
-        data-testid="testimonials-section"
+      data-testid="testimonials-section"
+        data-selection-surface="light"
         className="relative z-[26] w-full bg-white py-24 px-4 sm:px-8 select-text"
         style={{ backgroundColor: '#FFFFFF' }}
         aria-label="Testimonials"
@@ -321,6 +321,7 @@ export function OstrumTestimonialsSection({
       id="testimonials"
       ref={sectionRef}
       data-testid="testimonials-section"
+      data-selection-surface="light"
       className="relative z-[26] w-full bg-white select-text overflow-visible"
       style={{ backgroundColor: '#FFFFFF' }}
       aria-label="Testimonials"
@@ -329,6 +330,7 @@ export function OstrumTestimonialsSection({
       <div
         ref={stageRef}
         data-testid="testimonials-stage"
+        data-selection-surface="light"
         className="sticky top-0 w-full h-screen h-[100svh] min-h-screen overflow-hidden bg-white flex flex-col items-center justify-center relative px-4 sm:px-8"
         style={{ backgroundColor: '#FFFFFF' }}
       >

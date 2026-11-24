@@ -105,6 +105,7 @@ export function OstrumContactSection() {
     <section
       id="contact"
       data-testid="contact-section"
+      data-selection-surface="dark"
       className="relative z-20 w-full overflow-hidden select-text text-black bg-transparent"
       aria-label="Contact and Project Enquiry"
     >

@@ -128,6 +128,12 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         // z-20 on #faq-contact-field) ensures the CTA never slips beneath the contact form.
         container.dataset.mobileCurtainActive = 'true';
         const getLiftDistance = () => curtain.offsetHeight || window.innerHeight;
+        const updateExtraTravel = () => {
+          const naturalTravel = Math.max(0, stage.offsetHeight - window.innerHeight);
+          const extraTravel = Math.max(0, getLiftDistance() - naturalTravel);
+          stage.style.marginTop = `${extraTravel}px`;
+        };
+        updateExtraTravel();
 
         gsap.set(curtain, {
           position: 'absolute',
@@ -141,7 +147,11 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
           visibility: 'visible',
           pointerEvents: 'auto',
         });
-        gsap.set(stage, { position: 'relative', zIndex: 10, width: '100%' });
+        gsap.set(stage, {
+          position: 'relative',
+          zIndex: 10,
+          width: '100%',
+        });
 
         const tl = gsap.timeline({ paused: true });
         tl.to(curtain, { y: () => -getLiftDistance(), ease: 'none' });
@@ -149,10 +159,11 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         const trigger = ScrollTrigger.create({
           trigger: container,
           start: 'top top',
-          end: 'bottom bottom',
+          end: () => `+=${getLiftDistance()}`,
           scrub: 0.6,
           id: 'mobile-curtain-reveal-cta',
           invalidateOnRefresh: true,
+          onRefreshInit: updateExtraTravel,
           animation: tl,
           onUpdate: (self) => {
             curtain.style.pointerEvents = self.progress >= 0.95 ? 'none' : 'auto';

@@ -902,6 +902,9 @@ export function OstrumContinuousJourney() {
         modelRoot.visible = true;
         material.opacity = 1;
         ribbonGroup.visible = false;
+        if (container.style.opacity !== '1') {
+          container.style.opacity = '1';
+        }
       }
 
       // Zero-G subtle organic breathing float: active during journey (Hero & travel)
@@ -1010,17 +1013,7 @@ export function OstrumContinuousJourney() {
         container.style.opacity = '1';
       }
 
-      // Recompute pose before interpolation resumes on phone
-      if (isMobile) {
-        isInitialized = false;
-      }
-
-      // Clear stale lerp state when returning to hero
-      if (scrollY <= 30) {
-        if (isMobile) isInitialized = false;
-      }
-
-      // Make RAF cancel/restart idempotent
+      // Make RAF cancel/restart idempotent (never more than one RAF loop)
       if (animId === 0) {
         animId = requestAnimationFrame(animate);
       }
