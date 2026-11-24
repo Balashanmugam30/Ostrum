@@ -119,9 +119,13 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
 
     mm.add('(max-width: 767px)', () => {
       if (showCTA) {
-        // Reuse the desktop curtain itself on phones, but keep the wrapper in
-        // document flow instead of adding a pin spacer. The curtain tracks the
-        // CTA-to-footer scroll interval and fully resets on reverse scroll.
+        // Pinned theatre curtain reveal on mobile matching desktop choreography:
+        // The CTA section scrolls into view in normal document flow. Once it
+        // reaches the top of the viewport ('top top'), the wrapper pins and
+        // the curtain lifts cleanly upward over 100svh of scroll travel,
+        // revealing the underlying studio footer stage. Stacking precedence
+        // (z-30 on #theatre-stage-wrapper vs z-20 on #faq-contact-field) ensures
+        // the CTA never slips beneath the contact form.
         container.dataset.mobileCurtainActive = 'true';
         const getLiftDistance = () => curtain.offsetHeight || window.innerHeight;
 
@@ -144,8 +148,10 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
 
         const trigger = ScrollTrigger.create({
           trigger: container,
-          start: 'top bottom',
+          start: 'top top',
           end: () => `+=${getLiftDistance()}`,
+          pin: container,
+          pinSpacing: true,
           scrub: 0.6,
           anticipatePin: 1,
           id: 'mobile-curtain-reveal-cta',
@@ -277,7 +283,7 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
   // Reduced motion fallback: show components sequentially in normal document flow
   if (isReducedMotion) {
     return (
-      <div className="relative w-full overflow-hidden bg-[#64120F]">
+      <div className="relative z-30 w-full overflow-hidden bg-[#64120F]">
         {showCTA && <OstrumLiquidSandCTA />}
         <div className="relative z-10 w-full bg-[#64120F]">
           <OstrumStudioFooter />
@@ -292,7 +298,7 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
       id="theatre-stage-wrapper"
       data-testid="theatre-curtain-reveal-container"
       data-show-cta={showCTA ? 'true' : 'false'}
-      className="relative w-full overflow-hidden bg-[#64120F]"
+      className="relative z-30 w-full overflow-hidden bg-[#64120F]"
     >
       {/* THEATRE CURTAIN: Foreground Closing Panel (z-20) */}
       <div

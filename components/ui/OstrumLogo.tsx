@@ -60,7 +60,7 @@ export function OstrumLogo({
       // Keep the existing desktop response. On phones, use time-based
       // smoothing and reset at the top so a fast reverse fling cannot leave
       // the per-letter parallax translated far outside the hero.
-      if (isMobile && targetScrollY <= 2) {
+      if (isMobile && targetScrollY <= 8) {
         currentScrollY = 0;
       } else if (isMobile) {
         const elapsed = Math.min(64, time - previousFrameTime);

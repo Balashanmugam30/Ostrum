@@ -898,10 +898,10 @@ export function OstrumContinuousJourney() {
 
       // A fast mobile reverse fling can stop at the hero before the paused
       // canvas has caught up with the scroll-derived pose. Lock the sculpture
-      // back into the O at the top so it cannot remain rotated or offscreen;
+      // back into the O at the top (scrollY <= 30) so it cannot remain rotated or offscreen;
       // the normal scroll-linked interpolation resumes as soon as the user
       // scrolls away from the hero.
-      if (isMobile && scrollY <= 12 && currentPhase === 'complete') {
+      if (isMobile && scrollY <= 30 && currentPhase === 'complete') {
         currentX = targetWorld.x;
         currentY = targetWorld.y;
         currentScale = targetScale;
@@ -995,12 +995,17 @@ export function OstrumContinuousJourney() {
     };
 
     const syncAnimation = () => {
+      if (isDisposed || isContextLost) return;
       const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
       const exitBoundary = stEnergy ? stEnergy.end + 100 : anchors.exitScrollY;
-      if (window.scrollY > exitBoundary) {
+      const scrollY = window.scrollY;
+
+      if (scrollY > exitBoundary) {
         if (container.style.opacity !== '0') container.style.opacity = '0';
-        cancelAnimationFrame(animId);
-        animId = 0;
+        if (animId !== 0) {
+          cancelAnimationFrame(animId);
+          animId = 0;
+        }
         if (isMobile) isInitialized = false;
         return;
       }
@@ -1008,14 +1013,32 @@ export function OstrumContinuousJourney() {
       if (container.style.opacity !== '1') {
         container.style.opacity = '1';
       }
-      if (!isDisposed && !isContextLost && animId === 0) {
+
+      // If returning to hero at the top on phone, clear stale lerp state
+      if (isMobile && scrollY <= 30) {
+        isInitialized = false;
+      }
+
+      if (animId === 0) {
         animId = requestAnimationFrame(animate);
       }
     };
     wakeAnimation = syncAnimation;
 
     window.addEventListener('scroll', syncAnimation, { passive: true });
+    if (typeof window !== 'undefined' && 'onscrollend' in window) {
+      window.addEventListener('scrollend', syncAnimation, { passive: true });
+    }
+    ScrollTrigger.addEventListener('scrollStart', syncAnimation);
+    ScrollTrigger.addEventListener('scrollEnd', syncAnimation);
     ScrollTrigger.addEventListener('refresh', syncAnimation);
+
+    const onVisibilityChange = () => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        syncAnimation();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
     syncAnimation();
 
     // 10. Resize Handling
@@ -1038,7 +1061,13 @@ export function OstrumContinuousJourney() {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', syncAnimation);
+      if (typeof window !== 'undefined' && 'onscrollend' in window) {
+        window.removeEventListener('scrollend', syncAnimation);
+      }
+      ScrollTrigger.removeEventListener('scrollStart', syncAnimation);
+      ScrollTrigger.removeEventListener('scrollEnd', syncAnimation);
       ScrollTrigger.removeEventListener('refresh', syncAnimation);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('ostrum:focus-bias', handleFocusBias);
       window.removeEventListener('ostrum:narrative-ready', onNarrativeReady);

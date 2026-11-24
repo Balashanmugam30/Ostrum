@@ -115,4 +115,35 @@ Commit `76c2a99c68fa0d1fb6c404680d81bf7690df5d87` is deployed as Vercel producti
 - Touch emulation on the production build completed 36 upward swipes from the footer to the hero and 36 downward swipes back to the footer. At the hero the model was visible, rotation was `0`, the O letter transform was `translate3d(0px, 0px, 0px)`, and the page retained one Capabilities section/six cards/footer. No page errors or failed requests were observed.
 - The mobile wheel reveal was observed at normalized transition progress `0.580` with the temporary container fixed, then released to normal flow at completion. The CTA curtain had a mobile, unpinned ScrollTrigger and lifted about 375px at midpoint on a 390×844 viewport. Full mobile darkening was `#050505` at opacity `1`.
 - Desktop regression at 1440×900 retained the sticky Capabilities stage and the pinned `theatre-curtain-reveal-cta` trigger. The desktop curtain was translated about 429px at midpoint. No desktop overflow or browser errors were observed.
-- Evidence and commands are in `reports/audits/OSTRUM_MOBILE_SCROLL_EFFECT_PARITY_2026-11-24.md`. The supplied exact blank-page screenshot was not reproduced, and no physical Android device or new Lighthouse run was available in this pass. The previously measured low Lighthouse performance remains a separate open performance task.
+- Evidence and commands are in `reports/audits/OSTRUM_MOBILE_SCROLL_EFFECT_PARITY_2026-11-24.md`. The supplied exact blank-page screenshot was not reproduced, and no physical Android device was available in this pass.
+
+### Live production release status (2026-11-24)
+
+- Commit `4e912f9ef0c8b45eb0bb8ea8c5121f2f1d4c9ede` is deployed as Vercel production deployment `dpl_6EGmrg8q684Mt5bm3haFbF965JMu` (`READY`, `PROMOTED`) with aliases `www.theostrum.tech` and `theostrum.tech`.
+- Live Playwright checks on `https://www.theostrum.tech/`:
+  - Mobile hero return, wheel reveal to vertical 6 cards, solid `#050505` dark stage, unpinned CTA curtain lift (`-844px`), and 3 reverse scroll stress cycles passed with 0 console errors, 0 failed requests, and 0px horizontal overflow across all tested viewports.
+  - Desktop 1440×900 regression confirms sticky Capabilities and pinned CTA curtain (`-900px`) remain intact.
+  - Sitemap (`/sitemap.xml`) returns HTTP 200 with 3 canonical URLs; robots (`/robots.txt`) returns HTTP 200 with search engine directives.
+  - Analytics consent gating verified: 0 GA requests sent by default or on Decline; banner functions on mobile and desktop; clicking Accept triggers GA4 script (`G-Z8VEVVW4GY`) and updates consent storage.
+  - Upstash Redis database `ostrum-redis` (`store_VJSmeeRXdCRIGkXE`) is connected on the Free ($0) plan and verified responding with HTTP 200 `PONG`. Rate-limiter fail-closed prerequisites are satisfied.
+  - Resend domain `theostrum.tech` is verified and sending enabled across all 4 DNS records.
+- Fresh live Lighthouse 13.6.0 audit (Nov 24, 2026):
+  - Mobile: Performance 44, Accessibility 100, Best Practices 100, SEO 100; FCP 1.1s, LCP 5.8s, TBT 4,930ms (improved from 10.9s baseline), CLS 0, Speed Index 5.7s, total transfer 1,757 KiB.
+  - Desktop: Performance 47, Accessibility 100, Best Practices 100, SEO 100; FCP 0.5s, LCP 2.5s, TBT 1,930ms (improved from 4.2s baseline), CLS 0, Speed Index 5.6s, total transfer 3,990 KiB.
+  - Primary performance constraint remains initial JavaScript bootup and main-thread execution during WebGL/GSAP initialization, which remains an open follow-up optimization.
+
+## Mobile defects repair: CTA stacking & 3D hero lifecycle (2026-11-24)
+
+- **Issue 1 (CTA behind enquiry form) resolved:**
+  - Diagnosed stacking context conflict between `#faq-contact-field` (`relative z-20`) and `#theatre-stage-wrapper` (`relative z-auto`), exacerbated by premature upward translation at `start: 'top bottom'` which pushed ~250px of the CTA behind the contact form.
+  - Elevating `#theatre-stage-wrapper` to `relative z-30` guarantees strict stacking precedence over `#faq-contact-field`.
+  - Re-aligning mobile ScrollTrigger to `start: 'top top'` with `pin: container` and `pinSpacing: true` allows the CTA section to enter in normal document flow, pin when full-screen, and lift cleanly upwards by 100svh to reveal `OstrumStudioFooter`.
+  - Verified across `320×568`, `360×640`, `390×844`, and `428×926`: crossing transform is identity (`matrix(1, 0, 0, 1, 0, 0)`), midpoint transform is lifted cleanly, and footer pointer events switch to `none` at `progress >= 0.95`.
+- **Issue 2 (Hero 3D sculpture disappearance on reverse scroll) resolved:**
+  - Asset verified: `/models/monyedre-360-mobile.glb` (mobile, 684 KB) and `/models/monyedre-360.glb` (desktop, 2.87 MB), loaded via `THREE.GLTFLoader` in `components/visuals/OstrumContinuousJourney.tsx` line 334.
+  - Diagnosed pause/wake lifecycle failure: mobile offscreen pause (`container.style.opacity = '0'` and `cancelAnimationFrame(animId)`) only listened to `window.onscroll` and `ScrollTrigger.refresh`. On touch devices with momentum flings, the browser often stops without firing a final scroll event, stranding the canvas paused at `opacity: 0`.
+  - Expanded wake listeners to include `scroll`, `scrollend`, `ScrollTrigger.scrollStart`, `ScrollTrigger.scrollEnd`, `ScrollTrigger.refresh`, and `document.visibilitychange`.
+  - In `syncAnimation`, guaranteed `container.style.opacity = '1'` and restarted the render loop whenever `scrollY <= exitBoundary`.
+  - Expanded mobile hero reset zone to `scrollY <= 30` (matching `IntroHero` `isScrolled` boundary) and `OstrumLogo` reset to `targetScrollY <= 8` so that rapid reverse flings reliably lock the sculpture into the O counter with 0 rotation and proper scale.
+  - Verified across 3 rapid full-page reverse scroll cycles on `390×844`: sculpture renders with `opacity: 1`, `rotY: 0`, and coordinates `(56.76, 325.02)` centered in the O, with subsequent downward scroll resuming animation smoothly.
+- **Desktop regression passed:** Pinned Capabilities stage, desktop hero 3D sculpture, and pinned CTA curtain reveal verified with 0 console errors and 0px horizontal overflow.
