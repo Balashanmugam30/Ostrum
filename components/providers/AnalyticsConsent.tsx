@@ -31,12 +31,25 @@ function loadAnalytics() {
   if (typeof window === 'undefined') return;
 
   window.dataLayer = window.dataLayer || [];
-  window.gtag = window.gtag || function gtag(...args: unknown[]) {
-    window.dataLayer?.push(args);
-  };
+  window.gtag =
+    window.gtag ||
+    function gtag() {
+      // gtag.js processes array-like `arguments` entries rather than plain JS arrays.
+      // eslint-disable-next-line prefer-rest-params
+      window.dataLayer?.push(arguments);
+    };
 
   window.gtag('consent', 'default', {
     analytics_storage: 'denied',
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+  });
+  // loadAnalytics() is invoked only after explicit user opt-in; apply granted
+  // analytics consent before js/config so the initial page_view carries gcs=G101
+  // and reuses the persistent _ga client ID across page reloads.
+  window.gtag('consent', 'update', {
+    analytics_storage: 'granted',
     ad_storage: 'denied',
     ad_user_data: 'denied',
     ad_personalization: 'denied',
