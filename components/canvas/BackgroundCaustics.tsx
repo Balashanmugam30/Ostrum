@@ -1,35 +1,47 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import * as THREE from 'three';
+import { isHandheldTouchDevice, subscribeDeviceTierChange } from '@/lib/device-tier';
 
 export function BackgroundCaustics() {
   const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [useStaticFallback, setUseStaticFallback] = useState(true);
 
   const isLegalPage =
     pathname?.startsWith('/terms-and-conditions') ||
     pathname?.startsWith('/privacy-policy');
 
-  // The mobile fallback uses the same tall art as the desktop shader, but moves
-  // the image and darkens it with document scroll instead of rendering WebGL.
+  useEffect(() => {
+    if (isLegalPage) return;
+    const syncTier = () => {
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      setUseStaticFallback(isHandheldTouchDevice() || reducedMotion);
+    };
+    syncTier();
+    return subscribeDeviceTierChange(syncTier);
+  }, [isLegalPage]);
+
+  // The fallback layer uses the tall crimson artwork with scroll parallax and darkening
+  // on all handheld devices (including phone "Request desktop site") or if WebGL fails/loses context.
   useEffect(() => {
     if (isLegalPage) return;
 
     const container = containerRef.current;
     if (!container) return;
 
-    const mobileQuery = window.matchMedia('(max-width: 767px)');
     let frame = 0;
 
     const update = () => {
       if (frame) return;
       frame = window.requestAnimationFrame(() => {
         frame = 0;
-        const isMobile = mobileQuery.matches;
-        container.dataset.mobileBackground = String(isMobile);
-        if (!isMobile) return;
+        const isStaticActive =
+          useStaticFallback || container.dataset.webglFailed === 'true';
+        container.dataset.mobileBackground = String(isStaticActive);
+        if (!isStaticActive) return;
 
         const maxScroll = Math.max(
           1,
@@ -57,32 +69,37 @@ export function BackgroundCaustics() {
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update, { passive: true });
-    mobileQuery.addEventListener('change', update);
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
-      mobileQuery.removeEventListener('change', update);
-      delete container.dataset.mobileBackground;
-      container.style.removeProperty('--bg-scroll-position');
+      container.style.removeProperty('--bg-scroll-offset');
       container.style.removeProperty('--bg-darken');
     };
-  }, [isLegalPage]);
+  }, [isLegalPage, useStaticFallback]);
 
   useEffect(() => {
-    if (isLegalPage) return;
+    if (isLegalPage || useStaticFallback) return;
 
     const container = containerRef.current;
     if (!container) return;
 
-    const isMobile = window.innerWidth < 768;
-    if (isMobile) return;
+    delete container.dataset.webglFailed;
 
+    const isMobile = window.innerWidth < 768;
     let animationFrameId = 0;
     const size = { width: container.clientWidth || window.innerWidth, height: container.clientHeight || window.innerHeight };
 
-    const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' });
+    } catch {
+      container.dataset.webglFailed = 'true';
+      container.dataset.mobileBackground = 'true';
+      return;
+    }
+
     renderer.setSize(size.width, size.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
     renderer.domElement.style.display = 'block';
@@ -91,6 +108,9 @@ export function BackgroundCaustics() {
     renderer.domElement.style.position = 'absolute';
     renderer.domElement.style.inset = '0';
     renderer.domElement.style.pointerEvents = 'none';
+    // Keep CSS art visible until the shader texture has decoded and rendered its first frame
+    renderer.domElement.style.opacity = '0';
+    renderer.domElement.style.transition = 'opacity 180ms ease';
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -373,15 +393,31 @@ export function BackgroundCaustics() {
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
     scene.add(mesh);
 
+    let hasTexture = false;
     const textureLoader = new THREE.TextureLoader();
-    textureLoader.load('/images/bg.webp', (tex) => {
-      tex.minFilter = THREE.LinearFilter;
-      tex.magFilter = THREE.LinearFilter;
-      material.uniforms.uTexture.value = tex;
-      if (tex.image) {
-        material.uniforms.uTextureResolution.value.set(tex.image.width, tex.image.height);
-      }
-    });
+    textureLoader.load(
+      '/images/bg.webp',
+      (tex) => {
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        material.uniforms.uTexture.value = tex;
+        if (tex.image) {
+          material.uniforms.uTextureResolution.value.set(tex.image.width, tex.image.height);
+        }
+        hasTexture = true;
+        if (!isContextLost && isVisible) {
+          renderer.render(scene, camera);
+        }
+        renderer.domElement.style.opacity = '1';
+      },
+      undefined,
+      () => {
+        // Ensure static CSS art remains visible if desktop texture fails to load or decode.
+        container.dataset.webglFailed = 'true';
+        container.dataset.mobileBackground = 'true';
+        renderer.domElement.style.opacity = '0';
+      },
+    );
 
     const mousePos = { x: 0.5, y: 0.5 };
     const targetPos = { x: 0.5, y: 0.5 };
@@ -459,10 +495,16 @@ export function BackgroundCaustics() {
       isContextLost = true;
       cancelAnimationFrame(animationFrameId);
       animationFrameId = 0;
+      renderer.domElement.style.opacity = '0';
+      container.dataset.webglFailed = 'true';
+      container.dataset.mobileBackground = 'true';
     };
 
     const onContextRestored = () => {
       isContextLost = false;
+      delete container.dataset.webglFailed;
+      container.dataset.mobileBackground = 'false';
+      renderer.domElement.style.opacity = hasTexture ? '1' : '0';
       updateVisibility();
       scheduleFrame();
     };
@@ -562,7 +604,7 @@ export function BackgroundCaustics() {
       mesh.geometry.dispose();
       renderer.dispose();
     };
-  }, [isLegalPage]);
+  }, [isLegalPage, useStaticFallback]);
 
   if (isLegalPage) {
     return null;

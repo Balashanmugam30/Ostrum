@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { OstrumLiquidSandCTA } from '@/components/sections/OstrumLiquidSandCTA';
 import { OstrumStudioFooter } from '@/components/sections/OstrumStudioFooter';
+import { isHandheldTouchDevice, subscribeDeviceTierChange } from '@/lib/device-tier';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -37,15 +38,9 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
     const stage = stageRef.current;
     if (!container || !curtain || !stage) return;
 
-    const mm = gsap.matchMedia();
+    const setupDesktopPinned = () => {
+      const getLiftDistance = () => curtain.offsetHeight || window.innerHeight;
 
-    // Keep the pinned theatre reveal on desktop, where pointer scrolling is
-    // predictable. Touch devices use a normal-flow CTA and footer so a fast
-    // fling in either direction cannot strand the page inside a pin spacer.
-    mm.add('(min-width: 768px)', () => {
-      const getLiftDistance = () => window.innerHeight;
-
-      // Initialize curtain layer: spans 100% width and full viewport height (100svh)
       gsap.set(curtain, {
         position: 'absolute',
         top: 0,
@@ -56,17 +51,15 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         y: 0,
         autoAlpha: 1,
         visibility: 'visible',
-        pointerEvents: showCTA ? 'auto' : 'auto',
+        pointerEvents: 'auto',
       });
 
-      // Underlying stage layer
       gsap.set(stage, {
         position: 'relative',
         zIndex: 10,
         width: '100%',
       });
 
-      // Lift animation: clean 1:1 translation upwards by exactly one viewport height
       const tl = gsap.timeline({ paused: true });
       tl.to(curtain, {
         y: () => -getLiftDistance(),
@@ -86,8 +79,6 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         animation: tl,
         onUpdate: (self) => {
           if (curtain) {
-            // Disable pointer events on curtain only when near fully lifted
-            // ensuring hidden footer links cannot be clicked through the mask
             curtain.style.pointerEvents = self.progress >= 0.95 ? 'none' : 'auto';
           }
         },
@@ -115,23 +106,86 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         tl.kill();
         gsap.set([curtain, stage], { clearProps: 'all' });
       };
-    });
+    };
 
-    mm.add('(max-width: 767px)', () => {
+    const setupHandheldFlow = () => {
       if (showCTA) {
-        // Unpinned theatre curtain reveal on mobile matching desktop choreography in normal document flow:
-        // The CTA section scrolls into view in normal document flow. Once it reaches
-        // the top of the viewport ('top top'), the curtain lifts cleanly upward over
-        // the natural scroll travel of the stage wrapper, revealing the underlying
-        // studio footer stage without pinning the wrapper or creating any trailing
-        // pin-spacer void. Stacking precedence (z-30 on #theatre-stage-wrapper vs
-        // z-20 on #faq-contact-field) ensures the CTA never slips beneath the contact form.
         container.dataset.mobileCurtainActive = 'true';
         const getLiftDistance = () => curtain.offsetHeight || window.innerHeight;
+        const naturalStageHeight = stage.offsetHeight;
+        const vpH = getLiftDistance();
+
+        // Tall portrait phone viewports (e.g. Chrome "Request desktop site" at ~980x1742)
+        // fit the entire studio footer inside 100svh. Locking stage with sticky positioning
+        // while the CTA scrolls natively 1:1 prevents pin-spacer cutoff and bottom voids.
+        if (naturalStageHeight <= vpH + 2) {
+          container.style.overflowX = 'clip';
+          container.style.overflowY = 'visible';
+          container.style.minHeight = `${vpH + naturalStageHeight}px`;
+
+          gsap.set(curtain, {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100svh',
+            zIndex: 20,
+            y: 0,
+            autoAlpha: 1,
+            visibility: 'visible',
+            pointerEvents: 'auto',
+          });
+          gsap.set(stage, {
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+            width: '100%',
+          });
+
+          const trigger = ScrollTrigger.create({
+            trigger: container,
+            start: 'top top',
+            end: () => `+=${getLiftDistance()}`,
+            id: 'mobile-curtain-reveal-cta',
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              curtain.style.pointerEvents = self.progress >= 0.95 ? 'none' : 'auto';
+            },
+            onLeave: () => {
+              curtain.style.pointerEvents = 'none';
+              curtain.style.visibility = 'hidden';
+            },
+            onEnterBack: (self) => {
+              curtain.style.visibility = 'visible';
+              curtain.style.pointerEvents = self.progress >= 0.95 ? 'none' : 'auto';
+            },
+            onLeaveBack: () => {
+              curtain.style.visibility = 'visible';
+              curtain.style.pointerEvents = 'auto';
+            },
+          });
+
+          const refreshTimeout = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+          return () => {
+            window.clearTimeout(refreshTimeout);
+            trigger.kill();
+            delete container.dataset.mobileCurtainActive;
+            container.style.overflowX = '';
+            container.style.overflowY = '';
+            container.style.minHeight = '';
+            gsap.set([curtain, stage], { clearProps: 'all' });
+          };
+        }
+
+        // Unpinned normal-flow reveal when footer exceeds 100svh (390x844 mobile or short landscape).
+        const naturalTravel = Math.max(0, naturalStageHeight - vpH);
+        const extraTravel = Math.max(0, vpH - naturalTravel);
+        const totalTravel = Math.max(vpH, extraTravel);
         const updateExtraTravel = () => {
-          const naturalTravel = Math.max(0, stage.offsetHeight - window.innerHeight);
-          const extraTravel = Math.max(0, getLiftDistance() - naturalTravel);
-          stage.style.marginTop = `${extraTravel}px`;
+          const curVpH = getLiftDistance();
+          const curNatural = Math.max(0, stage.offsetHeight - curVpH);
+          const curExtra = Math.max(0, curVpH - curNatural);
+          stage.style.marginTop = `${curExtra}px`;
         };
         updateExtraTravel();
 
@@ -153,20 +207,29 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
           width: '100%',
         });
 
+        const clearFrac = extraTravel > 0 ? Math.min(1, extraTravel / totalTravel) : 1;
+        const targetCurtainY = extraTravel > 0 ? -Math.min(vpH, naturalTravel) : -vpH;
         const tl = gsap.timeline({ paused: true });
-        tl.to(curtain, { y: () => -getLiftDistance(), ease: 'none' });
+        if (extraTravel > 0) {
+          tl.to(curtain, { y: targetCurtainY, duration: clearFrac, ease: 'none' });
+          if (clearFrac < 1) {
+            tl.to(curtain, { y: targetCurtainY, duration: 1 - clearFrac, ease: 'none' });
+          }
+        } else {
+          tl.to(curtain, { y: () => -getLiftDistance(), ease: 'none' });
+        }
 
         const trigger = ScrollTrigger.create({
           trigger: container,
           start: 'top top',
-          end: () => `+=${getLiftDistance()}`,
+          end: () => `+=${totalTravel}`,
           scrub: 0.6,
           id: 'mobile-curtain-reveal-cta',
           invalidateOnRefresh: true,
           onRefreshInit: updateExtraTravel,
           animation: tl,
           onUpdate: (self) => {
-            curtain.style.pointerEvents = self.progress >= 0.95 ? 'none' : 'auto';
+            curtain.style.pointerEvents = self.progress >= clearFrac * 0.95 ? 'none' : 'auto';
           },
           onLeave: () => {
             curtain.style.pointerEvents = 'none';
@@ -174,7 +237,7 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
           },
           onEnterBack: (self) => {
             curtain.style.visibility = 'visible';
-            curtain.style.pointerEvents = self.progress >= 0.95 ? 'none' : 'auto';
+            curtain.style.pointerEvents = self.progress >= clearFrac * 0.95 ? 'none' : 'auto';
           },
           onLeaveBack: () => {
             curtain.style.visibility = 'visible';
@@ -234,10 +297,26 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         tl.kill();
         gsap.set([curtain, stage], { clearProps: 'all' });
       };
-    });
+    };
+
+    let activeMode: 'handheld' | 'desktop' | null = null;
+    let activeCleanup: (() => void) | undefined;
+
+    const rebuildForTier = () => {
+      const nextMode: 'handheld' | 'desktop' = isHandheldTouchDevice() ? 'handheld' : 'desktop';
+      if (nextMode === activeMode && activeCleanup) return;
+      activeCleanup?.();
+      activeMode = nextMode;
+      activeCleanup = nextMode === 'handheld' ? setupHandheldFlow() : setupDesktopPinned();
+    };
+
+    rebuildForTier();
+    const unsubTier = subscribeDeviceTierChange(rebuildForTier);
 
     return () => {
-      mm.revert();
+      unsubTier();
+      activeCleanup?.();
+      activeCleanup = undefined;
     };
   }, [showCTA]);
 

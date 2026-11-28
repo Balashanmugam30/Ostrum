@@ -9,6 +9,101 @@ export interface Card3DAccentProps {
   'data-testid'?: string;
 }
 
+interface SharedCardEntry {
+  render: (time: number, dt: number, renderer: THREE.WebGLRenderer) => void;
+  isVisible: () => boolean;
+}
+
+/**
+ * Single shared offscreen WebGLRenderer across all capability cards on desktop.
+ * Eliminates creating 6+ concurrent WebGL contexts alongside the hero journey,
+ * background shader, and footer CTA.
+ */
+let sharedRenderer: THREE.WebGLRenderer | null = null;
+let sharedRendererLost = false;
+let sharedActiveCount = 0;
+let sharedRafId = 0;
+let sharedLastTime = 0;
+const sharedEntries = new Set<SharedCardEntry>();
+
+function ensureSharedRenderer(): THREE.WebGLRenderer | null {
+  if (sharedRenderer && !sharedRendererLost) return sharedRenderer;
+  if (sharedRenderer && sharedRendererLost) return null;
+
+  try {
+    const renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: true,
+      powerPreference: 'high-performance',
+    });
+    renderer.setClearColor(0x000000, 0);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    renderer.domElement.addEventListener(
+      'webglcontextlost',
+      (e) => {
+        e.preventDefault();
+        sharedRendererLost = true;
+      },
+      false,
+    );
+    renderer.domElement.addEventListener(
+      'webglcontextrestored',
+      () => {
+        sharedRendererLost = false;
+        scheduleSharedLoop();
+      },
+      false,
+    );
+    sharedRenderer = renderer;
+    return renderer;
+  } catch {
+    return null;
+  }
+}
+
+function tickSharedCards(time: number) {
+  sharedRafId = 0;
+  if (sharedEntries.size === 0 || sharedRendererLost) return;
+
+  const renderer = sharedRenderer;
+  if (!renderer) return;
+
+  const dt = sharedLastTime > 0 ? Math.min(0.1, (time - sharedLastTime) / 1000) : 0.016;
+  sharedLastTime = time;
+
+  let anyVisible = false;
+  sharedEntries.forEach((entry) => {
+    if (!entry.isVisible()) return;
+    anyVisible = true;
+    entry.render(time, dt, renderer);
+  });
+
+  if (anyVisible || sharedEntries.size > 0) {
+    sharedRafId = requestAnimationFrame(tickSharedCards);
+  }
+}
+
+function scheduleSharedLoop() {
+  if (sharedRafId === 0 && sharedEntries.size > 0 && !sharedRendererLost) {
+    sharedLastTime = performance.now();
+    sharedRafId = requestAnimationFrame(tickSharedCards);
+  }
+}
+
+function releaseSharedRendererIfUnused() {
+  if (sharedActiveCount > 0 || sharedEntries.size > 0) return;
+  if (sharedRafId) {
+    cancelAnimationFrame(sharedRafId);
+    sharedRafId = 0;
+  }
+  if (sharedRenderer) {
+    sharedRenderer.dispose();
+    sharedRenderer = null;
+    sharedRendererLost = false;
+  }
+}
+
 export function Card3DAccent({
   variant,
   className,
@@ -22,50 +117,47 @@ export function Card3DAccent({
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
+    const ctx2d = canvas.getContext('2d');
+    if (!ctx2d) return;
+
+    sharedActiveCount += 1;
+    const renderer = ensureSharedRenderer();
+    if (!renderer) {
+      sharedActiveCount = Math.max(0, sharedActiveCount - 1);
+      return;
+    }
+
     let isDisposed = false;
     let isVisible = true;
-    let animId: number = 0;
+    let targetW = 320;
+    let targetH = 180;
 
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // 1. Scene, Camera, Renderer
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
     camera.position.set(0, 0, 5.2);
 
-    let renderer: THREE.WebGLRenderer | null = null;
-    try {
-      renderer = new THREE.WebGLRenderer({
-        canvas,
-        alpha: true,
-        antialias: true,
-        powerPreference: 'high-performance',
-      });
-    } catch {
-      return;
-    }
-
-    const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.25);
-    renderer.setPixelRatio(dpr);
-    renderer.setClearColor(0x000000, 0); // 100% transparent
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
-
-    // Resize handler
     const updateSize = () => {
-      if (!container || !renderer) return;
+      if (!container) return;
       const rect = container.getBoundingClientRect();
-      const w = Math.max(120, rect.width);
-      const h = Math.max(120, rect.height);
-      camera.aspect = w / h;
+      targetW = Math.max(120, Math.round(rect.width));
+      targetH = Math.max(120, Math.round(rect.height));
+      const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.25);
+      const pixelW = Math.max(1, Math.round(targetW * dpr));
+      const pixelH = Math.max(1, Math.round(targetH * dpr));
+      if (canvas.width !== pixelW || canvas.height !== pixelH) {
+        canvas.width = pixelW;
+        canvas.height = pixelH;
+      }
+      camera.aspect = targetW / targetH;
       camera.updateProjectionMatrix();
-      renderer.setSize(w, h, false);
     };
     updateSize();
 
-    // 2. Studio Lighting Rig tailored for glossy glass and specular metallics
+    // Studio Lighting Rig tailored for glossy glass and specular metallics
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
     scene.add(ambientLight);
 
@@ -81,7 +173,7 @@ export function Card3DAccent({
     rimLight.position.set(0, 3, -3);
     scene.add(rimLight);
 
-    // 3. Procedural Sculptures for each of the 6 capabilities
+    // Procedural Sculptures for each of the 6 capabilities
     const group = new THREE.Group();
     scene.add(group);
 
@@ -89,7 +181,6 @@ export function Card3DAccent({
     const cleanupMaterials: THREE.Material[] = [];
 
     if (variant === 1) {
-      // 1. DIGITAL EXPERIENCES: Translucent iridescent glass form / sculptural digital interface prism
       const geom = new THREE.IcosahedronGeometry(1.22, 0);
       cleanupGeometries.push(geom);
       const mat = new THREE.MeshPhysicalMaterial({
@@ -106,10 +197,8 @@ export function Card3DAccent({
         attenuationDistance: 1.2,
       });
       cleanupMaterials.push(mat);
-      const mesh = new THREE.Mesh(geom, mat);
-      group.add(mesh);
+      group.add(new THREE.Mesh(geom, mat));
 
-      // Fine wireframe inner accent
       const innerGeom = new THREE.OctahedronGeometry(0.72, 0);
       cleanupGeometries.push(innerGeom);
       const innerMat = new THREE.MeshStandardMaterial({
@@ -118,10 +207,8 @@ export function Card3DAccent({
         roughness: 0.2,
       });
       cleanupMaterials.push(innerMat);
-      const innerMesh = new THREE.Mesh(innerGeom, innerMat);
-      group.add(innerMesh);
+      group.add(new THREE.Mesh(innerGeom, innerMat));
     } else if (variant === 2) {
-      // 2. AI SYSTEMS & AGENTS: Neural structure / luminous orbital core
       const coreGeom = new THREE.SphereGeometry(0.55, 32, 32);
       cleanupGeometries.push(coreGeom);
       const coreMat = new THREE.MeshStandardMaterial({
@@ -132,10 +219,8 @@ export function Card3DAccent({
         metalness: 0.4,
       });
       cleanupMaterials.push(coreMat);
-      const coreMesh = new THREE.Mesh(coreGeom, coreMat);
-      group.add(coreMesh);
+      group.add(new THREE.Mesh(coreGeom, coreMat));
 
-      // Two nested orbital rings
       const ring1Geom = new THREE.TorusGeometry(1.15, 0.055, 16, 64);
       cleanupGeometries.push(ring1Geom);
       const ring1Mat = new THREE.MeshPhysicalMaterial({
@@ -162,7 +247,6 @@ export function Card3DAccent({
       ring2.rotation.y = Math.PI / 4;
       group.add(ring2);
     } else if (variant === 3) {
-      // 3. BUSINESS PLATFORMS: Isometric architectural glass / modular structure
       const cubeMat = new THREE.MeshPhysicalMaterial({
         color: 0xffeed5,
         roughness: 0.1,
@@ -196,7 +280,6 @@ export function Card3DAccent({
       group.rotation.x = 0.55;
       group.rotation.y = 0.78;
     } else if (variant === 4) {
-      // 4. SOFTWARE & PRODUCT ENGINEERING: Layered digital prism / metallic geometry
       const plateGeom = new THREE.CylinderGeometry(1.15, 1.15, 0.16, 6);
       cleanupGeometries.push(plateGeom);
 
@@ -216,7 +299,6 @@ export function Card3DAccent({
         group.add(plate);
       }
     } else if (variant === 5) {
-      // 5. HARDWARE & CONNECTED TECHNOLOGY: Precision-machined electronic sculpture / sensor structure
       const cylGeom = new THREE.CylinderGeometry(0.68, 0.68, 1.1, 32);
       cleanupGeometries.push(cylGeom);
       const cylMat = new THREE.MeshStandardMaterial({
@@ -225,10 +307,8 @@ export function Card3DAccent({
         roughness: 0.2,
       });
       cleanupMaterials.push(cylMat);
-      const cyl = new THREE.Mesh(cylGeom, cylMat);
-      group.add(cyl);
+      group.add(new THREE.Mesh(cylGeom, cylMat));
 
-      // Fine concentric rings
       const torusGeom = new THREE.TorusGeometry(1.05, 0.06, 16, 48);
       cleanupGeometries.push(torusGeom);
       const torusMat = new THREE.MeshPhysicalMaterial({
@@ -248,7 +328,6 @@ export function Card3DAccent({
       t2.scale.set(0.85, 0.85, 0.85);
       group.add(t2);
     } else {
-      // 6. CUSTOM ENGINEERING: Abstract multidisciplinary geometric assembly
       const knotGeom = new THREE.TorusKnotGeometry(0.85, 0.24, 80, 20, 2, 3);
       cleanupGeometries.push(knotGeom);
       const knotMat = new THREE.MeshPhysicalMaterial({
@@ -261,11 +340,9 @@ export function Card3DAccent({
         sheenColor: new THREE.Color(0xffd9b7),
       });
       cleanupMaterials.push(knotMat);
-      const knot = new THREE.Mesh(knotGeom, knotMat);
-      group.add(knot);
+      group.add(new THREE.Mesh(knotGeom, knotMat));
     }
 
-    // 4. Interactive pointer tilt
     let targetRotX = 0;
     let targetRotY = 0;
     let currentRotX = 0;
@@ -273,6 +350,7 @@ export function Card3DAccent({
 
     const handlePointerMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
+      if (!(rect.width > 0 && rect.height > 0)) return;
       const nx = (e.clientX - rect.left) / rect.width - 0.5;
       const ny = (e.clientY - rect.top) / rect.height - 0.5;
       targetRotY = nx * 0.75;
@@ -287,55 +365,54 @@ export function Card3DAccent({
     container.addEventListener('mousemove', handlePointerMove);
     container.addEventListener('mouseleave', handlePointerLeave);
 
-    // 5. Visibility optimization via IntersectionObserver
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
         isVisible = entry?.isIntersecting ?? false;
       },
-      { threshold: 0.05 }
+      { threshold: 0.05 },
     );
     observer.observe(container);
 
-    // ResizeObserver for container
     const resizeObserver = new ResizeObserver(() => {
       updateSize();
     });
     resizeObserver.observe(container);
 
-    // 6. Main animation loop
-    let lastTime = performance.now();
-    const animate = (time: number) => {
-      if (isDisposed) return;
-      animId = requestAnimationFrame(animate);
+    const entry: SharedCardEntry = {
+      isVisible: () => !isDisposed && isVisible && !sharedRendererLost,
+      render: (_time, dt, activeRenderer) => {
+        const dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.25);
+        activeRenderer.setPixelRatio(dpr);
+        activeRenderer.setSize(targetW, targetH, false);
 
-      if (!isVisible || !renderer) return;
+        if (!prefersReducedMotion) {
+          group.rotation.y += 0.45 * dt;
+          group.rotation.x += 0.22 * dt;
+        }
 
-      const dt = Math.min(0.1, (time - lastTime) / 1000);
-      lastTime = time;
+        currentRotX += (targetRotX - currentRotX) * 0.1;
+        currentRotY += (targetRotY - currentRotY) * 0.1;
 
-      // Gentle continuous rotation
-      if (!prefersReducedMotion) {
-        group.rotation.y += 0.45 * dt;
-        group.rotation.x += 0.22 * dt;
-      }
+        camera.position.x = currentRotY * 1.2;
+        camera.position.y = -currentRotX * 1.2;
+        camera.lookAt(0, 0, 0);
 
-      // Smooth pointer tilt lerp
-      currentRotX += (targetRotX - currentRotX) * 0.1;
-      currentRotY += (targetRotY - currentRotY) * 0.1;
+        activeRenderer.render(scene, camera);
 
-      camera.position.x = currentRotY * 1.2;
-      camera.position.y = -currentRotX * 1.2;
-      camera.lookAt(0, 0, 0);
-
-      renderer.render(scene, camera);
+        ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+        ctx2d.drawImage(activeRenderer.domElement, 0, 0, canvas.width, canvas.height);
+      },
     };
 
-    animId = requestAnimationFrame(animate);
+    sharedEntries.add(entry);
+    entry.render(performance.now(), 0.016, renderer);
+    scheduleSharedLoop();
 
     return () => {
       isDisposed = true;
-      cancelAnimationFrame(animId);
+      sharedEntries.delete(entry);
+      sharedActiveCount = Math.max(0, sharedActiveCount - 1);
       observer.disconnect();
       resizeObserver.disconnect();
       container.removeEventListener('mousemove', handlePointerMove);
@@ -343,9 +420,7 @@ export function Card3DAccent({
 
       cleanupGeometries.forEach((g) => g.dispose());
       cleanupMaterials.forEach((m) => m.dispose());
-      if (renderer) {
-        renderer.dispose();
-      }
+      releaseSharedRendererIfUnused();
     };
   }, [variant]);
 

@@ -7,14 +7,15 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { usePreloader } from '@/context/PreloaderContext';
+import { isHandheldTouchDevice } from '@/lib/device-tier';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
   (window as any).ScrollTrigger = ScrollTrigger;
 }
 
-// Module-level cache to eliminate redundant asset decoding
-let cachedModelScene: THREE.Group | null = null;
+// Module-level cache keyed by asset URL so handheld/desktop switches never mismatch assets
+let cachedModelEntry: { url: string; scene: THREE.Group } | null = null;
 
 export function OstrumContinuousJourney() {
   const pathname = usePathname();
@@ -52,58 +53,139 @@ export function OstrumContinuousJourney() {
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
-    const isMobile = window.innerWidth < 768;
+    const isHandheldGpu = isHandheldTouchDevice();
 
+    const isDevDiagnostics = process.env.NODE_ENV !== 'production';
     let isDisposed = false;
     let isContextLost = false;
-    let animId = 0;
-    let wakeAnimation: () => void = () => {};
+    let isLoopActive = false;
+    let lifecycleSeq = 0;
+    let contextLostCount = 0;
+    let contextRestoredCount = 0;
+    let rendererRecreatedCount = 0;
+    let restoreAttemptedForCurrentLoss = false;
+    let recoveryAttemptTimer: ReturnType<typeof setTimeout> | null = null;
+    let recoveryFallbackTimer: ReturnType<typeof setTimeout> | null = null;
+    let lastContextEvent: 'none' | 'webglcontextlost' | 'webglcontextrestored' | 'renderer-recreated' = 'none';
+    let lastContextEventAt = 0;
+    let lastLoggedStateKey = '';
+
+    let reconcileLifecycle: (
+      reason: string,
+      options?: { forcePoseSnap?: boolean; renderImmediate?: boolean }
+    ) => void = () => {};
+    let handleContextRestoredWork: () => void = () => {};
+
+    const clearRecoveryTimers = () => {
+      if (recoveryAttemptTimer !== null) {
+        clearTimeout(recoveryAttemptTimer);
+        recoveryAttemptTimer = null;
+      }
+      if (recoveryFallbackTimer !== null) {
+        clearTimeout(recoveryFallbackTimer);
+        recoveryFallbackTimer = null;
+      }
+    };
+
+    const getViewportDimensions = () => ({
+      width: container.clientWidth || window.innerWidth || 1,
+      height: container.clientHeight || window.innerHeight || 1,
+    });
+
+    const isCompactLayout = () => getViewportDimensions().width < 768;
+
+    const getCurrentScrollY = () => {
+      if (typeof window === 'undefined') return 0;
+      return Math.max(0, window.scrollY ?? window.pageYOffset ?? 0);
+    };
 
     // 1. Scene & Camera setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 50);
+    const initialVp = getViewportDimensions();
+    const camera = new THREE.PerspectiveCamera(34, initialVp.width / initialVp.height, 0.1, 50);
     camera.position.set(0, 0, 7.5);
 
-    // 2. WebGL Renderer
-    let renderer: THREE.WebGLRenderer;
-    try {
-      renderer = new THREE.WebGLRenderer({
-        antialias: !isMobile,
+    // 2. WebGL Renderer lifecycle helpers (supports safe single-renderer replacement only if restoration fails)
+    let renderer!: THREE.WebGLRenderer;
+
+    const syncRendererSizeAndProjection = () => {
+      if (!renderer) return;
+      const { width, height } = getViewportDimensions();
+      const dpr = Math.min(window.devicePixelRatio || 1, isHandheldGpu ? 1.0 : 1.35);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setPixelRatio(dpr);
+      renderer.setSize(width, height, false);
+      renderer.setClearColor(0x000000, 0); // 100% transparent
+    };
+
+    const checkContextLost = () => {
+      try {
+        const gl = renderer?.getContext?.();
+        const glLost = Boolean(gl && typeof gl.isContextLost === 'function' && gl.isContextLost());
+        return isContextLost || glLost;
+      } catch {
+        return isContextLost;
+      }
+    };
+
+    // Context loss listeners (registered after WebGLRenderer constructor so Three.js restores GL state first)
+    const onContextLost = (e: Event) => {
+      e.preventDefault();
+      isContextLost = true;
+      restoreAttemptedForCurrentLoss = false;
+      clearRecoveryTimers();
+      contextLostCount += 1;
+      lastContextEvent = 'webglcontextlost';
+      lastContextEventAt = Date.now();
+      reconcileLifecycle('webglcontextlost');
+    };
+    const onContextRestored = () => {
+      isContextLost = false;
+      restoreAttemptedForCurrentLoss = false;
+      clearRecoveryTimers();
+      contextRestoredCount += 1;
+      lastContextEvent = 'webglcontextrestored';
+      lastContextEventAt = Date.now();
+      handleContextRestoredWork();
+    };
+
+    const attachRenderer = (nextRenderer: THREE.WebGLRenderer) => {
+      renderer = nextRenderer;
+      // Pre-cache WEBGL_lose_context while context is healthy so Three.js
+      // forceContextRestore() can recover Chromium LRU context evictions cleanly.
+      try {
+        renderer.extensions?.get?.('WEBGL_lose_context');
+      } catch {
+        // Optional extension
+      }
+      syncRendererSizeAndProjection();
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      renderer.domElement.style.display = 'block';
+      renderer.domElement.style.pointerEvents = 'none';
+      renderer.domElement.setAttribute('aria-hidden', 'true');
+      container.appendChild(renderer.domElement);
+      renderer.domElement.addEventListener('webglcontextlost', onContextLost, false);
+      renderer.domElement.addEventListener('webglcontextrestored', onContextRestored, false);
+    };
+
+    const createWebGLRenderer = () =>
+      new THREE.WebGLRenderer({
+        antialias: !isHandheldGpu,
         alpha: true,
         powerPreference: 'high-performance',
       });
+
+    try {
+      attachRenderer(createWebGLRenderer());
     } catch (err: any) {
       console.warn('[3D Journey] WebGL init fallback:', err);
       reportError(err?.message || 'WebGL not supported');
       return;
     }
-
-    const dpr = Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.35);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(dpr);
-    renderer.setClearColor(0x000000, 0); // 100% transparent
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
-    renderer.domElement.style.width = '100%';
-    renderer.domElement.style.height = '100%';
-    renderer.domElement.style.display = 'block';
-    renderer.domElement.style.pointerEvents = 'none';
-    renderer.domElement.setAttribute('aria-hidden', 'true');
-    container.appendChild(renderer.domElement);
-
-    // Context loss listeners
-    const onContextLost = (e: Event) => {
-      e.preventDefault();
-      isContextLost = true;
-      cancelAnimationFrame(animId);
-      animId = 0;
-    };
-    const onContextRestored = () => {
-      isContextLost = false;
-      wakeAnimation();
-    };
-    renderer.domElement.addEventListener('webglcontextlost', onContextLost, false);
-    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored, false);
 
     // 3. Studio 4-point Lighting Rig + Energy Accent Lights
     const keyLight = new THREE.DirectionalLight('#fff7ee', 2.2);
@@ -238,9 +320,9 @@ export function OstrumContinuousJourney() {
       depthWrite: false,
     });
 
-    const tubeGeom1 = new THREE.TubeGeometry(curve1, isMobile ? 48 : 72, 0.024, 6, true);
-    const tubeGeom2 = new THREE.TubeGeometry(curve2, isMobile ? 48 : 72, 0.018, 6, true);
-    const tubeGeom3 = new THREE.TubeGeometry(curve3, isMobile ? 48 : 72, 0.014, 6, true);
+    const tubeGeom1 = new THREE.TubeGeometry(curve1, isHandheldGpu ? 48 : 72, 0.024, 6, true);
+    const tubeGeom2 = new THREE.TubeGeometry(curve2, isHandheldGpu ? 48 : 72, 0.018, 6, true);
+    const tubeGeom3 = new THREE.TubeGeometry(curve3, isHandheldGpu ? 48 : 72, 0.014, 6, true);
 
     const tubeMesh1 = new THREE.Mesh(tubeGeom1, filamentMat1);
     const tubeMesh2 = new THREE.Mesh(tubeGeom2, filamentMat2);
@@ -258,7 +340,7 @@ export function OstrumContinuousJourney() {
     scene.add(ribbonGroup);
     ribbonGroup.position.set(0, 0, 0);
 
-    const TRACK_WIDTH = isMobile ? 1.60 : 2.20;
+    const TRACK_WIDTH = isCompactLayout() ? 1.60 : 2.20;
     const startX = -TRACK_WIDTH / 2;
     const endX = TRACK_WIDTH / 2;
 
@@ -281,7 +363,7 @@ export function OstrumContinuousJourney() {
     }
 
     const ribbonCurve = new THREE.CatmullRomCurve3(ribbonPoints, false, 'centripetal');
-    let ribbonGeometry = new THREE.TubeGeometry(ribbonCurve, isMobile ? 40 : 56, 0.046, 8, false);
+    let ribbonGeometry = new THREE.TubeGeometry(ribbonCurve, isHandheldGpu ? 40 : 56, 0.046, 8, false);
     const ribbonMaterial = material.clone();
     ribbonMaterial.transparent = true;
     ribbonMaterial.opacity = 1;
@@ -324,17 +406,19 @@ export function OstrumContinuousJourney() {
       isModelReadyRef.current = true;
       setIsLoaded(true);
       reportModelReady();
+      reconcileLifecycle('model-ready', { forcePoseSnap: true, renderImmediate: true });
     };
 
-    if (cachedModelScene) {
-      setupModelMesh(cachedModelScene.clone(true));
+    const modelUrl = isHandheldGpu ? '/models/monyedre-360-mobile.glb' : '/models/monyedre-360.glb';
+    if (cachedModelEntry && cachedModelEntry.url === modelUrl) {
+      setupModelMesh(cachedModelEntry.scene.clone(true));
     } else {
       const loader = new GLTFLoader();
       loader.load(
-        isMobile ? '/models/monyedre-360-mobile.glb' : '/models/monyedre-360.glb',
+        modelUrl,
         (gltf) => {
           if (isDisposed) return;
-          cachedModelScene = gltf.scene;
+          cachedModelEntry = { url: modelUrl, scene: gltf.scene };
           setupModelMesh(gltf.scene.clone(true));
         },
         undefined,
@@ -347,15 +431,17 @@ export function OstrumContinuousJourney() {
 
     // 8. Mathematical Screen-to-World Projection
     const getVisibleWorldDimensions = () => {
+      const { width, height } = getViewportDimensions();
       const vHeight = 2 * Math.tan((34 * Math.PI) / 360) * 7.5;
-      const vWidth = vHeight * (window.innerWidth / window.innerHeight);
+      const vWidth = vHeight * (width / height);
       return { vWidth, vHeight };
     };
 
     const screenToWorld = (screenX: number, screenY: number) => {
+      const { width, height } = getViewportDimensions();
       const { vWidth, vHeight } = getVisibleWorldDimensions();
-      const worldX = ((screenX / window.innerWidth) * 2 - 1) * (vWidth / 2);
-      const worldY = -(((screenY / window.innerHeight) * 2 - 1) * (vHeight / 2));
+      const worldX = ((screenX / width) * 2 - 1) * (vWidth / 2);
+      const worldY = -(((screenY / height) * 2 - 1) * (vHeight / 2));
       return { x: worldX, y: worldY };
     };
 
@@ -378,7 +464,7 @@ export function OstrumContinuousJourney() {
     let anchors: AnchorData = {
       introDocX: window.innerWidth * 0.50,
       introDocY: window.innerHeight * 0.50,
-      introScale: isMobile ? 0.40 : 0.48,
+      introScale: isCompactLayout() ? 0.40 : 0.48,
       heroDocX: window.innerWidth * 0.16,
       heroDocY: window.innerHeight * 0.35,
       heroScale: 0.25,
@@ -390,13 +476,17 @@ export function OstrumContinuousJourney() {
       exitScrollY: 3800,
     };
 
+    let lastKnownExitBoundary = anchors.exitScrollY;
+
     const updateAnchors = () => {
-      const isMob = window.innerWidth < 768;
+      const { width: vpW, height: vpH } = getViewportDimensions();
+      const liveScrollY = getCurrentScrollY();
+      const isMob = isCompactLayout();
       const vHeight = 2 * Math.tan((34 * Math.PI) / 360) * 7.5;
 
       // 0. Intro Center Anchor (Visual center of screen)
-      const iDocX = window.innerWidth * 0.50;
-      const iDocY = window.innerHeight * 0.50;
+      const iDocX = vpW * 0.50;
+      const iDocY = vpH * 0.50;
       const iScale = isMob ? 0.40 : 0.48;
 
       anchors.introDocX = iDocX;
@@ -405,15 +495,15 @@ export function OstrumContinuousJourney() {
 
       // 1. Measure Hero SVG Wordmark
       const heroSvg = document.querySelector('.intro svg[aria-label="OSTRUM"]');
-      let hDocX = window.innerWidth * 0.16;
-      let hDocY = window.innerHeight * 0.35;
+      let hDocX = vpW * 0.16;
+      let hDocY = vpH * 0.35;
       let hWidth = 160;
 
       if (heroSvg) {
         const svgRect = heroSvg.getBoundingClientRect();
         const svgScale = svgRect.width / 1253;
         hDocX = svgRect.left + 104 * svgScale;
-        hDocY = svgRect.top + 171 * svgScale + window.scrollY;
+        hDocY = svgRect.top + 171 * svgScale + liveScrollY;
         hWidth = 185 * svgScale;
         reportHeroTargetReady();
       }
@@ -421,7 +511,7 @@ export function OstrumContinuousJourney() {
       // Hero scale: fit comfortably inside 'O' counter footprint with zero collision with 'S'
       // Scaled strictly proportional to measured 'O' width
       const heroPixelTarget = Math.max(32, hWidth * 0.72);
-      const heroWorldUnits = (heroPixelTarget / window.innerHeight) * vHeight;
+      const heroWorldUnits = (heroPixelTarget / vpH) * vHeight;
       const hScale = Math.max(0.05, Math.min(0.24, heroWorldUnits / 3.35));
 
       anchors.heroDocX = hDocX;
@@ -430,22 +520,22 @@ export function OstrumContinuousJourney() {
 
       // 2. Measure Section 02 Slot
       const engineSlot = document.getElementById('section02-sculpture-slot');
-      let sDocX = window.innerWidth * 0.50;
-      let sDocY = window.innerHeight * 1.8;
+      let sDocX = vpW * 0.50;
+      let sDocY = vpH * 1.8;
       let sWidth = isMob ? 320 : 470;
 
       if (engineSlot) {
         const slotRect = engineSlot.getBoundingClientRect();
         sDocX = slotRect.left + slotRect.width * 0.50;
-        sDocY = slotRect.top + slotRect.height * 0.50 + window.scrollY;
+        sDocY = slotRect.top + slotRect.height * 0.50 + liveScrollY;
         sWidth = slotRect.width;
       }
 
       // Section 02 scale: fit cleanly within the slot with ample breathing room
       const slotPixelTarget = isMob
-        ? Math.min(220, window.innerWidth * 0.58)
+        ? Math.min(220, vpW * 0.58)
         : Math.min(330, sWidth * 0.70);
-      const slotWorldUnits = (slotPixelTarget / window.innerHeight) * vHeight;
+      const slotWorldUnits = (slotPixelTarget / vpH) * vHeight;
       const sScale = Math.max(0.25, Math.min(0.55, slotWorldUnits / 3.35));
 
       // 3. Section 03 Scale Target: Subtle focal zoom (4-5% larger than Section 02 slot size)
@@ -453,12 +543,16 @@ export function OstrumContinuousJourney() {
       const eScale = sScale * 1.04;
 
       const st = ScrollTrigger.getById('section02-hold');
-      const dScrollY = st ? st.start : Math.max(1, sDocY - window.innerHeight * 0.50);
+      const dScrollY = st && Number.isFinite(st.start) ? st.start : Math.max(1, sDocY - vpH * 0.50);
 
       const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
-      const exitY = stEnergy
-        ? stEnergy.end + 100
-        : dScrollY + (isMob ? 5000 : 7500);
+      const exitY =
+        stEnergy && Number.isFinite(stEnergy.end)
+          ? stEnergy.end + 100
+          : Math.max(lastKnownExitBoundary, dScrollY + (isMob ? 5000 : 7500));
+      if (stEnergy && Number.isFinite(stEnergy.end)) {
+        lastKnownExitBoundary = exitY;
+      }
 
       anchors = {
         introDocX: iDocX,
@@ -476,14 +570,56 @@ export function OstrumContinuousJourney() {
       };
     };
 
-    updateAnchors();
-    const anchorTimer1 = setTimeout(updateAnchors, 100);
-    const anchorTimer2 = setTimeout(updateAnchors, 500);
-    const anchorTimer3 = setTimeout(updateAnchors, 1500);
+    const getStoryBounds = () => {
+      const { height: vpH } = getViewportDimensions();
+      const isCompact = isCompactLayout();
+      const st02 = ScrollTrigger.getById('section02-hold');
+      const dockStart = st02 && Number.isFinite(st02.start) ? st02.start : anchors.dockScrollY;
+      const dockEnd =
+        st02 && Number.isFinite(st02.end)
+          ? st02.end
+          : anchors.dockScrollY + (isCompact ? 650 : 1000);
 
-    const onNarrativeReady = () => updateAnchors();
+      const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
+      const energyStart =
+        stEnergy && Number.isFinite(stEnergy.start)
+          ? stEnergy.start
+          : dockEnd + (isCompact ? 500 : 800);
+      const energyEnd =
+        stEnergy && Number.isFinite(stEnergy.end)
+          ? stEnergy.end
+          : energyStart + (isCompact ? 3600 : 5000) + vpH;
+
+      const liveExit =
+        stEnergy && Number.isFinite(stEnergy.end) ? stEnergy.end + 100 : null;
+      if (liveExit !== null) {
+        lastKnownExitBoundary = liveExit;
+      }
+      const exitBoundary =
+        liveExit !== null ? liveExit : Math.max(anchors.exitScrollY, lastKnownExitBoundary);
+
+      return { dockStart, dockEnd, energyStart, energyEnd, exitBoundary };
+    };
+
+    updateAnchors();
+    const anchorTimer1 = setTimeout(() => {
+      updateAnchors();
+      reconcileLifecycle('anchor-timer-100');
+    }, 100);
+    const anchorTimer2 = setTimeout(() => {
+      updateAnchors();
+      reconcileLifecycle('anchor-timer-500');
+    }, 500);
+    const anchorTimer3 = setTimeout(() => {
+      updateAnchors();
+      reconcileLifecycle('anchor-timer-1500');
+    }, 1500);
+
+    const onNarrativeReady = () => {
+      updateAnchors();
+      reconcileLifecycle('narrative-ready');
+    };
     window.addEventListener('ostrum:narrative-ready', onNarrativeReady);
-    ScrollTrigger.addEventListener('refresh', updateAnchors);
 
     let focusBias = 0;
     let targetFocusBias = 0;
@@ -496,7 +632,7 @@ export function OstrumContinuousJourney() {
     window.addEventListener('ostrum:focus-bias', handleFocusBias);
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (isMobile || prefersReducedMotion) return;
+      if (isHandheldGpu || prefersReducedMotion) return;
       pointer.targetX = ((e.clientX / window.innerWidth) * 2 - 1) * 0.12;
       pointer.targetY = -(((e.clientY / window.innerHeight) * 2 - 1) * 0.12);
     };
@@ -602,40 +738,20 @@ export function OstrumContinuousJourney() {
       ribbonMesh.geometry.dispose();
       ribbonMesh.geometry = new THREE.TubeGeometry(
         ribbonCurve,
-        isMobile ? 40 : 56,
+        isHandheldGpu ? 40 : 56,
         0.046,
         8,
         false
       );
     };
 
-    // Main Animation Loop
-    const animate = (time: number) => {
-      animId = 0;
-      if (isDisposed || isContextLost) return;
+    // Pose evaluation helper separated from loop scheduling so any wake/restore/hero lock
+    // renders an accurate frame before or immediately upon starting setAnimationLoop.
+    const updateScenePose = (time: number, forceSnap = false) => {
+      const scrollY = getCurrentScrollY();
+      const { width: vpW, height: vpH } = getViewportDimensions();
+      const { dockStart, dockEnd, energyStart, energyEnd } = getStoryBounds();
 
-      const scrollY = window.scrollY;
-
-      // ScrollTrigger Intervals
-      const st02 = ScrollTrigger.getById('section02-hold');
-      const dockStart = st02 ? st02.start : anchors.dockScrollY;
-      const dockEnd = st02 ? st02.end : anchors.dockScrollY + (isMobile ? 650 : 1000);
-
-      const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
-      const energyStart = stEnergy ? stEnergy.start : dockEnd + (isMobile ? 500 : 800);
-      const energyEnd = stEnergy ? stEnergy.end : energyStart + (isMobile ? 3600 : 5000) + window.innerHeight;
-
-      const exitBoundary = stEnergy ? stEnergy.end + 100 : anchors.exitScrollY;
-      const isPastExit = scrollY > exitBoundary;
-
-      if (isPastExit) {
-        // Outside storytelling range: pause loop without mutating container.style.opacity
-        // (syncAnimation maintains sole ownership of canvas wrapper opacity).
-        if (isMobile) isInitialized = false;
-        return;
-      }
-
-      // Real-time synchronization with preloader phases
       const currentPhase =
         (typeof window !== 'undefined' && (window as any).__ostrumPhase) ||
         phaseRef.current;
@@ -697,7 +813,6 @@ export function OstrumContinuousJourney() {
       else if (currentPhase === 'transforming') {
         updateRibbonPoints('transforming', 1.0, transformP);
 
-        // Subtle hero presentation zoom & lighting as loop completes (transformP >= 0.82)
         const heroP = transformP >= 0.82 ? (transformP - 0.82) / 0.18 : 0;
         const zoomPulse = Math.sin(heroP * Math.PI * 0.5) * 0.15;
 
@@ -712,7 +827,6 @@ export function OstrumContinuousJourney() {
           ribbonMaterial.opacity = 1;
           material.opacity = 0;
         } else {
-          // Model resolves into view without pop
           ribbonGroup.visible = transformP < 0.98;
           modelRoot.visible = true;
           const fade = (transformP - 0.72) / 0.26;
@@ -729,7 +843,6 @@ export function OstrumContinuousJourney() {
         modelRoot.visible = true;
         material.opacity = 1;
 
-        // dockP is already smoothly eased by GSAP with power2.inOut
         const ease = dockP;
 
         const startScale = anchors.introScale * 1.15;
@@ -756,7 +869,7 @@ export function OstrumContinuousJourney() {
 
         targetScreenX = anchors.heroDocX + (anchors.slotDocX - anchors.heroDocX) * ease;
         const startScreenY = anchors.heroDocY;
-        const targetCenterY = window.innerHeight * 0.50;
+        const targetCenterY = vpH * 0.50;
         targetScreenY = startScreenY + (targetCenterY - startScreenY) * ease;
         targetScale = anchors.heroScale + (anchors.slotScale - anchors.heroScale) * ease;
         targetRotY = t * Math.PI * 2;
@@ -773,7 +886,7 @@ export function OstrumContinuousJourney() {
         material.opacity = 1;
 
         targetScreenX = anchors.slotDocX;
-        targetScreenY = window.innerHeight * 0.50;
+        targetScreenY = vpH * 0.50;
         targetScale = anchors.slotScale;
         targetRotY = Math.PI * 2 + focusBias;
         targetEnergyLevel = 0;
@@ -801,15 +914,11 @@ export function OstrumContinuousJourney() {
         const t = Math.min(1, Math.max(0, (scrollY - dockEnd) / (energyStart - dockEnd || 1)));
         const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-        // Smooth centered alignment into viewport focal position
-        const targetCenterX = window.innerWidth * 0.50;
+        const targetCenterX = vpW * 0.50;
         targetScreenX = anchors.slotDocX + (targetCenterX - anchors.slotDocX) * ease;
-        targetScreenY = window.innerHeight * 0.50;
+        targetScreenY = vpH * 0.50;
 
-        // Restrained focal zoom: gentle approach from Section 02 slot scale to Section 03 focal scale
         targetScale = anchors.slotScale + (anchors.energyScale - anchors.slotScale) * ease;
-
-        // Stationary orientation hold during approach: rotation holds still at 2.0π (orientation held from Section 02)
         targetRotY = Math.PI * 2 + focusBias * (1 - ease);
         targetEnergyLevel = ease * 0.35;
       }
@@ -819,26 +928,24 @@ export function OstrumContinuousJourney() {
         modelRoot.visible = true;
         material.opacity = 1;
 
-        const initialHold = isMobile ? 450 : 600; // Pause 1: ~1s visual dwell on dark stage before text
-        const narrativeSpan = isMobile ? 3600 : 5000; // Preserved narrative travel span for the 5 beats
+        const isCompact = isCompactLayout();
+        const initialHold = isCompact ? 450 : 600;
+        const narrativeSpan = isCompact ? 3600 : 5000;
         const narrativeStart = energyStart + initialHold;
         const narrativeEnd = narrativeStart + narrativeSpan;
 
-        targetScreenX = window.innerWidth * 0.50;
-        targetScreenY = window.innerHeight * 0.50;
+        targetScreenX = vpW * 0.50;
+        targetScreenY = vpH * 0.50;
         targetScale = anchors.energyScale;
 
         if (scrollY < narrativeStart) {
-          // Pause 1: Completed dark-background composition held stationary for ~1 second (zero rotation, orientation held from Section 02)
           targetRotY = 2.0 * Math.PI;
           targetEnergyLevel = 0.35;
         } else if (scrollY <= narrativeEnd) {
-          // Synchronized rotation initiated as Beat 01 reveals, progressing smoothly across the 5 narrative beats
           const narrativeProgress = Math.min(1, Math.max(0, (scrollY - narrativeStart) / (narrativeSpan || 1)));
           targetRotY = 2.0 * Math.PI + narrativeProgress * (2.0 * Math.PI);
           targetEnergyLevel = 0.35 + narrativeProgress * 0.65;
         } else {
-          // Pause 2 & handoff: Completed closing composition held stationary for ~1 second in front-facing rest pose (4.0π) before Selected Work
           targetRotY = 4.0 * Math.PI;
           targetEnergyLevel = 1.0;
         }
@@ -849,8 +956,8 @@ export function OstrumContinuousJourney() {
         modelRoot.visible = true;
         material.opacity = 1;
 
-        targetScreenX = window.innerWidth * 0.50;
-        targetScreenY = window.innerHeight * 0.50;
+        targetScreenX = vpW * 0.50;
+        targetScreenY = vpH * 0.50;
         targetScale = anchors.energyScale;
         targetRotY = 4.0 * Math.PI;
         targetEnergyLevel = 1.0;
@@ -859,14 +966,9 @@ export function OstrumContinuousJourney() {
       // Screen to 3D World conversion
       const targetWorld = screenToWorld(targetScreenX, targetScreenY);
 
-      if (!isInitialized) {
-        currentX = targetWorld.x;
-        currentY = targetWorld.y;
-        currentScale = targetScale;
-        currentRotationY = targetRotY;
-        currentEnergy = targetEnergyLevel;
-        isInitialized = true;
-      } else if (
+      if (
+        !isInitialized ||
+        forceSnap ||
         currentPhase === 'preparing' ||
         currentPhase === 'counting' ||
         currentPhase === 'transforming' ||
@@ -877,6 +979,7 @@ export function OstrumContinuousJourney() {
         currentScale = targetScale;
         currentRotationY = targetRotY;
         currentEnergy = targetEnergyLevel;
+        isInitialized = true;
       } else {
         const isPinnedState = scrollY >= dockStart && scrollY <= energyEnd;
         const posLerp = isPinnedState ? 0.35 : 0.18;
@@ -902,14 +1005,14 @@ export function OstrumContinuousJourney() {
         modelRoot.visible = true;
         material.opacity = 1;
         ribbonGroup.visible = false;
-        if (container.style.opacity !== '1') {
-          container.style.opacity = '1';
-        }
+        isInitialized = true;
       }
 
       // Zero-G subtle organic breathing float: active during journey (Hero & travel)
       const isTraveling = scrollY < dockStart && currentPhase === 'complete';
-      const floatOffset = isTraveling ? Math.sin(time * 0.0016) * 0.04 * currentScale : 0;
+      const floatOffset = isTraveling && !prefersReducedMotion
+        ? Math.sin(time * 0.0016) * 0.04 * currentScale
+        : 0;
 
       modelRoot.position.set(currentX, currentY + floatOffset, 0);
       modelRoot.scale.set(currentScale, currentScale, currentScale);
@@ -962,7 +1065,7 @@ export function OstrumContinuousJourney() {
         pointer.y += (pointer.targetY - pointer.y) * 0.06;
         focusBias += (targetFocusBias - focusBias) * 0.10;
 
-        if (!isMobile && !prefersReducedMotion) {
+        if (!isHandheldGpu && !prefersReducedMotion) {
           const isPinnedState = scrollY >= dockStart && scrollY <= energyEnd;
           if (isPinnedState) {
             modelRoot.rotation.x = pointer.y * 0.08;
@@ -983,92 +1086,355 @@ export function OstrumContinuousJourney() {
         camera.position.y = 0;
       }
       camera.lookAt(0, 0, 0);
+    };
 
+    const renderSceneFrame = () => {
+      if (isDisposed || checkContextLost()) return;
       renderer.render(scene, camera);
       if (!hasReportedFirstFrame && isModelReadyRef.current) {
         hasReportedFirstFrame = true;
         reportFirstFrame();
       }
-      animId = requestAnimationFrame(animate);
     };
 
-    const syncAnimation = () => {
-      if (isDisposed || isContextLost) return;
-      const stEnergy = ScrollTrigger.getById('energy-narrative-pin');
-      const exitBoundary = stEnergy ? stEnergy.end + 100 : anchors.exitScrollY;
-      const scrollY = window.scrollY;
+    const updateDomTelemetry = () => {
+      container.dataset.loopActive = String(isLoopActive);
+      container.dataset.contextLost = String(checkContextLost());
+      container.dataset.modelLoaded = String(isModelReadyRef.current);
+    };
 
-      if (scrollY > exitBoundary) {
-        if (container.style.opacity !== '0') container.style.opacity = '0';
-        if (animId !== 0) {
-          cancelAnimationFrame(animId);
-          animId = 0;
-        }
-        if (isMobile) isInitialized = false;
+    const getDiagnosticsSnapshot = (reason = 'query') => {
+      const scrollY = getCurrentScrollY();
+      const bounds = getStoryBounds();
+      const currentPhase =
+        (typeof window !== 'undefined' && (window as any).__ostrumPhase) ||
+        phaseRef.current;
+      return {
+        reason,
+        scrollY,
+        exitBoundary: bounds.exitBoundary,
+        dockStart: bounds.dockStart,
+        dockEnd: bounds.dockEnd,
+        phase: currentPhase,
+        modelLoaded: isModelReadyRef.current,
+        modelVisible: modelRoot.visible,
+        wrapperOpacity: container.style.opacity || getComputedStyle(container).opacity,
+        canvasConnected: renderer.domElement.isConnected && container.contains(renderer.domElement),
+        isLoopActive,
+        isContextLost: checkContextLost(),
+        contextLostCount,
+        contextRestoredCount,
+        rendererRecreatedCount,
+        lastContextEvent,
+        lastContextEventAt,
+        lifecycleSeq,
+      };
+    };
+
+    const logDiagnosticsTransition = (reason: string) => {
+      if (!isDevDiagnostics) return;
+      const snapshot = getDiagnosticsSnapshot(reason);
+      const stateKey = [
+        snapshot.isLoopActive,
+        snapshot.wrapperOpacity,
+        snapshot.isContextLost,
+        snapshot.modelLoaded,
+        snapshot.scrollY <= 30,
+        snapshot.contextLostCount,
+        snapshot.contextRestoredCount,
+        snapshot.rendererRecreatedCount,
+      ].join('|');
+      if (
+        stateKey !== lastLoggedStateKey ||
+        reason === 'webglcontextlost' ||
+        reason === 'webglcontextrestored' ||
+        reason === 'renderer-recreated-after-loss'
+      ) {
+        lastLoggedStateKey = stateKey;
+        console.debug('[3D Journey]', reason, snapshot);
+      }
+    };
+
+    const stopLoop = () => {
+      if (isLoopActive) {
+        renderer.setAnimationLoop(null);
+        isLoopActive = false;
+      }
+    };
+
+    const startLoop = () => {
+      if (!isLoopActive && !isDisposed && !checkContextLost()) {
+        renderer.setAnimationLoop(animate);
+        isLoopActive = true;
+      }
+    };
+
+    const recreateRendererAfterPermanentLoss = () => {
+      if (isDisposed || !checkContextLost()) return;
+      const scrollY = getCurrentScrollY();
+      const bounds = getStoryBounds();
+      if (scrollY > bounds.exitBoundary || (typeof document !== 'undefined' && document.hidden)) {
         return;
       }
 
-      // Reverse scroll into story range: ensure wrapper is visible before restarting RAF
+      const oldRenderer = renderer;
+      stopLoop();
+      oldRenderer.domElement.removeEventListener('webglcontextlost', onContextLost);
+      oldRenderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
+      if (oldRenderer.domElement && container.contains(oldRenderer.domElement)) {
+        container.removeChild(oldRenderer.domElement);
+      }
+      oldRenderer.dispose();
+
+      try {
+        // Reattach existing scene/model/materials to a fresh WebGL context without reloading the GLB.
+        attachRenderer(createWebGLRenderer());
+        isContextLost = false;
+        isInitialized = false;
+        restoreAttemptedForCurrentLoss = false;
+        clearRecoveryTimers();
+        rendererRecreatedCount += 1;
+        lastContextEvent = 'renderer-recreated';
+        lastContextEventAt = Date.now();
+        updateAnchors();
+        reconcileLifecycle('renderer-recreated-after-loss', {
+          forcePoseSnap: true,
+          renderImmediate: true,
+        });
+      } catch (err: any) {
+        console.warn('[3D Journey] WebGL context recreation failed:', err);
+        reportError(err?.message || 'WebGL recovery failed');
+      }
+    };
+
+    const scheduleContextRecovery = () => {
+      if (restoreAttemptedForCurrentLoss || isDisposed) return;
+      restoreAttemptedForCurrentLoss = true;
+      clearRecoveryTimers();
+
+      // Stage 1: Give Three.js / browser restoration a chance via forceContextRestore()
+      // (recovers Chromium LRU "Too many active WebGL contexts" evictions without a second renderer).
+      recoveryAttemptTimer = setTimeout(() => {
+        recoveryAttemptTimer = null;
+        if (
+          isDisposed ||
+          !checkContextLost() ||
+          getCurrentScrollY() > getStoryBounds().exitBoundary ||
+          (typeof document !== 'undefined' && document.hidden)
+        ) {
+          return;
+        }
+        try {
+          renderer.forceContextRestore();
+        } catch {
+          // Ignore driver-specific InvalidOperation errors and let Stage 2 evaluate.
+        }
+      }, 0);
+
+      // Stage 2 fallback: only if Three.js restoration still left context lost after 250ms in active range.
+      recoveryFallbackTimer = setTimeout(() => {
+        recoveryFallbackTimer = null;
+        if (
+          !isDisposed &&
+          checkContextLost() &&
+          getCurrentScrollY() <= getStoryBounds().exitBoundary &&
+          !(typeof document !== 'undefined' && document.hidden)
+        ) {
+          recreateRendererAfterPermanentLoss();
+        }
+      }, 250);
+    };
+
+    // Main Animation Loop (driven solely by WebGLRenderer.setAnimationLoop)
+    function animate(time: number) {
+      if (isDisposed || !isLoopActive) return;
+
+      if (checkContextLost()) {
+        reconcileLifecycle('animate-context-lost');
+        return;
+      }
+
+      const scrollY = getCurrentScrollY();
+      const bounds = getStoryBounds();
+      const tabHidden = typeof document !== 'undefined' && document.hidden;
+      if (scrollY > bounds.exitBoundary || tabHidden) {
+        reconcileLifecycle(tabHidden ? 'animate-tab-hidden' : 'animate-past-exit');
+        return;
+      }
+
+      updateScenePose(time, false);
+      renderSceneFrame();
+    }
+
+    // Single authoritative owner of loop start/stop and wrapper visibility
+    reconcileLifecycle = (reason, options) => {
+      if (isDisposed) {
+        clearRecoveryTimers();
+        stopLoop();
+        updateDomTelemetry();
+        return;
+      }
+
+      const epoch = ++lifecycleSeq;
+      const scrollY = getCurrentScrollY();
+      const bounds = getStoryBounds();
+      const glLost = checkContextLost();
+      const tabHidden = typeof document !== 'undefined' && document.hidden;
+
+      if (glLost || scrollY > bounds.exitBoundary || tabHidden) {
+        // Stale guard: never allow an older callback to hide if a newer event superseded it.
+        if (epoch !== lifecycleSeq) return;
+        if (glLost || scrollY > bounds.exitBoundary) {
+          isInitialized = false;
+        }
+        if (scrollY > bounds.exitBoundary || tabHidden) {
+          clearRecoveryTimers();
+          if (glLost) restoreAttemptedForCurrentLoss = false;
+        } else if (glLost && reason !== 'webglcontextlost') {
+          // Re-entered active story range while WebGL context is still lost:
+          // attempt Three.js restoration first, then recreate only if restoration proves insufficient.
+          scheduleContextRecovery();
+        }
+        stopLoop();
+        if (container.style.opacity !== '0') {
+          container.style.opacity = '0';
+        }
+        updateDomTelemetry();
+        logDiagnosticsTransition(reason);
+        return;
+      }
+
+      const wasInactive =
+        !isLoopActive ||
+        container.style.opacity !== '1' ||
+        !isInitialized;
+
+      if (wasInactive || options?.forcePoseSnap || reason === 'resize' || reason === 'scrolltrigger-refresh') {
+        updateAnchors();
+      }
+
+      // Re-verify fresh scroll state and epoch after measuring anchors.
+      if (epoch !== lifecycleSeq) return;
+      const freshScrollY = getCurrentScrollY();
+      const freshBounds = getStoryBounds();
+      const freshHidden = typeof document !== 'undefined' && document.hidden;
+      if (checkContextLost() || freshScrollY > freshBounds.exitBoundary || freshHidden) {
+        isInitialized = false;
+        stopLoop();
+        if (container.style.opacity !== '0') {
+          container.style.opacity = '0';
+        }
+        updateDomTelemetry();
+        logDiagnosticsTransition(reason + ':recheck-paused');
+        return;
+      }
+
+      // Reveal wrapper before rendering the first resumed frame.
       if (container.style.opacity !== '1') {
         container.style.opacity = '1';
       }
 
-      // Make RAF cancel/restart idempotent (never more than one RAF loop)
-      if (animId === 0) {
-        animId = requestAnimationFrame(animate);
+      const shouldSnap = Boolean(
+        options?.forcePoseSnap ||
+        wasInactive ||
+        (isHandheldGpu && freshScrollY <= 30)
+      );
+      if (shouldSnap || options?.renderImmediate) {
+        updateScenePose(performance.now(), shouldSnap);
+        renderSceneFrame();
       }
+
+      startLoop();
+      updateDomTelemetry();
+      logDiagnosticsTransition(reason);
     };
-    wakeAnimation = syncAnimation;
 
-    window.addEventListener('scroll', syncAnimation, { passive: true });
-    if (typeof window !== 'undefined' && 'onscrollend' in window) {
-      window.addEventListener('scrollend', syncAnimation, { passive: true });
-    }
-    ScrollTrigger.addEventListener('scrollStart', syncAnimation);
-    ScrollTrigger.addEventListener('scrollEnd', syncAnimation);
-    ScrollTrigger.addEventListener('refresh', syncAnimation);
-
-    const onVisibilityChange = () => {
-      if (typeof document !== 'undefined' && !document.hidden) {
-        syncAnimation();
-      }
-    };
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    syncAnimation();
-
-    // 10. Resize Handling
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.35));
+    handleContextRestoredWork = () => {
+      isInitialized = false;
+      syncRendererSizeAndProjection();
       updateAnchors();
-      syncAnimation();
+      reconcileLifecycle('webglcontextrestored', {
+        forcePoseSnap: true,
+        renderImmediate: true,
+      });
     };
+
+    if (isDevDiagnostics && typeof window !== 'undefined') {
+      (window as any).__ostrumJourneyDiagnostics = () => getDiagnosticsSnapshot('manual');
+      (window as any).__ostrumJourneyDebug = {
+        getSnapshot: () => getDiagnosticsSnapshot('debug'),
+        forceContextLoss: () => renderer.forceContextLoss(),
+        forceContextRestore: () => renderer.forceContextRestore(),
+      };
+    }
+
+    const onScrollSync = () => reconcileLifecycle('scroll');
+    const onScrollEndSync = () => reconcileLifecycle('scrollend');
+    const onStStartSync = () => reconcileLifecycle('scrolltrigger-start');
+    const onStEndSync = () => reconcileLifecycle('scrolltrigger-end');
+    const onStRefreshSync = () => {
+      updateAnchors();
+      reconcileLifecycle('scrolltrigger-refresh');
+    };
+    const onVisibilityChange = () => {
+      reconcileLifecycle(document.hidden ? 'visibility-hidden' : 'visibility-visible', {
+        forcePoseSnap: !document.hidden,
+        renderImmediate: !document.hidden,
+      });
+    };
+    const handleResize = () => {
+      if (!checkContextLost()) {
+        syncRendererSizeAndProjection();
+      }
+      updateAnchors();
+      reconcileLifecycle('resize', {
+        forcePoseSnap: true,
+        renderImmediate: true,
+      });
+    };
+
+    window.addEventListener('scroll', onScrollSync, { passive: true });
+    if (typeof window !== 'undefined' && 'onscrollend' in window) {
+      window.addEventListener('scrollend', onScrollEndSync, { passive: true });
+    }
+    ScrollTrigger.addEventListener('scrollStart', onStStartSync);
+    ScrollTrigger.addEventListener('scrollEnd', onStEndSync);
+    ScrollTrigger.addEventListener('refresh', onStRefreshSync);
+    document.addEventListener('visibilitychange', onVisibilityChange);
     window.addEventListener('resize', handleResize);
+    window.visualViewport?.addEventListener('resize', handleResize);
+
+    reconcileLifecycle('init', { forcePoseSnap: true, renderImmediate: true });
 
     // Cleanup
     return () => {
       isDisposed = true;
+      clearRecoveryTimers();
       clearTimeout(anchorTimer1);
       clearTimeout(anchorTimer2);
       clearTimeout(anchorTimer3);
-      cancelAnimationFrame(animId);
+      stopLoop();
+      updateDomTelemetry();
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', syncAnimation);
+      window.visualViewport?.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', onScrollSync);
       if (typeof window !== 'undefined' && 'onscrollend' in window) {
-        window.removeEventListener('scrollend', syncAnimation);
+        window.removeEventListener('scrollend', onScrollEndSync);
       }
-      ScrollTrigger.removeEventListener('scrollStart', syncAnimation);
-      ScrollTrigger.removeEventListener('scrollEnd', syncAnimation);
-      ScrollTrigger.removeEventListener('refresh', syncAnimation);
+      ScrollTrigger.removeEventListener('scrollStart', onStStartSync);
+      ScrollTrigger.removeEventListener('scrollEnd', onStEndSync);
+      ScrollTrigger.removeEventListener('refresh', onStRefreshSync);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('ostrum:focus-bias', handleFocusBias);
       window.removeEventListener('ostrum:narrative-ready', onNarrativeReady);
-      ScrollTrigger.removeEventListener('refresh', updateAnchors);
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
       renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
+
+      if (isDevDiagnostics && typeof window !== 'undefined') {
+        delete (window as any).__ostrumJourneyDiagnostics;
+        delete (window as any).__ostrumJourneyDebug;
+      }
 
       if (renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);

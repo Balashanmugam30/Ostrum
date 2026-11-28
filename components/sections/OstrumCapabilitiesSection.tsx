@@ -5,6 +5,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { isHandheldTouchDevice, subscribeDeviceTierChange } from '@/lib/device-tier';
 
 const Card3DAccent = dynamic(
   () => import('@/components/ui/Card3DAccent').then((module) => module.Card3DAccent),
@@ -102,37 +103,9 @@ function CapabilityArtwork({
   card: CapabilityCardData;
   showLiveArtwork: boolean;
 }) {
-  const frameRef = useRef<HTMLDivElement>(null);
-  const [isNearViewport, setIsNearViewport] = useState(false);
-
-  useEffect(() => {
-    if (showLiveArtwork) {
-      setIsNearViewport(true);
-      return;
-    }
-
-    setIsNearViewport(false);
-    const frame = frameRef.current;
-    if (!frame) return;
-    if (!("IntersectionObserver" in window)) {
-      setIsNearViewport(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsNearViewport(entry?.isIntersecting ?? false),
-      { rootMargin: "140px 0px", threshold: 0.01 },
-    );
-    observer.observe(frame);
-    return () => observer.disconnect();
-  }, [showLiveArtwork]);
-
   return (
-    <div
-      ref={frameRef}
-      className="capability-art-frame relative w-full h-[125px] sm:h-[145px] md:h-[180px] shrink-0 my-1 flex items-center justify-center overflow-hidden"
-    >
-      {showLiveArtwork || isNearViewport ? (
+    <div className="capability-art-frame relative w-full h-[125px] sm:h-[145px] md:h-[180px] shrink-0 my-1 flex items-center justify-center overflow-hidden">
+      {showLiveArtwork ? (
         <Card3DAccent
           variant={card.variant}
           data-testid={`capability-artwork-${card.variant}`}
@@ -160,11 +133,14 @@ export function OstrumCapabilitiesSection() {
   const transitionOriginRef = useRef<DOMRect | null>(null);
 
   useEffect(() => {
-    const desktop = window.matchMedia('(min-width: 768px)');
-    const syncArtwork = () => setShowLiveArtwork(desktop.matches);
+    const syncArtwork = () => {
+      const desktop = window.matchMedia('(min-width: 768px)').matches;
+      // Phones in either normal or "Request desktop site" mode render crisp static card artwork
+      // (0 card WebGL contexts) so hero 3D and background never suffer WebGL context exhaustion.
+      setShowLiveArtwork(desktop && !isHandheldTouchDevice());
+    };
     syncArtwork();
-    desktop.addEventListener('change', syncArtwork);
-    return () => desktop.removeEventListener('change', syncArtwork);
+    return subscribeDeviceTierChange(syncArtwork);
   }, []);
 
   useEffect(() => {
@@ -286,6 +262,11 @@ export function OstrumCapabilitiesSection() {
           if (rect.bottom <= 0) {
             // Already scrolled past capabilities into lower sections; do not apply fixed overlay
             clearTransitionStyles(false);
+            return;
+          }
+          if (rect.top >= window.innerHeight) {
+            // Scrolled or flung back above Capabilities; release the white fixed overlay immediately
+            clearTransitionStyles(true);
             return;
           }
           sectionRef.current.style.backgroundColor = '#FFFFFF';
@@ -423,12 +404,21 @@ export function OstrumCapabilitiesSection() {
         updateTransition({ active: true, progress });
       }
     };
+    const onScrollSafety = () => {
+      if (pinContainer.style.position !== 'fixed') return;
+      const rect = sectionRef.current?.getBoundingClientRect();
+      if (window.scrollY < 100 || (rect && rect.top >= window.innerHeight * 1.15)) {
+        clearTransitionStyles(true);
+      }
+    };
     window.addEventListener('resize', onResize);
+    window.addEventListener('scroll', onScrollSafety, { passive: true });
 
     return () => {
       delete (window as any).__ostrumUpdateCapabilitiesTransition;
       window.removeEventListener('ostrum:capabilities-transition', onCustomEvent);
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', onScrollSafety);
     };
   }, []);
 

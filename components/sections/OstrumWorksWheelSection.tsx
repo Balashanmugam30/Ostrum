@@ -304,6 +304,28 @@ export function OstrumWorksWheelSection() {
         emitVisualCoverage(false);
         ctx.revert();
       };
+      // Ensure fast reverse touch flings above #selected-work reset any light card backdrop
+      // even if a scroll frame skips works-wheel's onLeaveBack transition callback.
+      const onScrollReset = () => {
+        const st = ScrollTrigger.getById('works-wheel-pin');
+        if (!st || window.scrollY >= st.start - 40) return;
+        if (pinContainerRef.current && pinContainerRef.current.style.backgroundColor !== RESTING_WHEEL_THEME.deep) {
+          pinContainerRef.current.style.opacity = '1';
+          pinContainerRef.current.style.visibility = 'visible';
+          pinContainerRef.current.style.backgroundColor = RESTING_WHEEL_THEME.deep;
+        }
+        if (sectionRef.current && sectionRef.current.style.backgroundColor !== RESTING_WHEEL_THEME.deep) {
+          sectionRef.current.style.backgroundColor = RESTING_WHEEL_THEME.deep;
+        }
+        notifyCapabilities({ active: false });
+      };
+      window.addEventListener('scroll', onScrollReset, { passive: true });
+
+      const prevCleanup = cleanupCtx;
+      cleanupCtx = () => {
+        window.removeEventListener('scroll', onScrollReset);
+        prevCleanup?.();
+      };
       ScrollTrigger.sort();
       ScrollTrigger.refresh();
     };

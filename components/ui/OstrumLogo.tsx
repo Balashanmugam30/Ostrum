@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { isHandheldTouchDevice } from '@/lib/device-tier';
 
 interface OstrumLogoProps {
   className?: string;
@@ -34,7 +35,6 @@ export function OstrumLogo({
     if (mediaQuery.matches) return;
 
     let animId: number;
-    const isMobile = window.matchMedia('(max-width: 767px)').matches;
     let targetScrollY = Math.max(0, window.scrollY);
     let currentScrollY = targetScrollY;
     let previousFrameTime = performance.now();
@@ -53,16 +53,15 @@ export function OstrumLogo({
 
     const tick = (time: number) => {
       animId = requestAnimationFrame(tick);
+      const isPhoneTouch = isHandheldTouchDevice();
       // The passive scroll event may be coalesced during touch flings. Sample
-      // the live offset on phones so the hero letters cannot keep a stale
-      // transform after the browser has already returned to the top.
-      if (isMobile) targetScrollY = Math.max(0, window.scrollY);
-      // Keep the existing desktop response. On phones, use time-based
-      // smoothing and reset at the top so a fast reverse fling cannot leave
-      // the per-letter parallax translated far outside the hero.
-      if (isMobile && targetScrollY <= 8) {
+      // the live offset on phones (both narrow mobile and desktop-site mode)
+      // so the hero letters cannot keep a stale transform at the top.
+      if (isPhoneTouch) targetScrollY = Math.max(0, window.scrollY);
+      // Keep the existing desktop response on non-touch laptops.
+      if (isPhoneTouch && targetScrollY <= 8) {
         currentScrollY = 0;
-      } else if (isMobile) {
+      } else if (isPhoneTouch) {
         const elapsed = Math.min(64, time - previousFrameTime);
         const alpha = 1 - Math.exp(-elapsed / 80);
         currentScrollY += (targetScrollY - currentScrollY) * alpha;

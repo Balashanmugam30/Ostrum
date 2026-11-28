@@ -64,20 +64,20 @@ export function OstrumStudioFooter() {
       wordWeight={700}
       cut={0.16}
       animate={true}
-      className="w-full relative z-10 flex flex-col justify-between"
+      className="w-full min-h-[100svh] relative z-10 flex flex-col justify-between"
     >
-      <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 pt-16 sm:pt-20 md:pt-24">
+      <div className="footer-content-wrap w-full max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 pt-16 sm:pt-20 md:pt-24">
         {/* PHASE 3A: TOP CONTACT TILES (Restored coral/white high-contrast visual baseline) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-7">
+        <div className="footer-tiles-grid grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-7">
           {/* Tile 1: White Surface / Email Inquiry */}
           <a
             href={`mailto:${SITE_CONFIG.contactEmail}`}
             data-testid="footer-tile-email"
             data-selection-surface="light"
-            className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-white text-[#050505] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,255,255,0.14)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ostrum-footer-accent,#C9362B)]"
+            className="footer-tile group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-white text-[#050505] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,255,255,0.14)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ostrum-footer-accent,#C9362B)]"
           >
             <div>
-              <span className="font-mono text-xs sm:text-[13px] uppercase tracking-[0.2em] font-semibold text-[#71717A] block">
+              <span className="footer-tile-eyebrow font-mono text-xs sm:text-[13px] uppercase tracking-[0.2em] font-semibold text-[#71717A] block">
                 / PREFER EMAIL?
               </span>
               <h3 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#050505] mt-3 sm:mt-4">
@@ -85,11 +85,11 @@ export function OstrumStudioFooter() {
               </h3>
             </div>
 
-            <div className="flex items-center justify-between pt-6 border-t border-black/10">
-              <span className="font-sans text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-[#050505] group-hover:text-[var(--ostrum-footer-accent,#C9362B)] transition-colors">
+            <div className="flex items-center justify-between gap-3 pt-6 border-t border-black/10">
+              <span className="footer-tile-cta min-w-0 break-all sm:break-normal font-sans text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-[#050505] group-hover:text-[var(--ostrum-footer-accent,#C9362B)] transition-colors">
                 {SITE_CONFIG.contactEmail}
               </span>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-black/15 flex items-center justify-center transition-all duration-300 group-hover:border-[var(--ostrum-footer-accent,#FF4D30)] group-hover:bg-[var(--ostrum-footer-accent,#FF4D30)] group-hover:text-white">
+              <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-black/15 flex items-center justify-center transition-all duration-300 group-hover:border-[var(--ostrum-footer-accent,#FF4D30)] group-hover:bg-[var(--ostrum-footer-accent,#FF4D30)] group-hover:text-white">
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   viewBox="0 0 16 16"
@@ -112,10 +112,10 @@ export function OstrumStudioFooter() {
             data-testid="footer-tile-project"
             data-selection-surface="coral"
             onClick={(e) => handleNavClick(e, '#contact')}
-            className="group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-[var(--ostrum-footer-accent,#FF4D30)] text-[#050505] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,77,48,0.32)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="footer-tile group relative flex flex-col justify-between min-h-[240px] sm:min-h-[280px] md:min-h-[320px] p-8 sm:p-10 md:p-12 rounded-[22px] sm:rounded-[28px] bg-[var(--ostrum-footer-accent,#FF4D30)] text-[#050505] transition-all duration-300 hover:shadow-[0_20px_50px_rgba(255,77,48,0.32)] hover:scale-[1.01] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <div>
-              <span className="font-mono text-xs sm:text-[13px] uppercase tracking-[0.2em] font-semibold text-black/60 block">
+              <span className="footer-tile-eyebrow font-mono text-xs sm:text-[13px] uppercase tracking-[0.2em] font-semibold text-black/60 block">
                 / NEXT STEP
               </span>
               <h3 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#050505] mt-3 sm:mt-4">
@@ -123,11 +123,11 @@ export function OstrumStudioFooter() {
               </h3>
             </div>
 
-            <div className="flex items-center justify-between pt-6 border-t border-black/15">
-              <span className="font-sans text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-[#050505] group-hover:underline underline-offset-4">
+            <div className="flex items-center justify-between gap-3 pt-6 border-t border-black/15">
+              <span className="footer-tile-cta min-w-0 font-sans text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-[#050505] group-hover:underline underline-offset-4">
                 Start a project
               </span>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-black/20 flex items-center justify-center transition-all duration-300 group-hover:border-black group-hover:bg-black group-hover:text-[var(--ostrum-footer-accent,#FF4D30)]">
+              <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-black/20 flex items-center justify-center transition-all duration-300 group-hover:border-black group-hover:bg-black group-hover:text-[var(--ostrum-footer-accent,#FF4D30)]">
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   viewBox="0 0 16 16"
@@ -146,13 +146,13 @@ export function OstrumStudioFooter() {
         </div>
 
         {/* PHASE 3B: MAIN FOOTER DIRECTORY (Restored original spacing and typography) */}
-        <div className="mt-28 sm:mt-36 md:mt-44 pt-12 sm:pt-16 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-10 sm:gap-12 lg:gap-16">
+        <div className="footer-directory-grid mt-28 sm:mt-36 md:mt-44 pt-12 sm:pt-16 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-10 sm:gap-12 lg:gap-16">
           {/* Column 1: EXPLORE */}
           <div>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-label-accent,#FF765E)] block mb-5">
+            <span className="footer-dir-label font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-label-accent,#FF765E)] block mb-5">
               EXPLORE
             </span>
-            <ul className="space-y-3 font-sans text-sm sm:text-base text-[#D4D4D8]">
+            <ul className="footer-dir-list space-y-3 font-sans text-sm sm:text-base text-[#D4D4D8]">
               <li>
                 <Link
                   href="/#selected-work"
@@ -194,10 +194,10 @@ export function OstrumStudioFooter() {
 
           {/* Column 2: CONNECT */}
           <div>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-label-accent,#FF765E)] block mb-5">
+            <span className="footer-dir-label font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-label-accent,#FF765E)] block mb-5">
               CONNECT
             </span>
-            <ul className="space-y-3 font-sans text-sm sm:text-base text-[#D4D4D8]">
+            <ul className="footer-dir-list space-y-3 font-sans text-sm sm:text-base text-[#D4D4D8]">
               <li>
                 <a
                   href={`mailto:${SITE_CONFIG.contactEmail}`}
@@ -275,10 +275,10 @@ export function OstrumStudioFooter() {
 
           {/* Column 3: LEGAL */}
           <div>
-            <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-label-accent,#FF765E)] block mb-5">
+            <span className="footer-dir-label font-mono text-xs uppercase tracking-[0.2em] font-semibold text-[var(--ostrum-footer-label-accent,#FF765E)] block mb-5">
               LEGAL
             </span>
-            <ul className="space-y-3 font-sans text-sm sm:text-base text-[#D4D4D8]">
+            <ul className="footer-dir-list space-y-3 font-sans text-sm sm:text-base text-[#D4D4D8]">
               <li>
                 <Link
                   href="/terms-and-conditions"
@@ -301,15 +301,15 @@ export function OstrumStudioFooter() {
           {/* Column 4: STUDIO NOTE & COPYRIGHT */}
           <div className="col-span-2 md:col-span-1 flex flex-col justify-between">
             <div>
-              <span className="font-mono text-xs uppercase tracking-[0.2em] font-semibold text-white/90 block mb-2">
+              <span className="footer-dir-label font-mono text-xs uppercase tracking-[0.2em] font-semibold text-white/90 block mb-2">
                 OSTRUM
               </span>
-              <p className="font-sans text-xs text-[#B9B0AF] mt-2 leading-relaxed">
+              <p className="footer-studio-note font-sans text-xs text-[#B9B0AF] mt-2 leading-relaxed">
                 Custom software, AI systems and original digital products, engineered by OSTRUM.
               </p>
             </div>
 
-            <div className="mt-8 font-mono text-xs text-[#B9B0AF]">
+            <div className="footer-copyright mt-8 font-mono text-xs text-[#B9B0AF]">
               © {currentYear} Ostrum. All rights reserved.
             </div>
           </div>

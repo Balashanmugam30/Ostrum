@@ -7,6 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Testimonial } from '@/types/testimonials';
 import { TESTIMONIALS_DATA } from '@/data/testimonials';
 import { MnesaLogo } from '@/components/ui/MnesaLogo';
+import { isHandheldTouchDevice } from '@/lib/device-tier';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -84,8 +85,8 @@ export function OstrumTestimonialsSection({
     let scrollDistance = getScrollDistance();
     let lastWidth = window.innerWidth;
     const setSectionHeight = () => {
-      const isMobile = window.innerWidth < 768;
-      section.style.height = isMobile && ScrollTrigger.isTouch === 1
+      const isTouchPhone = isHandheldTouchDevice() || ScrollTrigger.isTouch === 1;
+      section.style.height = isTouchPhone
         ? `calc(100svh + ${scrollDistance}px)`
         : `${window.innerHeight + scrollDistance}px`;
     };
@@ -213,7 +214,7 @@ export function OstrumTestimonialsSection({
       // Ignore touch-only height changes from browser chrome. They are not a
       // new layout size; reacting to them shifts the testimonial end and the
       // downstream Capabilities handoff while the user is scrolling.
-      if (ScrollTrigger.isTouch === 1 && !widthChanged) return;
+      if ((isHandheldTouchDevice() || ScrollTrigger.isTouch === 1) && !widthChanged) return;
 
       lastWidth = window.innerWidth;
       scrollDistance = getScrollDistance();
