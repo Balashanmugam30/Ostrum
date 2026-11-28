@@ -160,6 +160,7 @@ export function OstrumContinuousJourney() {
         // Optional extension
       }
       syncRendererSizeAndProjection();
+      renderer.debug.checkShaderErrors = isDevDiagnostics;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.15;
       renderer.domElement.style.width = '100%';
@@ -192,7 +193,7 @@ export function OstrumContinuousJourney() {
     keyLight.position.set(-2.5, 3.6, 3.2);
     scene.add(keyLight);
 
-    const hemiLight = new THREE.HemisphereLight('#fdeddc', '#220404', 0.95);
+    const hemiLight = new THREE.HemisphereLight('#fdeddc', '#220404', isHandheldGpu ? 1.15 : 0.95);
     hemiLight.position.set(0, 5, 0);
     scene.add(hemiLight);
 
@@ -200,18 +201,26 @@ export function OstrumContinuousJourney() {
     rimLight.position.set(3.4, -1.2, -2.6);
     scene.add(rimLight);
 
-    const fillLight = new THREE.DirectionalLight('#ffebd8', 0.45);
-    fillLight.position.set(1.8, 1.2, 2.0);
-    scene.add(fillLight);
+    if (!isHandheldGpu) {
+      const fillLight = new THREE.DirectionalLight('#ffebd8', 0.45);
+      fillLight.position.set(1.8, 1.2, 2.0);
+      scene.add(fillLight);
+    }
 
-    // Dynamic Energy Accent Lights (Local to the sculpture)
+    // Dynamic Energy Accent Lights (Lazy-added only when needed during preloader morph or Section 03)
+    let energyLightsAdded = false;
     const energyRubyLight = new THREE.PointLight('#ff1e2e', 0, 10, 1.6);
     energyRubyLight.position.set(0, 0, 0);
-    scene.add(energyRubyLight);
 
     const energyAmberLight = new THREE.PointLight('#ff9933', 0, 8, 1.8);
     energyAmberLight.position.set(1.8, 0.8, -1.0);
-    scene.add(energyAmberLight);
+
+    const ensureEnergyLights = () => {
+      if (energyLightsAdded) return;
+      energyLightsAdded = true;
+      scene.add(energyRubyLight);
+      scene.add(energyAmberLight);
+    };
 
     // 4. Crimson Porcelain Material with Dynamic Energy Response
     const porcelainColor = new THREE.Color('#f7eee8');
@@ -221,27 +230,38 @@ export function OstrumContinuousJourney() {
     const emissiveBlack = new THREE.Color(0x000000);
     const emissiveScarlet = new THREE.Color('#550b12');
 
-    const material = new THREE.MeshPhysicalMaterial({
-      color: porcelainColor.clone(),
-      roughness: 0.26,
-      metalness: 0.06,
-      clearcoat: 0.58,
-      clearcoatRoughness: 0.18,
-      transmission: 0,
-      ior: 1.50,
-      sheen: 0.65,
-      sheenColor: sheenColorNormal.clone(),
-      sheenRoughness: 0.35,
-      specularColor: new THREE.Color('#ffffff'),
-      specularIntensity: 0.95,
-      iridescence: 0.06,
-      iridescenceIOR: 1.32,
-      emissive: emissiveBlack.clone(),
-      emissiveIntensity: 0,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 1,
-    });
+    const material: THREE.MeshStandardMaterial | THREE.MeshPhysicalMaterial = isHandheldGpu
+      ? new THREE.MeshStandardMaterial({
+          color: porcelainColor.clone(),
+          roughness: 0.22,
+          metalness: 0.08,
+          emissive: emissiveBlack.clone(),
+          emissiveIntensity: 0,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 1,
+        })
+      : new THREE.MeshPhysicalMaterial({
+          color: porcelainColor.clone(),
+          roughness: 0.26,
+          metalness: 0.06,
+          clearcoat: 0.58,
+          clearcoatRoughness: 0.18,
+          transmission: 0,
+          ior: 1.50,
+          sheen: 0.65,
+          sheenColor: sheenColorNormal.clone(),
+          sheenRoughness: 0.35,
+          specularColor: new THREE.Color('#ffffff'),
+          specularIntensity: 0.95,
+          iridescence: 0.06,
+          iridescenceIOR: 1.32,
+          emissive: emissiveBlack.clone(),
+          emissiveIntensity: 0,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 1,
+        });
 
     // 5. Model Root & Pivot Group
     const modelRoot = new THREE.Group();
@@ -253,128 +273,154 @@ export function OstrumContinuousJourney() {
     pivotGroup.rotation.x = 0.20;
     pivotGroup.rotation.z = -0.05;
 
-    // 6. Luminous Energy Filaments (Threaded around the Möbius geometry)
-    const filamentsGroup = new THREE.Group();
-    pivotGroup.add(filamentsGroup);
+    // 6. Luminous Energy Filaments (Lazy-created only when entering Section 03 Energy Narrative)
+    let filamentsState: {
+      group: THREE.Group;
+      mat1: THREE.MeshBasicMaterial;
+      mat2: THREE.MeshBasicMaterial;
+      mat3: THREE.MeshBasicMaterial;
+      geom1: THREE.TubeGeometry;
+      geom2: THREE.TubeGeometry;
+      geom3: THREE.TubeGeometry;
+    } | null = null;
 
-    const createFilamentCurve = (paramFn: (t: number) => THREE.Vector3, pointsCount = 72) => {
-      const points: THREE.Vector3[] = [];
-      for (let i = 0; i <= pointsCount; i++) {
-        const t = (i / pointsCount) * Math.PI * 2;
-        points.push(paramFn(t));
-      }
-      return new THREE.CatmullRomCurve3(points, true);
+    const ensureFilaments = () => {
+      if (filamentsState) return filamentsState;
+      const group = new THREE.Group();
+      pivotGroup.add(group);
+
+      const createFilamentCurve = (paramFn: (t: number) => THREE.Vector3, pointsCount = 72) => {
+        const points: THREE.Vector3[] = [];
+        for (let i = 0; i <= pointsCount; i++) {
+          const t = (i / pointsCount) * Math.PI * 2;
+          points.push(paramFn(t));
+        }
+        return new THREE.CatmullRomCurve3(points, true);
+      };
+
+      const curve1 = createFilamentCurve((t) => {
+        const r = 1.62 + 0.22 * Math.cos(2 * t);
+        return new THREE.Vector3(r * Math.cos(t), 1.92 * Math.sin(t), 0.92 * Math.sin(2 * t));
+      });
+      const curve2 = createFilamentCurve((t) => {
+        const r = 1.84 + 0.18 * Math.sin(3 * t);
+        return new THREE.Vector3(r * Math.cos(-t + 0.5), 1.75 * Math.sin(-t + 0.5), 0.85 * Math.cos(2 * t));
+      });
+      const curve3 = createFilamentCurve((t) => {
+        const r = 1.48 + 0.28 * Math.cos(t);
+        return new THREE.Vector3(r * Math.sin(t * 1.5), 1.55 * Math.cos(t), 1.10 * Math.sin(t * 2.5));
+      });
+
+      const mat1 = new THREE.MeshBasicMaterial({
+        color: new THREE.Color('#ff2233'),
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const mat2 = new THREE.MeshBasicMaterial({
+        color: new THREE.Color('#ffaa38'),
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const mat3 = new THREE.MeshBasicMaterial({
+        color: new THREE.Color('#fff2e8'),
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+
+      const geom1 = new THREE.TubeGeometry(curve1, isHandheldGpu ? 48 : 72, 0.024, 6, true);
+      const geom2 = new THREE.TubeGeometry(curve2, isHandheldGpu ? 48 : 72, 0.018, 6, true);
+      const geom3 = new THREE.TubeGeometry(curve3, isHandheldGpu ? 48 : 72, 0.014, 6, true);
+
+      group.add(new THREE.Mesh(geom1, mat1));
+      group.add(new THREE.Mesh(geom2, mat2));
+      group.add(new THREE.Mesh(geom3, mat3));
+
+      filamentsState = { group, mat1, mat2, mat3, geom1, geom2, geom3 };
+      return filamentsState;
     };
 
-    // Filament 1: Scarlet Core Wave (threads through center cavity)
-    const curve1 = createFilamentCurve((t) => {
-      const r = 1.62 + 0.22 * Math.cos(2 * t);
-      return new THREE.Vector3(
-        r * Math.cos(t),
-        1.92 * Math.sin(t),
-        0.92 * Math.sin(2 * t)
-      );
-    });
-
-    // Filament 2: Amber Secondary Helix (counter-rotating ribbon)
-    const curve2 = createFilamentCurve((t) => {
-      const r = 1.84 + 0.18 * Math.sin(3 * t);
-      return new THREE.Vector3(
-        r * Math.cos(-t + 0.5),
-        1.75 * Math.sin(-t + 0.5),
-        0.85 * Math.cos(2 * t)
-      );
-    });
-
-    // Filament 3: Champagne Tertiary Whisp (outer highlight)
-    const curve3 = createFilamentCurve((t) => {
-      const r = 1.48 + 0.28 * Math.cos(t);
-      return new THREE.Vector3(
-        r * Math.sin(t * 1.5),
-        1.55 * Math.cos(t),
-        1.10 * Math.sin(t * 2.5)
-      );
-    });
-
-    const filamentMat1 = new THREE.MeshBasicMaterial({
-      color: new THREE.Color('#ff2233'),
-      transparent: true,
-      opacity: 0,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-
-    const filamentMat2 = new THREE.MeshBasicMaterial({
-      color: new THREE.Color('#ffaa38'),
-      transparent: true,
-      opacity: 0,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-
-    const filamentMat3 = new THREE.MeshBasicMaterial({
-      color: new THREE.Color('#fff2e8'),
-      transparent: true,
-      opacity: 0,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-
-    const tubeGeom1 = new THREE.TubeGeometry(curve1, isHandheldGpu ? 48 : 72, 0.024, 6, true);
-    const tubeGeom2 = new THREE.TubeGeometry(curve2, isHandheldGpu ? 48 : 72, 0.018, 6, true);
-    const tubeGeom3 = new THREE.TubeGeometry(curve3, isHandheldGpu ? 48 : 72, 0.014, 6, true);
-
-    const tubeMesh1 = new THREE.Mesh(tubeGeom1, filamentMat1);
-    const tubeMesh2 = new THREE.Mesh(tubeGeom2, filamentMat2);
-    const tubeMesh3 = new THREE.Mesh(tubeGeom3, filamentMat3);
-
-    filamentsGroup.add(tubeMesh1);
-    filamentsGroup.add(tubeMesh2);
-    filamentsGroup.add(tubeMesh3);
-
-    // =========================================================================
-    // =========================================================================
-    // 7. 3D PROGRESS RIBBON & UNDERSTATED CHARCOAL TRACK
-    // =========================================================================
-    const ribbonGroup = new THREE.Group();
-    scene.add(ribbonGroup);
-    ribbonGroup.position.set(0, 0, 0);
-
-    const TRACK_WIDTH = isCompactLayout() ? 1.60 : 2.20;
-    const startX = -TRACK_WIDTH / 2;
-    const endX = TRACK_WIDTH / 2;
-
-    // Understated Charcoal Progress Track (matches ribbon endpoints with 0px protrusion)
-    const trackGeom = new THREE.PlaneGeometry(TRACK_WIDTH, 0.075);
-    const trackMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color('#222226'),
-      transparent: true,
-      opacity: 1,
-      side: THREE.DoubleSide,
-    });
-    const trackMesh = new THREE.Mesh(trackGeom, trackMat);
-    trackMesh.position.set(0, 0, 0.01);
-    ribbonGroup.add(trackMesh);
-
+    // 7. 3D Progress Ribbon (Lazy-created only for desktop preloader intro; skipped on mobile!)
     const RIBBON_SAMPLES = 64;
-    const ribbonPoints: THREE.Vector3[] = [];
-    for (let i = 0; i <= RIBBON_SAMPLES; i++) {
-      ribbonPoints.push(new THREE.Vector3(startX + (TRACK_WIDTH * i) / RIBBON_SAMPLES, 0, 0.05));
+    interface RibbonState {
+      group: THREE.Group;
+      trackWidth: number;
+      startX: number;
+      trackGeom: THREE.PlaneGeometry;
+      trackMat: THREE.MeshBasicMaterial;
+      ribbonPoints: THREE.Vector3[];
+      ribbonCurve: THREE.CatmullRomCurve3;
+      ribbonMaterial: THREE.MeshStandardMaterial | THREE.MeshPhysicalMaterial;
+      ribbonMesh: THREE.Mesh;
+      tipGlow: THREE.PointLight;
     }
+    let ribbonState: RibbonState | null = null;
 
-    const ribbonCurve = new THREE.CatmullRomCurve3(ribbonPoints, false, 'centripetal');
-    let ribbonGeometry = new THREE.TubeGeometry(ribbonCurve, isHandheldGpu ? 40 : 56, 0.046, 8, false);
-    const ribbonMaterial = material.clone();
-    ribbonMaterial.transparent = true;
-    ribbonMaterial.opacity = 1;
-    const ribbonMesh = new THREE.Mesh(ribbonGeometry, ribbonMaterial);
-    ribbonMesh.scale.set(1.0, 1.0, 0.55); // 1:1 X/Y proportion, sleek sculptural ribbon profile
-    ribbonGroup.add(ribbonMesh);
+    const ensureRibbon = (): RibbonState => {
+      if (ribbonState) return ribbonState;
+      const group = new THREE.Group();
+      scene.add(group);
+      group.position.set(0, 0, 0);
 
-    // Tip accent highlight
-    const tipGlow = new THREE.PointLight('#fff7ee', 1.6, 3.0, 2.0);
-    tipGlow.position.set(startX, 0, 0.15);
-    ribbonGroup.add(tipGlow);
+      const trackWidth = isCompactLayout() ? 1.60 : 2.20;
+      const rStartX = -trackWidth / 2;
+
+      const trackGeom = new THREE.PlaneGeometry(trackWidth, 0.075);
+      const trackMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color('#222226'),
+        transparent: true,
+        opacity: 1,
+        side: THREE.DoubleSide,
+      });
+      const trackMesh = new THREE.Mesh(trackGeom, trackMat);
+      trackMesh.position.set(0, 0, 0.01);
+      group.add(trackMesh);
+
+      const ribbonPoints: THREE.Vector3[] = [];
+      for (let i = 0; i <= RIBBON_SAMPLES; i++) {
+        ribbonPoints.push(new THREE.Vector3(rStartX + (trackWidth * i) / RIBBON_SAMPLES, 0, 0.05));
+      }
+
+      const ribbonCurve = new THREE.CatmullRomCurve3(ribbonPoints, false, 'centripetal');
+      const ribbonGeometry = new THREE.TubeGeometry(ribbonCurve, isHandheldGpu ? 40 : 56, 0.046, 8, false);
+      const ribbonMaterial = material.clone();
+      ribbonMaterial.transparent = true;
+      ribbonMaterial.opacity = 1;
+      const ribbonMesh = new THREE.Mesh(ribbonGeometry, ribbonMaterial);
+      ribbonMesh.scale.set(1.0, 1.0, 0.55);
+      group.add(ribbonMesh);
+
+      const tipGlow = new THREE.PointLight('#fff7ee', 1.6, 3.0, 2.0);
+      tipGlow.position.set(rStartX, 0, 0.15);
+      group.add(tipGlow);
+
+      const created: RibbonState = {
+        group,
+        trackWidth,
+        startX: rStartX,
+        trackGeom,
+        trackMat,
+        ribbonPoints,
+        ribbonCurve,
+        ribbonMaterial,
+        ribbonMesh,
+        tipGlow,
+      };
+      ribbonState = created;
+      return created;
+    };
+
+    const initialPhase =
+      (typeof window !== 'undefined' && (window as any).__ostrumPhase) ||
+      phaseRef.current;
+    if (initialPhase !== 'complete') {
+      ensureRibbon();
+    }
 
     const setupModelMesh = (rawGroup: THREE.Group) => {
       rawGroup.traverse((child) => {
@@ -383,7 +429,7 @@ export function OstrumContinuousJourney() {
           mesh.material = material;
           mesh.castShadow = false;
           mesh.receiveShadow = false;
-          if (mesh.geometry) {
+          if (mesh.geometry && !mesh.geometry.attributes.normal) {
             mesh.geometry.computeVertexNormals();
           }
         }
@@ -604,16 +650,15 @@ export function OstrumContinuousJourney() {
     updateAnchors();
     const anchorTimer1 = setTimeout(() => {
       updateAnchors();
-      reconcileLifecycle('anchor-timer-100');
-    }, 100);
-    const anchorTimer2 = setTimeout(() => {
-      updateAnchors();
-      reconcileLifecycle('anchor-timer-500');
-    }, 500);
-    const anchorTimer3 = setTimeout(() => {
-      updateAnchors();
-      reconcileLifecycle('anchor-timer-1500');
-    }, 1500);
+      reconcileLifecycle('anchor-timer-450');
+    }, 450);
+    if (typeof document !== 'undefined' && document.fonts) {
+      document.fonts.ready.then(() => {
+        if (isDisposed) return;
+        updateAnchors();
+        reconcileLifecycle('fonts-ready');
+      });
+    }
 
     const onNarrativeReady = () => {
       updateAnchors();
@@ -654,52 +699,46 @@ export function OstrumContinuousJourney() {
       pIntro: number,
       pTransform: number
     ) => {
+      const rib = ensureRibbon();
+      const { group: rGroup, trackWidth, startX: rStartX, trackMat: rTrackMat, ribbonPoints: rPoints, ribbonCurve: rCurve, ribbonMaterial: rMat, ribbonMesh: rMesh, tipGlow: rTipGlow } = rib;
       if (pPhase === 'preparing') {
-        trackMat.opacity = 1;
-        const minHead = startX + TRACK_WIDTH * 0.005;
+        rTrackMat.opacity = 1;
+        const minHead = rStartX + trackWidth * 0.005;
         for (let k = 0; k <= RIBBON_SAMPLES; k++) {
           const u = k / RIBBON_SAMPLES;
-          const px = startX + (minHead - startX) * u;
-          ribbonPoints[k].set(px, 0, 0.05);
+          const px = rStartX + (minHead - rStartX) * u;
+          rPoints[k].set(px, 0, 0.05);
         }
-        tipGlow.position.set(minHead, 0, 0.15);
-        tipGlow.intensity = 0.8;
-        ribbonGroup.rotation.set(0, 0, 0);
+        rTipGlow.position.set(minHead, 0, 0.15);
+        rTipGlow.intensity = 0.8;
+        rGroup.rotation.set(0, 0, 0);
       } else if (pPhase === 'counting') {
-        trackMat.opacity = 1;
+        rTrackMat.opacity = 1;
         const clampedP = Math.max(0.005, Math.min(1.0, pIntro));
-        const currentEnd = startX + TRACK_WIDTH * clampedP;
+        const currentEnd = rStartX + trackWidth * clampedP;
 
         for (let k = 0; k <= RIBBON_SAMPLES; k++) {
           const u = k / RIBBON_SAMPLES;
-          // Progress ribbon advances strictly from startX to currentEnd
-          const px = startX + (currentEnd - startX) * u;
-          const normX = (px - startX) / TRACK_WIDTH;
-          // Subtle elegant elevation wave across the active path
+          const px = rStartX + (currentEnd - rStartX) * u;
+          const normX = (px - rStartX) / trackWidth;
           const py = Math.sin(normX * Math.PI) * 0.025;
           const pz = 0.05 + Math.cos(normX * Math.PI * 2) * 0.015;
-          ribbonPoints[k].set(px, py, pz);
+          rPoints[k].set(px, py, pz);
         }
 
-        tipGlow.position.set(currentEnd, 0, 0.15);
-        tipGlow.intensity = 1.4;
-        ribbonGroup.rotation.set(0, 0, 0);
+        rTipGlow.position.set(currentEnd, 0, 0.15);
+        rTipGlow.intensity = 1.4;
+        rGroup.rotation.set(0, 0, 0);
       } else if (pPhase === 'transforming') {
-        // Morph the completed horizontal ribbon into the broad 3-lobe Ostrum Möbius sculpture
         const t = Math.max(0, Math.min(1.0, pTransform));
-
-        // Background track fades out smoothly as transformation begins
-        trackMat.opacity = Math.max(0, 1 - t * 3.5);
+        rTrackMat.opacity = Math.max(0, 1 - t * 3.5);
 
         for (let k = 0; k <= RIBBON_SAMPLES; k++) {
           const u = k / RIBBON_SAMPLES;
-          // Base horizontal curve at t=0
-          const x0 = startX + TRACK_WIDTH * u;
+          const x0 = rStartX + trackWidth * u;
           const y0 = Math.sin(u * Math.PI) * 0.025;
           const z0 = 0.05 + Math.cos(u * Math.PI * 2) * 0.015;
 
-          // Target 3-lobe Möbius loop geometry matching media_1792170732096_47cecb64.png
-          // Broad, softly rounded triangular loop with circular 1:1 footprint (NOT a narrow raindrop or vertical oval)
           const angle = u * Math.PI * 2;
           const R0 = 1.45;
           const A = 0.22;
@@ -709,35 +748,31 @@ export function OstrumContinuousJourney() {
           const y1 = r * Math.sin(angle);
           const z1 = B * Math.sin(3 * angle);
 
-          // Sequential curling: leading tip curves around first to fold into the loop
           const curlDelay = (1 - u) * 0.24;
           const localT = Math.max(0, Math.min(1, (t - curlDelay) / (1 - curlDelay || 1)));
           const easeT = localT < 0.5 ? 4 * localT * localT * localT : 1 - Math.pow(-2 * localT + 2, 3) / 2;
 
-          const curX = x0 * (1 - easeT) + x1 * easeT;
-          const curY = y0 * (1 - easeT) + y1 * easeT;
-          const curZ = z0 * (1 - easeT) + z1 * easeT;
-          ribbonPoints[k].set(curX, curY, curZ);
+          rPoints[k].set(x0 * (1 - easeT) + x1 * easeT, y0 * (1 - easeT) + y1 * easeT, z0 * (1 - easeT) + z1 * easeT);
         }
 
-        // Align ribbon group orientation with GLB resting pose (0.20 on X, -0.05 on Z)
-        ribbonGroup.rotation.x = t * 0.20;
-        ribbonGroup.rotation.z = -t * 0.05;
-        ribbonGroup.rotation.y = 0;
+        rGroup.rotation.x = t * 0.20;
+        rGroup.rotation.z = -t * 0.05;
+        rGroup.rotation.y = 0;
 
-        // Dynamic light sweep over curling surfaces
+        ensureEnergyLights();
         const sweep = Math.sin(t * Math.PI);
         energyRubyLight.intensity = sweep * 2.8;
         energyAmberLight.intensity = sweep * 1.5;
-        ribbonMaterial.sheenColor.lerpColors(sheenColorNormal, sheenColorScarlet, sweep);
-        tipGlow.intensity = (1 - t) * 1.5;
+        if (rMat instanceof THREE.MeshPhysicalMaterial) {
+          rMat.sheenColor.lerpColors(sheenColorNormal, sheenColorScarlet, sweep);
+        }
+        rTipGlow.intensity = (1 - t) * 1.5;
       }
 
-      // Rebuild tube mesh along updated curve
-      ribbonCurve.updateArcLengths();
-      ribbonMesh.geometry.dispose();
-      ribbonMesh.geometry = new THREE.TubeGeometry(
-        ribbonCurve,
+      rCurve.updateArcLengths();
+      rMesh.geometry.dispose();
+      rMesh.geometry = new THREE.TubeGeometry(
+        rCurve,
         isHandheldGpu ? 40 : 56,
         0.046,
         8,
@@ -778,9 +813,10 @@ export function OstrumContinuousJourney() {
       // INTRO PHASE 1: PREPARING (0.0s - 0.4s)
       // =========================================================================
       if (currentPhase === 'preparing') {
-        ribbonGroup.visible = true;
+        const rib = ensureRibbon();
+        rib.group.visible = true;
         modelRoot.visible = false;
-        ribbonMaterial.opacity = 1;
+        rib.ribbonMaterial.opacity = 1;
         material.opacity = 0;
 
         updateRibbonPoints('preparing', 0, 0);
@@ -794,9 +830,10 @@ export function OstrumContinuousJourney() {
       // INTRO PHASE 2: COUNTING (0.4s - 4.2s)
       // =========================================================================
       else if (currentPhase === 'counting') {
-        ribbonGroup.visible = true;
+        const rib = ensureRibbon();
+        rib.group.visible = true;
         modelRoot.visible = false;
-        ribbonMaterial.opacity = 1;
+        rib.ribbonMaterial.opacity = 1;
         material.opacity = 0;
 
         updateRibbonPoints('counting', introP, 0);
@@ -812,6 +849,7 @@ export function OstrumContinuousJourney() {
       // =========================================================================
       else if (currentPhase === 'transforming') {
         updateRibbonPoints('transforming', 1.0, transformP);
+        const rib = ensureRibbon();
 
         const heroP = transformP >= 0.82 ? (transformP - 0.82) / 0.18 : 0;
         const zoomPulse = Math.sin(heroP * Math.PI * 0.5) * 0.15;
@@ -822,15 +860,15 @@ export function OstrumContinuousJourney() {
         targetRotY = 0;
 
         if (transformP < 0.72) {
-          ribbonGroup.visible = true;
+          rib.group.visible = true;
           modelRoot.visible = false;
-          ribbonMaterial.opacity = 1;
+          rib.ribbonMaterial.opacity = 1;
           material.opacity = 0;
         } else {
-          ribbonGroup.visible = transformP < 0.98;
+          rib.group.visible = transformP < 0.98;
           modelRoot.visible = true;
           const fade = (transformP - 0.72) / 0.26;
-          ribbonMaterial.opacity = Math.max(0, 1 - fade);
+          rib.ribbonMaterial.opacity = Math.max(0, 1 - fade);
           material.opacity = Math.min(1, fade);
         }
       }
@@ -839,7 +877,7 @@ export function OstrumContinuousJourney() {
       // Live GLB glides from center into measured Hero 'O' anchor
       // =========================================================================
       else if (currentPhase === 'docking') {
-        ribbonGroup.visible = false;
+        if (ribbonState) ribbonState.group.visible = false;
         modelRoot.visible = true;
         material.opacity = 1;
 
@@ -860,7 +898,7 @@ export function OstrumContinuousJourney() {
       // COMPLETE: HERO AT REST & DOWNSTREAM SCROLL JOURNEY
       // =========================================================================
       else if (scrollY < dockStart) {
-        ribbonGroup.visible = false;
+        if (ribbonState) ribbonState.group.visible = false;
         modelRoot.visible = true;
         material.opacity = 1;
 
@@ -881,7 +919,7 @@ export function OstrumContinuousJourney() {
       }
       // Stage 2: Section 02 Editorial Pinned Hold
       else if (scrollY <= dockEnd) {
-        ribbonGroup.visible = false;
+        if (ribbonState) ribbonState.group.visible = false;
         modelRoot.visible = true;
         material.opacity = 1;
 
@@ -907,7 +945,7 @@ export function OstrumContinuousJourney() {
       }
       // Stage 3: Phase B : Connected Darkening, Gentle Zoom & Stationary Orientation Hold
       else if (scrollY < energyStart) {
-        ribbonGroup.visible = false;
+        if (ribbonState) ribbonState.group.visible = false;
         modelRoot.visible = true;
         material.opacity = 1;
 
@@ -924,7 +962,7 @@ export function OstrumContinuousJourney() {
       }
       // Stage 4: Energy Narrative Pinned Experience
       else if (scrollY <= energyEnd) {
-        ribbonGroup.visible = false;
+        if (ribbonState) ribbonState.group.visible = false;
         modelRoot.visible = true;
         material.opacity = 1;
 
@@ -952,7 +990,7 @@ export function OstrumContinuousJourney() {
       }
       // Stage 5: Transition into Selected Work
       else {
-        ribbonGroup.visible = false;
+        if (ribbonState) ribbonState.group.visible = false;
         modelRoot.visible = true;
         material.opacity = 1;
 
@@ -1004,7 +1042,7 @@ export function OstrumContinuousJourney() {
         currentEnergy = 0;
         modelRoot.visible = true;
         material.opacity = 1;
-        ribbonGroup.visible = false;
+        if (ribbonState) ribbonState.group.visible = false;
         isInitialized = true;
       }
 
@@ -1028,32 +1066,40 @@ export function OstrumContinuousJourney() {
       const E = currentEnergy;
 
       if (E > 0.01) {
+        const fil = ensureFilaments();
+        ensureEnergyLights();
         material.color.lerpColors(porcelainColor, rubyChampagneColor, E * 0.55);
         material.roughness = 0.26 - E * 0.10;
-        material.clearcoat = 0.58 + E * 0.40;
-        material.sheen = 0.65 + E * 0.35;
-        material.sheenColor.lerpColors(sheenColorNormal, sheenColorScarlet, E);
+        if (material instanceof THREE.MeshPhysicalMaterial) {
+          material.clearcoat = 0.58 + E * 0.40;
+          material.sheen = 0.65 + E * 0.35;
+          material.sheenColor.lerpColors(sheenColorNormal, sheenColorScarlet, E);
+        }
         material.emissive.lerpColors(emissiveBlack, emissiveScarlet, E * 0.60);
         material.emissiveIntensity = E * 0.95;
 
-        filamentMat1.opacity = Math.min(0.92, E * 1.15);
-        filamentMat2.opacity = Math.min(0.78, E * 0.95);
-        filamentMat3.opacity = Math.min(0.65, E * 0.85);
+        fil.mat1.opacity = Math.min(0.92, E * 1.15);
+        fil.mat2.opacity = Math.min(0.78, E * 0.95);
+        fil.mat3.opacity = Math.min(0.65, E * 0.85);
 
         energyRubyLight.intensity = E * 3.8;
         energyAmberLight.intensity = E * 2.2;
       } else if (currentPhase === 'complete') {
         material.color.copy(porcelainColor);
-        material.roughness = 0.26;
-        material.clearcoat = 0.58;
-        material.sheen = 0.65;
-        material.sheenColor.copy(sheenColorNormal);
+        material.roughness = isHandheldGpu ? 0.22 : 0.26;
+        if (material instanceof THREE.MeshPhysicalMaterial) {
+          material.clearcoat = 0.58;
+          material.sheen = 0.65;
+          material.sheenColor.copy(sheenColorNormal);
+        }
         material.emissive.copy(emissiveBlack);
         material.emissiveIntensity = 0;
 
-        filamentMat1.opacity = 0;
-        filamentMat2.opacity = 0;
-        filamentMat3.opacity = 0;
+        if (filamentsState) {
+          filamentsState.mat1.opacity = 0;
+          filamentsState.mat2.opacity = 0;
+          filamentsState.mat3.opacity = 0;
+        }
 
         energyRubyLight.intensity = 0;
         energyAmberLight.intensity = 0;
@@ -1246,6 +1292,7 @@ export function OstrumContinuousJourney() {
     };
 
     // Main Animation Loop (driven solely by WebGLRenderer.setAnimationLoop)
+    let lastIdleHeroFrameTime = 0;
     function animate(time: number) {
       if (isDisposed || !isLoopActive) return;
 
@@ -1260,6 +1307,13 @@ export function OstrumContinuousJourney() {
       if (scrollY > bounds.exitBoundary || tabHidden) {
         reconcileLifecycle(tabHidden ? 'animate-tab-hidden' : 'animate-past-exit');
         return;
+      }
+
+      // On handheld GPUs while resting at hero top, pace the subtle breathing float to ~25fps
+      // so idle frames do not saturate the main thread; full frame rate resumes on any scroll.
+      if (isHandheldGpu && scrollY <= 30 && hasReportedFirstFrame) {
+        if (time - lastIdleHeroFrameTime < 38) return;
+        lastIdleHeroFrameTime = time;
       }
 
       updateScenePose(time, false);
@@ -1339,7 +1393,12 @@ export function OstrumContinuousJourney() {
         wasInactive ||
         (isHandheldGpu && freshScrollY <= 30)
       );
-      if (shouldSnap || options?.renderImmediate) {
+      const activePhase =
+        (typeof window !== 'undefined' && (window as any).__ostrumPhase) ||
+        phaseRef.current;
+      const canRenderCurrentFrame =
+        isModelReadyRef.current || activePhase !== 'complete';
+      if (canRenderCurrentFrame && (shouldSnap || options?.renderImmediate)) {
         updateScenePose(performance.now(), shouldSnap);
         renderSceneFrame();
       }
@@ -1411,8 +1470,6 @@ export function OstrumContinuousJourney() {
       isDisposed = true;
       clearRecoveryTimers();
       clearTimeout(anchorTimer1);
-      clearTimeout(anchorTimer2);
-      clearTimeout(anchorTimer3);
       stopLoop();
       updateDomTelemetry();
       window.removeEventListener('resize', handleResize);
@@ -1441,15 +1498,19 @@ export function OstrumContinuousJourney() {
       }
       renderer.dispose();
       material.dispose();
-      ribbonMaterial.dispose();
-      ribbonGeometry.dispose();
-      tubeGeom1.dispose();
-      tubeGeom2.dispose();
-      tubeGeom3.dispose();
-      trackGeom.dispose();
-      trackMat.dispose();
-      if (ribbonMesh.geometry) {
-        ribbonMesh.geometry.dispose();
+      if (ribbonState) {
+        ribbonState.ribbonMaterial.dispose();
+        ribbonState.ribbonMesh.geometry.dispose();
+        ribbonState.trackGeom.dispose();
+        ribbonState.trackMat.dispose();
+      }
+      if (filamentsState) {
+        filamentsState.geom1.dispose();
+        filamentsState.geom2.dispose();
+        filamentsState.geom3.dispose();
+        filamentsState.mat1.dispose();
+        filamentsState.mat2.dispose();
+        filamentsState.mat3.dispose();
       }
     };
   }, [reportError, reportFirstFrame, reportHeroTargetReady, reportModelReady, isLegalPage]);

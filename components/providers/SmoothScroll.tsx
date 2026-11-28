@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import Lenis from 'lenis';
-import 'lenis/dist/lenis.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { scheduleScrollTriggerRefresh } from '@/lib/scroll-refresh';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -43,42 +42,54 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
     if (prefersReducedMotion) return cleanupNormalizer;
 
-    // Initialize root Lenis smooth scrolling instance
-    const lenis = new Lenis({
-      duration: 1.15,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 0.95,
-      touchMultiplier: 1.0,
-      autoRaf: false, // Fully synchronized with GSAP ticker below
+    let isDisposed = false;
+    let lenisInstance: import('lenis').default | null = null;
+    let updateTicker: ((time: number) => void) | null = null;
+
+    Promise.all([
+      import('lenis'),
+      import('lenis/dist/lenis.css' as string),
+    ]).then(([{ default: Lenis }]) => {
+      if (isDisposed) return;
+
+      const lenis = new Lenis({
+        duration: 1.15,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 0.95,
+        touchMultiplier: 1.0,
+        autoRaf: false, // Fully synchronized with GSAP ticker below
+      });
+
+      lenisInstance = lenis;
+      (window as any).lenis = lenis;
+
+      // Synchronize Lenis scroll position with GSAP ScrollTrigger
+      lenis.on('scroll', ScrollTrigger.update);
+
+      // Drive Lenis through GSAP ticker with correct second-to-millisecond conversion
+      updateTicker = (time: number) => {
+        lenis.raf(time * 1000);
+      };
+
+      gsap.ticker.add(updateTicker);
+      gsap.ticker.lagSmoothing(0);
+
+      // Refresh ScrollTrigger once fonts and assets are ready
+      if (typeof document !== 'undefined' && document.fonts) {
+        document.fonts.ready.then(() => {
+          if (!isDisposed) scheduleScrollTriggerRefresh();
+        });
+      }
     });
 
-    (window as any).lenis = lenis;
-
-    // Synchronize Lenis scroll position with GSAP ScrollTrigger
-    lenis.on('scroll', ScrollTrigger.update);
-
-    // Drive Lenis through GSAP ticker with correct second-to-millisecond conversion
-    const updateTicker = (time: number) => {
-      lenis.raf(time * 1000);
-    };
-
-    gsap.ticker.add(updateTicker);
-    gsap.ticker.lagSmoothing(0);
-
-    // Refresh ScrollTrigger once fonts and assets are ready
-    if (typeof document !== 'undefined' && document.fonts) {
-      document.fonts.ready.then(() => {
-        ScrollTrigger.refresh();
-      });
-    }
-
     return () => {
+      isDisposed = true;
       delete (window as any).lenis;
-      gsap.ticker.remove(updateTicker);
-      lenis.destroy();
+      if (updateTicker) gsap.ticker.remove(updateTicker);
+      lenisInstance?.destroy();
       cleanupNormalizer();
     };
   }, []);

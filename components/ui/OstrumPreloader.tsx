@@ -145,7 +145,7 @@ export function OstrumPreloader() {
       id="ostrum-preloader-root"
       data-testid="ostrum-preloader-root"
       data-phase={phase}
-      className="fixed inset-0 pointer-events-none select-none"
+      className="fixed inset-0 pointer-events-none select-none hidden md:block"
     >
       {/* =========================================================================
           LAYER 1: FULL-SCREEN PURE BLACK STAGE (#000000) (z-[15])

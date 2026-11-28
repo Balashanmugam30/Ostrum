@@ -4,10 +4,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLanguage } from '@/context/LanguageContext';
-import {
-  OstrumCore3D,
-  OstrumCore3DHandle,
-  QualityTier,
+import type {
+
+
+  OstrumCore3DHandle, QualityTier,
 } from '@/components/visuals/OstrumCore3D';
 import { LivingThread } from '@/components/ui/LivingThread';
 

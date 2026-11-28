@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import * as THREE from 'three';
 import { isHandheldTouchDevice, subscribeDeviceTierChange } from '@/lib/device-tier';
 
 export function BackgroundCaustics() {
@@ -87,522 +86,552 @@ export function BackgroundCaustics() {
 
     delete container.dataset.webglFailed;
 
-    const isMobile = window.innerWidth < 768;
-    let animationFrameId = 0;
-    const size = { width: container.clientWidth || window.innerWidth, height: container.clientHeight || window.innerHeight };
-
-    let renderer: THREE.WebGLRenderer;
-    try {
-      renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' });
-    } catch {
-      container.dataset.webglFailed = 'true';
-      container.dataset.mobileBackground = 'true';
-      return;
-    }
-
-    renderer.setSize(size.width, size.height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
-    renderer.domElement.style.display = 'block';
-    renderer.domElement.style.width = '100%';
-    renderer.domElement.style.height = '100%';
-    renderer.domElement.style.position = 'absolute';
-    renderer.domElement.style.inset = '0';
-    renderer.domElement.style.pointerEvents = 'none';
-    // Keep CSS art visible until the shader texture has decoded and rendered its first frame
-    renderer.domElement.style.opacity = '0';
-    renderer.domElement.style.transition = 'opacity 180ms ease';
-    container.appendChild(renderer.domElement);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 10);
-    camera.position.z = 1;
-
-
-    const vertexShader = `
-      varying vec2 vUv;
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `;
-
-    const fragmentShader = `
-      precision highp float;
-      varying vec2 vUv;
-
-      uniform float uTime;
-      uniform vec2 uResolution;
-      uniform vec2 uMouse;
-
-      // Texture
-      uniform sampler2D uTexture;
-      uniform vec2 uTextureResolution;
-
-      // Water
-      uniform float uWaterScale;
-      uniform float uWaterSpeed;
-      uniform float uDistortionStrength;
-
-      // Mouse interaction
-      uniform float uMouseRadius;
-      uniform float uMouseStrength;
-
-      // Grain
-      uniform float uGrainIntensity;
-      uniform float uGrainSpeed;
-
-      // Scroll
-      uniform float uScrollY;
-
-      // Halo
-      uniform float uHaloIntensity;
-      uniform float uHaloSize;
-      uniform vec3 uHaloColor;
-
-      // Section Darkening for Energy Narrative
-      uniform float uDarken;
-
-      // ============================================
-      // SIMPLEX 3D NOISE
-      // ============================================
-
-      vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-      vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-      vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
-      vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-
-      float snoise(vec3 v) {
-        const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
-        const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
-
-        vec3 i = floor(v + dot(v, C.yyy));
-        vec3 x0 = v - i + dot(i, C.xxx);
-
-        vec3 g = step(x0.yzx, x0.xyz);
-        vec3 l = 1.0 - g;
-        vec3 i1 = min(g.xyz, l.zxy);
-        vec3 i2 = max(g.xyz, l.zxy);
-
-        vec3 x1 = x0 - i1 + C.xxx;
-        vec3 x2 = x0 - i2 + C.yyy;
-        vec3 x3 = x0 - D.yyy;
-
-        i = mod289(i);
-        vec4 p = permute(permute(permute(
-          i.z + vec4(0.0, i1.z, i2.z, 1.0))
-          + i.y + vec4(0.0, i1.y, i2.y, 1.0))
-          + i.x + vec4(0.0, i1.x, i2.x, 1.0));
-
-        float n_ = 0.142857142857;
-        vec3 ns = n_ * D.wyz - D.xzx;
-
-        vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-
-        vec4 x_ = floor(j * ns.z);
-        vec4 y_ = floor(j - 7.0 * x_);
-
-        vec4 x = x_ * ns.x + ns.yyyy;
-        vec4 y = y_ * ns.x + ns.yyyy;
-        vec4 h = 1.0 - abs(x) - abs(y);
-
-        vec4 b0 = vec4(x.xy, y.xy);
-        vec4 b1 = vec4(x.zw, y.zw);
-
-        vec4 s0 = floor(b0) * 2.0 + 1.0;
-        vec4 s1 = floor(b1) * 2.0 + 1.0;
-        vec4 sh = -step(h, vec4(0.0));
-
-        vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
-        vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-
-        vec3 p0 = vec3(a0.xy, h.x);
-        vec3 p1 = vec3(a0.zw, h.y);
-        vec3 p2 = vec3(a1.xy, h.z);
-        vec3 p3 = vec3(a1.zw, h.w);
-
-        vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
-        p0 *= norm.x;
-        p1 *= norm.y;
-        p2 *= norm.z;
-        p3 *= norm.w;
-
-        vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
-        m = m * m;
-        return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
-      }
-
-      // ============================================
-      // OBJECT-FIT COVER UV (aligned to top in hero)
-      // ============================================
-
-      vec2 coverUV(vec2 uv, vec2 screenSize, vec2 textureSize) {
-        float screenAspect = screenSize.x / screenSize.y;
-        float textureAspect = textureSize.x / textureSize.y;
-
-        vec2 scale = vec2(1.0);
-
-        if (screenAspect > textureAspect) {
-          // Screen is wider - scale texture width to match, crop height
-          scale.y = textureAspect / screenAspect;
-        } else {
-          // Screen is taller - scale texture height to match, crop width
-          scale.x = screenAspect / textureAspect;
-        }
-
-        // Center horizontally, align to top vertically
-        vec2 offset = vec2(0.5, 1.0 - scale.y * 0.5);
-        return (uv - vec2(0.5, 0.5)) * scale + offset;
-      }
-
-      // ============================================
-      // WATER DISTORTION
-      // ============================================
-
-      vec2 waterDistortion(vec2 p, float time) {
-        vec3 coord = vec3(p * uWaterScale, time * uWaterSpeed);
-
-        float n1 = snoise(coord);
-        float n2 = snoise(coord + vec3(0.1, 0.0, 0.0));
-        float n3 = snoise(coord + vec3(0.0, 0.1, 0.0));
-
-        vec2 grad = vec2(n2 - n1, n3 - n1);
-        return grad * uDistortionStrength;
-      }
-
-      // ============================================
-      // FILM GRAIN
-      // ============================================
-
-      float filmGrain(vec2 uv, float time) {
-        vec2 grainUv = uv * uResolution;
-        float seed = mod(floor(time * uGrainSpeed), 400.0) * 0.37;
-
-        float grain1 = fract(sin(dot(grainUv + seed, vec2(12.9898, 78.233))) * 43758.5453);
-        float grain2 = fract(sin(dot(grainUv * 0.7 + 0.5 + seed, vec2(39.346, 11.135))) * 43758.5453);
-
-        return mix(grain1, grain2, 0.5);
-      }
-
-      // ============================================
-      // MOUSE DISTORTION
-      // ============================================
-
-      vec2 mouseDistortion(vec2 uv, vec2 mouse) {
-        vec2 dir = uv - mouse;
-        float dist = length(dir);
-
-        float strength = smoothstep(uMouseRadius, 0.0, dist);
-        strength = pow(strength, 1.5);
-
-        vec2 displacement = normalize(dir + 0.0001) * strength * uMouseStrength;
-        return displacement;
-      }
-
-      // ============================================
-      // MOUSE LIGHT HALO
-      // ============================================
-
-      vec3 mouseHalo(vec2 uv, vec2 mouse) {
-        float aspect = uResolution.x / uResolution.y;
-
-        vec2 uvCorrected = vec2(uv.x * aspect, uv.y);
-        vec2 mouseCorrected = vec2(mouse.x * aspect, mouse.y);
-
-        float dist = length(uvCorrected - mouseCorrected);
-        float glow = smoothstep(uHaloSize, 0.0, dist);
-        float intensity = pow(glow, 1.5);
-
-        return uHaloColor * intensity * uHaloIntensity;
-      }
-
-      // ============================================
-      // MAIN
-      // ============================================
-
-      void main() {
-        vec2 uv = vUv;
-        float time = uTime;
-
-        // Calculate cover UV for texture (aligned to top)
-        vec2 texUV = coverUV(uv, uResolution, uTextureResolution);
-
-        // Apply continuous scroll progression through the tall 2532px artwork
-        texUV.y -= uScrollY;
-
-        vec2 distortion = waterDistortion(uv, time);
-        vec2 mouseDist = mouseDistortion(uv, uMouse);
-
-        texUV += distortion + mouseDist;
-
-        // Continuous texture sampling with seamless boundary falloff into obsidian black
-        vec3 color = vec3(0.0);
-        if (texUV.x >= 0.0 && texUV.x <= 1.0 && texUV.y >= 0.0 && texUV.y <= 1.0) {
-          float bottomFade = smoothstep(0.0, 0.03, texUV.y);
-          color = texture2D(uTexture, texUV).rgb * bottomFade;
-        }
-
-        // Radiant cursor halo (fades out as atmosphere darkens into narrative)
-        vec3 halo = mouseHalo(uv, uMouse) * max(0.0, 1.0 - uDarken * 1.5);
-        color += halo;
-
-        // Concentrated atmosphere darkening for Energy Narrative
-        if (uDarken > 0.001) {
-          // Pure obsidian dark base (#030204) matching Ignite reference
-          vec3 nearBlack = vec3(0.012, 0.008, 0.016);
-          float aspect = uResolution.x / uResolution.y;
-          vec2 screenCenter = vec2(0.5 * aspect, 0.5);
-          vec2 currentCoord = vec2(uv.x * aspect, uv.y);
-          float distToCenter = length(currentCoord - screenCenter);
-          // Restrained ruby radiance centered directly behind the Möbius sculpture
-          float coreSpotlight = smoothstep(0.42, 0.0, distToCenter);
-          vec3 centralRadiance = vec3(0.42, 0.05, 0.03) * pow(coreSpotlight, 1.8);
-          vec3 cinematicField = nearBlack + centralRadiance;
-          color = mix(color, cinematicField, uDarken);
-        }
-
-        color = clamp(color, 0.0, 1.0);
-
-        gl_FragColor = vec4(color, 1.0);
-      }
-    `;
-
-    const material = new THREE.ShaderMaterial({
-      vertexShader,
-      fragmentShader,
-      uniforms: {
-        uTime: { value: 0 },
-        uResolution: { value: new THREE.Vector2(size.width, size.height) },
-        uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-        uTexture: { value: null },
-        uTextureResolution: { value: new THREE.Vector2(1920, 2532) },
-        uWaterScale: { value: 2 },
-        uWaterSpeed: { value: 0.15 },
-        uDistortionStrength: { value: isMobile ? 0.018 : 0.025 },
-        uMouseRadius: { value: 0.3 },
-        uMouseStrength: { value: isMobile ? 0 : 0.035 },
-        uGrainIntensity: { value: 0.0 },
-        uGrainSpeed: { value: 0.0 },
-        uScrollY: { value: 0 },
-        uHaloIntensity: { value: isMobile ? 0 : 0.75 },
-        uHaloSize: { value: 0.5 },
-        uHaloColor: { value: new THREE.Color(0.91, 0.063, 0.0) },
-        uDarken: { value: 0 },
-      },
-    });
-
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
-    scene.add(mesh);
-
-    let hasTexture = false;
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.load(
-      '/images/bg.webp',
-      (tex) => {
-        tex.minFilter = THREE.LinearFilter;
-        tex.magFilter = THREE.LinearFilter;
-        material.uniforms.uTexture.value = tex;
-        if (tex.image) {
-          material.uniforms.uTextureResolution.value.set(tex.image.width, tex.image.height);
-        }
-        hasTexture = true;
-        if (!isContextLost && isVisible) {
-          renderer.render(scene, camera);
-        }
-        renderer.domElement.style.opacity = '1';
-      },
-      undefined,
-      () => {
-        // Ensure static CSS art remains visible if desktop texture fails to load or decode.
+    let isDisposed = false;
+    let initRaf = 0;
+    let initTimer: ReturnType<typeof setTimeout> | null = null;
+    let cleanupWebGL: (() => void) | null = null;
+
+    const startDesktopWebGL = async () => {
+      if (isDisposed) return;
+
+      const THREE = await import('three');
+      if (isDisposed) return;
+
+      const isMobile = window.innerWidth < 768;
+      let animationFrameId = 0;
+      const size = {
+        width: container.clientWidth || window.innerWidth,
+        height: container.clientHeight || window.innerHeight,
+      };
+
+      let renderer: InstanceType<typeof THREE.WebGLRenderer>;
+      try {
+        renderer = new THREE.WebGLRenderer({
+          antialias: false,
+          alpha: false,
+          powerPreference: 'high-performance',
+        });
+      } catch {
         container.dataset.webglFailed = 'true';
         container.dataset.mobileBackground = 'true';
-        renderer.domElement.style.opacity = '0';
-      },
-    );
-
-    const mousePos = { x: 0.5, y: 0.5 };
-    const targetPos = { x: 0.5, y: 0.5 };
-    let scrollY = 0;
-    let targetScrollY = 0;
-    let currentDarken = 0;
-    let targetDarken = 0;
-    let isVisible = document.visibilityState === 'visible';
-    let isContextLost = false;
-    const coveredSurfaces = new Set<string>();
-
-    const onBgDarken = (e: Event) => {
-      const customEvent = e as CustomEvent<number>;
-      if (typeof customEvent.detail === 'number') {
-        targetDarken = Math.max(0, Math.min(1, customEvent.detail));
+        return;
       }
-    };
-    window.addEventListener('ostrum:bg-darken', onBgDarken);
 
-    const onMouseMove = (e: MouseEvent) => {
-      targetPos.x = e.clientX / window.innerWidth;
-      targetPos.y = 1 - e.clientY / window.innerHeight;
-    };
+      renderer.debug.checkShaderErrors = process.env.NODE_ENV !== 'production';
+      renderer.setSize(size.width, size.height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
+      renderer.domElement.style.display = 'block';
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      renderer.domElement.style.position = 'absolute';
+      renderer.domElement.style.inset = '0';
+      renderer.domElement.style.pointerEvents = 'none';
+      // Keep CSS art visible until the shader texture has decoded and rendered its first frame
+      renderer.domElement.style.opacity = '0';
+      renderer.domElement.style.transition = 'opacity 180ms ease';
+      container.appendChild(renderer.domElement);
 
-    const onScroll = () => {
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      targetScrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      const scene = new THREE.Scene();
+      const camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 10);
+      camera.position.z = 1;
 
-      const scrollYPos = window.scrollY;
-      const st02 = (window as any).ScrollTrigger?.getById('section02-hold');
-      const stEnergy = (window as any).ScrollTrigger?.getById('energy-narrative-pin');
-
-      if (st02 && stEnergy) {
-        const dockEnd = st02.end;
-        const energyStart = stEnergy.start;
-        const handoffSpan = Math.max(1, energyStart - dockEnd);
-
-        if (scrollYPos <= dockEnd) {
-          // Section 01 (Hero) and Section 02 (Engine & Reading Hold): 100% pure crimson caustics
-          targetDarken = 0.0;
-        } else if (scrollYPos < energyStart) {
-          // Exact handoff journey between Section 02 release and Section 03 entrance:
-          // Smooth, continuous, mono-directional transition from 0.0 to 1.0
-          // Uses identical cubic ease curve matching the 3D sculpture's half-turn and zoom
-          const t = Math.max(0, Math.min(1, (scrollYPos - dockEnd) / handoffSpan));
-          const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-          targetDarken = ease;
-        } else {
-          // Inside Section 03 pinned narrative & subsequent spacer: deep black with subtle ruby core
-          targetDarken = 1.0;
+      const vertexShader = `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
-      } else {
-        // Fallback using DOM geometry if ScrollTrigger is not yet registered
-        const energyEl = document.getElementById('energy-narrative');
-        if (energyEl) {
-          const rect = energyEl.getBoundingClientRect();
-          const winH = window.innerHeight || 800;
-          const transitionDistance = Math.min(winH * 0.8, 600);
+      `;
 
-          if (rect.top >= transitionDistance) {
+      const fragmentShader = `
+        precision highp float;
+        varying vec2 vUv;
+
+        uniform float uTime;
+        uniform vec2 uResolution;
+        uniform vec2 uMouse;
+
+        // Texture
+        uniform sampler2D uTexture;
+        uniform vec2 uTextureResolution;
+
+        // Water
+        uniform float uWaterScale;
+        uniform float uWaterSpeed;
+        uniform float uDistortionStrength;
+
+        // Mouse interaction
+        uniform float uMouseRadius;
+        uniform float uMouseStrength;
+
+        // Grain
+        uniform float uGrainIntensity;
+        uniform float uGrainSpeed;
+
+        // Scroll
+        uniform float uScrollY;
+
+        // Halo
+        uniform float uHaloIntensity;
+        uniform float uHaloSize;
+        uniform vec3 uHaloColor;
+
+        // Section Darkening for Energy Narrative
+        uniform float uDarken;
+
+        // ============================================
+        // SIMPLEX 3D NOISE
+        // ============================================
+
+        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+        vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+        float snoise(vec3 v) {
+          const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
+          const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+
+          vec3 i = floor(v + dot(v, C.yyy));
+          vec3 x0 = v - i + dot(i, C.xxx);
+
+          vec3 g = step(x0.yzx, x0.xyz);
+          vec3 l = 1.0 - g;
+          vec3 i1 = min(g.xyz, l.zxy);
+          vec3 i2 = max(g.xyz, l.zxy);
+
+          vec3 x1 = x0 - i1 + C.xxx;
+          vec3 x2 = x0 - i2 + C.yyy;
+          vec3 x3 = x0 - D.yyy;
+
+          i = mod289(i);
+          vec4 p = permute(permute(permute(
+            i.z + vec4(0.0, i1.z, i2.z, 1.0))
+            + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+            + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+
+          float n_ = 0.142857142857;
+          vec3 ns = n_ * D.wyz - D.xzx;
+
+          vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+
+          vec4 x_ = floor(j * ns.z);
+          vec4 y_ = floor(j - 7.0 * x_);
+
+          vec4 x = x_ * ns.x + ns.yyyy;
+          vec4 y = y_ * ns.x + ns.yyyy;
+          vec4 h = 1.0 - abs(x) - abs(y);
+
+          vec4 b0 = vec4(x.xy, y.xy);
+          vec4 b1 = vec4(x.zw, y.zw);
+
+          vec4 s0 = floor(b0) * 2.0 + 1.0;
+          vec4 s1 = floor(b1) * 2.0 + 1.0;
+          vec4 sh = -step(h, vec4(0.0));
+
+          vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+          vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+
+          vec3 p0 = vec3(a0.xy, h.x);
+          vec3 p1 = vec3(a0.zw, h.y);
+          vec3 p2 = vec3(a1.xy, h.z);
+          vec3 p3 = vec3(a1.zw, h.w);
+
+          vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+          p0 *= norm.x;
+          p1 *= norm.y;
+          p2 *= norm.z;
+          p3 *= norm.w;
+
+          vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
+          m = m * m;
+          return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+        }
+
+        // ============================================
+        // OBJECT-FIT COVER UV (aligned to top in hero)
+        // ============================================
+
+        vec2 coverUV(vec2 uv, vec2 screenSize, vec2 textureSize) {
+          float screenAspect = screenSize.x / screenSize.y;
+          float textureAspect = textureSize.x / textureSize.y;
+
+          vec2 scale = vec2(1.0);
+
+          if (screenAspect > textureAspect) {
+            // Screen is wider - scale texture width to match, crop height
+            scale.y = textureAspect / screenAspect;
+          } else {
+            // Screen is taller - scale texture height to match, crop width
+            scale.x = screenAspect / textureAspect;
+          }
+
+          // Center horizontally, align to top vertically
+          vec2 offset = vec2(0.5, 1.0 - scale.y * 0.5);
+          return (uv - vec2(0.5, 0.5)) * scale + offset;
+        }
+
+        // ============================================
+        // WATER DISTORTION
+        // ============================================
+
+        vec2 waterDistortion(vec2 p, float time) {
+          vec3 coord = vec3(p * uWaterScale, time * uWaterSpeed);
+
+          float n1 = snoise(coord);
+          float n2 = snoise(coord + vec3(0.1, 0.0, 0.0));
+          float n3 = snoise(coord + vec3(0.0, 0.1, 0.0));
+
+          vec2 grad = vec2(n2 - n1, n3 - n1);
+          return grad * uDistortionStrength;
+        }
+
+        // ============================================
+        // FILM GRAIN
+        // ============================================
+
+        float filmGrain(vec2 uv, float time) {
+          vec2 grainUv = uv * uResolution;
+          float seed = mod(floor(time * uGrainSpeed), 400.0) * 0.37;
+
+          float grain1 = fract(sin(dot(grainUv + seed, vec2(12.9898, 78.233))) * 43758.5453);
+          float grain2 = fract(sin(dot(grainUv * 0.7 + 0.5 + seed, vec2(39.346, 11.135))) * 43758.5453);
+
+          return mix(grain1, grain2, 0.5);
+        }
+
+        // ============================================
+        // MOUSE DISTORTION
+        // ============================================
+
+        vec2 mouseDistortion(vec2 uv, vec2 mouse) {
+          vec2 dir = uv - mouse;
+          float dist = length(dir);
+
+          float strength = smoothstep(uMouseRadius, 0.0, dist);
+          strength = pow(strength, 1.5);
+
+          vec2 displacement = normalize(dir + 0.0001) * strength * uMouseStrength;
+          return displacement;
+        }
+
+        // ============================================
+        // MOUSE LIGHT HALO
+        // ============================================
+
+        vec3 mouseHalo(vec2 uv, vec2 mouse) {
+          float aspect = uResolution.x / uResolution.y;
+
+          vec2 uvCorrected = vec2(uv.x * aspect, uv.y);
+          vec2 mouseCorrected = vec2(mouse.x * aspect, mouse.y);
+
+          float dist = length(uvCorrected - mouseCorrected);
+          float glow = smoothstep(uHaloSize, 0.0, dist);
+          float intensity = pow(glow, 1.5);
+
+          return uHaloColor * intensity * uHaloIntensity;
+        }
+
+        // ============================================
+        // MAIN
+        // ============================================
+
+        void main() {
+          vec2 uv = vUv;
+          float time = uTime;
+
+          // Calculate cover UV for texture (aligned to top)
+          vec2 texUV = coverUV(uv, uResolution, uTextureResolution);
+
+          // Apply continuous scroll progression through the tall 2532px artwork
+          texUV.y -= uScrollY;
+
+          vec2 distortion = waterDistortion(uv, time);
+          vec2 mouseDist = mouseDistortion(uv, uMouse);
+
+          texUV += distortion + mouseDist;
+
+          // Continuous texture sampling with seamless boundary falloff into obsidian black
+          vec3 color = vec3(0.0);
+          if (texUV.x >= 0.0 && texUV.x <= 1.0 && texUV.y >= 0.0 && texUV.y <= 1.0) {
+            float bottomFade = smoothstep(0.0, 0.03, texUV.y);
+            color = texture2D(uTexture, texUV).rgb * bottomFade;
+          }
+
+          // Radiant cursor halo (fades out as atmosphere darkens into narrative)
+          vec3 halo = mouseHalo(uv, uMouse) * max(0.0, 1.0 - uDarken * 1.5);
+          color += halo;
+
+          // Concentrated atmosphere darkening for Energy Narrative
+          if (uDarken > 0.001) {
+            // Pure obsidian dark base (#030204) matching Ignite reference
+            vec3 nearBlack = vec3(0.012, 0.008, 0.016);
+            float aspect = uResolution.x / uResolution.y;
+            vec2 screenCenter = vec2(0.5 * aspect, 0.5);
+            vec2 currentCoord = vec2(uv.x * aspect, uv.y);
+            float distToCenter = length(currentCoord - screenCenter);
+            // Restrained ruby radiance centered directly behind the Möbius sculpture
+            float coreSpotlight = smoothstep(0.42, 0.0, distToCenter);
+            vec3 centralRadiance = vec3(0.42, 0.05, 0.03) * pow(coreSpotlight, 1.8);
+            vec3 cinematicField = nearBlack + centralRadiance;
+            color = mix(color, cinematicField, uDarken);
+          }
+
+          color = clamp(color, 0.0, 1.0);
+
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `;
+
+      const material = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        uniforms: {
+          uTime: { value: 0 },
+          uResolution: { value: new THREE.Vector2(size.width, size.height) },
+          uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+          uTexture: { value: null },
+          uTextureResolution: { value: new THREE.Vector2(1920, 2532) },
+          uWaterScale: { value: 2 },
+          uWaterSpeed: { value: 0.15 },
+          uDistortionStrength: { value: isMobile ? 0.018 : 0.025 },
+          uMouseRadius: { value: 0.3 },
+          uMouseStrength: { value: isMobile ? 0 : 0.035 },
+          uGrainIntensity: { value: 0.0 },
+          uGrainSpeed: { value: 0.0 },
+          uScrollY: { value: 0 },
+          uHaloIntensity: { value: isMobile ? 0 : 0.75 },
+          uHaloSize: { value: 0.5 },
+          uHaloColor: { value: new THREE.Color(0.91, 0.063, 0.0) },
+          uDarken: { value: 0 },
+        },
+      });
+
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+      scene.add(mesh);
+
+      let hasTexture = false;
+      const textureLoader = new THREE.TextureLoader();
+      textureLoader.load(
+        '/images/bg.webp',
+        (tex) => {
+          if (isDisposed) {
+            tex.dispose();
+            return;
+          }
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          material.uniforms.uTexture.value = tex;
+          if (tex.image) {
+            material.uniforms.uTextureResolution.value.set(tex.image.width, tex.image.height);
+          }
+          hasTexture = true;
+          if (!isContextLost && isVisible) {
+            renderer.render(scene, camera);
+          }
+          renderer.domElement.style.opacity = '1';
+        },
+        undefined,
+        () => {
+          // Ensure static CSS art remains visible if desktop texture fails to load or decode.
+          container.dataset.webglFailed = 'true';
+          container.dataset.mobileBackground = 'true';
+          renderer.domElement.style.opacity = '0';
+        },
+      );
+
+      const mousePos = { x: 0.5, y: 0.5 };
+      const targetPos = { x: 0.5, y: 0.5 };
+      let scrollY = 0;
+      let targetScrollY = 0;
+      let currentDarken = 0;
+      let targetDarken = 0;
+      let isVisible = document.visibilityState === 'visible';
+      let isContextLost = false;
+      const coveredSurfaces = new Set<string>();
+
+      const onBgDarken = (e: Event) => {
+        const customEvent = e as CustomEvent<number>;
+        if (typeof customEvent.detail === 'number') {
+          targetDarken = Math.max(0, Math.min(1, customEvent.detail));
+        }
+      };
+      window.addEventListener('ostrum:bg-darken', onBgDarken);
+
+      const onMouseMove = (e: MouseEvent) => {
+        targetPos.x = e.clientX / window.innerWidth;
+        targetPos.y = 1 - e.clientY / window.innerHeight;
+      };
+
+      const onScroll = () => {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        targetScrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+
+        const scrollYPos = window.scrollY;
+        const st02 = (window as any).ScrollTrigger?.getById('section02-hold');
+        const stEnergy = (window as any).ScrollTrigger?.getById('energy-narrative-pin');
+
+        if (st02 && stEnergy) {
+          const dockEnd = st02.end;
+          const energyStart = stEnergy.start;
+          const handoffSpan = Math.max(1, energyStart - dockEnd);
+
+          if (scrollYPos <= dockEnd) {
             targetDarken = 0.0;
-          } else if (rect.top > 0) {
-            targetDarken = Math.max(0, Math.min(1, (transitionDistance - rect.top) / transitionDistance));
+          } else if (scrollYPos < energyStart) {
+            const t = Math.max(0, Math.min(1, (scrollYPos - dockEnd) / handoffSpan));
+            const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            targetDarken = ease;
           } else {
             targetDarken = 1.0;
           }
         } else {
-          targetDarken = 0.0;
+          const energyEl = document.getElementById('energy-narrative');
+          if (energyEl) {
+            const rect = energyEl.getBoundingClientRect();
+            const winH = window.innerHeight || 800;
+            const transitionDistance = Math.min(winH * 0.8, 600);
+
+            if (rect.top >= transitionDistance) {
+              targetDarken = 0.0;
+            } else if (rect.top > 0) {
+              targetDarken = Math.max(0, Math.min(1, (transitionDistance - rect.top) / transitionDistance));
+            } else {
+              targetDarken = 1.0;
+            }
+          } else {
+            targetDarken = 0.0;
+          }
         }
-      }
-    };
+      };
 
-    const onContextLost = (e: Event) => {
-      e.preventDefault();
-      isContextLost = true;
-      cancelAnimationFrame(animationFrameId);
-      animationFrameId = 0;
-      renderer.domElement.style.opacity = '0';
-      container.dataset.webglFailed = 'true';
-      container.dataset.mobileBackground = 'true';
-    };
-
-    const onContextRestored = () => {
-      isContextLost = false;
-      delete container.dataset.webglFailed;
-      container.dataset.mobileBackground = 'false';
-      renderer.domElement.style.opacity = hasTexture ? '1' : '0';
-      updateVisibility();
-      scheduleFrame();
-    };
-
-    renderer.domElement.addEventListener('webglcontextlost', onContextLost, false);
-    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored, false);
-
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-
-    const startTime = performance.now();
-
-    const animate = () => {
-      animationFrameId = 0;
-      if (!isVisible || isContextLost) return;
-
-      const elapsed = ((performance.now() - startTime) * 0.001) % 3600.0;
-      mousePos.x += (targetPos.x - mousePos.x) * 0.08;
-      mousePos.y += (targetPos.y - mousePos.y) * 0.08;
-      scrollY += (targetScrollY - scrollY) * 0.10;
-
-      const uniforms = material.uniforms;
-      uniforms.uTime.value = elapsed;
-      uniforms.uMouse.value.set(mousePos.x, mousePos.y);
-      // Continuous scroll progression mapping through 2532px vertical artwork
-      uniforms.uScrollY.value = scrollY * 0.84;
-      currentDarken += (targetDarken - currentDarken) * 0.28;
-      uniforms.uDarken.value = currentDarken;
-
-      renderer.render(scene, camera);
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    const scheduleFrame = () => {
-      if (isVisible && !isContextLost && animationFrameId === 0) {
-        animationFrameId = requestAnimationFrame(animate);
-      }
-    };
-
-    const updateVisibility = () => {
-      const nextIsVisible =
-        document.visibilityState === 'visible' && coveredSurfaces.size === 0;
-      if (nextIsVisible === isVisible && !isContextLost) return;
-
-      isVisible = nextIsVisible;
-      if (isVisible && !isContextLost) {
-        scheduleFrame();
-      } else {
+      const onContextLost = (e: Event) => {
+        e.preventDefault();
+        isContextLost = true;
         cancelAnimationFrame(animationFrameId);
         animationFrameId = 0;
-      }
-    };
+        renderer.domElement.style.opacity = '0';
+        container.dataset.webglFailed = 'true';
+        container.dataset.mobileBackground = 'true';
+      };
 
-    const onVisualCoverage = (event: Event) => {
-      const { id, covered } = (event as CustomEvent).detail ?? {};
-      if (typeof id !== 'string') return;
-      if (covered) coveredSurfaces.add(id);
-      else coveredSurfaces.delete(id);
+      const onContextRestored = () => {
+        isContextLost = false;
+        delete container.dataset.webglFailed;
+        container.dataset.mobileBackground = 'false';
+        renderer.domElement.style.opacity = hasTexture ? '1' : '0';
+        updateVisibility();
+        scheduleFrame();
+      };
+
+      renderer.domElement.addEventListener('webglcontextlost', onContextLost, false);
+      renderer.domElement.addEventListener('webglcontextrestored', onContextRestored, false);
+
+      window.addEventListener('mousemove', onMouseMove, { passive: true });
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      const startTime = performance.now();
+
+      const animate = () => {
+        animationFrameId = 0;
+        if (!isVisible || isContextLost) return;
+
+        const elapsed = ((performance.now() - startTime) * 0.001) % 3600.0;
+        mousePos.x += (targetPos.x - mousePos.x) * 0.08;
+        mousePos.y += (targetPos.y - mousePos.y) * 0.08;
+        scrollY += (targetScrollY - scrollY) * 0.10;
+
+        const uniforms = material.uniforms;
+        uniforms.uTime.value = elapsed;
+        uniforms.uMouse.value.set(mousePos.x, mousePos.y);
+        uniforms.uScrollY.value = scrollY * 0.84;
+        currentDarken += (targetDarken - currentDarken) * 0.28;
+        uniforms.uDarken.value = currentDarken;
+
+        renderer.render(scene, camera);
+        animationFrameId = requestAnimationFrame(animate);
+      };
+
+      const scheduleFrame = () => {
+        if (isVisible && !isContextLost && animationFrameId === 0) {
+          animationFrameId = requestAnimationFrame(animate);
+        }
+      };
+
+      const updateVisibility = () => {
+        const nextIsVisible =
+          document.visibilityState === 'visible' && coveredSurfaces.size === 0;
+        if (nextIsVisible === isVisible && !isContextLost) return;
+
+        isVisible = nextIsVisible;
+        if (isVisible && !isContextLost) {
+          scheduleFrame();
+        } else {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = 0;
+        }
+      };
+
+      const onVisualCoverage = (event: Event) => {
+        const { id, covered } = (event as CustomEvent).detail ?? {};
+        if (typeof id !== 'string') return;
+        if (covered) coveredSurfaces.add(id);
+        else coveredSurfaces.delete(id);
+        updateVisibility();
+      };
+
+      const onVisibilityChange = () => updateVisibility();
+      window.addEventListener('ostrum:visual-coverage', onVisualCoverage);
+      document.addEventListener('visibilitychange', onVisibilityChange);
       updateVisibility();
-    };
-
-    const onVisibilityChange = () => updateVisibility();
-    window.addEventListener('ostrum:visual-coverage', onVisualCoverage);
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    updateVisibility();
-    scheduleFrame();
-
-    const onResize = () => {
-      size.width = container.clientWidth || window.innerWidth;
-      size.height = container.clientHeight || window.innerHeight;
-      renderer.setSize(size.width, size.height);
-      material.uniforms.uResolution.value.set(size.width, size.height);
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      targetScrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
       scheduleFrame();
+
+      const onResize = () => {
+        size.width = container.clientWidth || window.innerWidth;
+        size.height = container.clientHeight || window.innerHeight;
+        renderer.setSize(size.width, size.height);
+        material.uniforms.uResolution.value.set(size.width, size.height);
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        targetScrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+        scheduleFrame();
+      };
+
+      window.addEventListener('resize', onResize);
+
+      cleanupWebGL = () => {
+        cancelAnimationFrame(animationFrameId);
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onResize);
+        window.removeEventListener('ostrum:bg-darken', onBgDarken);
+        window.removeEventListener('ostrum:visual-coverage', onVisualCoverage);
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+        renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
+        renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
+
+        if (renderer.domElement.parentNode) {
+          renderer.domElement.parentNode.removeChild(renderer.domElement);
+        }
+        material.uniforms.uTexture.value?.dispose();
+        material.dispose();
+        mesh.geometry.dispose();
+        renderer.dispose();
+      };
     };
 
-    window.addEventListener('resize', onResize);
+    // Defer desktop WebGL shader setup past first paint so hero/UI hydration completes unblocked
+    initRaf = requestAnimationFrame(() => {
+      initTimer = setTimeout(() => {
+        startDesktopWebGL();
+      }, 0);
+    });
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onResize);
-      window.removeEventListener('ostrum:bg-darken', onBgDarken);
-      window.removeEventListener('ostrum:visual-coverage', onVisualCoverage);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
-      renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored);
-
-      if (renderer.domElement.parentNode) {
-        renderer.domElement.parentNode.removeChild(renderer.domElement);
-      }
-      material.uniforms.uTexture.value?.dispose();
-      material.dispose();
-      mesh.geometry.dispose();
-      renderer.dispose();
+      isDisposed = true;
+      cancelAnimationFrame(initRaf);
+      if (initTimer !== null) clearTimeout(initTimer);
+      cleanupWebGL?.();
     };
   }, [isLegalPage, useStaticFallback]);
 

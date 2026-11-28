@@ -59,6 +59,10 @@ export function PreloaderProvider({ children }: { children: React.ReactNode }) {
   const isCompletedRef = useRef(false);
   const isModelReadyRef = useRef(false);
   const isHeroTargetReadyRef = useRef(false);
+  const lastPhaseRef = useRef<PreloaderPhase>('preparing');
+  const lastPercentRef = useRef(0);
+  const lastHeroDockRef = useRef(false);
+  const lastHeaderDockRef = useRef(false);
 
   // Complete helper: unlocks scroll and stores session flag
   const completeIntro = useCallback(() => {
@@ -170,13 +174,22 @@ export function PreloaderProvider({ children }: { children: React.ReactNode }) {
           currentPhase = 'counting';
         }
 
-        setPhase(currentPhase);
-        setIntroProgress(proxy.progress);
-        setProgressPercent(Math.round(proxy.percent));
-        setTransformProgress(proxy.transform);
-        setDockProgress(proxy.dock);
-        setOverlayOpacity(proxy.overlayOpacity);
-        setCounterOpacity(proxy.counterOpacity);
+        const roundedPercent = Math.round(proxy.percent);
+        if (currentPhase !== lastPhaseRef.current) {
+          lastPhaseRef.current = currentPhase;
+          setPhase(currentPhase);
+        }
+        if (roundedPercent !== lastPercentRef.current) {
+          lastPercentRef.current = roundedPercent;
+          setProgressPercent(roundedPercent);
+        }
+        if (proxy.dock >= 0.45 && !lastHeroDockRef.current) {
+          lastHeroDockRef.current = true;
+          setDockProgress(proxy.dock);
+        } else if (proxy.dock >= 0.5 && !lastHeaderDockRef.current) {
+          lastHeaderDockRef.current = true;
+          setDockProgress(proxy.dock);
+        }
 
         if (typeof window !== 'undefined') {
           (window as any).__ostrumPhase = currentPhase;

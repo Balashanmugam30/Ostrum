@@ -1296,8 +1296,8 @@ export default function SculptureHero(props: SculptureHeroProps) {
     () => (imageBackground ? hexToRgb(imageBackground, [0.0667, 0.0667, 0.0667]) : null),
     [imageBackground]
   )
-  const [isMobile, setIsMobile] = React.useState(false)
-  const mobileRef = React.useRef(false)
+  const [isMobile, setIsMobile] = React.useState(() => (typeof window !== "undefined" ? window.innerWidth < 640 : false))
+  const mobileRef = React.useRef(isMobile)
 
   // Pick the image for the current theme and layout
   const activeSrc =

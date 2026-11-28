@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { scheduleScrollTriggerRefresh } from '@/lib/scroll-refresh';
 import {
   WorksWheel,
   OSTRUM_WORKS,
@@ -326,8 +327,7 @@ export function OstrumWorksWheelSection() {
         window.removeEventListener('scroll', onScrollReset);
         prevCleanup?.();
       };
-      ScrollTrigger.sort();
-      ScrollTrigger.refresh();
+      scheduleScrollTriggerRefresh();
     };
 
     if (ScrollTrigger.getById('energy-narrative-pin')) {

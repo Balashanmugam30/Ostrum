@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { OstrumLiquidSandCTA } from '@/components/sections/OstrumLiquidSandCTA';
 import { OstrumStudioFooter } from '@/components/sections/OstrumStudioFooter';
 import { isHandheldTouchDevice, subscribeDeviceTierChange } from '@/lib/device-tier';
+import { scheduleScrollTriggerRefresh } from '@/lib/scroll-refresh';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -96,12 +97,9 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
         },
       });
 
-      const refreshTimeout = setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 150);
+      scheduleScrollTriggerRefresh(120);
 
       return () => {
-        clearTimeout(refreshTimeout);
         trigger.kill();
         tl.kill();
         gsap.set([curtain, stage], { clearProps: 'all' });
@@ -165,9 +163,8 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
             },
           });
 
-          const refreshTimeout = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+          scheduleScrollTriggerRefresh(120);
           return () => {
-            window.clearTimeout(refreshTimeout);
             trigger.kill();
             delete container.dataset.mobileCurtainActive;
             container.style.overflowX = '';
@@ -245,9 +242,8 @@ export function OstrumFooterReveal({ showCTA = true }: OstrumFooterRevealProps =
           },
         });
 
-        const refreshTimeout = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+        scheduleScrollTriggerRefresh(120);
         return () => {
-          window.clearTimeout(refreshTimeout);
           trigger.kill();
           tl.kill();
           delete container.dataset.mobileCurtainActive;

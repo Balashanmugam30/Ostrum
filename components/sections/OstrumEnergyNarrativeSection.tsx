@@ -4,6 +4,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState, useMemo } from 're
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLanguage } from '@/context/LanguageContext';
+import { scheduleScrollTriggerRefresh } from '@/lib/scroll-refresh';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -185,7 +186,7 @@ export function OstrumEnergyNarrativeSection() {
 
     if (typeof document !== 'undefined' && document.fonts) {
       document.fonts.ready.then(() => {
-        runMeasurement();
+        requestAnimationFrame(runMeasurement);
       });
     } else {
       runMeasurement();
@@ -195,7 +196,7 @@ export function OstrumEnergyNarrativeSection() {
     const handleResize = () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        runMeasurement();
+        requestAnimationFrame(runMeasurement);
       }, 150);
     };
 
@@ -385,7 +386,7 @@ export function OstrumEnergyNarrativeSection() {
           tl.to(card, { opacity: 0, y: -20, duration: timing.exitEnd - timing.holdEnd, ease: 'power2.in' }, timing.holdEnd);
         }
       });
-      ScrollTrigger.refresh();
+      scheduleScrollTriggerRefresh();
       window.dispatchEvent(new CustomEvent('ostrum:narrative-ready'));
     }, section);
 

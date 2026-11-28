@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { IntroHero } from '@/components/sections/IntroHero';
 import { OstrumEngineSection } from '@/components/sections/OstrumEngineSection';
 import { OstrumEnergyNarrativeSection } from '@/components/sections/OstrumEnergyNarrativeSection';
@@ -35,19 +35,29 @@ export default function HomePage() {
       <IntroHero />
 
       {/* SECTION 02: The Ostrum Engine (One Core · Two Engines · Studio & Foundry) */}
-      <OstrumEngineSection />
+      <Suspense fallback={<section id="engine" className="w-full min-h-screen" />}>
+        <OstrumEngineSection />
+      </Suspense>
 
       {/* SECTION 03: The Energy Continuum (Cinematic 3D Scroll Narrative) */}
-      <OstrumEnergyNarrativeSection />
+      <Suspense fallback={<section id="energy-narrative" className="w-full min-h-screen" />}>
+        <OstrumEnergyNarrativeSection />
+      </Suspense>
 
       {/* SECTION 04: Works Wheel Showcase (Selected Work) */}
-      <OstrumWorksWheelSection />
+      <Suspense fallback={<section id="selected-work" className="w-full min-h-screen" />}>
+        <OstrumWorksWheelSection />
+      </Suspense>
 
       {/* SECTION 05: Our Capabilities */}
-      <OstrumCapabilitiesSection />
+      <Suspense fallback={<section id="capabilities" className="w-full min-h-screen" />}>
+        <OstrumCapabilitiesSection />
+      </Suspense>
 
       {/* SECTION 06: Testimonials (Ignite-inspired Stacked Editorial Cards) */}
-      <OstrumTestimonialsSection />
+      <Suspense fallback={<section id="testimonials" className="w-full min-h-screen" />}>
+        <OstrumTestimonialsSection />
+      </Suspense>
 
       {/* SECTIONS 07 & 08: Unified FAQ & Contact Red Color Field */}
       <div
@@ -71,15 +81,20 @@ export default function HomePage() {
         }}
       >
         {/* SECTION 07: Frequently Asked Questions (FAQ) */}
-        <OstrumFaqSection />
+        <Suspense fallback={<section id="faq" className="w-full min-h-[600px]" />}>
+          <OstrumFaqSection />
+        </Suspense>
 
         {/* SECTION 08: Contact / Project Enquiry Form */}
-        <OstrumContactSection />
+        <Suspense fallback={<section id="contact" className="w-full min-h-[700px]" />}>
+          <OstrumContactSection />
+        </Suspense>
       </div>
 
       {/* SECTIONS 09 & 10: Final Closing CTA with Reveal Transition into Studio Footer */}
-      <OstrumFooterReveal />
+      <Suspense fallback={<div id="theatre-stage-wrapper" className="w-full min-h-[100svh] bg-[#050505]" />}>
+        <OstrumFooterReveal />
+      </Suspense>
     </div>
   );
 }
-

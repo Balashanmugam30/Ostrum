@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { isHandheldTouchDevice, subscribeDeviceTierChange } from '@/lib/device-tier';
+import { scheduleScrollTriggerRefresh } from '@/lib/scroll-refresh';
 
 const Card3DAccent = dynamic(
   () => import('@/components/ui/Card3DAccent').then((module) => module.Card3DAccent),
@@ -99,9 +100,11 @@ export const CAPABILITIES_DATA: CapabilityCardData[] = [
 function CapabilityArtwork({
   card,
   showLiveArtwork,
+  nearViewport,
 }: {
   card: CapabilityCardData;
   showLiveArtwork: boolean;
+  nearViewport: boolean;
 }) {
   return (
     <div className="capability-art-frame relative w-full h-[125px] sm:h-[145px] md:h-[180px] shrink-0 my-1 flex items-center justify-center overflow-hidden">
@@ -111,7 +114,7 @@ function CapabilityArtwork({
           data-testid={`capability-artwork-${card.variant}`}
           className="capability-artwork size-full"
         />
-      ) : (
+      ) : nearViewport ? (
         <Image
           src={card.artwork}
           alt=""
@@ -120,13 +123,14 @@ function CapabilityArtwork({
           sizes="(min-width: 768px) 365px, 80vw"
           className="object-contain"
         />
-      )}
+      ) : null}
     </div>
   );
 }
 
 export function OstrumCapabilitiesSection() {
   const [showLiveArtwork, setShowLiveArtwork] = useState(false);
+  const [mountCard3D, setMountCard3D] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -142,6 +146,27 @@ export function OstrumCapabilitiesSection() {
     syncArtwork();
     return subscribeDeviceTierChange(syncArtwork);
   }, []);
+
+  useEffect(() => {
+    if (mountCard3D) return;
+    const section = sectionRef.current;
+    if (!section || typeof IntersectionObserver === 'undefined') {
+      setMountCard3D(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setMountCard3D(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '1600px 0px' },
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [mountCard3D]);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -550,12 +575,11 @@ export function OstrumCapabilitiesSection() {
       });
     });
 
-    ScrollTrigger.sort();
-    ScrollTrigger.refresh();
+    scheduleScrollTriggerRefresh();
 
     const handleResize = () => {
       setSectionScrollHeight();
-      ScrollTrigger.refresh();
+      scheduleScrollTriggerRefresh();
     };
 
     window.addEventListener('resize', handleResize);
@@ -659,7 +683,7 @@ export function OstrumCapabilitiesSection() {
                 </div>
 
                 {/* 3D Dimensional Accent Viewport (Consistent Upper-Middle Frame) */}
-                <CapabilityArtwork card={card} showLiveArtwork={showLiveArtwork} />
+                <CapabilityArtwork card={card} showLiveArtwork={showLiveArtwork && mountCard3D} nearViewport={mountCard3D} />
 
                 {/* Card Content: Title, Description, Tags (Consistent Anchor) */}
                 <div className="flex-1 flex flex-col justify-between min-h-0 pt-1">
@@ -675,7 +699,7 @@ export function OstrumCapabilitiesSection() {
                     {card.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="inline-block px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-medium text-black/80 bg-white/60 backdrop-blur-sm border border-black/[0.06]"
+                        className="inline-block px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-medium text-black/80 bg-white/75 md:bg-white/60 md:backdrop-blur-sm border border-black/[0.06]"
                       >
                         {tag}
                       </span>

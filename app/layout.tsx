@@ -3,7 +3,7 @@ import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { PreloaderProvider } from '@/context/PreloaderContext';
 import { OstrumPreloader } from '@/components/ui/OstrumPreloader';
-import { OstrumContinuousJourney } from '@/components/visuals/OstrumContinuousJourney';
+import { JourneyLoader } from '@/components/providers/JourneyLoader';
 import { Header } from '@/components/navigation/Header';
 import { BackgroundCaustics } from '@/components/canvas/BackgroundCaustics';
 import { SmoothScroll } from '@/components/providers/SmoothScroll';
@@ -154,7 +154,7 @@ export default function RootLayout({
               <OstrumPreloader />
 
               {/* Master Continuous 3D Möbius Journey (z-[35] during preloader, z-[12] after complete) */}
-              <OstrumContinuousJourney />
+              <JourneyLoader />
 
               {/* Minimalist Floating Global Header */}
               <Header />

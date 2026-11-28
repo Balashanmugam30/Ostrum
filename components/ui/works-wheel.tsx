@@ -206,13 +206,14 @@ function InteractiveCardArtwork({
   alt,
   href,
   isCapabilities,
-  isFront,
+  nearViewport,
 }: {
   src: string;
   alt: string;
   href?: string;
   isCapabilities?: boolean;
   isFront?: boolean;
+  nearViewport: boolean;
 }) {
   if (isCapabilities) {
     return (
@@ -229,15 +230,16 @@ function InteractiveCardArtwork({
     <span
       className="relative block size-full overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(0,0,0,0.35)] border border-white/10 bg-black/20"
     >
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        draggable={false}
-        className="size-full object-cover"
-        sizes="(max-width: 768px) 100vw, 480px"
-        priority={isFront}
-      />
+      {nearViewport ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          draggable={false}
+          className="size-full object-cover"
+          sizes="(max-width: 768px) 100vw, 480px"
+        />
+      ) : null}
       {/* Subtle live destination indicator on front card */}
       {href?.startsWith("http") && (
         <span
@@ -293,6 +295,27 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
     const activeRef = React.useRef(-1);
     const [active, setActive] = React.useState(0);
     const [stage, setStage] = React.useState<Stage>({ w: 0, h: 0 });
+    const [nearViewport, setNearViewport] = React.useState(false);
+
+    React.useEffect(() => {
+      if (nearViewport) return;
+      const el = stageRef.current;
+      if (!el || typeof IntersectionObserver === "undefined") {
+        setNearViewport(true);
+        return;
+      }
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            setNearViewport(true);
+            io.disconnect();
+          }
+        },
+        { rootMargin: "1600px 0px" },
+      );
+      io.observe(el);
+      return () => io.disconnect();
+    }, [nearViewport]);
 
     const activeTheme = theme ?? (PROJECT_THEMES[active] ?? RESTING_WHEEL_THEME);
 
@@ -827,6 +850,7 @@ export const WorksWheel = React.forwardRef<WorksWheelHandle, WorksWheelProps>(
                     href={item.href}
                     isCapabilities={item.isCapabilities}
                     isFront={isCurrent}
+                    nearViewport={nearViewport}
                   />
                 </div>
               );

@@ -74,10 +74,13 @@ export function LivingThread({
       observer.observe(containerRef.current);
     }
 
+    let lastFrameTime = 0;
     // Cubic Bézier spline generator coordinated with travel
     const render = (time: number) => {
       animId = requestAnimationFrame(render);
       if (!isVisible) return;
+      if (isTouch && time - lastFrameTime < 40) return;
+      lastFrameTime = time;
 
       const elapsed = (time - startTime) * 0.001;
       mouse.y += (mouse.targetY - mouse.y) * 0.04;

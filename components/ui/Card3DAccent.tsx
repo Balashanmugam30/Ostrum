@@ -79,7 +79,7 @@ function tickSharedCards(time: number) {
     entry.render(time, dt, renderer);
   });
 
-  if (anyVisible || sharedEntries.size > 0) {
+  if (anyVisible) {
     sharedRafId = requestAnimationFrame(tickSharedCards);
   }
 }
@@ -128,7 +128,7 @@ export function Card3DAccent({
     }
 
     let isDisposed = false;
-    let isVisible = true;
+    let isVisible = false;
     let targetW = 320;
     let targetH = 180;
 
@@ -367,10 +367,16 @@ export function Card3DAccent({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const entry = entries[0];
-        isVisible = entry?.isIntersecting ?? false;
+        const nextEntry = entries[0];
+        const nextVisible = nextEntry?.isIntersecting ?? false;
+        if (nextVisible === isVisible) return;
+        isVisible = nextVisible;
+        if (isVisible && !isDisposed && !sharedRendererLost) {
+          entry.render(performance.now(), 0.016, renderer);
+          scheduleSharedLoop();
+        }
       },
-      { threshold: 0.05 },
+      { threshold: 0.01, rootMargin: '300px 0px' },
     );
     observer.observe(container);
 
@@ -406,8 +412,6 @@ export function Card3DAccent({
     };
 
     sharedEntries.add(entry);
-    entry.render(performance.now(), 0.016, renderer);
-    scheduleSharedLoop();
 
     return () => {
       isDisposed = true;

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { scheduleScrollTriggerRefresh } from '@/lib/scroll-refresh';
 import { Testimonial } from '@/types/testimonials';
 import { TESTIMONIALS_DATA } from '@/data/testimonials';
 import { MnesaLogo } from '@/components/ui/MnesaLogo';
@@ -206,8 +207,7 @@ export function OstrumTestimonialsSection({
       tl.to({}, { duration: 0.12 }, 0.88);
     }, section);
 
-    ScrollTrigger.sort();
-    ScrollTrigger.refresh();
+    scheduleScrollTriggerRefresh();
 
     const handleResize = () => {
       const widthChanged = window.innerWidth !== lastWidth;
@@ -219,7 +219,7 @@ export function OstrumTestimonialsSection({
       lastWidth = window.innerWidth;
       scrollDistance = getScrollDistance();
       setSectionHeight();
-      ScrollTrigger.refresh();
+      scheduleScrollTriggerRefresh();
     };
 
     window.addEventListener('resize', handleResize);
@@ -396,7 +396,6 @@ export function OstrumTestimonialsSection({
                     alt={testimonial.logoAlt || testimonial.clientName}
                     width={200}
                     height={48}
-                    priority={index === 0}
                     className="max-h-9 sm:max-h-10 w-auto object-contain"
                   />
                 ) : (
