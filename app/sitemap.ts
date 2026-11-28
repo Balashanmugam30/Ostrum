@@ -3,7 +3,7 @@ import { SITE_CONFIG } from '@/lib/site-config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Keep the sitemap modification date aligned with this release's page updates.
-  const lastModified = new Date('2026-11-23');
+  const lastModified = new Date('2026-11-28');
   return [
     {
       url: `${SITE_CONFIG.baseUrl}/`,

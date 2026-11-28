@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 const SECTIONS: LegalSectionItem[] = [
   { id: 'acceptance', num: '01', title: 'Acceptance of Terms' },
-  { id: 'identity', num: '02', title: 'Studio Identity & Planned Brand Domain' },
+  { id: 'identity', num: '02', title: 'Studio Identity & Official Website' },
   { id: 'showcase', num: '03', title: 'Nature of Website & Non-Binding Showcase' },
   { id: 'enquiries', num: '04', title: 'Project Enquiries & Commercial Engagements' },
   { id: 'acceptable-use', num: '05', title: 'Acceptable Use & System Integrity' },
@@ -139,7 +139,7 @@ export default function TermsAndConditionsPage() {
           No license, title, or interest in any studio intellectual property is granted to you by implication or otherwise. You may not reproduce, republish, redistribute, mirror, frame, decompile, or create derivative works from website materials without express advance written consent from an authorized principal of Ostrum.
         </p>
         <p className="mt-3 text-xs sm:text-sm text-[#404040]">
-          Certain interactive components and visual models incorporate open-source and Creative Commons works under their respective licenses: the 3D M&ouml;bius art ribbon is adapted from &ldquo;Mony&eacute;dre 360 moebius art ribbon&rdquo; by Print3dburton under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="text-[#64120F] hover:underline font-medium">CC BY 4.0</a> (with custom real-time shaders, materials, and scroll-linked rotational choreography); UI liquid-glass and particle shader systems incorporate components by Sera UI, Guglielmo Giannattasio, and Kedhareswer under MIT licenses. Complete notices are maintained in the repository third-party register.
+          Certain interactive components and visual models incorporate open-source and Creative Commons works under their respective licenses: the 3D M&ouml;bius art ribbon is adapted from &ldquo;Mony&eacute;dre 360 moebius art ribbon&rdquo; by Print3dburton under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="text-[#64120F] hover:underline font-medium">CC BY 4.0</a> (with custom real-time shaders, materials, and scroll-linked rotational choreography); UI liquid-glass and particle shader systems incorporate components by Sera UI, Guglielmo Giannattasio, and Kedhareswer under MIT licenses. Complete notices are maintained in the repository third-party register.
         </p>
       </section>
 

@@ -182,7 +182,7 @@ export function Header() {
         <button
           onClick={scrollToTop}
           className={`pointer-events-auto transition-all duration-500 cursor-pointer ${textColorClass} opacity-100 translate-y-0`}
-          aria-label="Back to top"
+          aria-label="OSTRUM, back to top"
         >
           <div className="w-[90px] sm:w-[100px] h-auto">
             <OstrumLogo className={textColorClass} />

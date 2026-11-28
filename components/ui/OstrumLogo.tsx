@@ -120,6 +120,7 @@ export function OstrumLogo({
             key={item.char}
             id={letterId}
             data-letter={item.char}
+            aria-hidden="true"
             ref={(el) => {
               groupRefs.current[i] = el;
             }}

@@ -137,16 +137,16 @@ export function AnalyticsConsent() {
   if (!showBanner) return null;
 
   return (
-    <aside
-      aria-label="Analytics cookie preferences"
+    <div
       className="fixed inset-x-3 bottom-3 z-[100] mx-auto max-w-2xl rounded-lg border border-[#C9362B]/45 bg-[#120D0D]/95 p-4 font-sans text-[#F7F1EB] shadow-[0_12px_42px_rgba(0,0,0,0.38)] backdrop-blur-sm sm:inset-x-6 sm:bottom-6 sm:p-5"
       role="dialog"
       aria-modal="false"
+      aria-labelledby="analytics-consent-title"
       aria-describedby="analytics-consent-description"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="max-w-xl">
-          <h2 className="text-sm font-semibold tracking-wide">Your privacy choices</h2>
+          <p id="analytics-consent-title" className="text-sm font-semibold tracking-wide">Your privacy choices</p>
           <p id="analytics-consent-description" className="mt-1 text-xs leading-5 text-[#D6CBC5] sm:text-sm">
             With your permission, Ostrum Tech uses Google Analytics to understand visits and improve the website. Analytics is off unless you accept. Read our{' '}
             <a className="underline underline-offset-2" href="/privacy-policy#cookies">Privacy Policy</a>.
@@ -169,7 +169,7 @@ export function AnalyticsConsent() {
           </button>
         </div>
       </div>
-    </aside>
+    </div>
   );
 }
 

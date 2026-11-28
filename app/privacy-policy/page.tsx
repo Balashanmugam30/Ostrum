@@ -42,7 +42,7 @@ const SECTIONS: LegalSectionItem[] = [
 ];
 
 export default function PrivacyPolicyPage() {
-  const lastUpdated = '22 November 2026';
+  const lastUpdated = '28 November 2026';
 
   return (
     <LegalDocumentLayout
@@ -76,7 +76,7 @@ export default function PrivacyPolicyPage() {
           The data controller responsible for personal information processed through this website is OSTRUM. Studio operations and inquiries are centrally administered through our designated contact mailbox at <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="text-[#64120F] hover:underline font-medium">{SITE_CONFIG.contactEmail}</a>.
         </p>
         <p className="mt-3">
-          Our planned primary domain is <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>. All electronic correspondence submitted through form handlers or direct email arrives directly in our studio triage queue.
+          Our official website domain is <code className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">{SITE_CONFIG.baseUrl}</code>. All electronic correspondence submitted through form handlers or direct email arrives directly in our studio triage queue.
         </p>
       </section>
 
@@ -178,6 +178,7 @@ export default function PrivacyPolicyPage() {
         <ul className="list-disc pl-5 mt-3 space-y-1.5 text-[#262626]">
           <li><strong>Edge Hosting &amp; Serverless Infrastructure:</strong> High-performance content delivery networks (CDNs) for static asset distribution and serverless API execution;</li>
           <li><strong>Email Delivery Infrastructure (Resend):</strong> Transactional email service provider utilized to route submitted project enquiries securely to studio notification mailboxes (<code className="px-1 py-0.5 rounded bg-[#F5F5F5] text-[#050505] font-mono text-xs">{SITE_CONFIG.contactEmail}</code>);</li>
+          <li><strong>Abuse Rate Limiting (Upstash Redis via Vercel):</strong> Stores only temporary, expiring cryptographic HMAC-hashed IP rate-limit counters (10-minute window) to protect the enquiry endpoint from automated spam; enquiry form contents are never persisted in Redis;</li>
           <li><strong>Security &amp; DDoS Shielding:</strong> Edge firewalls that monitor inbound request patterns to prevent distributed denial-of-service attacks.</li>
         </ul>
       </section>
